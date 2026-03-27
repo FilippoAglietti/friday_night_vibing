@@ -1,143 +1,221 @@
+// ─────────────────────────────────────────────────────────
+// Syllabi.ai — Shared Curriculum Types (Frontend ↔ Backend)
+// ─────────────────────────────────────────────────────────
+// This file is the CONTRACT between the frontend (page.tsx / components/)
+// and the backend (lib/ / app/api/). Do NOT change these interfaces
+// without coordinating with the other side.
+// ─────────────────────────────────────────────────────────
+
+// ── Enums & Literals ──────────────────────────────────────
+
+export type DifficultyLevel = "beginner" | "intermediate" | "advanced";
+
+/** Alias used by the API and prompt engine (same as DifficultyLevel) */
+export type AudienceLevel = DifficultyLevel;
+
+export type LessonFormat =
+  | "video"
+  | "reading"
+  | "interactive"
+  | "discussion"
+  | "project"
+  | "live-session";
+
+export type QuestionType =
+  | "multiple-choice"
+  | "true-false"
+  | "short-answer"
+  | "fill-in-the-blank";
+
+export type ResourceType =
+  | "article"
+  | "video"
+  | "podcast"
+  | "book"
+  | "tool"
+  | "template"
+  | "cheatsheet";
+
+export type PacingStyle =
+  | "self-paced"
+  | "cohort"
+  | "instructor-led"
+  | "blended";
+
 /**
- * types/curriculum.ts
- * ─────────────────────────────────────────────────────────────
- * Shared TypeScript interfaces for the Syllabi.ai curriculum
- * JSON structure produced by the Claude AI engine.
- *
- * This file is the contract between:
- *   - Filippo's backend  (lib/prompts, app/api/generate)
- *   - Gianmarco's frontend (components/CurriculumOutput.tsx)
- *
- * DO NOT change field names without coordinating with both sides.
- * ─────────────────────────────────────────────────────────────
+ * Desired course length sent from the generation form.
+ *   mini      → ~5 lessons (1-2 modules)
+ *   standard  → 10-15 lessons (3-5 modules)
+ *   bootcamp  → 20+ lessons (6-10 modules)
  */
-
-// ─── Input ────────────────────────────────────────────────────
-
-/** Audience level accepted by the generation form */
-export type AudienceLevel = "beginner" | "intermediate" | "advanced";
-
-/** Desired course length accepted by the generation form */
 export type CourseLength = "mini" | "standard" | "bootcamp";
 
-/** Raw request body sent from the frontend form to POST /api/generate */
+// ── Core Entities ─────────────────────────────────────────
+
+export interface QuizQuestion {
+  id: string;
+  type: QuestionType;
+  question: string;
+  /** Available options for multiple-choice / true-false */
+  options?: string[];
+  /** Index of the correct option, or the correct string for short-answer */
+  correctAnswer: number | string;
+  /** Why this answer is correct — shown after submission */
+  explanation?: string;
+  /** Points awarded for a correct answer (default: 1) */
+  points?: number;
+}
+
+export interface BonusResource {
+  id: string;
+  title: string;
+  type: ResourceType;
+  url: string;
+  /** Brief description of what the learner will get */
+  description?: string;
+  /** Estimated consumption time in minutes */
+  durationMinutes?: number;
+  /** Is this resource free or paid? */
+  isFree?: boolean;
+}
+
+export interface Lesson {
+  id: string;
+  title: string;
+  description: string;
+  format: LessonFormat;
+  /** Estimated duration in minutes */
+  durationMinutes: number;
+  /** Learning objectives for this specific lesson */
+  objectives?: string[];
+  /** Content body — markdown string rendered by the frontend */
+  content?: string;
+  /** Optional quiz attached to this lesson */
+  quiz?: QuizQuestion[];
+  /** Supplemental resources for deeper learning */
+  resources?: BonusResource[];
+  /** Order within the parent module (0-indexed) */
+  order: number;
+}
+
+export interface Module {
+  id: string;
+  title: string;
+  description: string;
+  /** Learning objectives for the entire module */
+  objectives: string[];
+  /** Ordered list of lessons inside this module */
+  lessons: Lesson[];
+  /** Optional module-level quiz (e.g. end-of-module assessment) */
+  quiz?: QuizQuestion[];
+  /** Order within the parent curriculum (0-indexed) */
+  order: number;
+  /** Estimated total duration in minutes (sum of lessons) */
+  durationMinutes: number;
+}
+
+export interface PacingSchedule {
+  /** How the course is delivered */
+  style: PacingStyle;
+  /** Total estimated hours to complete the full curriculum */
+  totalHours: number;
+  /** Recommended hours per week */
+  hoursPerWeek: number;
+  /** Suggested number of weeks to complete */
+  totalWeeks: number;
+  /** Optional per-week breakdown mapping week number → module/lesson IDs */
+  weeklyPlan?: WeekPlan[];
+}
+
+export interface WeekPlan {
+  week: number;
+  /** Human-readable label, e.g. "Foundations" */
+  label?: string;
+  /** Module IDs to cover this week */
+  moduleIds: string[];
+  /** Specific lesson IDs if more granular than full modules */
+  lessonIds?: string[];
+}
+
+// ── Top-Level Curriculum ──────────────────────────────────
+
+export interface Curriculum {
+  id: string;
+  title: string;
+  /** One-liner shown in cards & search results */
+  subtitle: string;
+  description: string;
+  /** Target audience description */
+  targetAudience: string;
+  difficulty: DifficultyLevel;
+  /** High-level learning objectives for the whole curriculum */
+  objectives: string[];
+  /** Prerequisite knowledge or courses */
+  prerequisites?: string[];
+  /** Tags for search & filtering */
+  tags?: string[];
+  /** Ordered list of modules */
+  modules: Module[];
+  /** Recommended pacing */
+  pacing: PacingSchedule;
+  /** Extra resources not tied to a specific lesson */
+  bonusResources?: BonusResource[];
+
+  // ── Metadata ──────────────────────────────────────────
+  createdBy: string;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+  /** Curriculum schema version for future migrations */
+  version: string;
+}
+
+// ── API Response Wrappers ─────────────────────────────────
+
+export interface CurriculumResponse {
+  success: boolean;
+  data?: Curriculum;
+  error?: string;
+}
+
+export interface CurriculumListResponse {
+  success: boolean;
+  data?: CurriculumSummary[];
+  error?: string;
+}
+
+/** Lightweight version for list views — no nested modules/lessons */
+export interface CurriculumSummary {
+  id: string;
+  title: string;
+  subtitle: string;
+  difficulty: DifficultyLevel;
+  tags?: string[];
+  totalModules: number;
+  totalLessons: number;
+  totalHours: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ── Generation API Types (POST /api/generate) ─────────────
+
+/** Request body from the CurriculumForm to POST /api/generate */
 export interface GenerateRequest {
-  /** The course subject (e.g. "Photography for Instagram") */
   topic: string;
-  /** Target student level */
   audience: AudienceLevel;
-  /** Desired course length:
-   *   mini      → ~5 lessons
-   *   standard  → 10-15 lessons
-   *   bootcamp  → 20+ lessons
-   */
   length: CourseLength;
-  /** Optional industry/niche context (e.g. "Health & Wellness") */
   niche?: string;
 }
 
-// ─── Output ───────────────────────────────────────────────────
-
-/** A single quiz question inside a module */
-export interface QuizQuestion {
-  /** The question text */
-  question: string;
-  /** Four answer options */
-  options: [string, string, string, string];
-  /** The correct option (must match one of options[]) */
-  correctAnswer: string;
-  /** Brief explanation of why this answer is correct */
-  explanation: string;
-}
-
-/** A single lesson inside a module */
-export interface Lesson {
-  /** 1-based lesson number (resets per module) */
-  lessonNumber: number;
-  /** Lesson title */
-  title: string;
-  /** Learning objective using Bloom's Taxonomy verb
-   *  e.g. "Students will be able to analyze..."
-   */
-  objective: string;
-  /** Suggested lesson duration, e.g. "20 minutes" */
-  duration: string;
-  /** 2-5 key topic strings covered in the lesson */
-  keyTopics: string[];
-}
-
-/** A course module containing several lessons and quiz questions */
-export interface Module {
-  /** 1-based module number */
-  moduleNumber: number;
-  /** Module title */
-  title: string;
-  /** One-paragraph description of what this module covers */
-  description: string;
-  /** Ordered list of lessons in this module */
-  lessons: Lesson[];
-  /** 2-3 quiz questions that test module understanding */
-  quizQuestions: QuizQuestion[];
-}
-
-/** Weekly pacing entry */
-export interface WeeklyPacing {
-  /** Week number, e.g. 1 */
-  week: number;
-  /** Module numbers covered this week, e.g. [1, 2] */
-  modules: number[];
-  /** Recommended hours of study per week */
-  hoursPerWeek: number;
-}
-
-/** Pacing schedule for the full course */
-export interface PacingSchedule {
-  /** Human-readable total duration, e.g. "6 weeks" */
-  totalDuration: string;
-  /** Week-by-week breakdown */
-  weeklyBreakdown: WeeklyPacing[];
-}
-
-/** Bonus learning resource */
-export interface BonusResource {
-  /** Resource name */
-  title: string;
-  /** Resource type */
-  type: "book" | "video" | "tool" | "website" | "course" | "article";
-  /** Short description of why it helps */
-  description: string;
-}
-
-/**
- * The full curriculum object returned by the AI engine.
- * This is what gets stored in Supabase and rendered by the frontend.
- */
-export interface Curriculum {
-  /** Compelling, marketable course title */
-  title: string;
-  /** One-line course subtitle */
-  subtitle: string;
-  /** 2-3 sentence course description */
-  description: string;
-  /** 3-5 student learning outcomes (Bloom's Taxonomy phrasing) */
-  learningOutcomes: string[];
-  /** Ordered modules (length depends on CourseLength requested) */
-  modules: Module[];
-  /** Suggested pacing schedule */
-  pacingSchedule: PacingSchedule;
-  /** Optional bonus resources */
-  bonusResources: BonusResource[];
-}
-
-// ─── API Response ─────────────────────────────────────────────
-
-/** Successful response from POST /api/generate */
+/** Success response from POST /api/generate */
 export interface GenerateResponse {
-  curriculum: Curriculum;
+  success: true;
+  data: Curriculum;
 }
 
 /** Error response from POST /api/generate */
 export interface GenerateErrorResponse {
+  success: false;
   error: string;
   details?: string;
 }
