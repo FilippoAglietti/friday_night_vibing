@@ -1,0 +1,179 @@
+{
+  "title": "Yoga Teacher Certification Mastery: The Complete 200-Hour Training Blueprint",
+  "subtitle": "For experienced yogis ready to teach — a comprehensive advanced curriculum covering anatomy, sequencing, and the business of teaching",
+  "description": "This bootcamp-level certification curriculum prepares advanced yoga practitioners to become confident, knowledgeable, and safe yoga teachers. You'll master the anatomy of movement, the art of sequencing, trauma-informed teaching methodologies, and the business skills needed to build a thriving teaching career.",
+  "learningOutcomes": [
+    "By the end of this course, students will be able to design and teach a complete 60-minute yoga class with confident cueing, appropriate modifications, and safe alignment principles.",
+    "By the end of this course, students will be able to evaluate a student's posture and movement patterns to identify contraindications and offer appropriate modifications.",
+    "By the end of this course, students will be able to apply trauma-informed teaching principles to create an inclusive, psychologically safe class environment.",
+    "By the end of this course, students will be able to construct periodised yoga sequences using traditional Vinyasa, Yin, and Restorative frameworks.",
+    "By the end of this course, students will be able to develop a personal teaching brand, manage class scheduling, and grow a student base."
+  ],
+  "modules": [
+    {
+      "moduleNumber": 1,
+      "title": "Foundations of Teaching Yoga: Philosophy and Ethics",
+      "description": "Before you step onto the teaching mat, you must understand the philosophical and ethical framework that underpins all authentic yoga teaching. This module covers the eight limbs of yoga, teaching ethics, and the critical differences between practitioner knowledge and teacher knowledge.",
+      "lessons": [
+        {
+          "lessonNumber": 1,
+          "title": "Patanjali's Eight Limbs in a Teaching Context",
+          "objective": "Students will be able to explain each of the eight limbs of yoga and apply them to modern classroom ethics.",
+          "duration": "45 minutes",
+          "keyTopics": ["Yamas and Niyamas in teaching ethics", "Pratyahara in class design", "Dharana and Dhyana for students", "Samadhi as intention-setting framework"]
+        },
+        {
+          "lessonNumber": 2,
+          "title": "Teaching Ethics, Boundaries, and Scope of Practice",
+          "objective": "Students will be able to define appropriate teacher-student boundaries and identify situations that exceed a yoga teacher's scope of practice.",
+          "duration": "40 minutes",
+          "keyTopics": ["dual relationships", "scope of practice vs. medical advice", "consent in hands-on assists", "mandatory reporting basics"]
+        },
+        {
+          "lessonNumber": 3,
+          "title": "The Difference Between Practising and Teaching",
+          "objective": "Students will be able to distinguish between internal practice awareness and the external observational skills required for effective teaching.",
+          "duration": "35 minutes",
+          "keyTopics": ["proprioceptive vs. visual feedback", "beginner's mind philosophy", "common beginner student mistakes", "the 'watch, cue, adjust' teaching loop"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "A student tells you they have lower back pain and asks if yoga will cure them. What is the most appropriate response?",
+          "options": ["Confidently say yes — yoga always helps back pain", "Refer them to a physiotherapist and explain that yoga can complement, but not replace, medical care", "Tell them to do less backbends", "Ignore it — students know their own bodies"],
+          "correctAnswer": "Refer them to a physiotherapist and explain that yoga can complement, but not replace, medical care",
+          "explanation": "Yoga teachers are not healthcare providers. Advising on medical conditions falls outside scope of practice. The ethical response is to acknowledge the issue, encourage professional evaluation, and offer appropriate modifications within class."
+        },
+        {
+          "question": "A student approaches you for hands-on adjustments in every class and starts messaging you outside of class. Which ethical principle is most relevant?",
+          "options": ["Ahimsa — be kind and always respond", "Satya — tell them how you feel", "Maintaining professional boundaries to prevent a dual relationship", "Tapas — push through the discomfort"],
+          "correctAnswer": "Maintaining professional boundaries to prevent a dual relationship",
+          "explanation": "Dual relationships occur when the teacher-student dynamic blends with personal or dependent relationships. This creates ethical risk and can harm the student's progress and wellbeing. Clear, compassionate boundaries protect both parties."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 2,
+      "title": "Applied Anatomy for Yoga Teachers",
+      "description": "This is the module that separates mediocre teachers from excellent ones. You will study the musculoskeletal system with direct application to yoga postures, learning to see what's actually happening in a student's body and why.",
+      "lessons": [
+        {
+          "lessonNumber": 4,
+          "title": "The Spine: Structure, Function, and Safe Loading",
+          "objective": "Students will be able to identify the five spinal regions, describe their natural curves, and explain safe principles for spinal loading in yoga postures.",
+          "duration": "50 minutes",
+          "keyTopics": ["cervical / thoracic / lumbar / sacral / coccygeal", "natural spinal curves", "flexion and extension mechanics", "spinal stenosis and disc considerations"]
+        },
+        {
+          "lessonNumber": 5,
+          "title": "The Hip Complex and Lower Body Anatomy",
+          "objective": "Students will be able to explain hip joint structure, identify the six deep external rotators, and design modifications for students with limited hip mobility.",
+          "duration": "50 minutes",
+          "keyTopics": ["ball-and-socket joint mechanics", "six deep rotators (piriformis etc.)", "anterior pelvic tilt in forward folds", "femoral acetabular impingement awareness"]
+        },
+        {
+          "lessonNumber": 6,
+          "title": "Shoulders and Wrists in Weight-Bearing Postures",
+          "objective": "Students will be able to assess shoulder girdle mechanics and teach safe shoulder engagement in Downward Dog, Plank, and arm balances.",
+          "duration": "45 minutes",
+          "keyTopics": ["rotator cuff roles", "scapular protraction/retraction", "wrist anatomy and compression vs. traction", "modifications for wrist pain"]
+        },
+        {
+          "lessonNumber": 7,
+          "title": "Reading Bodies: Postural Assessment in Class",
+          "objective": "Students will be able to conduct a standing postural assessment and use findings to inform cueing decisions during class.",
+          "duration": "40 minutes",
+          "keyTopics": ["anterior/posterior/lateral postural analysis", "common compensation patterns", "scoliosis awareness", "when to suggest one-on-one sessions"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "A student with anterior pelvic tilt attempts a forward fold and can't reach past their knees. What is the most appropriate anatomically-informed cue?",
+          "options": ["Tell them to push harder — flexibility comes with practice", "Offer a strap and cue them to hinge from the hips rather than rounding the spine", "Tell them their hips are wrong and they should come back when more flexible", "Have them skip forward folds entirely"],
+          "correctAnswer": "Offer a strap and cue them to hinge from the hips rather than rounding the spine",
+          "explanation": "Anterior pelvic tilt reduces available hip flexion range. Rounding the spine to compensate loads the lumbar vertebrae. A strap and hip-hinge cue allows a safe, functional fold that works within their current anatomy."
+        },
+        {
+          "question": "Why is external rotation of the upper arm important in Downward-Facing Dog?",
+          "options": ["It looks more aesthetically correct", "It broadens the shoulder blades and protects the rotator cuff by creating space in the glenohumeral joint", "It increases wrist loading for strength building", "It is a stylistic preference with no anatomical reason"],
+          "correctAnswer": "It broadens the shoulder blades and protects the rotator cuff by creating space in the glenohumeral joint",
+          "explanation": "External rotation of the humerus draws the greater tubercle away from the acromion, reducing impingement risk. Combined with scapular protraction, this positions the shoulder girdle for safe load bearing."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 3,
+      "title": "The Art of Sequencing",
+      "description": "Sequencing is the craft of yoga teaching. This module gives you frameworks for designing classes that have a clear arc — warm-up, peak, cool-down — with intelligent anatomical preparation and a satisfying experience for students of mixed levels.",
+      "lessons": [
+        {
+          "lessonNumber": 8,
+          "title": "Peak Pose Sequencing: Building to a Climax",
+          "objective": "Students will be able to design a 60-minute class that systematically prepares the body for a chosen peak pose.",
+          "duration": "55 minutes",
+          "keyTopics": ["identifying a peak pose", "anatomical prerequisites mapping", "counter-postures", "wave structure of a class"]
+        },
+        {
+          "lessonNumber": 9,
+          "title": "Designing for Mixed Levels: Modifications and Progressions",
+          "objective": "Students will be able to offer three variations of any posture (entry, standard, advanced) to serve all students simultaneously.",
+          "duration": "50 minutes",
+          "keyTopics": ["the 3-option rule", "props as equalizers", "verbal cue layering", "never singling out students"]
+        },
+        {
+          "lessonNumber": 10,
+          "title": "Theming and Intention: The Heart of the Class",
+          "objective": "Students will be able to weave a philosophical or emotional theme through a class using opening intention, transitional cues, and closing reflection.",
+          "duration": "40 minutes",
+          "keyTopics": ["choosing a dharma theme", "threading the theme through cues", "avoiding spiritual bypassing", "closing the loop in Savasana"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "You want to teach Eka Pada Rajakapotasana (King Pigeon) as the peak pose. Which preparatory actions should come earlier in the class?",
+          "options": ["Seated forward folds and hamstring stretches only", "Hip external rotation, hip flexor opening, thoracic extension, and shoulder preparation", "Jumping jacks and burpees for warmth", "Immediately attempt the posture — the body will warm up through it"],
+          "correctAnswer": "Hip external rotation, hip flexor opening, thoracic extension, and shoulder preparation",
+          "explanation": "King Pigeon requires deep hip external rotation (for the bent front leg), intense hip flexor stretch (for the back leg), and thoracic extension (for the backbend). Preparing each component systematically prevents injury and deepens the posture."
+        },
+        {
+          "question": "During a 60-minute Vinyasa class, what is the ideal timing structure?",
+          "options": ["30 min warm-up, 5 min peak, 25 min cool-down", "10 min warm-up, 35 min standing sequences, 15 min floor work and Savasana", "5 min meditation, 50 min advanced postures, 5 min rest", "Equal time for every posture regardless of intensity"],
+          "correctAnswer": "10 min warm-up, 35 min standing sequences, 15 min floor work and Savasana",
+          "explanation": "This structure follows the traditional energy arc: a gradual warm-up builds heat, the standing sequence delivers the main work, and floor work with Savasana allows integration. Savasana should never be less than 5 minutes."
+        }
+      ]
+    }
+  ],
+  "pacingSchedule": {
+    "totalDuration": "10 weeks",
+    "weeklyBreakdown": [
+      { "week": 1, "modules": [1], "hoursPerWeek": 6 },
+      { "week": 2, "modules": [2], "hoursPerWeek": 8 },
+      { "week": 3, "modules": [2], "hoursPerWeek": 8 },
+      { "week": 4, "modules": [3], "hoursPerWeek": 7 },
+      { "week": 5, "modules": [3], "hoursPerWeek": 7 }
+    ]
+  },
+  "bonusResources": [
+    {
+      "title": "Light on Yoga by B.K.S. Iyengar",
+      "type": "book",
+      "description": "The definitive reference book for over 200 postures with precise alignment instructions — every yoga teacher should have this on their shelf."
+    },
+    {
+      "title": "The Key Muscles of Yoga by Ray Long",
+      "type": "book",
+      "description": "Stunning anatomical illustrations of muscles in action during yoga postures, making anatomy genuinely visual and memorable."
+    },
+    {
+      "title": "Yoga International's Anatomy Series",
+      "type": "video",
+      "description": "A free video series by Jules Mitchell covering yoga biomechanics and the science behind flexibility — essential for evidence-based teaching."
+    },
+    {
+      "title": "Mindbody Software",
+      "type": "tool",
+      "description": "The industry-standard class scheduling and payment platform used by yoga studios worldwide — learn it before you graduate."
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "title": "Python for Absolute Beginners: From Zero to Writing Real Programs",
+  "subtitle": "A complete beginner's journey through Python — no prior coding experience needed",
+  "description": "Learn to think like a programmer and write Python code that actually does useful things. This course takes you from installing Python on your computer all the way to building a working project you can show off, using plain English explanations at every step.",
+  "learningOutcomes": [
+    "By the end of this course, students will be able to write Python programs that use variables, loops, conditionals, and functions to solve real problems.",
+    "By the end of this course, students will be able to read and debug Python error messages without panic.",
+    "By the end of this course, students will be able to work with lists, dictionaries, and files to store and process data.",
+    "By the end of this course, students will be able to design and build a small complete Python project from scratch."
+  ],
+  "modules": [
+    {
+      "moduleNumber": 1,
+      "title": "Your First Lines of Code: Python Basics",
+      "description": "Set up your Python environment and write your first programs. You'll learn what variables, data types, and print statements are, and why Python is one of the friendliest languages to start with.",
+      "lessons": [
+        {
+          "lessonNumber": 1,
+          "title": "Installing Python and Writing Hello World",
+          "objective": "Students will be able to install Python, open a terminal, and run their first Python script.",
+          "duration": "25 minutes",
+          "keyTopics": ["installing Python 3", "VS Code setup", "print() function", "running .py files from terminal"]
+        },
+        {
+          "lessonNumber": 2,
+          "title": "Variables and Data Types",
+          "objective": "Students will be able to create variables and explain the difference between strings, integers, floats, and booleans.",
+          "duration": "30 minutes",
+          "keyTopics": ["variable assignment", "str / int / float / bool", "type() function", "naming conventions"]
+        },
+        {
+          "lessonNumber": 3,
+          "title": "Getting Input and Doing Maths",
+          "objective": "Students will be able to use input() to receive user input and perform arithmetic operations in Python.",
+          "duration": "25 minutes",
+          "keyTopics": ["input() function", "type casting with int()", "arithmetic operators", "f-strings for output"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "What will this code print?  x = 5  y = '5'  print(x + int(y))",
+          "options": ["55", "10", "TypeError", "'55'"],
+          "correctAnswer": "10",
+          "explanation": "int(y) converts the string '5' to the integer 5. Adding two integers (5 + 5) gives 10. If you tried x + y without int() you'd get a TypeError because you can't add an integer and a string directly."
+        },
+        {
+          "question": "A student writes: name = input('Enter your name: ')  print('Hello ' + name). What type is the variable 'name'?",
+          "options": ["int", "bool", "str", "list"],
+          "correctAnswer": "str",
+          "explanation": "The input() function always returns a string, regardless of what the user types. If you need a number from input(), you must explicitly convert it with int() or float()."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 2,
+      "title": "Making Decisions: Conditionals and Loops",
+      "description": "This is where your programs start thinking for themselves. Learn how to use if/elif/else to make decisions based on data, and for/while loops to repeat actions automatically — the two most powerful ideas in all of programming.",
+      "lessons": [
+        {
+          "lessonNumber": 4,
+          "title": "If, Elif, Else: Teaching Python to Decide",
+          "objective": "Students will be able to write conditional statements that execute different code blocks based on data values.",
+          "duration": "30 minutes",
+          "keyTopics": ["if/elif/else syntax", "comparison operators", "boolean logic with and/or", "indentation rules"]
+        },
+        {
+          "lessonNumber": 5,
+          "title": "For Loops: Doing Things Repeatedly",
+          "objective": "Students will be able to use for loops to iterate over a range of numbers and a list of items.",
+          "duration": "30 minutes",
+          "keyTopics": ["for loop syntax", "range() function", "iterating over lists", "loop variable naming"]
+        },
+        {
+          "lessonNumber": 6,
+          "title": "While Loops and Breaking Out",
+          "objective": "Students will be able to write while loops that run until a condition is met and use break to exit early.",
+          "duration": "25 minutes",
+          "keyTopics": ["while loop syntax", "infinite loop risk", "break and continue", "practical use cases"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "What will this loop print?  for i in range(1, 5):  print(i)",
+          "options": ["1 2 3 4 5", "0 1 2 3 4", "1 2 3 4", "1 2 3 4 5 6"],
+          "correctAnswer": "1 2 3 4",
+          "explanation": "range(1, 5) generates numbers starting at 1 and stopping BEFORE 5. So it produces 1, 2, 3, 4. The stop value is always exclusive in Python's range()."
+        },
+        {
+          "question": "When should you use a while loop instead of a for loop?",
+          "options": ["When you know exactly how many times to repeat", "When you need to repeat until a condition becomes false, but don't know how many iterations it will take", "When you want to loop over items in a list", "While loops are just slower for loops — never use them"],
+          "correctAnswer": "When you need to repeat until a condition becomes false, but don't know how many iterations it will take",
+          "explanation": "For loops are ideal when you know the count upfront (e.g., 'do this 10 times'). While loops are better when the stopping condition depends on user input or data that changes during execution."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 3,
+      "title": "Functions and Reusable Code",
+      "description": "Stop writing the same code twice. Functions are the fundamental tool for organising, reusing, and testing code. You'll learn to write functions that take inputs, do work, and return results.",
+      "lessons": [
+        {
+          "lessonNumber": 7,
+          "title": "Defining and Calling Functions",
+          "objective": "Students will be able to define functions with def, call them, and explain why functions make code easier to maintain.",
+          "duration": "30 minutes",
+          "keyTopics": ["def keyword", "parameters vs. arguments", "return statement", "function naming conventions"]
+        },
+        {
+          "lessonNumber": 8,
+          "title": "Scope and Default Parameters",
+          "objective": "Students will be able to explain variable scope and write functions with optional default parameter values.",
+          "duration": "25 minutes",
+          "keyTopics": ["local vs. global scope", "default parameter values", "avoiding global variables", "docstrings"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "What is wrong with this function?  def add(a, b):  total = a + b  print(total)  result = add(3, 4)  print(result)",
+          "options": ["Nothing is wrong", "The function uses print instead of return, so result will be None", "You can't add numbers inside a function", "The parameters a and b are invalid names"],
+          "correctAnswer": "The function uses print instead of return, so result will be None",
+          "explanation": "print() displays a value but doesn't give it back to the caller. Without a return statement, Python functions implicitly return None. Using return total would allow result to hold the value 7."
+        },
+        {
+          "question": "Which of these correctly defines a function with a default parameter?",
+          "options": ["def greet(name, greeting = 'Hello'):", "def greet(name, greeting == 'Hello'):", "def greet(name = , greeting = 'Hello'):", "default def greet(name, greeting):"],
+          "correctAnswer": "def greet(name, greeting = 'Hello'):",
+          "explanation": "Default parameters use a single equals sign (=) with no spaces required, placed after the parameter name. Parameters with defaults must come after parameters without defaults."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 4,
+      "title": "Data Structures: Lists and Dictionaries",
+      "description": "Real programs need to store and organise data. Lists and dictionaries are Python's two most-used data structures, and mastering them will let you build almost anything.",
+      "lessons": [
+        {
+          "lessonNumber": 9,
+          "title": "Lists: Ordered Collections",
+          "objective": "Students will be able to create, modify, and iterate over Python lists using common list methods.",
+          "duration": "35 minutes",
+          "keyTopics": ["list creation and indexing", "append / remove / pop", "list slicing", "list comprehensions intro"]
+        },
+        {
+          "lessonNumber": 10,
+          "title": "Dictionaries: Key-Value Storage",
+          "objective": "Students will be able to create dictionaries, access values by key, and loop over dictionary items.",
+          "duration": "35 minutes",
+          "keyTopics": ["dict creation", "get() vs. bracket access", "dict.items() / .keys() / .values()", "nested dictionaries"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "What does this code produce?  scores = {'Alice': 95, 'Bob': 88}  print(scores.get('Charlie', 0))",
+          "options": ["KeyError", "None", "0", "Charlie"],
+          "correctAnswer": "0",
+          "explanation": "dict.get(key, default) returns the value if the key exists, or the default value if it doesn't. Since 'Charlie' is not in the dictionary, it returns 0 instead of raising a KeyError."
+        },
+        {
+          "question": "Which is the correct way to add a new key 'city' with value 'Milan' to a dictionary named 'person'?",
+          "options": ["person.add('city', 'Milan')", "person['city'] = 'Milan'", "person.insert('city', 'Milan')", "person.city = 'Milan'"],
+          "correctAnswer": "person['city'] = 'Milan'",
+          "explanation": "Dictionaries use bracket notation for both reading and writing values. Assigning to a key that doesn't exist creates it automatically."
+        }
+      ]
+    }
+  ],
+  "pacingSchedule": {
+    "totalDuration": "4 weeks",
+    "weeklyBreakdown": [
+      { "week": 1, "modules": [1], "hoursPerWeek": 3 },
+      { "week": 2, "modules": [2], "hoursPerWeek": 3 },
+      { "week": 3, "modules": [3], "hoursPerWeek": 3 },
+      { "week": 4, "modules": [4], "hoursPerWeek": 3 }
+    ]
+  },
+  "bonusResources": [
+    {
+      "title": "Python.org Official Tutorial",
+      "type": "website",
+      "description": "The official Python documentation tutorial is surprisingly readable and is the most authoritative reference for any language feature."
+    },
+    {
+      "title": "Automate the Boring Stuff with Python by Al Sweigart",
+      "type": "book",
+      "description": "A free, practical book full of real projects like automating spreadsheets, PDFs, and web scraping — perfect for applying what you've learned."
+    },
+    {
+      "title": "Replit.com",
+      "type": "tool",
+      "description": "Free browser-based Python IDE — write and run Python without installing anything, great for practicing on the go."
+    }
+  ]
+}

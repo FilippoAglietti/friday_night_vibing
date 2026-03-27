@@ -1,0 +1,172 @@
+{
+  "title": "Digital Marketing for Small Businesses: Get More Customers Without Wasting Money",
+  "subtitle": "An intermediate-level course on building a focused, budget-smart digital marketing strategy that actually drives sales",
+  "description": "Most small business owners waste their marketing budget by doing a little of everything and excelling at nothing. This course shows you how to identify where your customers actually spend their time, build a focused multi-channel strategy, and measure results so every euro you spend works harder. No agency required.",
+  "learningOutcomes": [
+    "By the end of this course, students will be able to define a clear ideal customer profile and use it to make sharper targeting decisions across all channels.",
+    "By the end of this course, students will be able to design and run a Google Ads or Meta Ads campaign with a positive return on ad spend.",
+    "By the end of this course, students will be able to build and automate a basic email marketing funnel that converts subscribers into paying customers.",
+    "By the end of this course, students will be able to interpret key marketing metrics (CAC, ROAS, CTR, conversion rate) and use them to optimise ongoing campaigns."
+  ],
+  "modules": [
+    {
+      "moduleNumber": 1,
+      "title": "Strategy First: Know Your Customer and Your Numbers",
+      "description": "Every wasted marketing euro traces back to a fuzzy strategy. This module forces clarity: who exactly are you selling to, what do they care about, and what does a successful customer actually cost you? Build this foundation and every tactical decision becomes easier.",
+      "lessons": [
+        {
+          "lessonNumber": 1,
+          "title": "Building Your Ideal Customer Profile (ICP)",
+          "objective": "Students will be able to create a detailed ideal customer profile that goes beyond demographics to include psychographics, jobs-to-be-done, and buying triggers.",
+          "duration": "40 minutes",
+          "keyTopics": ["demographics vs. psychographics", "jobs-to-be-done framework", "buying triggers and objections", "where to find real customer language (reviews, forums)"]
+        },
+        {
+          "lessonNumber": 2,
+          "title": "The Only Marketing Metrics That Matter for Small Businesses",
+          "objective": "Students will be able to calculate Customer Acquisition Cost (CAC), Lifetime Value (LTV), and ROAS, and explain why LTV:CAC ratio determines sustainability.",
+          "duration": "35 minutes",
+          "keyTopics": ["CAC calculation", "LTV and repeat purchase rate", "ROAS formula", "LTV:CAC benchmark (3:1 minimum)"]
+        },
+        {
+          "lessonNumber": 3,
+          "title": "Choosing Your Channels: Go Deep, Not Wide",
+          "objective": "Students will be able to evaluate five digital marketing channels and choose one or two to focus on based on their customer profile and budget.",
+          "duration": "30 minutes",
+          "keyTopics": ["SEO vs. paid ads vs. social vs. email vs. content", "channel/audience fit matrix", "budget allocation principles", "avoiding shiny object syndrome"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "A bakery acquires customers at €25 each and the average customer spends €40 total with them. What should the owner prioritise?",
+          "options": ["Scale up paid ads immediately — the margin is fine", "Focus first on increasing repeat purchases and LTV before scaling acquisition spend", "Cut the CAC in half by reducing ad spend", "The numbers are fine — do nothing"],
+          "correctAnswer": "Focus first on increasing repeat purchases and LTV before scaling acquisition spend",
+          "explanation": "With an LTV:CAC ratio of 1.6:1, this business is barely breaking even on customer acquisition. The industry benchmark is 3:1. Increasing repeat purchase frequency (loyalty programme, email nurture) to raise LTV is more sustainable than scaling spend at a losing ratio."
+        },
+        {
+          "question": "You sell handmade furniture to homeowners aged 35-55. Which channel should you test first?",
+          "options": ["TikTok — it has the most users", "Pinterest and Google Search — visual discovery and high purchase intent match your buyer perfectly", "Snapchat — younger audiences share content virally", "Radio advertising — older audiences don't use social media"],
+          "correctAnswer": "Pinterest and Google Search — visual discovery and high purchase intent match your buyer perfectly",
+          "explanation": "Channel selection should follow where your ICP actually spends time with purchase intent. Pinterest over-indexes for home decor and furniture with the 35-55 demographic. Google Search captures buyers actively looking for what you sell. TikTok skews younger and is primarily entertainment-driven."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 2,
+      "title": "Paid Advertising That Pays Back: Google and Meta Ads",
+      "description": "Paid ads are the fastest way to get new customers — and the fastest way to burn money if you don't know what you're doing. This module gives you the systematic approach professionals use to launch, test, and scale campaigns that generate positive returns.",
+      "lessons": [
+        {
+          "lessonNumber": 4,
+          "title": "Google Search Ads: Capturing Buyers Who Are Already Looking",
+          "objective": "Students will be able to set up a Google Search campaign targeting high-intent keywords with a structured campaign, ad group, and ad copy framework.",
+          "duration": "55 minutes",
+          "keyTopics": ["keyword match types (broad/phrase/exact)", "negative keyword lists", "ad copy with USP and CTA", "Quality Score and its impact on cost"]
+        },
+        {
+          "lessonNumber": 5,
+          "title": "Meta Ads: Audience Targeting and Creative Testing",
+          "objective": "Students will be able to build a Meta Ads campaign using custom audiences, lookalike audiences, and a structured creative testing framework.",
+          "duration": "55 minutes",
+          "keyTopics": ["custom audiences from customer lists", "lookalike audiences", "campaign budget optimisation", "A/B testing creatives systematically"]
+        },
+        {
+          "lessonNumber": 6,
+          "title": "Reading Your Ad Account: What to Optimise and When",
+          "objective": "Students will be able to interpret CTR, CPC, conversion rate, and ROAS data to diagnose campaign problems and make evidence-based optimisation decisions.",
+          "duration": "40 minutes",
+          "keyTopics": ["CTR benchmarks by industry", "CPC vs. CPM bidding strategy", "conversion window settings", "when to kill an ad vs. give it more time"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "Your Google Search ad has a 12% CTR but a 0.5% conversion rate on your landing page. Where is the problem?",
+          "options": ["The keywords are wrong — change your targeting", "The ad is working well but the landing page is failing to convert interested visitors", "The CTR is too high — you're targeting the wrong audience", "Reduce your budget to lower the pressure on the landing page"],
+          "correctAnswer": "The ad is working well but the landing page is failing to convert interested visitors",
+          "explanation": "A 12% CTR indicates the ad copy is compelling and attracting clicks. A 0.5% conversion rate (industry average is 2-5%) points to a landing page problem: unclear offer, slow load time, poor mobile experience, or a mismatch between ad promise and page content."
+        },
+        {
+          "question": "What is the primary advantage of a Lookalike Audience on Meta Ads?",
+          "options": ["It lets you retarget people who visited your website", "It shows ads to people who are similar to your best existing customers, improving the probability of finding new buyers", "It is cheaper than interest-based targeting", "It targets competitors' followers"],
+          "correctAnswer": "It shows ads to people who are similar to your best existing customers, improving the probability of finding new buyers",
+          "explanation": "Lookalike audiences use Meta's algorithm to find users who share characteristics with your seed audience (e.g., your customer list). This is particularly effective for small businesses because it leverages real purchase data rather than guessed interest categories."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 3,
+      "title": "Email Marketing: Your Highest-ROI Channel",
+      "description": "Email marketing consistently delivers the highest ROI of any digital channel — often €36 back for every €1 spent. This module shows you how to build a list, design a welcome sequence that converts, and automate follow-ups that work while you sleep.",
+      "lessons": [
+        {
+          "lessonNumber": 7,
+          "title": "Building Your Email List with Lead Magnets",
+          "objective": "Students will be able to create a high-value lead magnet and integrate it into their website to collect email subscribers consistently.",
+          "duration": "40 minutes",
+          "keyTopics": ["lead magnet types (PDF, quiz, discount, tool)", "opt-in form placement", "GDPR compliance basics", "double opt-in vs. single opt-in"]
+        },
+        {
+          "lessonNumber": 8,
+          "title": "Writing a Welcome Sequence That Sells",
+          "objective": "Students will be able to write a 5-email welcome sequence that introduces the brand, builds trust, and makes a first purchase offer.",
+          "duration": "50 minutes",
+          "keyTopics": ["email 1: instant value delivery", "emails 2-3: story and social proof", "email 4: handling objections", "email 5: clear offer with urgency"]
+        },
+        {
+          "lessonNumber": 9,
+          "title": "Automating Campaigns: Flows That Work for You",
+          "objective": "Students will be able to set up abandoned cart, post-purchase, and win-back automation flows in an email platform.",
+          "duration": "45 minutes",
+          "keyTopics": ["abandoned cart recovery sequence", "post-purchase upsell flow", "win-back campaign for inactive subscribers", "segmentation by purchase behaviour"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "Your welcome email has a 55% open rate but subsequent emails drop to 15%. What is the most likely cause?",
+          "options": ["Your email list is fake", "The welcome email set expectations the follow-up emails don't meet, causing disengagement", "15% open rate is actually very good — this is normal and expected", "You should send more emails to increase engagement"],
+          "correctAnswer": "The welcome email set expectations the follow-up emails don't meet, causing disengagement",
+          "explanation": "Welcome emails always have the highest open rates due to novelty and expectation. A sharp drop usually means the subsequent emails shifted from value-giving to sales pitching too quickly, or the content quality dropped. The fix is to maintain the same tone and value density across the entire sequence."
+        },
+        {
+          "question": "A customer added a product to their cart 2 hours ago and hasn't purchased. When should the first abandoned cart email be sent?",
+          "options": ["After 30 days — give them plenty of time to decide", "Immediately — within 5 minutes", "Within 1 hour — while the purchase intent is still high", "After 24 hours — don't seem desperate"],
+          "correctAnswer": "Within 1 hour — while the purchase intent is still high",
+          "explanation": "Studies consistently show the first abandoned cart email performs best within 1 hour of abandonment. After that, conversion rates drop significantly. The 3-email sequence (1h, 24h, 72h) is the industry standard, with the first email focused on a helpful reminder, not a discount."
+        }
+      ]
+    }
+  ],
+  "pacingSchedule": {
+    "totalDuration": "6 weeks",
+    "weeklyBreakdown": [
+      { "week": 1, "modules": [1], "hoursPerWeek": 3 },
+      { "week": 2, "modules": [1], "hoursPerWeek": 3 },
+      { "week": 3, "modules": [2], "hoursPerWeek": 4 },
+      { "week": 4, "modules": [2], "hoursPerWeek": 4 },
+      { "week": 5, "modules": [3], "hoursPerWeek": 4 },
+      { "week": 6, "modules": [3], "hoursPerWeek": 3 }
+    ]
+  },
+  "bonusResources": [
+    {
+      "title": "Google Analytics 4 (GA4)",
+      "type": "tool",
+      "description": "Free website analytics that ties all your marketing channels together — essential for understanding which campaigns actually drive revenue."
+    },
+    {
+      "title": "This Is Marketing by Seth Godin",
+      "type": "book",
+      "description": "The best book for shifting from 'how do I reach more people?' to 'how do I create something worth talking about?' — foundational strategic thinking."
+    },
+    {
+      "title": "Klaviyo",
+      "type": "tool",
+      "description": "The gold-standard email marketing platform for e-commerce with powerful automation, segmentation, and revenue attribution built-in."
+    },
+    {
+      "title": "Ahrefs Webmaster Tools",
+      "type": "tool",
+      "description": "Free version of the industry's best SEO tool — shows you what keywords you rank for and where competitors are getting their traffic."
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "title": "Photography for Instagram: Build a Feed That Stops the Scroll",
+  "subtitle": "A beginner's mini-course on creating scroll-stopping photos with just your smartphone",
+  "description": "Learn the core principles of photography composition, lighting, and editing to build a beautiful, consistent Instagram feed from scratch. No expensive camera required — just your phone and a creative eye.",
+  "learningOutcomes": [
+    "By the end of this course, students will be able to apply the rule of thirds and leading lines to compose visually compelling photographs.",
+    "By the end of this course, students will be able to identify and use natural light effectively to enhance any photo.",
+    "By the end of this course, students will be able to edit photos using a consistent style that strengthens their personal brand on Instagram.",
+    "By the end of this course, students will be able to plan and schedule a cohesive Instagram content calendar."
+  ],
+  "modules": [
+    {
+      "moduleNumber": 1,
+      "title": "The Eye Before the Lens: Composition Fundamentals",
+      "description": "Great photography starts before you tap the shutter button. In this module you will learn how professional photographers think about framing, balance, and visual flow — and how to apply these principles instantly with any camera.",
+      "lessons": [
+        {
+          "lessonNumber": 1,
+          "title": "The Rule of Thirds: Your New Best Friend",
+          "objective": "Students will be able to apply the rule of thirds grid to frame subjects in any photo.",
+          "duration": "15 minutes",
+          "keyTopics": ["rule of thirds grid", "enabling grid overlay on phone", "subject placement", "horizon line positioning"]
+        },
+        {
+          "lessonNumber": 2,
+          "title": "Leading Lines and Depth",
+          "objective": "Students will be able to identify and use leading lines to draw the viewer's eye through a photograph.",
+          "duration": "15 minutes",
+          "keyTopics": ["leading lines in architecture", "natural leading lines", "creating depth", "foreground and background"]
+        },
+        {
+          "lessonNumber": 3,
+          "title": "Negative Space and Minimalism",
+          "objective": "Students will be able to use negative space to give subjects visual breathing room and create impactful minimalist shots.",
+          "duration": "15 minutes",
+          "keyTopics": ["negative space definition", "sky and water as negative space", "minimalist aesthetic", "subject isolation"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "Where should the main subject be placed when using the rule of thirds?",
+          "options": ["Dead centre of the frame", "At one of the four grid intersection points", "In the bottom-left corner only", "As close to the edge as possible"],
+          "correctAnswer": "At one of the four grid intersection points",
+          "explanation": "The rule of thirds divides the frame into a 3×3 grid. Placing the subject at one of the four intersection points creates natural visual tension and interest compared to dead-centre placement."
+        },
+        {
+          "question": "A photographer sees a road disappearing into the horizon. How should they use this element?",
+          "options": ["Avoid it — straight lines are boring", "Use it as a leading line to guide the viewer's eye toward the horizon", "Crop it out and focus on the foreground only", "Place the road in the top-right corner"],
+          "correctAnswer": "Use it as a leading line to guide the viewer's eye toward the horizon",
+          "explanation": "Roads, fences, rivers, and staircases are classic leading lines. Placing them so they direct the viewer's gaze into the scene creates depth and visual storytelling."
+        }
+      ]
+    },
+    {
+      "moduleNumber": 2,
+      "title": "Light Is Everything: Mastering Natural Light",
+      "description": "Professional photographers say 'photography is painting with light.' This module teaches you how to read, chase, and use natural light to make any subject look stunning — and when to avoid bad light altogether.",
+      "lessons": [
+        {
+          "lessonNumber": 4,
+          "title": "Golden Hour vs. Harsh Midday Sun",
+          "objective": "Students will be able to distinguish between flattering and unflattering natural light conditions and plan shoots accordingly.",
+          "duration": "20 minutes",
+          "keyTopics": ["golden hour timing", "harsh midday shadows", "blue hour", "scheduling shoots by light quality"]
+        },
+        {
+          "lessonNumber": 5,
+          "title": "Using Window Light Indoors",
+          "objective": "Students will be able to set up an indoor shot using a single window as a professional-quality light source.",
+          "duration": "20 minutes",
+          "keyTopics": ["diffused window light", "reflectors with white card", "side lighting vs. front lighting", "sheer curtains as diffusers"]
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "Why is golden hour considered the best time for outdoor photography?",
+          "options": ["Because there is the most light available", "Because the sun is directly overhead and shadows are minimal", "Because the low sun angle creates warm, soft, directional light with long gentle shadows", "Because golden hour lasts only a few seconds, making photos rare and valuable"],
+          "correctAnswer": "Because the low sun angle creates warm, soft, directional light with long gentle shadows",
+          "explanation": "Shortly after sunrise and before sunset, the sun's light travels through more atmosphere, diffusing and warming it. This produces flattering, dimensional light ideal for portraits, landscapes, and product shots."
+        },
+        {
+          "question": "You want to shoot a flat-lay of your product indoors. What is the best light setup without any equipment?",
+          "options": ["Turn on every lamp in the room for maximum brightness", "Shoot directly under a ceiling light for even illumination", "Position your product near a large window with indirect daylight and use a white card opposite to fill shadows", "Use your phone flash on full power"],
+          "correctAnswer": "Position your product near a large window with indirect daylight and use a white card opposite to fill shadows",
+          "explanation": "A large window provides soft, directional natural light. A white card (or white foam board) bounces light back into the shadow side, eliminating harsh shadows without any expensive equipment."
+        }
+      ]
+    }
+  ],
+  "pacingSchedule": {
+    "totalDuration": "1 week",
+    "weeklyBreakdown": [
+      {
+        "week": 1,
+        "modules": [1, 2],
+        "hoursPerWeek": 2
+      }
+    ]
+  },
+  "bonusResources": [
+    {
+      "title": "VSCO App",
+      "type": "tool",
+      "description": "Industry-standard mobile editing app for creating consistent presets and filters that define your Instagram aesthetic."
+    },
+    {
+      "title": "Understanding Exposure by Bryan Peterson",
+      "type": "book",
+      "description": "The best beginner book on how aperture, shutter speed, and ISO work together — essential for when you upgrade from a phone camera."
+    },
+    {
+      "title": "Later.com",
+      "type": "tool",
+      "description": "Visual Instagram scheduling tool that lets you preview how your grid will look before publishing — key for maintaining feed consistency."
+    }
+  ]
+}
