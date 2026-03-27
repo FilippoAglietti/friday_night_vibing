@@ -7,9 +7,9 @@
  * validates it, checks auth + rate limits, calls the Claude API,
  * saves the result to Supabase, and returns the curriculum JSON.
  *
- * Request body:  { topic, audience, length, niche? }
- * Success:       { curriculum: Curriculum }
- * Error:         { error: string, details?: string }
+ * Request body:  { topic, difficulty, courseLength, niche? }
+ * Success:       { success: true, data: Curriculum }
+ * Error:         { success: false, error: string, details?: string }
  *
  * Rate limit:    5 requests per IP per hour (in-memory, resets on restart)
  * Auth:          Supabase session cookie (optional for free tier — 1 free generation)
@@ -106,18 +106,16 @@ function validateRequest(body: unknown): GenerateRequest {
     throw new Error("'topic' is required and must be at least 3 characters.");
   }
 
-  // audience — required, must be a valid enum value
-  if (!b.audience || !VALID_AUDIENCES.includes(b.audience as AudienceLevel)) {
-    throw new Error(
-      `'audience' must be one of: ${VALID_AUDIENCES.join(", ")}.`
-    );
+  // difficulty (audience) — accept both field names for compatibility
+  const audience = (b.difficulty ?? b.audience) as AudienceLevel | undefined;
+  if (!audience || !VALID_AUDIENCES.includes(audience)) {
+    throw new Error(`'difficulty' must be one of: ${VALID_AUDIENCES.join(", ")}.`);
   }
 
-  // length — required, must be a valid enum value
-  if (!b.length || !VALID_LENGTHS.includes(b.length as CourseLength)) {
-    throw new Error(
-      `'length' must be one of: ${VALID_LENGTHS.join(", ")}.`
-    );
+  // courseLength (length) — accept both field names for compatibility
+  const length = (b.courseLength ?? b.length) as CourseLength | undefined;
+  if (!length || !VALID_LENGTHS.includes(length)) {
+    throw new Error(`'courseLength' must be one of: ${VALID_LENGTHS.join(", ")}.`);
   }
 
   // niche — optional, string or undefined
@@ -127,8 +125,8 @@ function validateRequest(body: unknown): GenerateRequest {
 
   return {
     topic: b.topic.trim(),
-    audience: b.audience as AudienceLevel,
-    length: b.length as CourseLength,
+    audience,
+    length,
     niche: b.niche ? (b.niche as string).trim() : undefined,
   };
 }
@@ -293,7 +291,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
 
   if (!checkRateLimit(ip)) {
     return NextResponse.json(
-      { error: "Too many requests. Please wait before generating again." },
+      { success: false, error: "Too many requests. Please wait before generating again." },
       { status: 429 }
     );
   }
@@ -306,6 +304,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
   } catch (err) {
     return NextResponse.json(
       {
+        success: false,
         error: "Invalid request.",
         details: err instanceof Error ? err.message : "Unknown validation error.",
       },
@@ -349,9 +348,9 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
     console.error("[/api/generate] Claude API error:", err);
     return NextResponse.json(
       {
+        success: false,
         error: "Failed to generate curriculum.",
-        details:
-          err instanceof Error ? err.message : "Unexpected error from AI engine.",
+        details: err instanceof Error ? err.message : "Unexpected error from AI engine.",
       },
       { status: 500 }
     );
@@ -363,5 +362,6 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
   });
 
   // ── Step 6: Return the curriculum ──────────────────────────
-  return NextResponse.json({ curriculum }, { status: 200 });
+  // Return { success: true, data: curriculum } to match GenerateResponse type
+  return NextResponse.json({ success: true, data: curriculum }, { status: 200 });
 }
