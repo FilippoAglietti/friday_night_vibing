@@ -38,6 +38,8 @@ export interface CurriculumFormProps {
   onGenerated?: (curriculum: Curriculum) => void;
   /** Called when generation starts */
   onLoadingChange?: (loading: boolean) => void;
+  /** Called when the user has hit their free generation limit (403) */
+  onLimitReached?: () => void;
 }
 
 /* ─── Constants ──────────────────────────────────────────── */
@@ -83,6 +85,7 @@ function validate(data: CurriculumFormData): FormErrors {
 export default function CurriculumForm({
   onGenerated,
   onLoadingChange,
+  onLimitReached,
 }: CurriculumFormProps) {
   const [form, setForm] = useState<CurriculumFormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -147,6 +150,11 @@ export default function CurriculumForm({
 
         if (!res.ok) {
           const body = await res.json().catch(() => null);
+          if (res.status === 403) {
+            // Generation limit reached — show paywall
+            onLimitReached?.();
+            return;
+          }
           throw new Error(
             body?.error || `Generation failed (${res.status})`
           );
@@ -163,7 +171,7 @@ export default function CurriculumForm({
         onLoadingChange?.(false);
       }
     },
-    [form, onGenerated, onLoadingChange]
+    [form, onGenerated, onLoadingChange, onLimitReached]
   );
 
   /* ── Render ────────────────────────────────────────────── */

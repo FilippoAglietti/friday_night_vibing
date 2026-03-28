@@ -2,10 +2,16 @@
 
 import CurriculumForm from "@/components/CurriculumForm";
 import CurriculumOutput from "@/components/CurriculumOutput";
-import { useState, useEffect } from "react";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
+import PaywallModal from "@/components/PaywallModal";
+import AuthModal from "@/components/AuthModal";
+import AuthButton from "@/components/AuthButton";
+import { useToast } from "@/components/ToastProvider";
+import { useState, useEffect, useCallback } from "react";
 import type { Curriculum } from "@/types/curriculum";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { supabaseBrowser } from "@/lib/supabase";
 import {
   Card,
   CardContent,
@@ -156,11 +162,63 @@ const difficultyColor: Record<string, string> = {
 export default function Home() {
   const [dark, setDark] = useState(true);
   const [curriculum, setCurriculum] = useState<Curriculum | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [user, setUser] = useState<unknown>(null);
+  const [skipAuth, setSkipAuth] = useState(false);
+  const { toast } = useToast();
   const prefersReduced = useReducedMotion();
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
+
+  // Track auth state
+  useEffect(() => {
+    supabaseBrowser.auth.getUser().then(({ data: { user } }) => setUser(user));
+    const { data: { subscription } } = supabaseBrowser.auth.onAuthStateChange(
+      (_event, session) => setUser(session?.user ?? null)
+    );
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Check for checkout success/error in URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "success") {
+      toast("Payment successful! You now have Pro access.", "success");
+      window.history.replaceState({}, "", "/");
+    } else if (params.get("checkout") === "cancelled") {
+      toast("Checkout cancelled. You can try again anytime.", "info");
+      window.history.replaceState({}, "", "/");
+    } else if (params.get("auth_error") === "true") {
+      toast("Sign in failed. Please try again.", "error");
+      window.history.replaceState({}, "", "/");
+    }
+  }, [toast]);
+
+  const handleLoadingChange = useCallback((loading: boolean) => {
+    setIsGenerating(loading);
+  }, []);
+
+  const handleGenerated = useCallback((c: Curriculum) => {
+    setCurriculum(c);
+    toast("Curriculum generated successfully!", "success");
+  }, [toast]);
+
+  const handleLimitReached = useCallback(() => {
+    setShowPaywall(true);
+  }, []);
+
+  const handleFormSubmitAttempt = useCallback(() => {
+    // If user is not authenticated and hasn't chosen to skip, show auth modal
+    if (!user && !skipAuth) {
+      setShowAuthModal(true);
+      return false;
+    }
+    return true;
+  }, [user, skipAuth]);
 
   // Respect user motion preference
   const anim = prefersReduced ? {} : fadeUp;
@@ -222,10 +280,12 @@ export default function Home() {
             >
               {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </Button>
+            <AuthButton />
             <Button
               id="nav-cta"
               className="hidden rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all hover:scale-[1.02] sm:inline-flex"
               size="lg"
+              onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Get Started Free
             </Button>
@@ -460,7 +520,16 @@ export default function Home() {
             viewport={{ once: true, amount: 0.2 }}
             variants={stagger}
           >
-            {!curriculum ? (
+            {isGenerating ? (
+              <LoadingSkeleton />
+            ) : curriculum ? (
+              <motion.div variants={anim} key="output-view">
+                <CurriculumOutput
+                  curriculum={curriculum}
+                  onGenerateAnother={() => setCurriculum(null)}
+                />
+              </motion.div>
+            ) : (
               <>
                 <motion.div className="text-center mb-10" variants={anim}>
                   <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
@@ -471,16 +540,13 @@ export default function Home() {
                   </h2>
                 </motion.div>
                 <motion.div variants={anim} custom={1} className="mx-auto max-w-xl">
-                  <CurriculumForm onGenerated={setCurriculum} />
+                  <CurriculumForm
+                    onGenerated={handleGenerated}
+                    onLoadingChange={handleLoadingChange}
+                    onLimitReached={handleLimitReached}
+                  />
                 </motion.div>
               </>
-            ) : (
-              <motion.div variants={anim} key="output-view">
-                <CurriculumOutput
-                  curriculum={curriculum}
-                  onGenerateAnother={() => setCurriculum(null)}
-                />
-              </motion.div>
             )}
           </motion.div>
         </section>
@@ -598,7 +664,7 @@ export default function Home() {
             PRICING
         ═══════════════════════════════════════════════════ */}
         <section id="pricing" className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-4xl">
+          <div className="mx-auto max-w-5xl">
             <motion.div
               className="text-center mb-16"
               initial="hidden"
@@ -622,7 +688,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="grid gap-6 md:grid-cols-2"
+              className="grid gap-6 md:grid-cols-3"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
@@ -674,6 +740,7 @@ export default function Home() {
                       variant="outline"
                       className="w-full rounded-full"
                       size="lg"
+                      onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
                     >
                       Get Started Free
                     </Button>
@@ -722,8 +789,58 @@ export default function Home() {
                       id="pricing-pro-cta"
                       className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all hover:scale-[1.02]"
                       size="lg"
+                      onClick={() => setShowPaywall(true)}
                     >
                       Start Pro — $29/mo
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+
+              {/* 5-PACK */}
+              <motion.div variants={anim} custom={2}>
+                <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">
+                      One-Time
+                    </CardDescription>
+                    <CardTitle className="text-3xl font-bold">
+                      $39
+                      <span className="text-base font-normal text-muted-foreground">
+                        {" "}one-time
+                      </span>
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      5 curriculum generations. No subscription, no commitment.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {[
+                        "5 curriculum generations",
+                        "Full modules, lessons & quizzes",
+                        "JSON, Markdown & PDF export",
+                        "Custom pacing schedules",
+                        "No recurring charges",
+                      ].map((text, i) => (
+                        <li
+                          key={i}
+                          className="flex items-center gap-2.5 text-sm"
+                        >
+                          <Check className="size-4 text-cyan-500 shrink-0" />
+                          <span>{text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter className="mt-auto">
+                    <Button
+                      id="pricing-5pack-cta"
+                      className="w-full rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all hover:scale-[1.02]"
+                      size="lg"
+                      onClick={() => setShowPaywall(true)}
+                    >
+                      Buy 5-Pack — $39
                     </Button>
                   </CardFooter>
                 </Card>
@@ -937,6 +1054,14 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* ── Modals ─────────────────────────────────────── */}
+      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />
+      <AuthModal
+        open={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onContinueAnonymous={() => setSkipAuth(true)}
+      />
     </div>
   );
 }
