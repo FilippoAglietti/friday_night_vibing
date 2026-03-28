@@ -43,11 +43,17 @@ function requireEnv(key: string): string {
 
 // ─── Supabase URLs & keys ─────────────────────────────────────
 
+// NEXT_PUBLIC_ variants are available in the browser (client components).
+// Non-prefixed variants are server-only. We prefer NEXT_PUBLIC_ so this
+// module can be safely imported from both client and server components.
+
 /** Supabase project URL — safe to expose to the client */
-export const SUPABASE_URL = requireEnv("SUPABASE_URL");
+export const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || requireEnv("SUPABASE_URL");
 
 /** Public anon key — safe for client-side use (respects RLS policies) */
-export const SUPABASE_ANON_KEY = requireEnv("SUPABASE_ANON_KEY");
+export const SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || requireEnv("SUPABASE_ANON_KEY");
 
 // ─── Browser client (client components) ──────────────────────
 
