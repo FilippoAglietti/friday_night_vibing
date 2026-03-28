@@ -169,16 +169,41 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
 
   const rawText = textBlock.text.trim();
 
-  // Parse the JSON — Claude should return pure JSON per our prompt instructions
+  // Parse the JSON — Claude should return pure JSON per our prompt instructions.
+  // Sometimes Claude wraps JSON in markdown fences or adds preamble text,
+  // so we try multiple extraction strategies.
   let curriculum: Curriculum;
   try {
+    // Strategy 1: Direct parse (ideal case — pure JSON)
     curriculum = JSON.parse(rawText) as Curriculum;
   } catch {
-    // If JSON parsing fails, attempt to extract JSON from markdown code fences
+    let parsed = false;
+
+    // Strategy 2: Extract from markdown code fences ```json ... ```
     const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)```/);
     if (jsonMatch) {
-      curriculum = JSON.parse(jsonMatch[1]) as Curriculum;
-    } else {
+      try {
+        curriculum = JSON.parse(jsonMatch[1]) as Curriculum;
+        parsed = true;
+      } catch { /* fall through to strategy 3 */ }
+    }
+
+    // Strategy 3: Find the first '{' and last '}' to extract the JSON object
+    if (!parsed) {
+      const firstBrace = rawText.indexOf("{");
+      const lastBrace = rawText.lastIndexOf("}");
+      if (firstBrace !== -1 && lastBrace > firstBrace) {
+        try {
+          curriculum = JSON.parse(
+            rawText.slice(firstBrace, lastBrace + 1)
+          ) as Curriculum;
+          parsed = true;
+        } catch { /* fall through to error */ }
+      }
+    }
+
+    if (!parsed) {
+      console.error("[/api/generate] Raw Claude response:", rawText.substring(0, 500));
       throw new Error(
         "Claude returned a response that could not be parsed as JSON."
       );
