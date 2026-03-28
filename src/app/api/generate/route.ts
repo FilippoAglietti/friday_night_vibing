@@ -194,8 +194,8 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
  * Creates a Supabase server client using Next.js cookies.
  * Used to read the user session and save generations.
  */
-function createSupabaseServer() {
-  const cookieStore = cookies();
+async function createSupabaseServer() {
+  const cookieStore = await cookies();
   return createServerClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_ANON_KEY!,
@@ -218,7 +218,7 @@ function createSupabaseServer() {
  * @returns true if generation is allowed, false if the limit is reached
  */
 async function checkGenerationLimit(userId: string): Promise<boolean> {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
 
   const { data: profile, error } = await supabase
     .from("profiles")
@@ -253,7 +253,7 @@ async function saveGeneration(
 ): Promise<void> {
   if (!userId) return; // Don't save anonymous generations
 
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
 
   // Save the generation to the generations table
   await supabase.from("generations").insert({
@@ -315,7 +315,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
   // ── Step 3: Auth + generation limit check ──────────────────
   let userId: string | null = null;
   try {
-    const supabase = createSupabaseServer();
+    const supabase = await createSupabaseServer();
     const {
       data: { user },
     } = await supabase.auth.getUser();
