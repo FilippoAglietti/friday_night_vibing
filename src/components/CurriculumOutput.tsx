@@ -24,76 +24,12 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
+import { curriculumToMarkdown } from "@/lib/exports/toMarkdown";
 import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource } from "@/types/curriculum";
 
 interface CurriculumOutputProps {
   curriculum: Curriculum;
   onGenerateAnother: () => void;
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function toMarkdown(c: Curriculum): string {
-  const lines: string[] = [];
-
-  lines.push(`# ${c.title}`);
-  lines.push(`**${c.subtitle}**\n`);
-  lines.push(`${c.description}\n`);
-
-  lines.push(`## Learning Outcomes`);
-  c.objectives.forEach((o) => lines.push(`- ${o}`));
-  lines.push("");
-
-  c.modules.forEach((mod) => {
-    lines.push(`## Module ${mod.order + 1}: ${mod.title}`);
-    lines.push(`${mod.description}\n`);
-    mod.lessons.forEach((l) => {
-      lines.push(`### Lesson ${l.order + 1}: ${l.title}`);
-      if (l.objectives && l.objectives.length > 0) {
-        lines.push(`**Objectives:** ${l.objectives.join(", ")}`);
-      }
-      lines.push(`**Duration:** ${l.durationMinutes} mins`);
-      lines.push("");
-    });
-    if (mod.quiz && mod.quiz.length > 0) {
-      lines.push(`### Quiz`);
-      mod.quiz.forEach((q, i) => {
-        lines.push(`**Q${i + 1}: ${q.question}**`);
-        if (q.options) {
-          q.options.forEach((opt) => lines.push(`- ${opt}`));
-        }
-        const answerText = typeof q.correctAnswer === "number" && q.options 
-          ? q.options[q.correctAnswer] 
-          : q.correctAnswer;
-        lines.push(`✅ **Answer:** ${answerText}`);
-        if (q.explanation) {
-          lines.push(`💡 ${q.explanation}\n`);
-        }
-      });
-    }
-  });
-
-  lines.push(`## Pacing Schedule`);
-  if (c.pacing) {
-    lines.push(`**Total Duration:** ${c.pacing.totalHours} hours\n`);
-    if (c.pacing.weeklyPlan) {
-      c.pacing.weeklyPlan.forEach((w) => {
-        lines.push(
-          `- **Week ${w.week}:** Modules ${w.moduleIds?.length ? w.moduleIds.join(", ") : w.label || "TBD"} — ${c.pacing.hoursPerWeek}h/week`
-        );
-      });
-    }
-  }
-  lines.push("");
-
-  if (c.bonusResources && c.bonusResources.length > 0) {
-    lines.push(`## Bonus Resources`);
-    c.bonusResources.forEach((r) =>
-      lines.push(`- **${r.title}** *(${r.type})*: ${r.description}`)
-    );
-  }
-
-  return lines.join("\n");
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -193,7 +129,7 @@ export default function CurriculumOutput({
 
   // ── Copy as Markdown ──
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(toMarkdown(curriculum));
+    await navigator.clipboard.writeText(curriculumToMarkdown(curriculum));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
