@@ -131,6 +131,54 @@ function validateRequest(body: unknown): GenerateRequest {
   };
 }
 
+// ─── JSON repair helper ──────────────────────────────────────
+
+/**
+ * Attempts to repair truncated JSON by closing any unclosed brackets/braces
+ * and removing trailing incomplete key-value pairs.
+ *
+ * This is a best-effort approach for when Claude's response is cut off
+ * mid-JSON due to hitting the max_tokens limit.
+ *
+ * @param json - Potentially truncated JSON string
+ * @returns Repaired JSON string, or the original if repair fails
+ */
+function repairTruncatedJson(json: string): string {
+  // Remove any trailing incomplete string (cut off mid-value)
+  // Look for the last complete key-value pair
+  let repaired = json;
+
+  // Remove trailing incomplete string value (e.g., "key": "value that got cut)
+  repaired = repaired.replace(/,\s*"[^"]*"?\s*:\s*"[^"]*$/, "");
+  // Remove trailing incomplete number/boolean (e.g., "key": 12)
+  repaired = repaired.replace(/,\s*"[^"]*"?\s*:\s*[\d.tfn][^,}\]]*$/, "");
+  // Remove trailing incomplete key (e.g., , "incomplet)
+  repaired = repaired.replace(/,\s*"[^"]*$/, "");
+
+  // Count unclosed brackets and braces
+  let openBraces = 0;
+  let openBrackets = 0;
+  let inString = false;
+  let escapeNext = false;
+
+  for (const char of repaired) {
+    if (escapeNext) { escapeNext = false; continue; }
+    if (char === "\\") { escapeNext = true; continue; }
+    if (char === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (char === "{") openBraces++;
+    if (char === "}") openBraces--;
+    if (char === "[") openBrackets++;
+    if (char === "]") openBrackets--;
+  }
+
+  // Close any unclosed brackets and braces (brackets first, then braces)
+  while (openBrackets > 0) { repaired += "]"; openBrackets--; }
+  while (openBraces > 0) { repaired += "}"; openBraces--; }
+
+  return repaired;
+}
+
 // ─── Claude API call ──────────────────────────────────────────
 
 /**
@@ -154,9 +202,10 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
   const { system, messages } = buildCurriculumPrompt(request);
 
   // Call Claude — no streaming for now (simpler to parse)
+  // 16384 tokens ensures even large bootcamp curricula (6-10 modules) are not truncated
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 8192,
+    max_tokens: 16384,
     system,
     messages,
   });
@@ -168,6 +217,12 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
   }
 
   const rawText = textBlock.text.trim();
+
+  // Check if the response was truncated (stop_reason === "max_tokens")
+  // A truncated JSON will never parse correctly, so warn early
+  if (response.stop_reason === "max_tokens") {
+    console.warn("[/api/generate] Response was truncated (hit max_tokens). Attempting JSON repair...");
+  }
 
   // Parse the JSON — Claude should return pure JSON per our prompt instructions.
   // Sometimes Claude wraps JSON in markdown fences or adds preamble text,
@@ -198,12 +253,28 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
             rawText.slice(firstBrace, lastBrace + 1)
           ) as Curriculum;
           parsed = true;
+        } catch { /* fall through to strategy 4 */ }
+      }
+    }
+
+    // Strategy 4: Repair truncated JSON (when response hit max_tokens)
+    // Extract from first '{' and attempt to close unclosed brackets/braces
+    if (!parsed) {
+      const firstBrace = rawText.indexOf("{");
+      if (firstBrace !== -1) {
+        const truncatedJson = rawText.slice(firstBrace);
+        const repairedJson = repairTruncatedJson(truncatedJson);
+        try {
+          curriculum = JSON.parse(repairedJson) as Curriculum;
+          parsed = true;
+          console.warn("[/api/generate] JSON was repaired after truncation — some content may be incomplete.");
         } catch { /* fall through to error */ }
       }
     }
 
     if (!parsed) {
-      console.error("[/api/generate] Raw Claude response:", rawText.substring(0, 500));
+      console.error("[/api/generate] Raw Claude response (first 500 chars):", rawText.substring(0, 500));
+      console.error("[/api/generate] Raw Claude response (last 200 chars):", rawText.substring(rawText.length - 200));
       throw new Error(
         "Claude returned a response that could not be parsed as JSON."
       );
