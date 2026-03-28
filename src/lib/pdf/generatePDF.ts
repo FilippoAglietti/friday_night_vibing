@@ -277,7 +277,7 @@ class PDFBuilder {
 
     this.doc.setFont("helvetica", "normal");
     this.doc.setTextColor(224, 231, 255);
-    for (const outcome of curriculum.learningOutcomes.slice(0, 4)) {
+    for (const outcome of curriculum.objectives.slice(0, 4)) {
       const lines = this.doc.splitTextToSize(`• ${outcome}`, PAGE.contentWidth - 10) as string[];
       this.doc.text(lines, PAGE.width / 2, this.y, { align: "center" });
       this.y += lines.length * FONT.small * 0.42 + 2;
@@ -336,7 +336,7 @@ class PDFBuilder {
 
     // Register in TOC with current page number
     this.toc.push({
-      title: `Module ${module.moduleNumber}: ${module.title}`,
+      title: `Module ${module.order + 1}: ${module.title}`,
       page: this.pageNum,
     });
 
@@ -348,7 +348,7 @@ class PDFBuilder {
     this.doc.setFont("helvetica", "bold");
     this.doc.setTextColor(255, 255, 255);
     this.doc.text(
-      `Module ${module.moduleNumber}: ${module.title}`,
+      `Module ${module.order + 1}: ${module.title}`,
       PAGE.marginLeft,
       this.y + 6
     );
@@ -368,13 +368,15 @@ class PDFBuilder {
     }
 
     // Quiz
-    this.gap(4);
-    this.text("Module Quiz", FONT.h4, true, COLORS.primary);
-    this.hr(1);
-    this.gap(2);
+    if (module.quiz && module.quiz.length > 0) {
+      this.gap(4);
+      this.text("Module Quiz", FONT.h4, true, COLORS.primary);
+      this.hr(1);
+      this.gap(2);
 
-    for (let i = 0; i < module.quizQuestions.length; i++) {
-      this.buildQuizQuestion(module.quizQuestions[i], i + 1);
+      for (let i = 0; i < module.quiz.length; i++) {
+        this.buildQuizQuestion(module.quiz[i], i + 1);
+      }
     }
   }
 
@@ -391,7 +393,7 @@ class PDFBuilder {
     this.doc.setFont("helvetica", "bold");
     this.color(COLORS.text);
     this.doc.text(
-      `${lesson.lessonNumber}. ${lesson.title}`,
+      `${lesson.order + 1}. ${lesson.title}`,
       PAGE.marginLeft,
       this.y
     );
@@ -400,21 +402,12 @@ class PDFBuilder {
     this.doc.setFontSize(FONT.tiny);
     this.doc.setFont("helvetica", "normal");
     this.color(COLORS.textMuted);
-    this.doc.text(`⏱ ${lesson.duration}`, PAGE.width - PAGE.marginRight, this.y, { align: "right" });
+    this.doc.text(`⏱ ${lesson.durationMinutes}m`, PAGE.width - PAGE.marginRight, this.y, { align: "right" });
     this.y += FONT.body * 0.45;
 
     // Objective
-    this.wrappedText(`Objective: ${lesson.objective}`, FONT.small, false, COLORS.textMuted, PAGE.marginLeft + 4);
-
-    // Key topics
-    if (lesson.keyTopics.length > 0) {
-      this.wrappedText(
-        `Topics: ${lesson.keyTopics.join(" · ")}`,
-        FONT.small,
-        false,
-        COLORS.textMuted,
-        PAGE.marginLeft + 4
-      );
+    if (lesson.objectives && lesson.objectives.length > 0) {
+      this.wrappedText(`Objective: ${lesson.objectives[0]}`, FONT.small, false, COLORS.textMuted, PAGE.marginLeft + 4);
     }
 
     this.gap(3);
@@ -435,11 +428,13 @@ class PDFBuilder {
 
     // Answer options
     const letters = ["A", "B", "C", "D"];
-    for (let i = 0; i < q.options.length; i++) {
-      const isCorrect = q.options[i] === q.correctAnswer;
-      const color = isCorrect ? COLORS.primary : COLORS.textMuted;
-      const prefix = isCorrect ? `✓ ${letters[i]}.` : `   ${letters[i]}.`;
-      this.wrappedText(`${prefix} ${q.options[i]}`, FONT.small, isCorrect, color, PAGE.marginLeft + 4);
+    if (q.options) {
+      for (let i = 0; i < q.options.length; i++) {
+        const isCorrect = q.options[i] === q.correctAnswer || i === q.correctAnswer;
+        const color = isCorrect ? COLORS.primary : COLORS.textMuted;
+        const prefix = isCorrect ? `✓ ${letters[i]}.` : `   ${letters[i]}.`;
+        this.wrappedText(`${prefix} ${q.options[i]}`, FONT.small, isCorrect, color, PAGE.marginLeft + 4);
+      }
     }
 
     // Explanation
@@ -462,7 +457,7 @@ class PDFBuilder {
     this.gap(2);
 
     this.wrappedText(
-      `Total Duration: ${curriculum.pacingSchedule.totalDuration}`,
+      `Total Duration: ${curriculum.pacing.totalHours} Hours`,
       FONT.body,
       true,
       COLORS.text
@@ -481,19 +476,25 @@ class PDFBuilder {
     this.y += 7;
 
     // Table rows
-    for (const week of curriculum.pacingSchedule.weeklyBreakdown) {
-      this.ensureSpace(8);
-      this.doc.setFontSize(FONT.small);
-      this.doc.setFont("helvetica", "normal");
-      this.color(COLORS.text);
-      this.doc.text(`Week ${week.week}`, PAGE.marginLeft + 2, this.y);
-      this.doc.text(`Module${week.modules.length > 1 ? "s" : ""} ${week.modules.join(", ")}`, PAGE.marginLeft + 30, this.y);
-      this.doc.text(`${week.hoursPerWeek}h`, PAGE.marginLeft + 100, this.y);
-      this.y += 6;
+    if (curriculum.pacing.weeklyPlan) {
+      for (const week of curriculum.pacing.weeklyPlan) {
+        this.ensureSpace(8);
+        this.doc.setFontSize(FONT.small);
+        this.doc.setFont("helvetica", "normal");
+        this.color(COLORS.text);
+        this.doc.text(`Week ${week.week}`, PAGE.marginLeft + 2, this.y);
+        
+        const modulesText = week.moduleIds && week.moduleIds.length > 0 
+          ? `Module${week.moduleIds.length > 1 ? "s" : ""} ${week.moduleIds.join(", ")}` 
+          : week.label || "";
+        this.doc.text(modulesText, PAGE.marginLeft + 30, this.y);
+        this.doc.text(`${curriculum.pacing.hoursPerWeek}h`, PAGE.marginLeft + 100, this.y);
+        this.y += 6;
 
-      // Light row separator
-      this.doc.setDrawColor(COLORS.border[0], COLORS.border[1], COLORS.border[2]);
-      this.doc.line(PAGE.marginLeft, this.y - 1, PAGE.width - PAGE.marginRight, this.y - 1);
+        // Light row separator
+        this.doc.setDrawColor(COLORS.border[0], COLORS.border[1], COLORS.border[2]);
+        this.doc.line(PAGE.marginLeft, this.y - 1, PAGE.width - PAGE.marginRight, this.y - 1);
+      }
     }
   }
 
@@ -530,7 +531,7 @@ class PDFBuilder {
       this.y += FONT.body * 0.45 + 2;
 
       // Description
-      this.wrappedText(resource.description, FONT.small, false, COLORS.textMuted, PAGE.marginLeft + 4);
+      this.wrappedText(resource.description || "", FONT.small, false, COLORS.textMuted, PAGE.marginLeft + 4);
       this.gap(4);
     }
   }
@@ -578,7 +579,7 @@ export function generateCurriculumPDF(curriculum: Curriculum): jsPDF {
   builder.buildPacingPage(curriculum);
 
   // 4. Bonus resources
-  if (curriculum.bonusResources.length > 0) {
+  if (curriculum.bonusResources && curriculum.bonusResources.length > 0) {
     builder.buildBonusResourcesPage(curriculum.bonusResources);
   }
 

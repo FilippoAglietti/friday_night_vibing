@@ -1,7 +1,9 @@
 "use client";
 
 import CurriculumForm from "@/components/CurriculumForm";
+import CurriculumOutput from "@/components/CurriculumOutput";
 import { useState, useEffect } from "react";
+import type { Curriculum } from "@/types/curriculum";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -153,6 +155,7 @@ const difficultyColor: Record<string, string> = {
 
 export default function Home() {
   const [dark, setDark] = useState(true);
+  const [curriculum, setCurriculum] = useState<Curriculum | null>(null);
   const prefersReduced = useReducedMotion();
 
   useEffect(() => {
@@ -447,27 +450,38 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════
-            TRY IT — CURRICULUM FORM
+            TRY IT — CURRICULUM FORM / OUTPUT
         ═══════════════════════════════════════════════════ */}
         <section id="generate" className="relative px-4 py-20 sm:py-28">
           <motion.div
-            className="mx-auto max-w-xl"
+            className="mx-auto max-w-3xl"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
             variants={stagger}
           >
-            <motion.div className="text-center mb-10" variants={anim}>
-              <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
-                Try It Now
-              </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-                Generate your curriculum
-              </h2>
-            </motion.div>
-            <motion.div variants={anim} custom={1}>
-              <CurriculumForm />
-            </motion.div>
+            {!curriculum ? (
+              <>
+                <motion.div className="text-center mb-10" variants={anim}>
+                  <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
+                    Try It Now
+                  </p>
+                  <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+                    Generate your curriculum
+                  </h2>
+                </motion.div>
+                <motion.div variants={anim} custom={1} className="mx-auto max-w-xl">
+                  <CurriculumForm onGenerated={setCurriculum} />
+                </motion.div>
+              </>
+            ) : (
+              <motion.div variants={anim} key="output-view">
+                <CurriculumOutput
+                  curriculum={curriculum}
+                  onGenerateAnother={() => setCurriculum(null)}
+                />
+              </motion.div>
+            )}
           </motion.div>
         </section>
 

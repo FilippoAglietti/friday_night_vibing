@@ -227,7 +227,7 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
   // Parse the JSON — Claude should return pure JSON per our prompt instructions.
   // Sometimes Claude wraps JSON in markdown fences or adds preamble text,
   // so we try multiple extraction strategies.
-  let curriculum: Curriculum;
+  let curriculum: Curriculum | undefined;
   try {
     // Strategy 1: Direct parse (ideal case — pure JSON)
     curriculum = JSON.parse(rawText) as Curriculum;
@@ -281,6 +281,9 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
     }
   }
 
+  if (!curriculum) {
+    throw new Error("Failed to parse curriculum JSON");
+  }
   return curriculum;
 }
 
@@ -422,6 +425,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
       if (!canGenerate) {
         return NextResponse.json(
           {
+            success: false,
             error: "Generation limit reached.",
             details:
               "You have used all your free generations. Upgrade to Pro for unlimited access.",
