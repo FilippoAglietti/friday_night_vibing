@@ -62,7 +62,10 @@ function toMarkdown(c: Curriculum): string {
         if (q.options) {
           q.options.forEach((opt) => lines.push(`- ${opt}`));
         }
-        lines.push(`✅ **Answer:** ${q.correctAnswer}`);
+        const answerText = typeof q.correctAnswer === "number" && q.options 
+          ? q.options[q.correctAnswer] 
+          : q.correctAnswer;
+        lines.push(`✅ **Answer:** ${answerText}`);
         if (q.explanation) {
           lines.push(`💡 ${q.explanation}\n`);
         }
@@ -147,7 +150,9 @@ function QuizCard({ question, index }: { question: QuizQuestion; index: number }
           {revealed ? (
             <div className="mt-2">
               <p className="text-xs text-green-600 dark:text-green-400 font-medium mb-1">
-                ✅ Answer: {question.correctAnswer}
+                ✅ Answer: {typeof question.correctAnswer === "number" && question.options
+                  ? question.options[question.correctAnswer]
+                  : question.correctAnswer}
               </p>
               {question.explanation && (
                 <p className="text-xs text-muted-foreground italic">
