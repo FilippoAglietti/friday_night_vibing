@@ -34,7 +34,7 @@ const plans = [
       "Priority AI processing",
     ],
     cta: "Start Pro — $29/mo",
-    priceId: "price_pro_monthly", // Replace with real Stripe price ID
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_pro_monthly",
     icon: Crown,
     gradient: "from-violet-600 to-indigo-600",
     highlight: true,
@@ -54,7 +54,7 @@ const plans = [
       "No recurring charges",
     ],
     cta: "Buy 5-Pack — $39",
-    priceId: "price_5pack", // Replace with real Stripe price ID
+    priceId: process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "price_5pack",
     icon: Zap,
     gradient: "from-cyan-600 to-blue-600",
     highlight: false,

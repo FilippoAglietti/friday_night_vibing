@@ -65,9 +65,11 @@ export async function POST(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     // Determine if this is a subscription or one-time payment
-    // Stripe will infer this from the price object itself
+    // Compare against the known 5-pack price ID from env, otherwise check Stripe price object
+    const fivePackPriceId = process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "";
+    const isOneTime = priceId === fivePackPriceId || priceId.includes("5pack");
     const session = await stripe.checkout.sessions.create({
-      mode: priceId.includes("5pack") ? "payment" : "subscription",
+      mode: isOneTime ? "payment" : "subscription",
       payment_method_types: ["card"],
       line_items: [
         {
