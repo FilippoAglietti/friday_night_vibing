@@ -87,21 +87,48 @@ export const supabaseBrowser = createClient<Database>(
  * Never import this in any client component or expose it via an API route
  * without proper authentication checks.
  *
+ * This is lazily initialised so that importing this module from a client
+ * component (e.g. AuthModal importing supabaseBrowser) does not crash the
+ * browser by attempting to read a server-only environment variable.
+ *
  * Usage (server only):
  *   import { supabaseAdmin } from '@/lib/supabase'
  *   await supabaseAdmin.from('profiles').update({ plan: 'pro' }).eq('id', userId)
  */
-export const supabaseAdmin = createClient<Database>(
-  SUPABASE_URL,
-  requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
-  {
-    auth: {
-      // Disable session persistence for the admin client — it's stateless
-      persistSession: false,
-      autoRefreshToken: false,
-    },
+let _supabaseAdmin: ReturnType<typeof createClient<Database>> | null = null;
+
+export function getSupabaseAdmin() {
+  if (typeof window !== "undefined") {
+    throw new Error("supabaseAdmin must not be used in the browser.");
   }
-);
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = createClient<Database>(
+      SUPABASE_URL,
+      requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      }
+    );
+  }
+  return _supabaseAdmin;
+}
+
+// Backwards-compatible export — lazily initialised, only works server-side
+export const supabaseAdmin = typeof window === "undefined"
+  ? createClient<Database>(
+      SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      }
+    )
+  : (null as unknown as ReturnType<typeof createClient<Database>>);
 
 // ─── Per-request server client (Next.js App Router) ──────────
 
