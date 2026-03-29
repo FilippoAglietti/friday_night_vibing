@@ -513,7 +513,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
   // ── Step 6: Return the curriculum ──────────────────────────
   // Return { success: true, data: curriculum } to match GenerateResponse type
   const res = NextResponse.json(
-    { success: true, data: curriculum },
+    { success: true as const, data: curriculum },
     { status: 200 }
   );
   res.headers.set("X-Content-Type-Options", "nosniff");
