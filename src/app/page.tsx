@@ -1025,6 +1025,16 @@ export default function Home() {
                     Support
                   </a>
                 </li>
+                <li>
+                  <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLScHZQ9cSmQwUnDnHiSPSFaRyeS1Ijh4jbnueFAJ4fdedQZdfA/viewform"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground transition-colors text-violet-400 font-medium"
+                  >
+                    Feedback
+                  </a>
+                </li>
               </ul>
             </div>
 
