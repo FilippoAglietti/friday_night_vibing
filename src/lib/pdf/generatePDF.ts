@@ -334,9 +334,13 @@ class PDFBuilder {
   buildModule(module: Module): void {
     this.newPage();
 
+    // Strip any "Module N:" prefix the AI may have included in the title
+    const cleanTitle = module.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "");
+    const moduleHeading = `Module ${module.order + 1}: ${cleanTitle}`;
+
     // Register in TOC with current page number
     this.toc.push({
-      title: `Module ${module.order + 1}: ${module.title}`,
+      title: moduleHeading,
       page: this.pageNum,
     });
 
@@ -348,7 +352,7 @@ class PDFBuilder {
     this.doc.setFont("helvetica", "bold");
     this.doc.setTextColor(255, 255, 255);
     this.doc.text(
-      `Module ${module.order + 1}: ${module.title}`,
+      moduleHeading,
       PAGE.marginLeft,
       this.y + 6
     );
@@ -485,7 +489,10 @@ class PDFBuilder {
         this.doc.text(`Week ${week.week}`, PAGE.marginLeft + 2, this.y);
         
         const modulesText = week.moduleIds && week.moduleIds.length > 0 
-          ? `Module${week.moduleIds.length > 1 ? "s" : ""} ${week.moduleIds.join(", ")}` 
+          ? week.moduleIds.map(id => {
+              const mod = curriculum.modules.find(m => m.id === id);
+              return mod ? mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "") : id;
+            }).join(", ")
           : week.label || "";
         this.doc.text(modulesText, PAGE.marginLeft + 30, this.y);
         this.doc.text(`${curriculum.pacing.hoursPerWeek}h`, PAGE.marginLeft + 100, this.y);

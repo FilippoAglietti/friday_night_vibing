@@ -203,6 +203,7 @@ export default function Home() {
   }, []);
 
   const handleGenerated = useCallback((c: Curriculum) => {
+    console.log("[DEBUG] handleGenerated called, data:", JSON.stringify(c)?.slice(0, 200));
     setCurriculum(c);
     toast("Curriculum generated successfully!", "success");
   }, [toast]);
@@ -523,7 +524,12 @@ export default function Home() {
             {isGenerating ? (
               <LoadingSkeleton />
             ) : curriculum ? (
-              <motion.div variants={anim} key="output-view">
+              <motion.div
+                key="output-view"
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              >
                 <CurriculumOutput
                   curriculum={curriculum}
                   onGenerateAnother={() => setCurriculum(null)}

@@ -89,10 +89,10 @@ export function curriculumToMarkdown(c: Curriculum): string {
       c.pacing.weeklyPlan.forEach((w) => {
         const moduleLabel =
           w.moduleIds?.length
-            ? w.moduleIds.join(", ")
+            ? w.moduleIds.map(id => { const mod = c.modules.find(m => m.id === id); return mod ? mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "") : id; }).join(", ")
             : w.label || "TBD";
         lines.push(
-          `- **Week ${w.week}:** Modules ${moduleLabel} — ${c.pacing.hoursPerWeek}h/week`
+          `- **Week ${w.week}:** ${moduleLabel} — ${c.pacing.hoursPerWeek}h/week`
         );
       });
     }

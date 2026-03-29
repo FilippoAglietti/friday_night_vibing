@@ -220,7 +220,7 @@ export default function CurriculumOutput({
                       {(mod.order !== undefined ? mod.order : index) + 1}
                     </span>
                     <div>
-                      <p className="font-medium text-sm">{mod.title}</p>
+                      <p className="font-medium text-sm">{mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "")}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {mod.lessons?.length || 0} lessons
                         {mod.quiz && mod.quiz.length > 0 &&
@@ -281,7 +281,7 @@ export default function CurriculumOutput({
                     Week {week.week}
                   </span>
                   <span className="text-muted-foreground flex-1">
-                    {week.label || (week.moduleIds && week.moduleIds.length > 0 ? `Modules ${week.moduleIds.join(", ")}` : "Course Content")}
+                    {week.label || (week.moduleIds && week.moduleIds.length > 0 ? week.moduleIds.map(id => { const m = curriculum.modules.find(mod => mod.id === id); return m ? m.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "") : id; }).join(", ") : "Course Content")}
                   </span>
                   <Badge variant="outline" className="text-xs">
                     {curriculum.pacing.hoursPerWeek}h / week
