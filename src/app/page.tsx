@@ -537,7 +537,12 @@ export default function Home() {
               </motion.div>
             ) : (
               <>
-                <motion.div className="text-center mb-10" variants={anim}>
+                <motion.div
+                  className="text-center mb-10"
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                >
                   <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
                     Try It Now
                   </p>
@@ -545,7 +550,12 @@ export default function Home() {
                     Generate your curriculum
                   </h2>
                 </motion.div>
-                <motion.div variants={anim} custom={1} className="mx-auto max-w-xl">
+                <motion.div
+                  className="mx-auto max-w-xl"
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                >
                   <CurriculumForm
                     onGenerated={handleGenerated}
                     onLoadingChange={handleLoadingChange}
