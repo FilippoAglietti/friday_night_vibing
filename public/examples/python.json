@@ -1,193 +1,593 @@
 {
-  "title": "Python for Absolute Beginners: From Zero to Writing Real Programs",
-  "subtitle": "A complete beginner's journey through Python — no prior coding experience needed",
-  "description": "Learn to think like a programmer and write Python code that actually does useful things. This course takes you from installing Python on your computer all the way to building a working project you can show off, using plain English explanations at every step.",
-  "learningOutcomes": [
-    "By the end of this course, students will be able to write Python programs that use variables, loops, conditionals, and functions to solve real problems.",
-    "By the end of this course, students will be able to read and debug Python error messages without panic.",
-    "By the end of this course, students will be able to work with lists, dictionaries, and files to store and process data.",
-    "By the end of this course, students will be able to design and build a small complete Python project from scratch."
+  "title": "Python Programming from Zero to Hero",
+  "subtitle": "Master Python from absolute beginner to confident developer",
+  "description": "Start with zero programming experience and emerge as a Python developer capable of building real applications. This comprehensive 5-week course covers fundamentals, data structures, functions, file handling, and object-oriented programming with practical projects throughout.",
+  "targetAudience": "Complete beginners with no programming experience, career changers, students, and professionals seeking to add coding skills",
+  "difficulty": "beginner",
+  "objectives": [
+    "Write functional Python programs using variables, operators, and control flow",
+    "Design and implement functions that solve real-world problems",
+    "Analyze and manipulate data using Python's built-in data structures",
+    "Create object-oriented programs using classes and inheritance",
+    "Develop complete Python projects from concept to deployment"
   ],
+  "prerequisites": [
+    "Access to a computer with Python 3.9+ installed",
+    "A code editor (VS Code recommended)",
+    "Dedication to practice coding daily",
+    "No prior programming experience needed"
+  ],
+  "tags": ["python", "programming", "coding", "backend development", "beginners"],
   "modules": [
     {
-      "moduleNumber": 1,
-      "title": "Your First Lines of Code: Python Basics",
-      "description": "Set up your Python environment and write your first programs. You'll learn what variables, data types, and print statements are, and why Python is one of the friendliest languages to start with.",
+      "id": "mod-1",
+      "title": "Python Fundamentals and Setup",
+      "description": "Get your development environment ready and learn the absolute basics of Python syntax, variables, data types, and operators.",
+      "objectives": [
+        "Install and configure Python development environment",
+        "Understand Python syntax and write your first program",
+        "Work with variables, data types, and operators",
+        "Use print statements and understand console output"
+      ],
+      "order": 0,
+      "durationMinutes": 240,
       "lessons": [
         {
-          "lessonNumber": 1,
-          "title": "Installing Python and Writing Hello World",
-          "objective": "Students will be able to install Python, open a terminal, and run their first Python script.",
-          "duration": "25 minutes",
-          "keyTopics": ["installing Python 3", "VS Code setup", "print() function", "running .py files from terminal"]
+          "id": "lesson-1-1",
+          "title": "Setting Up Your Python Environment",
+          "description": "Install Python, choose a code editor, and write your first 'Hello World' program.",
+          "format": "Video Tutorial + Installation Guide",
+          "durationMinutes": 40,
+          "objectives": ["Successfully set up Python development environment"],
+          "order": 0
         },
         {
-          "lessonNumber": 2,
-          "title": "Variables and Data Types",
-          "objective": "Students will be able to create variables and explain the difference between strings, integers, floats, and booleans.",
-          "duration": "30 minutes",
-          "keyTopics": ["variable assignment", "str / int / float / bool", "type() function", "naming conventions"]
+          "id": "lesson-1-2",
+          "title": "Variables, Data Types, and Basic Operations",
+          "description": "Learn about strings, integers, floats, booleans, and how to perform basic mathematical operations.",
+          "format": "Video Lecture + Interactive Code Examples",
+          "durationMinutes": 60,
+          "objectives": ["Create and manipulate variables of different data types"],
+          "order": 1
         },
         {
-          "lessonNumber": 3,
-          "title": "Getting Input and Doing Maths",
-          "objective": "Students will be able to use input() to receive user input and perform arithmetic operations in Python.",
-          "duration": "25 minutes",
-          "keyTopics": ["input() function", "type casting with int()", "arithmetic operators", "f-strings for output"]
+          "id": "lesson-1-3",
+          "title": "Operators and Expressions",
+          "description": "Master arithmetic, comparison, logical, and assignment operators to build complex expressions.",
+          "format": "Video + Coding Challenges",
+          "durationMinutes": 60,
+          "objectives": ["Use operators to build correct expressions"],
+          "order": 2
+        },
+        {
+          "id": "lesson-1-4",
+          "title": "Getting User Input and String Formatting",
+          "description": "Learn how to receive input from users and format output for readable programs.",
+          "format": "Video Tutorial + Practice Exercises",
+          "durationMinutes": 50,
+          "objectives": ["Create interactive programs that accept and display user data"],
+          "order": 3
+        },
+        {
+          "id": "lesson-1-5",
+          "title": "Module 1 Project: Simple Calculator",
+          "description": "Build a working calculator that can perform basic arithmetic operations with user input.",
+          "format": "Guided Project + Code Review",
+          "durationMinutes": 30,
+          "objectives": ["Apply fundamentals to create a working application"],
+          "order": 4
         }
       ],
-      "quizQuestions": [
+      "quiz": [
         {
-          "question": "What will this code print?  x = 5  y = '5'  print(x + int(y))",
-          "options": ["55", "10", "TypeError", "'55'"],
-          "correctAnswer": "10",
-          "explanation": "int(y) converts the string '5' to the integer 5. Adding two integers (5 + 5) gives 10. If you tried x + y without int() you'd get a TypeError because you can't add an integer and a string directly."
+          "id": "quiz-1-1",
+          "type": "multiple-choice",
+          "question": "What will be the output of this code? x = 10; y = 3; print(x % y)",
+          "options": [
+            "10",
+            "3",
+            "1",
+            "Error"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The % operator is the modulo operator, which returns the remainder of division. 10 divided by 3 is 3 with remainder 1.",
+          "points": 10
         },
         {
-          "question": "A student writes: name = input('Enter your name: ')  print('Hello ' + name). What type is the variable 'name'?",
-          "options": ["int", "bool", "str", "list"],
-          "correctAnswer": "str",
-          "explanation": "The input() function always returns a string, regardless of what the user types. If you need a number from input(), you must explicitly convert it with int() or float()."
+          "id": "quiz-1-2",
+          "type": "multiple-choice",
+          "question": "Which of the following is the correct way to create a variable with a string value in Python?",
+          "options": [
+            "name = [John]",
+            "name = 'John'",
+            "name: John",
+            "name >> 'John'"
+          ],
+          "correctAnswer": 1,
+          "explanation": "In Python, strings are created by enclosing text in single quotes (''), double quotes (\"\"), or triple quotes. Options with brackets and arrows are incorrect syntax.",
+          "points": 10
+        },
+        {
+          "id": "quiz-1-3",
+          "type": "multiple-choice",
+          "question": "What data type is the result of 5 / 2 in Python 3?",
+          "options": [
+            "Integer (2)",
+            "Float (2.5)",
+            "String",
+            "Boolean"
+          ],
+          "correctAnswer": 1,
+          "explanation": "In Python 3, the / operator always returns a float, even when dividing evenly. To get integer division, use //.",
+          "points": 10
         }
       ]
     },
     {
-      "moduleNumber": 2,
-      "title": "Making Decisions: Conditionals and Loops",
-      "description": "This is where your programs start thinking for themselves. Learn how to use if/elif/else to make decisions based on data, and for/while loops to repeat actions automatically — the two most powerful ideas in all of programming.",
+      "id": "mod-2",
+      "title": "Control Flow: Conditionals and Loops",
+      "description": "Master decision-making in code using if statements, loops, and control flow structures.",
+      "objectives": [
+        "Use conditional statements to make decisions in code",
+        "Implement for and while loops for repetitive tasks",
+        "Apply nested loops and complex control flow",
+        "Debug common loop and conditional errors"
+      ],
+      "order": 1,
+      "durationMinutes": 240,
       "lessons": [
         {
-          "lessonNumber": 4,
-          "title": "If, Elif, Else: Teaching Python to Decide",
-          "objective": "Students will be able to write conditional statements that execute different code blocks based on data values.",
-          "duration": "30 minutes",
-          "keyTopics": ["if/elif/else syntax", "comparison operators", "boolean logic with and/or", "indentation rules"]
+          "id": "lesson-2-1",
+          "title": "If, Elif, and Else Statements",
+          "description": "Learn how to make decisions in code based on conditions and logical expressions.",
+          "format": "Video Lecture + Interactive Examples",
+          "durationMinutes": 50,
+          "objectives": ["Write conditional logic to control program flow"],
+          "order": 0
         },
         {
-          "lessonNumber": 5,
-          "title": "For Loops: Doing Things Repeatedly",
-          "objective": "Students will be able to use for loops to iterate over a range of numbers and a list of items.",
-          "duration": "30 minutes",
-          "keyTopics": ["for loop syntax", "range() function", "iterating over lists", "loop variable naming"]
+          "id": "lesson-2-2",
+          "title": "For Loops and Iteration",
+          "description": "Understand how to repeat code blocks using for loops and the range() function.",
+          "format": "Video + Coding Challenges",
+          "durationMinutes": 60,
+          "objectives": ["Use for loops to iterate over sequences"],
+          "order": 1
         },
         {
-          "lessonNumber": 6,
-          "title": "While Loops and Breaking Out",
-          "objective": "Students will be able to write while loops that run until a condition is met and use break to exit early.",
-          "duration": "25 minutes",
-          "keyTopics": ["while loop syntax", "infinite loop risk", "break and continue", "practical use cases"]
+          "id": "lesson-2-3",
+          "title": "While Loops and Loop Control",
+          "description": "Master while loops, break, continue, and other loop control mechanisms.",
+          "format": "Video Tutorial + Practice Problems",
+          "durationMinutes": 60,
+          "objectives": ["Control loop execution with break and continue"],
+          "order": 2
+        },
+        {
+          "id": "lesson-2-4",
+          "title": "Nested Loops and Complex Logic",
+          "description": "Combine multiple loops and conditionals to solve more complex problems.",
+          "format": "Video + Advanced Exercises",
+          "durationMinutes": 40,
+          "objectives": ["Design nested structures for multi-dimensional problems"],
+          "order": 3
+        },
+        {
+          "id": "lesson-2-5",
+          "title": "Module 2 Project: Number Guessing Game",
+          "description": "Create an interactive game that uses loops, conditionals, and user input.",
+          "format": "Guided Project + Code Review",
+          "durationMinutes": 30,
+          "objectives": ["Combine control flow concepts in a complete game"],
+          "order": 4
         }
       ],
-      "quizQuestions": [
+      "quiz": [
         {
-          "question": "What will this loop print?  for i in range(1, 5):  print(i)",
-          "options": ["1 2 3 4 5", "0 1 2 3 4", "1 2 3 4", "1 2 3 4 5 6"],
-          "correctAnswer": "1 2 3 4",
-          "explanation": "range(1, 5) generates numbers starting at 1 and stopping BEFORE 5. So it produces 1, 2, 3, 4. The stop value is always exclusive in Python's range()."
+          "id": "quiz-2-1",
+          "type": "multiple-choice",
+          "question": "What is the output of this code? for i in range(3): print(i)",
+          "options": [
+            "0 1 2 3",
+            "0 1 2",
+            "1 2 3",
+            "Error"
+          ],
+          "correctAnswer": 1,
+          "explanation": "range(3) produces values 0, 1, 2 (not including 3). Each value is printed on a new line.",
+          "points": 10
         },
         {
-          "question": "When should you use a while loop instead of a for loop?",
-          "options": ["When you know exactly how many times to repeat", "When you need to repeat until a condition becomes false, but don't know how many iterations it will take", "When you want to loop over items in a list", "While loops are just slower for loops — never use them"],
-          "correctAnswer": "When you need to repeat until a condition becomes false, but don't know how many iterations it will take",
-          "explanation": "For loops are ideal when you know the count upfront (e.g., 'do this 10 times'). While loops are better when the stopping condition depends on user input or data that changes during execution."
+          "id": "quiz-2-2",
+          "type": "multiple-choice",
+          "question": "Which keyword stops the execution of a loop immediately?",
+          "options": [
+            "stop",
+            "exit",
+            "break",
+            "halt"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The 'break' keyword exits a loop immediately, while 'continue' skips to the next iteration.",
+          "points": 10
+        },
+        {
+          "id": "quiz-2-3",
+          "type": "multiple-choice",
+          "question": "What will this condition evaluate to? (5 > 3) and (2 < 1)",
+          "options": [
+            "True",
+            "False",
+            "Error",
+            "None"
+          ],
+          "correctAnswer": 1,
+          "explanation": "The first condition (5 > 3) is True, but the second (2 < 1) is False. 'and' requires both to be True, so the result is False.",
+          "points": 10
         }
       ]
     },
     {
-      "moduleNumber": 3,
-      "title": "Functions and Reusable Code",
-      "description": "Stop writing the same code twice. Functions are the fundamental tool for organising, reusing, and testing code. You'll learn to write functions that take inputs, do work, and return results.",
+      "id": "mod-3",
+      "title": "Data Structures: Lists, Dictionaries, and Tuples",
+      "description": "Organize and manipulate collections of data using Python's powerful built-in data structures.",
+      "objectives": [
+        "Create and manipulate lists, dictionaries, tuples, and sets",
+        "Apply list comprehensions for efficient data transformation",
+        "Choose appropriate data structures for different problems",
+        "Work with nested data structures"
+      ],
+      "order": 2,
+      "durationMinutes": 240,
       "lessons": [
         {
-          "lessonNumber": 7,
-          "title": "Defining and Calling Functions",
-          "objective": "Students will be able to define functions with def, call them, and explain why functions make code easier to maintain.",
-          "duration": "30 minutes",
-          "keyTopics": ["def keyword", "parameters vs. arguments", "return statement", "function naming conventions"]
+          "id": "lesson-3-1",
+          "title": "Lists: Creation, Indexing, and Slicing",
+          "description": "Master the most common data structure in Python with indexing, slicing, and list methods.",
+          "format": "Video + Interactive Exercises",
+          "durationMinutes": 60,
+          "objectives": ["Create and manipulate lists with proper indexing"],
+          "order": 0
         },
         {
-          "lessonNumber": 8,
-          "title": "Scope and Default Parameters",
-          "objective": "Students will be able to explain variable scope and write functions with optional default parameter values.",
-          "duration": "25 minutes",
-          "keyTopics": ["local vs. global scope", "default parameter values", "avoiding global variables", "docstrings"]
+          "id": "lesson-3-2",
+          "title": "Dictionaries: Key-Value Pairs",
+          "description": "Learn how to store and retrieve data using dictionaries with meaningful keys.",
+          "format": "Video Lecture + Practical Examples",
+          "durationMinutes": 50,
+          "objectives": ["Use dictionaries to organize related data"],
+          "order": 1
+        },
+        {
+          "id": "lesson-3-3",
+          "title": "Tuples, Sets, and Choosing Data Structures",
+          "description": "Understand tuples and sets, and learn how to choose the right data structure for different scenarios.",
+          "format": "Video + Comparison Examples",
+          "durationMinutes": 50,
+          "objectives": ["Select appropriate data structures for specific problems"],
+          "order": 2
+        },
+        {
+          "id": "lesson-3-4",
+          "title": "List Comprehensions and Advanced Techniques",
+          "description": "Write elegant, efficient code using list comprehensions and other advanced data structure techniques.",
+          "format": "Video + Advanced Challenges",
+          "durationMinutes": 50,
+          "objectives": ["Use list comprehensions for efficient data transformation"],
+          "order": 3
+        },
+        {
+          "id": "lesson-3-5",
+          "title": "Module 3 Project: Contact Management System",
+          "description": "Build a system that stores and manages contact information using dictionaries and lists.",
+          "format": "Guided Project + Code Review",
+          "durationMinutes": 30,
+          "objectives": ["Organize complex data with appropriate structures"],
+          "order": 4
         }
       ],
-      "quizQuestions": [
+      "quiz": [
         {
-          "question": "What is wrong with this function?  def add(a, b):  total = a + b  print(total)  result = add(3, 4)  print(result)",
-          "options": ["Nothing is wrong", "The function uses print instead of return, so result will be None", "You can't add numbers inside a function", "The parameters a and b are invalid names"],
-          "correctAnswer": "The function uses print instead of return, so result will be None",
-          "explanation": "print() displays a value but doesn't give it back to the caller. Without a return statement, Python functions implicitly return None. Using return total would allow result to hold the value 7."
+          "id": "quiz-3-1",
+          "type": "multiple-choice",
+          "question": "If you have the list my_list = [1, 2, 3, 4, 5], what is my_list[1:3]?",
+          "options": [
+            "[1, 2]",
+            "[2, 3]",
+            "[2, 3, 4]",
+            "[3, 4, 5]"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Slicing [1:3] returns elements from index 1 up to (but not including) index 3, which are elements 2 and 3.",
+          "points": 10
         },
         {
-          "question": "Which of these correctly defines a function with a default parameter?",
-          "options": ["def greet(name, greeting = 'Hello'):", "def greet(name, greeting == 'Hello'):", "def greet(name = , greeting = 'Hello'):", "default def greet(name, greeting):"],
-          "correctAnswer": "def greet(name, greeting = 'Hello'):",
-          "explanation": "Default parameters use a single equals sign (=) with no spaces required, placed after the parameter name. Parameters with defaults must come after parameters without defaults."
+          "id": "quiz-3-2",
+          "type": "multiple-choice",
+          "question": "What is the main difference between a list and a tuple?",
+          "options": [
+            "Lists are slower than tuples",
+            "Lists are mutable (changeable) while tuples are immutable",
+            "Tuples can only contain numbers",
+            "There is no difference"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Lists can be modified after creation (add, remove, change items), while tuples cannot. This makes tuples useful for data that shouldn't be changed.",
+          "points": 10
+        },
+        {
+          "id": "quiz-3-3",
+          "type": "multiple-choice",
+          "question": "Which of the following correctly creates a dictionary with two key-value pairs?",
+          "options": [
+            "{'name': 'John', 'age': 30}",
+            "[('name', 'John'), ('age', 30)]",
+            "{('name', 'John'), ('age', 30)}",
+            "both A and B"
+          ],
+          "correctAnswer": 0,
+          "explanation": "Option A is the correct dictionary syntax. Option B is a list of tuples, and option C is a set of tuples.",
+          "points": 10
         }
       ]
     },
     {
-      "moduleNumber": 4,
-      "title": "Data Structures: Lists and Dictionaries",
-      "description": "Real programs need to store and organise data. Lists and dictionaries are Python's two most-used data structures, and mastering them will let you build almost anything.",
+      "id": "mod-4",
+      "title": "Functions and Code Organization",
+      "description": "Write reusable, organized code by mastering function definition, parameters, return values, and scope.",
+      "objectives": [
+        "Define and call functions with appropriate parameters",
+        "Use return values and understand variable scope",
+        "Apply default parameters and flexible arguments",
+        "Refactor code into well-organized, modular functions"
+      ],
+      "order": 3,
+      "durationMinutes": 220,
       "lessons": [
         {
-          "lessonNumber": 9,
-          "title": "Lists: Ordered Collections",
-          "objective": "Students will be able to create, modify, and iterate over Python lists using common list methods.",
-          "duration": "35 minutes",
-          "keyTopics": ["list creation and indexing", "append / remove / pop", "list slicing", "list comprehensions intro"]
+          "id": "lesson-4-1",
+          "title": "Function Basics: Definition and Parameters",
+          "description": "Learn how to define functions and pass parameters to make your code reusable and modular.",
+          "format": "Video Lecture + Interactive Examples",
+          "durationMinutes": 50,
+          "objectives": ["Define functions with proper parameters"],
+          "order": 0
         },
         {
-          "lessonNumber": 10,
-          "title": "Dictionaries: Key-Value Storage",
-          "objective": "Students will be able to create dictionaries, access values by key, and loop over dictionary items.",
-          "duration": "35 minutes",
-          "keyTopics": ["dict creation", "get() vs. bracket access", "dict.items() / .keys() / .values()", "nested dictionaries"]
+          "id": "lesson-4-2",
+          "title": "Return Values and Function Output",
+          "description": "Master return statements and use function output to build complex programs.",
+          "format": "Video + Practice Exercises",
+          "durationMinutes": 50,
+          "objectives": ["Use return values to pass data between functions"],
+          "order": 1
+        },
+        {
+          "id": "lesson-4-3",
+          "title": "Scope and Variable Visibility",
+          "description": "Understand local and global scope to avoid errors and write maintainable code.",
+          "format": "Video Tutorial + Debugging Exercises",
+          "durationMinutes": 50,
+          "objectives": ["Manage variable scope correctly"],
+          "order": 2
+        },
+        {
+          "id": "lesson-4-4",
+          "title": "Advanced Function Features",
+          "description": "Explore default parameters, *args, **kwargs, and other advanced function techniques.",
+          "format": "Video + Advanced Challenges",
+          "durationMinutes": 40,
+          "objectives": ["Use advanced function features for flexible code"],
+          "order": 3
+        },
+        {
+          "id": "lesson-4-5",
+          "title": "Module 4 Project: Personal Budget Calculator",
+          "description": "Create a complete budgeting tool using well-organized functions for calculation and data management.",
+          "format": "Guided Project + Code Review",
+          "durationMinutes": 30,
+          "objectives": ["Organize complex logic into reusable functions"],
+          "order": 4
         }
       ],
-      "quizQuestions": [
+      "quiz": [
         {
-          "question": "What does this code produce?  scores = {'Alice': 95, 'Bob': 88}  print(scores.get('Charlie', 0))",
-          "options": ["KeyError", "None", "0", "Charlie"],
-          "correctAnswer": "0",
-          "explanation": "dict.get(key, default) returns the value if the key exists, or the default value if it doesn't. Since 'Charlie' is not in the dictionary, it returns 0 instead of raising a KeyError."
+          "id": "quiz-4-1",
+          "type": "multiple-choice",
+          "question": "What does the 'return' keyword do in a function?",
+          "options": [
+            "It stops the function and sends a value back to where the function was called",
+            "It restarts the function",
+            "It deletes the function",
+            "It prints output to the console"
+          ],
+          "correctAnswer": 0,
+          "explanation": "The return keyword ends function execution and sends a value back to the caller. Without return, the function returns None by default.",
+          "points": 10
         },
         {
-          "question": "Which is the correct way to add a new key 'city' with value 'Milan' to a dictionary named 'person'?",
-          "options": ["person.add('city', 'Milan')", "person['city'] = 'Milan'", "person.insert('city', 'Milan')", "person.city = 'Milan'"],
-          "correctAnswer": "person['city'] = 'Milan'",
-          "explanation": "Dictionaries use bracket notation for both reading and writing values. Assigning to a key that doesn't exist creates it automatically."
+          "id": "quiz-4-2",
+          "type": "multiple-choice",
+          "question": "What is a default parameter in Python?",
+          "options": [
+            "A parameter that must always be provided",
+            "A parameter with a pre-set value that can be changed when the function is called",
+            "A parameter that only accepts numbers",
+            "A parameter that cannot be changed"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Default parameters have values assigned in the function definition and can be overridden when calling the function.",
+          "points": 10
+        },
+        {
+          "id": "quiz-4-3",
+          "type": "multiple-choice",
+          "question": "What is the scope of a variable defined inside a function?",
+          "options": [
+            "Global - it can be used anywhere in the program",
+            "Local - it can only be used within that function",
+            "Module - it can be used in any module",
+            "It depends on the variable name"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Variables defined inside a function have local scope and can only be accessed within that function. This is a core principle of function scope.",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "mod-5",
+      "title": "Object-Oriented Programming and File Handling",
+      "description": "Learn to structure code using classes and objects, and work with files for data persistence.",
+      "objectives": [
+        "Create and instantiate classes with attributes and methods",
+        "Implement inheritance and polymorphism",
+        "Read and write files for data persistence",
+        "Apply OOP principles to design robust applications"
+      ],
+      "order": 4,
+      "durationMinutes": 240,
+      "lessons": [
+        {
+          "id": "lesson-5-1",
+          "title": "Classes and Objects Fundamentals",
+          "description": "Learn how to design classes, create objects, and define attributes and methods.",
+          "format": "Video Lecture + Interactive Examples",
+          "durationMinutes": 60,
+          "objectives": ["Create and use classes to structure code"],
+          "order": 0
+        },
+        {
+          "id": "lesson-5-2",
+          "title": "Inheritance and Polymorphism",
+          "description": "Master inheritance to reuse code and polymorphism to create flexible, extensible programs.",
+          "format": "Video + Real-World Examples",
+          "durationMinutes": 60,
+          "objectives": ["Use inheritance to create class hierarchies"],
+          "order": 1
+        },
+        {
+          "id": "lesson-5-3",
+          "title": "Reading and Writing Files",
+          "description": "Learn to work with text and CSV files to persist data beyond program execution.",
+          "format": "Video Tutorial + Practice Exercises",
+          "durationMinutes": 60,
+          "objectives": ["Read from and write to files"],
+          "order": 2
+        },
+        {
+          "id": "lesson-5-4",
+          "title": "Final Project: Building a Complete Application",
+          "description": "Design and implement a complete Python application using all concepts learned in the course.",
+          "format": "Guided Project + Code Review",
+          "durationMinutes": 60,
+          "objectives": ["Design and build a complete Python application"],
+          "order": 3
+        }
+      ],
+      "quiz": [
+        {
+          "id": "quiz-5-1",
+          "type": "multiple-choice",
+          "question": "What is a class in Python?",
+          "options": [
+            "A list of data",
+            "A blueprint for creating objects with defined attributes and methods",
+            "A type of loop",
+            "A function that returns multiple values"
+          ],
+          "correctAnswer": 1,
+          "explanation": "A class is a template that defines how to create objects with specific properties (attributes) and behaviors (methods).",
+          "points": 10
+        },
+        {
+          "id": "quiz-5-2",
+          "type": "multiple-choice",
+          "question": "What is inheritance in object-oriented programming?",
+          "options": [
+            "Creating multiple objects from one class",
+            "Allowing a class to inherit attributes and methods from another class",
+            "Passing variables between functions",
+            "Storing data in files"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Inheritance allows a new class (child) to inherit properties and methods from an existing class (parent), promoting code reuse.",
+          "points": 10
+        },
+        {
+          "id": "quiz-5-3",
+          "type": "multiple-choice",
+          "question": "What does the open() function do in Python?",
+          "options": [
+            "Opens a web browser",
+            "Opens a file so you can read or write data to it",
+            "Opens a new Python editor",
+            "Opens a Python documentation page"
+          ],
+          "correctAnswer": 1,
+          "explanation": "The open() function returns a file object that allows you to read from or write to files.",
+          "points": 10
         }
       ]
     }
   ],
-  "pacingSchedule": {
-    "totalDuration": "4 weeks",
-    "weeklyBreakdown": [
-      { "week": 1, "modules": [1], "hoursPerWeek": 3 },
-      { "week": 2, "modules": [2], "hoursPerWeek": 3 },
-      { "week": 3, "modules": [3], "hoursPerWeek": 3 },
-      { "week": 4, "modules": [4], "hoursPerWeek": 3 }
+  "pacing": {
+    "style": "Standard Course",
+    "totalHours": 50,
+    "hoursPerWeek": 10,
+    "totalWeeks": 5,
+    "weeklyPlan": [
+      {
+        "week": 1,
+        "label": "Python Basics and Environment",
+        "moduleIds": ["mod-1"]
+      },
+      {
+        "week": 2,
+        "label": "Control Flow and Decision Making",
+        "moduleIds": ["mod-2"]
+      },
+      {
+        "week": 3,
+        "label": "Working with Data Collections",
+        "moduleIds": ["mod-3"]
+      },
+      {
+        "week": 4,
+        "label": "Functions and Code Organization",
+        "moduleIds": ["mod-4"]
+      },
+      {
+        "week": 5,
+        "label": "OOP and File Handling",
+        "moduleIds": ["mod-5"]
+      }
     ]
   },
   "bonusResources": [
     {
-      "title": "Python.org Official Tutorial",
-      "type": "website",
-      "description": "The official Python documentation tutorial is surprisingly readable and is the most authoritative reference for any language feature."
+      "title": "Python Cheat Sheet",
+      "type": "PDF Reference",
+      "url": "https://example.com/python-cheatsheet",
+      "description": "Quick reference for common Python syntax, methods, and libraries"
     },
     {
-      "title": "Automate the Boring Stuff with Python by Al Sweigart",
-      "type": "book",
-      "description": "A free, practical book full of real projects like automating spreadsheets, PDFs, and web scraping — perfect for applying what you've learned."
+      "title": "Debugging Guide for Beginners",
+      "type": "Interactive Guide",
+      "url": "https://example.com/debugging-guide",
+      "description": "Learn strategies for finding and fixing errors in your Python code"
     },
     {
-      "title": "Replit.com",
-      "type": "tool",
-      "description": "Free browser-based Python IDE — write and run Python without installing anything, great for practicing on the go."
+      "title": "Pre-built Project Templates",
+      "type": "GitHub Repository",
+      "url": "https://example.com/project-templates",
+      "description": "Starting templates for various project types to accelerate development"
+    },
+    {
+      "title": "Python Community Forum Access",
+      "type": "Community",
+      "url": "https://example.com/python-forum",
+      "description": "Get help from instructors and fellow learners in our exclusive community"
     }
   ]
 }

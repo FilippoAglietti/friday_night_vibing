@@ -1,117 +1,332 @@
 {
-  "title": "Photography for Instagram: Build a Feed That Stops the Scroll",
-  "subtitle": "A beginner's mini-course on creating scroll-stopping photos with just your smartphone",
-  "description": "Learn the core principles of photography composition, lighting, and editing to build a beautiful, consistent Instagram feed from scratch. No expensive camera required — just your phone and a creative eye.",
-  "learningOutcomes": [
-    "By the end of this course, students will be able to apply the rule of thirds and leading lines to compose visually compelling photographs.",
-    "By the end of this course, students will be able to identify and use natural light effectively to enhance any photo.",
-    "By the end of this course, students will be able to edit photos using a consistent style that strengthens their personal brand on Instagram.",
-    "By the end of this course, students will be able to plan and schedule a cohesive Instagram content calendar."
+  "title": "Instagram Photography Masterclass",
+  "subtitle": "Master the art of visual storytelling for social media",
+  "description": "Learn the fundamental principles of composition, lighting, and editing to create stunning Instagram photos that engage your audience. This compact course takes you from smartphone snapshots to professional-quality posts in just 3 weeks.",
+  "targetAudience": "Social media enthusiasts, aspiring content creators, and small business owners looking to improve their visual brand",
+  "difficulty": "beginner",
+  "objectives": [
+    "Apply composition techniques to create visually compelling photographs",
+    "Analyze lighting conditions and adapt shooting strategies accordingly",
+    "Edit photos using industry-standard tools to enhance visual impact",
+    "Curate a cohesive Instagram feed that reflects personal or brand aesthetic"
   ],
+  "prerequisites": [
+    "Access to a smartphone or camera",
+    "Basic familiarity with Instagram",
+    "Willingness to practice photography daily"
+  ],
+  "tags": ["photography", "instagram", "content creation", "visual design", "mobile photography"],
   "modules": [
     {
-      "moduleNumber": 1,
-      "title": "The Eye Before the Lens: Composition Fundamentals",
-      "description": "Great photography starts before you tap the shutter button. In this module you will learn how professional photographers think about framing, balance, and visual flow — and how to apply these principles instantly with any camera.",
+      "id": "mod-1",
+      "title": "Composition Fundamentals",
+      "description": "Master the core principles of visual composition that transform ordinary scenes into captivating images. Learn rule of thirds, leading lines, depth, and framing.",
+      "objectives": [
+        "Apply the rule of thirds to improve visual balance",
+        "Identify and use leading lines to guide viewer attention",
+        "Create depth through layering and perspective"
+      ],
+      "order": 0,
+      "durationMinutes": 180,
       "lessons": [
         {
-          "lessonNumber": 1,
-          "title": "The Rule of Thirds: Your New Best Friend",
-          "objective": "Students will be able to apply the rule of thirds grid to frame subjects in any photo.",
-          "duration": "15 minutes",
-          "keyTopics": ["rule of thirds grid", "enabling grid overlay on phone", "subject placement", "horizon line positioning"]
+          "id": "lesson-1-1",
+          "title": "Rule of Thirds and Visual Balance",
+          "description": "Understanding how to position subjects within the frame for maximum impact using the rule of thirds grid.",
+          "format": "Video + Interactive Exercise",
+          "durationMinutes": 45,
+          "objectives": ["Apply the rule of thirds in real-world photography"],
+          "order": 0
         },
         {
-          "lessonNumber": 2,
+          "id": "lesson-1-2",
           "title": "Leading Lines and Depth",
-          "objective": "Students will be able to identify and use leading lines to draw the viewer's eye through a photograph.",
-          "duration": "15 minutes",
-          "keyTopics": ["leading lines in architecture", "natural leading lines", "creating depth", "foreground and background"]
+          "description": "Learn how lines in your environment can draw viewers' eyes through your photos and create a sense of depth.",
+          "format": "Video + Photo Analysis",
+          "durationMinutes": 45,
+          "objectives": ["Identify and compose with leading lines"],
+          "order": 1
         },
         {
-          "lessonNumber": 3,
-          "title": "Negative Space and Minimalism",
-          "objective": "Students will be able to use negative space to give subjects visual breathing room and create impactful minimalist shots.",
-          "duration": "15 minutes",
-          "keyTopics": ["negative space definition", "sky and water as negative space", "minimalist aesthetic", "subject isolation"]
+          "id": "lesson-1-3",
+          "title": "Framing and Subject Placement",
+          "description": "Discover how to use your environment to frame subjects and create more dynamic compositions.",
+          "format": "Video + Hands-on Assignment",
+          "durationMinutes": 60,
+          "objectives": ["Create intentional frames within your photography"],
+          "order": 2
+        },
+        {
+          "id": "lesson-1-4",
+          "title": "Composition Critique Workshop",
+          "description": "Analyze real Instagram photos and discuss what makes them work compositionally.",
+          "format": "Live Q&A + Group Discussion",
+          "durationMinutes": 30,
+          "objectives": ["Critically evaluate composition in professional work"],
+          "order": 3
         }
       ],
-      "quizQuestions": [
+      "quiz": [
         {
-          "question": "Where should the main subject be placed when using the rule of thirds?",
-          "options": ["Dead centre of the frame", "At one of the four grid intersection points", "In the bottom-left corner only", "As close to the edge as possible"],
-          "correctAnswer": "At one of the four grid intersection points",
-          "explanation": "The rule of thirds divides the frame into a 3×3 grid. Placing the subject at one of the four intersection points creates natural visual tension and interest compared to dead-centre placement."
+          "id": "quiz-1-1",
+          "type": "multiple-choice",
+          "question": "When applying the rule of thirds, where should you typically place your subject for maximum visual impact?",
+          "options": [
+            "Always in the exact center of the frame",
+            "At one of the four intersecting points or along the grid lines",
+            "In the bottom left corner of the frame",
+            "As far to the edge as possible"
+          ],
+          "correctAnswer": 1,
+          "explanation": "The rule of thirds divides your frame into 9 equal sections. Placing subjects at the intersecting points creates more dynamic and visually appealing compositions than centering them.",
+          "points": 10
         },
         {
-          "question": "A photographer sees a road disappearing into the horizon. How should they use this element?",
-          "options": ["Avoid it — straight lines are boring", "Use it as a leading line to guide the viewer's eye toward the horizon", "Crop it out and focus on the foreground only", "Place the road in the top-right corner"],
-          "correctAnswer": "Use it as a leading line to guide the viewer's eye toward the horizon",
-          "explanation": "Roads, fences, rivers, and staircases are classic leading lines. Placing them so they direct the viewer's gaze into the scene creates depth and visual storytelling."
+          "id": "quiz-1-2",
+          "type": "multiple-choice",
+          "question": "What is a leading line in photography?",
+          "options": [
+            "A straight line that must be perfectly horizontal",
+            "Any element in your photo that naturally guides the viewer's eye through the composition",
+            "A line drawn in post-processing to mark the rule of thirds",
+            "Only lines created by roads or architecture"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Leading lines can be any element—roads, rivers, shadows, or even eye gaze—that naturally draws the viewer's attention through the frame toward your main subject.",
+          "points": 10
+        },
+        {
+          "id": "quiz-1-3",
+          "type": "multiple-choice",
+          "question": "How can you create depth in a photograph without using a professional camera?",
+          "options": [
+            "You cannot create depth with a smartphone",
+            "By layering elements at different distances: foreground, middle ground, and background",
+            "By using only black and white filters",
+            "Depth is automatically created when you zoom in"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Depth perception is created when viewers can see distinct layers in your photo. Including interesting elements in the foreground, middle, and background creates this layering effect.",
+          "points": 10
         }
       ]
     },
     {
-      "moduleNumber": 2,
-      "title": "Light Is Everything: Mastering Natural Light",
-      "description": "Professional photographers say 'photography is painting with light.' This module teaches you how to read, chase, and use natural light to make any subject look stunning — and when to avoid bad light altogether.",
+      "id": "mod-2",
+      "title": "Lighting and Exposure Mastery",
+      "description": "Transform your photography by understanding how light works. Learn to work with natural light, golden hour, backlighting, and exposure compensation.",
+      "objectives": [
+        "Evaluate ambient light conditions and adjust shooting strategies",
+        "Utilize golden hour and blue hour for optimal natural lighting",
+        "Control exposure using smartphone and camera settings"
+      ],
+      "order": 1,
+      "durationMinutes": 180,
       "lessons": [
         {
-          "lessonNumber": 4,
-          "title": "Golden Hour vs. Harsh Midday Sun",
-          "objective": "Students will be able to distinguish between flattering and unflattering natural light conditions and plan shoots accordingly.",
-          "duration": "20 minutes",
-          "keyTopics": ["golden hour timing", "harsh midday shadows", "blue hour", "scheduling shoots by light quality"]
+          "id": "lesson-2-1",
+          "title": "Understanding Natural Light",
+          "description": "Explore how natural light changes throughout the day and how to use it to your advantage in photography.",
+          "format": "Video + Time-lapse Examples",
+          "durationMinutes": 45,
+          "objectives": ["Identify optimal times for natural light photography"],
+          "order": 0
         },
         {
-          "lessonNumber": 5,
-          "title": "Using Window Light Indoors",
-          "objective": "Students will be able to set up an indoor shot using a single window as a professional-quality light source.",
-          "duration": "20 minutes",
-          "keyTopics": ["diffused window light", "reflectors with white card", "side lighting vs. front lighting", "sheer curtains as diffusers"]
+          "id": "lesson-2-2",
+          "title": "Golden Hour and Blue Hour Photography",
+          "description": "Master the most flattering times of day for photography and learn why these hours produce magic in your images.",
+          "format": "Video + Photo Comparison",
+          "durationMinutes": 45,
+          "objectives": ["Plan photoshoots around optimal lighting times"],
+          "order": 1
+        },
+        {
+          "id": "lesson-2-3",
+          "title": "Backlighting and Creative Shadows",
+          "description": "Learn to use backlighting to create silhouettes, rim light effects, and atmospheric images.",
+          "format": "Video + Hands-on Assignment",
+          "durationMinutes": 60,
+          "objectives": ["Create professional backlighting effects"],
+          "order": 2
+        },
+        {
+          "id": "lesson-2-4",
+          "title": "Exposure Compensation Techniques",
+          "description": "Master exposure settings on your phone or camera to properly expose your subjects in challenging lighting.",
+          "format": "Interactive Tutorial",
+          "durationMinutes": 30,
+          "objectives": ["Adjust exposure for properly lit photos in any condition"],
+          "order": 3
         }
       ],
-      "quizQuestions": [
+      "quiz": [
         {
-          "question": "Why is golden hour considered the best time for outdoor photography?",
-          "options": ["Because there is the most light available", "Because the sun is directly overhead and shadows are minimal", "Because the low sun angle creates warm, soft, directional light with long gentle shadows", "Because golden hour lasts only a few seconds, making photos rare and valuable"],
-          "correctAnswer": "Because the low sun angle creates warm, soft, directional light with long gentle shadows",
-          "explanation": "Shortly after sunrise and before sunset, the sun's light travels through more atmosphere, diffusing and warming it. This produces flattering, dimensional light ideal for portraits, landscapes, and product shots."
+          "id": "quiz-2-1",
+          "type": "multiple-choice",
+          "question": "What is the 'golden hour' in photography?",
+          "options": [
+            "The first hour after sunrise or the last hour before sunset when light is warm and soft",
+            "The hour when the sun is directly overhead",
+            "Any hour during midday when the sun is brightest",
+            "A filter setting on Instagram"
+          ],
+          "correctAnswer": 0,
+          "explanation": "The golden hour occurs shortly after sunrise or before sunset when the sun is at a low angle, creating warm, soft, flattering light that's ideal for most types of photography.",
+          "points": 10
         },
         {
-          "question": "You want to shoot a flat-lay of your product indoors. What is the best light setup without any equipment?",
-          "options": ["Turn on every lamp in the room for maximum brightness", "Shoot directly under a ceiling light for even illumination", "Position your product near a large window with indirect daylight and use a white card opposite to fill shadows", "Use your phone flash on full power"],
-          "correctAnswer": "Position your product near a large window with indirect daylight and use a white card opposite to fill shadows",
-          "explanation": "A large window provides soft, directional natural light. A white card (or white foam board) bounces light back into the shadow side, eliminating harsh shadows without any expensive equipment."
+          "id": "quiz-2-2",
+          "type": "multiple-choice",
+          "question": "When should you use backlighting in your photography?",
+          "options": [
+            "Never, because it makes your subject too dark",
+            "When you want to create silhouettes or add a glowing rim light around your subject",
+            "Only when you have professional lighting equipment",
+            "Never, because it causes lens flare"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Backlighting, when the light source is behind your subject, creates beautiful effects like silhouettes, rim lighting, and separation from the background.",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "mod-3",
+      "title": "Editing and Instagram Aesthetics",
+      "description": "Take your photos to the next level with professional editing techniques. Learn color grading, preset creation, and how to build a cohesive Instagram aesthetic.",
+      "objectives": [
+        "Edit photos using Lightroom or Snapseed to enhance visual appeal",
+        "Create a consistent color palette and visual style",
+        "Develop preset strategies for efficient batch editing"
+      ],
+      "order": 2,
+      "durationMinutes": 180,
+      "lessons": [
+        {
+          "id": "lesson-3-1",
+          "title": "Editing Fundamentals with Lightroom Mobile",
+          "description": "Learn the essential editing adjustments: exposure, contrast, highlights, shadows, clarity, and saturation.",
+          "format": "Video Tutorial + Hands-on Practice",
+          "durationMinutes": 50,
+          "objectives": ["Apply professional editing adjustments to raw photos"],
+          "order": 0
+        },
+        {
+          "id": "lesson-3-2",
+          "title": "Color Grading for Brand Aesthetics",
+          "description": "Master color grading techniques to create a signature look that defines your Instagram aesthetic.",
+          "format": "Video + Color Theory Lesson",
+          "durationMinutes": 50,
+          "objectives": ["Apply consistent color grading to create visual cohesion"],
+          "order": 1
+        },
+        {
+          "id": "lesson-3-3",
+          "title": "Creating and Using Editing Presets",
+          "description": "Build custom presets to speed up your editing workflow while maintaining a consistent aesthetic across your feed.",
+          "format": "Interactive Tutorial + Software Demo",
+          "durationMinutes": 50,
+          "objectives": ["Develop custom presets for efficient editing"],
+          "order": 2
+        },
+        {
+          "id": "lesson-3-4",
+          "title": "Curating Your Instagram Feed",
+          "description": "Learn how to plan your Instagram grid layout, maintain visual consistency, and create an aesthetically pleasing feed.",
+          "format": "Planning Workshop + Strategy Guide",
+          "durationMinutes": 30,
+          "objectives": ["Design a cohesive Instagram feed layout"],
+          "order": 3
+        }
+      ],
+      "quiz": [
+        {
+          "id": "quiz-3-1",
+          "type": "multiple-choice",
+          "question": "What is the primary benefit of using editing presets?",
+          "options": [
+            "They automatically edit your photos perfectly without any adjustments",
+            "They provide a starting point for consistent editing that can be customized per photo",
+            "They replace the need for learning manual editing techniques",
+            "They can only be used on iPhone"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Presets save your editing settings as templates, allowing you to apply a consistent look across multiple photos while still maintaining the flexibility to adjust each image individually.",
+          "points": 10
+        },
+        {
+          "id": "quiz-3-2",
+          "type": "multiple-choice",
+          "question": "How can you create a cohesive Instagram aesthetic?",
+          "options": [
+            "Post random photos with different editing styles",
+            "Use the same preset without any customization on every photo",
+            "Maintain a consistent color palette, lighting style, and editing approach across your feed",
+            "Only post photos taken at the same location"
+          ],
+          "correctAnswer": 2,
+          "explanation": "A cohesive aesthetic comes from consistent choices in color grading, editing style, subject matter, and composition—not from mindlessly applying the same preset to every photo.",
+          "points": 10
+        },
+        {
+          "id": "quiz-3-3",
+          "type": "multiple-choice",
+          "question": "Which editing adjustment should you typically apply first when editing a photo?",
+          "options": [
+            "Saturation, to make colors pop immediately",
+            "Clarity, to add detail to your image",
+            "Exposure, to properly light your photo before making other adjustments",
+            "Vibrance, to enhance color intensity"
+          ],
+          "correctAnswer": 2,
+          "explanation": "Exposure should be adjusted first because it serves as the foundation for all other edits. Once your photo is properly exposed, you can then adjust contrast, color, and other elements.",
+          "points": 10
         }
       ]
     }
   ],
-  "pacingSchedule": {
-    "totalDuration": "1 week",
-    "weeklyBreakdown": [
+  "pacing": {
+    "style": "Mini Course",
+    "totalHours": 15,
+    "hoursPerWeek": 5,
+    "totalWeeks": 3,
+    "weeklyPlan": [
       {
         "week": 1,
-        "modules": [1, 2],
-        "hoursPerWeek": 2
+        "label": "Composition & Visual Foundation",
+        "moduleIds": ["mod-1"]
+      },
+      {
+        "week": 2,
+        "label": "Lighting Mastery",
+        "moduleIds": ["mod-2"]
+      },
+      {
+        "week": 3,
+        "label": "Editing & Feed Curation",
+        "moduleIds": ["mod-3"]
       }
     ]
   },
   "bonusResources": [
     {
-      "title": "VSCO App",
-      "type": "tool",
-      "description": "Industry-standard mobile editing app for creating consistent presets and filters that define your Instagram aesthetic."
+      "title": "Instagram Growth Checklist",
+      "type": "PDF Workbook",
+      "url": "https://example.com/instagram-checklist",
+      "description": "A practical checklist for optimizing your Instagram profile and posting strategy"
     },
     {
-      "title": "Understanding Exposure by Bryan Peterson",
-      "type": "book",
-      "description": "The best beginner book on how aperture, shutter speed, and ISO work together — essential for when you upgrade from a phone camera."
+      "title": "Free Editing Presets Bundle",
+      "type": "Download",
+      "url": "https://example.com/free-presets",
+      "description": "5 professional editing presets compatible with Lightroom Mobile and Snapseed"
     },
     {
-      "title": "Later.com",
-      "type": "tool",
-      "description": "Visual Instagram scheduling tool that lets you preview how your grid will look before publishing — key for maintaining feed consistency."
+      "title": "Photography Inspiration Boards",
+      "type": "Curated Pinterest Boards",
+      "url": "https://example.com/inspiration-boards",
+      "description": "Organized inspiration boards by photography style and aesthetic"
     }
   ]
 }

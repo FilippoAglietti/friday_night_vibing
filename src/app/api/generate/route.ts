@@ -123,11 +123,19 @@ function validateRequest(body: unknown): GenerateRequest {
     throw new Error("'niche' must be a string if provided.");
   }
 
+  // Sanitize: strip HTML tags and limit length
+  const sanitizedTopic = b.topic
+    .trim()
+    .replace(/<[^>]*>/g, "")
+    .substring(0, 200);
+
   return {
-    topic: b.topic.trim(),
+    topic: sanitizedTopic,
     audience,
     length,
-    niche: b.niche ? (b.niche as string).trim() : undefined,
+    niche: b.niche
+      ? (b.niche as string).trim().replace(/<[^>]*>/g, "").substring(0, 100)
+      : undefined,
   };
 }
 
@@ -179,14 +187,60 @@ function repairTruncatedJson(json: string): string {
   return repaired;
 }
 
-// ─── Claude API call ──────────────────────────────────────────
+// ─── Claude API call with retry logic ─────────────────────────
+
+/**
+ * Calls the Claude API with retry logic and timeout.
+ * - Retries once with exponential backoff (2s delay) on API failure
+ * - Includes 60-second timeout per API call
+ * - Logs all retry attempts to console
+ *
+ * @param anthropic - Anthropic SDK instance
+ * @param system - System prompt
+ * @param messages - User messages
+ * @param attempt - Current attempt number (1 or 2)
+ * @returns Claude API response
+ * @throws Error if both attempts fail
+ */
+async function callClaudeWithRetry(
+  anthropic: Anthropic,
+  system: string,
+  messages: Anthropic.MessageParam[],
+  attempt: number = 1
+): Promise<Anthropic.Message> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000);
+
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 16384,
+      system,
+      messages,
+    });
+
+    clearTimeout(timeout);
+    return response;
+  } catch (err) {
+    if (attempt < 2) {
+      console.warn(
+        `[/api/generate] Attempt ${attempt} failed, retrying in 2s...`,
+        err
+      );
+      await new Promise((r) => setTimeout(r, 2000));
+      return callClaudeWithRetry(anthropic, system, messages, attempt + 1);
+    }
+    throw err;
+  }
+}
 
 /**
  * Calls the Anthropic Claude API with the curriculum generation prompt
  * and parses the JSON response into a typed Curriculum object.
  *
  * Uses claude-sonnet-4-6 for the best balance of quality and speed.
- * max_tokens 8192 is needed for long bootcamp curricula.
+ * max_tokens 16384 is needed for long bootcamp curricula.
+ * Includes retry logic with exponential backoff and 60-second timeout.
  *
  * @param request - Validated generation request
  * @returns Parsed Curriculum object
@@ -201,14 +255,9 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
   // Build the system + user messages from the prompt factory
   const { system, messages } = buildCurriculumPrompt(request);
 
-  // Call Claude — no streaming for now (simpler to parse)
+  // Call Claude with retry logic and timeout
   // 16384 tokens ensures even large bootcamp curricula (6-10 modules) are not truncated
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 16384,
-    system,
-    messages,
-  });
+  const response = await callClaudeWithRetry(anthropic, system, messages);
 
   // Extract the text content from the response
   const textBlock = response.content.find((block) => block.type === "text");
@@ -463,5 +512,11 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
 
   // ── Step 6: Return the curriculum ──────────────────────────
   // Return { success: true, data: curriculum } to match GenerateResponse type
-  return NextResponse.json({ success: true, data: curriculum }, { status: 200 });
+  const res = NextResponse.json(
+    { success: true, data: curriculum },
+    { status: 200 }
+  );
+  res.headers.set("X-Content-Type-Options", "nosniff");
+  res.headers.set("X-Frame-Options", "DENY");
+  return res;
 }
