@@ -117,19 +117,6 @@ export default function AuthModal({
                   <div className="flex-1 h-px bg-border/50" />
                 </div>
 
-                {/* Anonymous option */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-3 text-xs text-muted-foreground hover:text-foreground"
-                  onClick={() => {
-                    onContinueAnonymous?.();
-                    onClose();
-                  }}
-                >
-                  Continue without account
-                </Button>
-
                 <p className="mt-5 text-[10px] text-muted-foreground/60 text-center">
                   By signing in, you agree to our Terms of Service and Privacy Policy.
                 </p>

@@ -41,6 +41,10 @@ export interface CurriculumFormProps {
   onLoadingChange?: (loading: boolean) => void;
   /** Called when the user hits the free-tier generation limit */
   onLimitReached?: () => void;
+  /** Called before submit — return false to block (e.g. for auth gate) */
+  onSubmitAttempt?: () => boolean;
+  /** When true, restrict to mini course + beginner/intermediate only */
+  isFreeUser?: boolean;
 }
 
 /* ─── Constants ──────────────────────────────────────────── */
@@ -88,6 +92,8 @@ export default function CurriculumForm({
   onGenerated,
   onLoadingChange,
   onLimitReached,
+  onSubmitAttempt,
+  isFreeUser = true,
 }: CurriculumFormProps) {
   const [form, setForm] = useState<CurriculumFormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -189,6 +195,10 @@ export default function CurriculumForm({
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+
+      // Auth gate — if onSubmitAttempt returns false, block submission
+      if (onSubmitAttempt && !onSubmitAttempt()) return;
+
       setApiError(null);
 
       // Mark all fields as touched
@@ -208,8 +218,8 @@ export default function CurriculumForm({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             topic: form.topic.trim(),
-            difficulty: form.difficulty,
-            courseLength: form.courseLength,
+            difficulty: isFreeUser && form.difficulty === "advanced" ? "intermediate" : form.difficulty,
+            courseLength: isFreeUser ? "mini" : form.courseLength,
             niche: form.niche.trim() || undefined,
             abstract: form.abstract.trim() || undefined,
           }),
@@ -233,7 +243,7 @@ export default function CurriculumForm({
         onLoadingChange?.(false);
       }
     },
-    [form, onGenerated, onLoadingChange]
+    [form, onGenerated, onLoadingChange, onSubmitAttempt, isFreeUser]
   );
 
   /* ── Render ────────────────────────────────────────────── */
@@ -245,10 +255,10 @@ export default function CurriculumForm({
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-xl font-bold">
           <Sparkles className="size-5 text-violet-500" />
-          Generate Curriculum
+          Generate Course
         </CardTitle>
         <CardDescription>
-          Describe your course and we&apos;ll build the full curriculum — modules,
+          Describe your course and we&apos;ll build the full course — modules,
           lessons, quizzes, and pacing — in seconds.
         </CardDescription>
       </CardHeader>
@@ -309,7 +319,9 @@ export default function CurriculumForm({
                   <SelectValue placeholder="Select level" />
                 </SelectTrigger>
                 <SelectContent>
-                  {DIFFICULTY_OPTIONS.map((opt) => (
+                  {DIFFICULTY_OPTIONS
+                    .filter((opt) => !isFreeUser || opt.value !== "advanced")
+                    .map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       <span className="flex flex-col">
                         <span className="font-medium">{opt.label}</span>
@@ -327,11 +339,14 @@ export default function CurriculumForm({
             <div className="space-y-1.5">
               <Label htmlFor="curriculum-length" className="text-sm font-medium">
                 Course Length
+                {isFreeUser && (
+                  <span className="ml-1.5 text-[10px] font-normal text-violet-400">(Mini only on free plan)</span>
+                )}
               </Label>
               <Select
-                value={form.courseLength}
+                value={isFreeUser ? "mini" : form.courseLength}
                 onValueChange={(val) => updateField("courseLength", val as CourseLength)}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isFreeUser}
               >
                 <SelectTrigger
                   id="curriculum-length"
@@ -340,7 +355,9 @@ export default function CurriculumForm({
                   <SelectValue placeholder="Select length" />
                 </SelectTrigger>
                 <SelectContent>
-                  {COURSE_LENGTH_OPTIONS.map((opt) => (
+                  {COURSE_LENGTH_OPTIONS
+                    .filter((opt) => !isFreeUser || opt.value === "mini")
+                    .map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       <span className="flex flex-col">
                         <span className="font-medium">{opt.label}</span>
@@ -380,7 +397,7 @@ export default function CurriculumForm({
             </Label>
             <textarea
               id="curriculum-abstract"
-              placeholder="Paste a course description, abstract, or outline to guide the curriculum generation…"
+              placeholder="Paste a course description, abstract, or outline to guide the course generation…"
               value={form.abstract}
               onChange={(e) => updateField("abstract", e.target.value)}
               disabled={isSubmitting || pdfExtracting}
@@ -456,12 +473,12 @@ export default function CurriculumForm({
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
-                Generating curriculum…
+                Generating course…
               </>
             ) : (
               <>
                 <Sparkles className="mr-2 size-4" />
-                Generate Curriculum
+                Generate Course
               </>
             )}
           </Button>

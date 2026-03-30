@@ -69,7 +69,7 @@ const painPoints = [
     icon: Clock,
     problem: "Hours wasted on blank outlines",
     solution:
-      "Get a complete, structured curriculum in under 60 seconds — modules, lessons, quizzes, and pacing all done.",
+      "Get a complete, structured course in under 60 seconds — modules, lessons, quizzes, and pacing all done.",
   },
   {
     icon: Brain,
@@ -81,7 +81,7 @@ const painPoints = [
     icon: Target,
     problem: "Courses feel random & disorganized",
     solution:
-      "Every generated curriculum has clear objectives, progressive difficulty, and measurable learning outcomes.",
+      "Every generated course has clear objectives, progressive difficulty, and measurable learning outcomes.",
   },
 ];
 
@@ -95,7 +95,7 @@ const steps = [
   {
     num: "02",
     icon: Sparkles,
-    title: "AI generates your curriculum",
+    title: "AI generates your course",
     desc: "In seconds you get modules, lessons, quizzes, resources, and a pacing schedule — all editable.",
   },
   {
@@ -134,7 +134,7 @@ const exampleCurricula = [
 ];
 
 const freePlanFeatures = [
-  { text: "1 curriculum generation", included: true },
+  { text: "1 free mini-course generation", included: true },
   { text: "Basic modules & lessons", included: true },
   { text: "JSON export", included: true },
   { text: "Quizzes & assessments", included: false },
@@ -169,7 +169,7 @@ export default function Home() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [user, setUser] = useState<unknown>(null);
-  const [skipAuth, setSkipAuth] = useState(false);
+  // Registration is required before generating
   const [previewCurriculum, setPreviewCurriculum] = useState<Curriculum | null>(null);
   const { toast } = useToast();
   const prefersReduced = useReducedMotion();
@@ -210,7 +210,7 @@ export default function Home() {
   const handleGenerated = useCallback((c: Curriculum) => {
     console.log("[DEBUG] handleGenerated called, data:", JSON.stringify(c)?.slice(0, 200));
     setCurriculum(c);
-    toast("Curriculum generated successfully!", "success");
+    toast("Course generated successfully!", "success");
   }, [toast]);
 
   const handleLimitReached = useCallback(() => {
@@ -218,13 +218,13 @@ export default function Home() {
   }, []);
 
   const handleFormSubmitAttempt = useCallback(() => {
-    // If user is not authenticated and hasn't chosen to skip, show auth modal
-    if (!user && !skipAuth) {
+    // Registration required before generating
+    if (!user) {
       setShowAuthModal(true);
       return false;
     }
     return true;
-  }, [user, skipAuth]);
+  }, [user]);
 
   // Respect user motion preference
   const anim = prefersReduced ? {} : fadeUp;
@@ -319,7 +319,7 @@ export default function Home() {
                 className="mb-6 rounded-full border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400"
               >
                 <Sparkles className="mr-1.5 size-3" />
-                AI-Powered Curriculum Design
+                AI-Powered Course Design
               </Badge>
             </motion.div>
 
@@ -331,7 +331,7 @@ export default function Home() {
               Turn Any Topic Into a
               <br />
               <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
-                Complete Course Curriculum
+                Complete Course
               </span>
               <br />
               in Seconds
@@ -342,9 +342,9 @@ export default function Home() {
               custom={2}
               className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
             >
-              AI-powered curriculum design for course creators, educators, and
+              AI-powered course design for course creators, educators, and
               coaches. Stop staring at blank outlines — get a production-ready
-              curriculum with modules, lessons, quizzes, and pacing.
+              course with modules, lessons, quizzes, and pacing.
             </motion.p>
 
             <motion.div
@@ -356,8 +356,9 @@ export default function Home() {
                 id="hero-cta"
                 size="lg"
                 className="h-12 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Generate Your First Curriculum Free
+                Generate Your First Course Free
                 <ArrowRight className="ml-2 size-4" />
               </Button>
               <Button
@@ -365,8 +366,9 @@ export default function Home() {
                 variant="outline"
                 size="lg"
                 className="h-12 rounded-full px-8 text-base"
+                onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                See Example Curricula
+                See Example Courses
               </Button>
             </motion.div>
 
@@ -552,7 +554,7 @@ export default function Home() {
                     Try It Now
                   </p>
                   <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-                    Generate your curriculum
+                    Generate your course
                   </h2>
                 </motion.div>
                 <motion.div
@@ -565,6 +567,7 @@ export default function Home() {
                     onGenerated={handleGenerated}
                     onLoadingChange={handleLoadingChange}
                     onLimitReached={handleLimitReached}
+                    onSubmitAttempt={handleFormSubmitAttempt}
                   />
                 </motion.div>
               </>
@@ -595,14 +598,14 @@ export default function Home() {
                 custom={1}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
               >
-                See what Syllabi generates
+                See what Syllabi can create
               </motion.h2>
               <motion.p
                 variants={anim}
                 custom={2}
                 className="mx-auto mt-4 max-w-2xl text-muted-foreground"
               >
-                These curricula were generated in seconds. Each one includes
+                These courses were generated in seconds. Each one includes
                 modules, lessons, quizzes, bonus resources, and a full pacing
                 schedule.
               </motion.p>
@@ -776,11 +779,11 @@ export default function Home() {
               </motion.div>
 
               {/* PRO PLAN */}
-              <motion.div variants={anim} custom={1}>
-                <Card className="relative h-full border-violet-500/30 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
+              <motion.div variants={anim} custom={1} className="overflow-visible">
+                <Card className="relative overflow-visible h-full border-violet-500/30 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
                   {/* Popular badge */}
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-1 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                    <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">
                       Most Popular
                     </Badge>
                   </div>
@@ -795,7 +798,7 @@ export default function Home() {
                       </span>
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      For serious course creators who ship curricula regularly.
+                      For serious course creators who ship courses regularly.
                     </p>
                   </CardHeader>
                   <CardContent>
@@ -838,13 +841,13 @@ export default function Home() {
                       </span>
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      5 curriculum generations. No subscription, no commitment.
+                      5 course generations. No subscription, no commitment.
                     </p>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3">
                       {[
-                        "5 curriculum generations",
+                        "5 course generations",
                         "Full modules, lessons & quizzes",
                         "JSON, Markdown & PDF export",
                         "Custom pacing schedules",
@@ -895,7 +898,7 @@ export default function Home() {
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Ready to build your
                 <br />
-                first curriculum?
+                first course?
               </h2>
               <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
                 Join hundreds of course creators who save 40+ hours per course
@@ -907,7 +910,7 @@ export default function Home() {
                 size="lg"
                 className="mt-8 h-12 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
               >
-                Generate Your First Curriculum Free
+                Generate Your First Course Free
                 <ArrowRight className="ml-2 size-4" />
               </Button>
             </motion.div>
@@ -933,7 +936,7 @@ export default function Home() {
                 </span>
               </a>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                AI-powered curriculum generation for course creators, educators,
+                AI-powered course generation for course creators, educators,
                 and coaches.
               </p>
               <div className="mt-4 flex gap-3">
@@ -1097,7 +1100,7 @@ export default function Home() {
       <AuthModal
         open={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onContinueAnonymous={() => setSkipAuth(true)}
+        onContinueAnonymous={() => {}}
       />
 
       {/* ═══════════════════════════════════════════════════
