@@ -123,6 +123,11 @@ function validateRequest(body: unknown): GenerateRequest {
     throw new Error("'niche' must be a string if provided.");
   }
 
+  // abstract — optional, string or undefined, max 4000 chars
+  if (b.abstract !== undefined && typeof b.abstract !== "string") {
+    throw new Error("'abstract' must be a string if provided.");
+  }
+
   // Sanitize: strip HTML tags and limit length
   const sanitizedTopic = b.topic
     .trim()
@@ -136,6 +141,7 @@ function validateRequest(body: unknown): GenerateRequest {
     niche: b.niche
       ? (b.niche as string).trim().replace(/<[^>]*>/g, "").substring(0, 100)
       : undefined,
+    abstract: b.abstract ? (b.abstract as string).trim().slice(0, 4000) : undefined,
   };
 }
 

@@ -16,7 +16,9 @@ import {
   Clock,
   Copy,
   Download,
+  ExternalLink,
   HelpCircle,
+  Lightbulb,
   RefreshCw,
   Sparkles,
   Target,
@@ -24,7 +26,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
-import { curriculumToMarkdown } from "@/lib/exports/toMarkdown";
 import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource } from "@/types/curriculum";
 
 interface CurriculumOutputProps {
@@ -32,20 +33,153 @@ interface CurriculumOutputProps {
   onGenerateAnother: () => void;
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function toMarkdown(c: Curriculum): string {
+  const lines: string[] = [];
+
+  lines.push(`# ${c.title}`);
+  lines.push(`**${c.subtitle}**\n`);
+  lines.push(`${c.description}\n`);
+
+  lines.push(`## Learning Outcomes`);
+  c.objectives.forEach((o) => lines.push(`- ${o}`));
+  lines.push("");
+
+  c.modules.forEach((mod) => {
+    lines.push(`## Module ${mod.order + 1}: ${mod.title}`);
+    lines.push(`${mod.description}\n`);
+    mod.lessons.forEach((l) => {
+      lines.push(`### Lesson ${l.order + 1}: ${l.title}`);
+      if (l.objectives && l.objectives.length > 0) {
+        lines.push(`**Objectives:** ${l.objectives.join(", ")}`);
+      }
+      lines.push(`**Duration:** ${l.durationMinutes} mins`);
+      if (l.keyPoints && l.keyPoints.length > 0) {
+        lines.push(`\n**Key Points:**`);
+        l.keyPoints.forEach((kp) => lines.push(`- ${kp}`));
+      }
+      if (l.suggestedResources && l.suggestedResources.length > 0) {
+        lines.push(`\n**Suggested Resources:**`);
+        l.suggestedResources.forEach((r) => lines.push(`- [${r.title}](${r.url}) *(${r.type})*`));
+      }
+      lines.push("");
+    });
+    if (mod.quiz && mod.quiz.length > 0) {
+      lines.push(`### Quiz`);
+      mod.quiz.forEach((q, i) => {
+        lines.push(`**Q${i + 1}: ${q.question}**`);
+        if (q.options) {
+          q.options.forEach((opt) => lines.push(`- ${opt}`));
+        }
+        const answerText = typeof q.correctAnswer === "number" && q.options 
+          ? q.options[q.correctAnswer] 
+          : q.correctAnswer;
+        lines.push(`✅ **Answer:** ${answerText}`);
+        if (q.explanation) {
+          lines.push(`💡 ${q.explanation}\n`);
+        }
+      });
+    }
+  });
+
+  lines.push(`## Pacing Schedule`);
+  if (c.pacing) {
+    lines.push(`**Total Duration:** ${c.pacing.totalHours} hours\n`);
+    if (c.pacing.weeklyPlan) {
+      c.pacing.weeklyPlan.forEach((w) => {
+        lines.push(
+          `- **Week ${w.week}:** Modules ${w.moduleIds?.length ? w.moduleIds.join(", ") : w.label || "TBD"} — ${c.pacing.hoursPerWeek}h/week`
+        );
+      });
+    }
+  }
+  lines.push("");
+
+  if (c.bonusResources && c.bonusResources.length > 0) {
+    lines.push(`## Bonus Resources`);
+    c.bonusResources.forEach((r) =>
+      lines.push(`- **${r.title}** *(${r.type})*: ${r.description}`)
+    );
+  }
+
+  return lines.join("\n");
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const hasDetails = (lesson.keyPoints && lesson.keyPoints.length > 0) ||
+                     (lesson.suggestedResources && lesson.suggestedResources.length > 0);
+
   return (
     <div className="pl-4 py-3 border-l-2 border-primary/20 hover:border-primary/60 transition-colors">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm text-foreground leading-snug">
-            {index + 1}. {lesson.title}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-sm text-foreground leading-snug">
+              {index + 1}. {lesson.title}
+            </p>
+            {hasDetails && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="text-xs text-primary hover:text-primary/80 underline-offset-2 hover:underline shrink-0"
+              >
+                {expanded ? "Less" : "Details"}
+              </button>
+            )}
+          </div>
           {lesson.objectives && lesson.objectives.length > 0 && (
             <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
               {lesson.objectives[0]}
             </p>
+          )}
+
+          {/* Expanded: Key Points + Suggested Resources */}
+          {expanded && hasDetails && (
+            <div className="mt-3 space-y-3">
+              {lesson.keyPoints && lesson.keyPoints.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <Lightbulb className="h-3 w-3 text-amber-500" />
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Key Points</span>
+                  </div>
+                  <ul className="space-y-1">
+                    {lesson.keyPoints.map((point, i) => (
+                      <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                        <span className="text-primary mt-0.5 shrink-0">•</span>
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {lesson.suggestedResources && lesson.suggestedResources.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <ExternalLink className="h-3 w-3 text-violet-500" />
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</span>
+                  </div>
+                  <ul className="space-y-1">
+                    {lesson.suggestedResources.map((res, i) => (
+                      <li key={i} className="text-xs">
+                        <a
+                          href={res.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline underline-offset-2"
+                        >
+                          {res.title}
+                        </a>
+                        <span className="text-muted-foreground ml-1">({res.type})</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           )}
         </div>
         <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
@@ -129,7 +263,7 @@ export default function CurriculumOutput({
 
   // ── Copy as Markdown ──
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(curriculumToMarkdown(curriculum));
+    await navigator.clipboard.writeText(toMarkdown(curriculum));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -220,7 +354,7 @@ export default function CurriculumOutput({
                       {(mod.order !== undefined ? mod.order : index) + 1}
                     </span>
                     <div>
-                      <p className="font-medium text-sm">{mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "")}</p>
+                      <p className="font-medium text-sm">{mod.title}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {mod.lessons?.length || 0} lessons
                         {mod.quiz && mod.quiz.length > 0 &&
@@ -281,7 +415,7 @@ export default function CurriculumOutput({
                     Week {week.week}
                   </span>
                   <span className="text-muted-foreground flex-1">
-                    {week.label || (week.moduleIds && week.moduleIds.length > 0 ? week.moduleIds.map(id => { const m = curriculum.modules.find(mod => mod.id === id); return m ? m.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "") : id; }).join(", ") : "Course Content")}
+                    {week.label || (week.moduleIds && week.moduleIds.length > 0 ? `Modules ${week.moduleIds.join(", ")}` : "Course Content")}
                   </span>
                   <Badge variant="outline" className="text-xs">
                     {curriculum.pacing.hoursPerWeek}h / week

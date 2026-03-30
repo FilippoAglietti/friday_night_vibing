@@ -79,6 +79,13 @@ export interface BonusResource {
   isFree?: boolean;
 }
 
+/** Lightweight resource suggestion attached to a lesson */
+export interface SuggestedResource {
+  title: string;
+  url: string;
+  type: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -88,6 +95,10 @@ export interface Lesson {
   durationMinutes: number;
   /** Learning objectives for this specific lesson */
   objectives?: string[];
+  /** 3-5 key talking points covering core concepts and practical tips */
+  keyPoints?: string[];
+  /** 1-3 suggested external resources with real URLs */
+  suggestedResources?: SuggestedResource[];
   /** Content body — markdown string rendered by the frontend */
   content?: string;
   /** Optional quiz attached to this lesson */
@@ -205,6 +216,8 @@ export interface GenerateRequest {
   audience: AudienceLevel;
   length: CourseLength;
   niche?: string;
+  /** Optional abstract or course description text (plain text or extracted from PDF) */
+  abstract?: string;
 }
 
 /** Success response from POST /api/generate */

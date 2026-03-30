@@ -19,7 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Sparkles, Loader2, AlertCircle } from "lucide-react";
+import { Sparkles, Loader2, AlertCircle, FileText, Upload, X } from "lucide-react";
 import type { DifficultyLevel, Curriculum } from "@/types/curriculum";
 
 /* ─── Types ──────────────────────────────────────────────── */
@@ -31,6 +31,7 @@ export interface CurriculumFormData {
   difficulty: DifficultyLevel;
   courseLength: CourseLength;
   niche: string;
+  abstract: string;
 }
 
 export interface CurriculumFormProps {
@@ -38,8 +39,6 @@ export interface CurriculumFormProps {
   onGenerated?: (curriculum: Curriculum) => void;
   /** Called when generation starts */
   onLoadingChange?: (loading: boolean) => void;
-  /** Called when the user has hit their free generation limit (403) */
-  onLimitReached?: () => void;
 }
 
 /* ─── Constants ──────────────────────────────────────────── */
@@ -61,6 +60,7 @@ const INITIAL_FORM: CurriculumFormData = {
   difficulty: "beginner",
   courseLength: "standard",
   niche: "",
+  abstract: "",
 };
 
 /* ─── Validation ─────────────────────────────────────────── */
@@ -85,13 +85,14 @@ function validate(data: CurriculumFormData): FormErrors {
 export default function CurriculumForm({
   onGenerated,
   onLoadingChange,
-  onLimitReached,
 }: CurriculumFormProps) {
   const [form, setForm] = useState<CurriculumFormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfExtracting, setPdfExtracting] = useState(false);
 
   /* ── Field handlers ────────────────────────────────────── */
 
@@ -117,6 +118,68 @@ export default function CurriculumForm({
     },
     [form]
   );
+
+  /* ── PDF Upload ────────────────────────────────────────── */
+
+  const handlePdfUpload = useCallback(
+    async (file: File) => {
+      if (file.type !== "application/pdf") {
+        setApiError("Please upload a PDF file.");
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setApiError("PDF must be under 10 MB.");
+        return;
+      }
+
+      setPdfFile(file);
+      setPdfExtracting(true);
+      setApiError(null);
+
+      try {
+        // Load pdf.js from CDN for client-side PDF text extraction
+        const pdfjsLib = await import("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" as string);
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+        const textParts: string[] = [];
+        const maxPages = Math.min(pdf.numPages, 20); // limit to 20 pages
+
+        for (let i = 1; i <= maxPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map((item: any) => item.str)
+            .join(" ");
+          textParts.push(pageText);
+        }
+
+        const text = textParts
+          .join("\n\n")
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 4000);
+
+        updateField("abstract", text);
+      } catch (err) {
+        console.error("PDF extraction error:", err);
+        setApiError("Failed to extract text from PDF. Try pasting the text directly.");
+        setPdfFile(null);
+      } finally {
+        setPdfExtracting(false);
+      }
+    },
+    [updateField]
+  );
+
+  const removePdf = useCallback(() => {
+    setPdfFile(null);
+    updateField("abstract", "");
+  }, [updateField]);
 
   /* ── Submit ────────────────────────────────────────────── */
 
@@ -145,16 +208,12 @@ export default function CurriculumForm({
             difficulty: form.difficulty,
             courseLength: form.courseLength,
             niche: form.niche.trim() || undefined,
+            abstract: form.abstract.trim() || undefined,
           }),
         });
 
         if (!res.ok) {
           const body = await res.json().catch(() => null);
-          if (res.status === 403) {
-            // Generation limit reached — show paywall
-            onLimitReached?.();
-            return;
-          }
           throw new Error(
             body?.error || `Generation failed (${res.status})`
           );
@@ -171,7 +230,7 @@ export default function CurriculumForm({
         onLoadingChange?.(false);
       }
     },
-    [form, onGenerated, onLoadingChange, onLimitReached]
+    [form, onGenerated, onLoadingChange]
   );
 
   /* ── Render ────────────────────────────────────────────── */
@@ -308,6 +367,64 @@ export default function CurriculumForm({
               disabled={isSubmitting}
               className="h-10"
             />
+          </div>
+
+          {/* ── Abstract / PDF Upload ─────────────────────── */}
+          <div className="space-y-1.5">
+            <Label htmlFor="curriculum-abstract" className="text-sm font-medium">
+              Course Abstract{" "}
+              <span className="text-muted-foreground font-normal">(optional — paste text or upload PDF)</span>
+            </Label>
+            <textarea
+              id="curriculum-abstract"
+              placeholder="Paste a course description, abstract, or outline to guide the curriculum generation…"
+              value={form.abstract}
+              onChange={(e) => updateField("abstract", e.target.value)}
+              disabled={isSubmitting || pdfExtracting}
+              rows={3}
+              maxLength={4000}
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y min-h-[72px]"
+            />
+
+            {/* PDF upload zone */}
+            <div className="flex items-center gap-2 mt-2">
+              {!pdfFile ? (
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-md border border-dashed border-border hover:border-primary/40">
+                  <Upload className="h-3.5 w-3.5" />
+                  <span>Upload PDF</span>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    disabled={isSubmitting || pdfExtracting}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handlePdfUpload(file);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              ) : (
+                <div className="flex items-center gap-2 text-xs bg-primary/5 border border-primary/20 rounded-md px-3 py-1.5">
+                  <FileText className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-foreground truncate max-w-[180px]">{pdfFile.name}</span>
+                  {pdfExtracting ? (
+                    <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={removePdf}
+                      className="text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              )}
+              <span className="text-[11px] text-muted-foreground">
+                {form.abstract.length > 0 && `${form.abstract.length}/4000 chars`}
+              </span>
+            </div>
           </div>
 
           {/* ── API Error ─────────────────────────────────── */}

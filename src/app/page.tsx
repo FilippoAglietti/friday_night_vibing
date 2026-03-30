@@ -9,6 +9,7 @@ import AuthButton from "@/components/AuthButton";
 import { useToast } from "@/components/ToastProvider";
 import { useState, useEffect, useCallback } from "react";
 import type { Curriculum } from "@/types/curriculum";
+import { exampleCurricula as fullExampleCurricula } from "@/data/exampleCurricula";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabaseBrowser } from "@/lib/supabase";
@@ -41,6 +42,8 @@ import {
   Mail,
   Sun,
   Moon,
+  Eye,
+  X as XIcon,
 } from "lucide-react";
 
 /* ─── Animation Helpers ──────────────────────────────────── */
@@ -167,8 +170,10 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [user, setUser] = useState<unknown>(null);
   const [skipAuth, setSkipAuth] = useState(false);
+  const [previewCurriculum, setPreviewCurriculum] = useState<Curriculum | null>(null);
   const { toast } = useToast();
   const prefersReduced = useReducedMotion();
+  const closePreview = useCallback(() => setPreviewCurriculum(null), []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -612,7 +617,10 @@ export default function Home() {
             >
               {exampleCurricula.map((c, i) => (
                 <motion.div key={i} variants={anim} custom={i}>
-                  <Card className="group h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5">
+                  <Card
+                    className="group h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5 cursor-pointer"
+                    onClick={() => setPreviewCurriculum(fullExampleCurricula[i])}
+                  >
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <Badge
@@ -621,7 +629,10 @@ export default function Home() {
                         >
                           {c.difficulty}
                         </Badge>
-                        <ChevronRight className="size-4 text-muted-foreground opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5" />
+                        <div className="flex items-center gap-1 text-xs text-violet-400 opacity-0 transition-all group-hover:opacity-100">
+                          <Eye className="size-3.5" />
+                          <span>Preview</span>
+                        </div>
                       </div>
                       <CardTitle className="mt-2 text-lg font-semibold leading-snug">
                         {c.title}
@@ -1088,6 +1099,33 @@ export default function Home() {
         onClose={() => setShowAuthModal(false)}
         onContinueAnonymous={() => setSkipAuth(true)}
       />
+
+      {/* ═══════════════════════════════════════════════════
+          EXAMPLE PREVIEW MODAL
+      ═══════════════════════════════════════════════════ */}
+      {previewCurriculum && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto py-8 px-4"
+          onClick={closePreview}
+        >
+          <div
+            className="relative w-full max-w-3xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={closePreview}
+              className="sticky top-0 z-10 ml-auto flex items-center gap-1.5 mb-4 rounded-full bg-background/90 border border-border/60 px-4 py-2 text-sm font-medium text-foreground shadow-lg hover:bg-background transition-colors backdrop-blur-sm"
+            >
+              <XIcon className="size-4" />
+              Close preview
+            </button>
+            <CurriculumOutput
+              curriculum={previewCurriculum}
+              onGenerateAnother={closePreview}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

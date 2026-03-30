@@ -8,6 +8,9 @@
 
 import type { GenerateRequest, AudienceLevel, CourseLength } from "@/types/curriculum";
 
+// Re-export for convenience
+export type { GenerateRequest };
+
 // ─── Helper maps ──────────────────────────────────────────────
 
 const AUDIENCE_DESCRIPTIONS: Record<AudienceLevel, string> = {
@@ -36,6 +39,7 @@ Follow these pedagogical principles:
 • 70/30 theory-to-practice — every lesson must include a practical exercise or real-world task
 • Quiz questions test UNDERSTANDING, not memorisation
 • Course titles must be compelling and marketable
+• Every lesson MUST include detailed "keyPoints" (3-5 bullet points covering the core concepts, actionable takeaways, and practical tips) and "suggestedResources" (1-3 external resources with real URLs)
 
 OUTPUT RULES (CRITICAL):
 - Respond with ONLY valid JSON — no markdown, no preamble, no explanation.
@@ -47,8 +51,12 @@ OUTPUT RULES (CRITICAL):
 // ─── User prompt factory ──────────────────────────────────────
 
 export function buildUserPrompt(params: GenerateRequest): string {
-  const { topic, audience, length, niche } = params;
+  const { topic, audience, length, niche, abstract } = params;
   const now = new Date().toISOString();
+
+  const abstractBlock = abstract
+    ? `\nCONTEXT / ABSTRACT:\n"""\n${abstract.slice(0, 4000)}\n"""\nUse the above abstract as the primary source material. Structure the curriculum around its key themes, arguments, and concepts.\n`
+    : "";
 
   return `
 Generate a complete course curriculum for:
@@ -56,7 +64,7 @@ Generate a complete course curriculum for:
 TOPIC: "${topic}"
 AUDIENCE: ${audience} — ${AUDIENCE_DESCRIPTIONS[audience]}
 LENGTH: ${LENGTH_DESCRIPTIONS[length]}
-NICHE: ${niche ? `"${niche}"` : "general / not specified"}
+NICHE: ${niche ? `"${niche}"` : "general / not specified"}${abstractBlock}
 
 Return ONLY this exact JSON structure:
 
@@ -86,6 +94,19 @@ Return ONLY this exact JSON structure:
           "format": "video",
           "durationMinutes": 20,
           "objectives": ["Single lesson learning objective using a Bloom's verb"],
+          "keyPoints": [
+            "Core concept or principle explained clearly",
+            "Practical tip or actionable takeaway",
+            "Common mistake to avoid or best practice",
+            "How this connects to the next lesson or real-world application"
+          ],
+          "suggestedResources": [
+            {
+              "title": "Resource title",
+              "url": "https://example.com/real-link",
+              "type": "article"
+            }
+          ],
           "order": 0
         }
       ],
@@ -133,6 +154,9 @@ Return ONLY this exact JSON structure:
 
 Requirements:
 - Each module must have 2-5 lessons and 2-3 quiz questions
+- Each lesson MUST have "keyPoints" (array of 3-5 strings) covering core concepts, practical tips, and actionable takeaways
+- Each lesson MUST have "suggestedResources" (array of 1-3 objects with title, url, type) with real, working URLs
+- suggestedResources type must be one of: article, video, podcast, book, tool, documentation
 - Include 3-5 bonusResources with real, working URLs where possible
 - weeklyPlan must cover ALL module IDs
 - lesson format must be one of: video, reading, interactive, discussion, project, live-session
