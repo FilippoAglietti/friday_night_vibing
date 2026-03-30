@@ -217,14 +217,19 @@ export default function Home() {
     setShowPaywall(true);
   }, []);
 
+  // Dev mode bypass: add ?dev=true to URL to skip auth (for testing before Supabase is configured)
+  const isDevMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("dev") === "true";
+
   const handleFormSubmitAttempt = useCallback(() => {
+    // Skip auth check in dev mode
+    if (isDevMode) return true;
     // Registration required before generating
     if (!user) {
       setShowAuthModal(true);
       return false;
     }
     return true;
-  }, [user]);
+  }, [user, isDevMode]);
 
   // Respect user motion preference
   const anim = prefersReduced ? {} : fadeUp;
@@ -718,7 +723,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div
-              className="grid gap-6 md:grid-cols-3"
+              className="grid gap-8 md:grid-cols-3 overflow-visible"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}

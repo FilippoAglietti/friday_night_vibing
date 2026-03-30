@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Syllabi.ai — AI Curriculum Generator";
+export const alt = "Syllabi.ai — AI Course Generator";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -61,7 +61,7 @@ export default function Image() {
         >
           Turn Any Topic Into a
           <br />
-          Complete Course Curriculum
+          Complete Course
         </h1>
         <p
           style={{

@@ -12,13 +12,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Syllabi.ai — AI Curriculum Generator for Course Creators",
+  title: "Syllabi.ai — AI Course Generator for Course Creators",
   description:
-    "Turn any topic into a complete course curriculum in seconds. Modules, lessons, quizzes, pacing schedules, and PDF export — powered by AI. Stop staring at blank outlines.",
+    "Turn any topic into a complete course in seconds. Modules, lessons, quizzes, pacing schedules, and PDF export — powered by AI. Stop staring at blank outlines.",
   keywords: [
-    "AI curriculum generator",
+    "AI course generator",
     "course creator tool",
-    "curriculum design",
+    "course design",
     "online course outline",
     "AI course builder",
     "syllabi",
@@ -27,9 +27,9 @@ export const metadata: Metadata = {
   ],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   openGraph: {
-    title: "Syllabi.ai — AI Curriculum Generator",
+    title: "Syllabi.ai — AI Course Generator",
     description:
-      "Turn any topic into a complete course curriculum in seconds. Modules, lessons, quizzes & PDF export.",
+      "Turn any topic into a complete course in seconds. Modules, lessons, quizzes & PDF export.",
     type: "website",
     siteName: "Syllabi.ai",
     images: [
@@ -37,15 +37,15 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Syllabi.ai — AI Curriculum Generator",
+        alt: "Syllabi.ai — AI Course Generator",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Syllabi.ai — AI Curriculum Generator",
+    title: "Syllabi.ai — AI Course Generator",
     description:
-      "Turn any topic into a complete course curriculum in seconds.",
+      "Turn any topic into a complete course in seconds.",
     images: ["/og.png"],
   },
   icons: {

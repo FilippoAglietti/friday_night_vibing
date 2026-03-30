@@ -51,20 +51,24 @@ OUTPUT RULES (CRITICAL):
 // ─── User prompt factory ──────────────────────────────────────
 
 export function buildUserPrompt(params: GenerateRequest): string {
-  const { topic, audience, length, niche, abstract } = params;
+  const { topic, audience, length, niche, abstract, learnerProfile } = params;
   const now = new Date().toISOString();
 
   const abstractBlock = abstract
-    ? `\nCONTEXT / ABSTRACT:\n"""\n${abstract.slice(0, 4000)}\n"""\nUse the above abstract as the primary source material. Structure the curriculum around its key themes, arguments, and concepts.\n`
+    ? `\nCONTEXT / ABSTRACT:\n"""\n${abstract.slice(0, 4000)}\n"""\nUse the above abstract as the primary source material. Structure the course around its key themes, arguments, and concepts.\n`
+    : "";
+
+  const learnerBlock = learnerProfile
+    ? `\nLEARNER PROFILE:\n"""\n${learnerProfile.slice(0, 500)}\n"""\nPersonalize the course for this learner. Adapt examples, exercises, and language to their background, goals, and experience level. Make the content feel tailored to who they are.\n`
     : "";
 
   return `
-Generate a complete course curriculum for:
+Generate a complete course for:
 
 TOPIC: "${topic}"
 AUDIENCE: ${audience} — ${AUDIENCE_DESCRIPTIONS[audience]}
 LENGTH: ${LENGTH_DESCRIPTIONS[length]}
-NICHE: ${niche ? `"${niche}"` : "general / not specified"}${abstractBlock}
+NICHE: ${niche ? `"${niche}"` : "general / not specified"}${learnerBlock}${abstractBlock}
 
 Return ONLY this exact JSON structure:
 

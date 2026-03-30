@@ -128,6 +128,11 @@ function validateRequest(body: unknown): GenerateRequest {
     throw new Error("'abstract' must be a string if provided.");
   }
 
+  // learnerProfile — optional, string or undefined, max 500 chars
+  if (b.learnerProfile !== undefined && typeof b.learnerProfile !== "string") {
+    throw new Error("'learnerProfile' must be a string if provided.");
+  }
+
   // Sanitize: strip HTML tags and limit length
   const sanitizedTopic = b.topic
     .trim()
@@ -142,6 +147,7 @@ function validateRequest(body: unknown): GenerateRequest {
       ? (b.niche as string).trim().replace(/<[^>]*>/g, "").substring(0, 100)
       : undefined,
     abstract: b.abstract ? (b.abstract as string).trim().slice(0, 4000) : undefined,
+    learnerProfile: b.learnerProfile ? (b.learnerProfile as string).trim().slice(0, 500) : undefined,
   };
 }
 
@@ -504,7 +510,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to generate curriculum.",
+        error: "Failed to generate course.",
         details: err instanceof Error ? err.message : "Unexpected error from AI engine.",
       },
       { status: 500 }

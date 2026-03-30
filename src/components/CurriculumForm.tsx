@@ -32,6 +32,7 @@ export interface CurriculumFormData {
   courseLength: CourseLength;
   niche: string;
   abstract: string;
+  learnerProfile: string;
 }
 
 export interface CurriculumFormProps {
@@ -67,6 +68,7 @@ const INITIAL_FORM: CurriculumFormData = {
   courseLength: "standard",
   niche: "",
   abstract: "",
+  learnerProfile: "",
 };
 
 /* ─── Validation ─────────────────────────────────────────── */
@@ -222,6 +224,7 @@ export default function CurriculumForm({
             courseLength: isFreeUser ? "mini" : form.courseLength,
             niche: form.niche.trim() || undefined,
             abstract: form.abstract.trim() || undefined,
+            learnerProfile: form.learnerProfile.trim() || undefined,
           }),
         });
 
@@ -387,6 +390,27 @@ export default function CurriculumForm({
               disabled={isSubmitting}
               className="h-10"
             />
+          </div>
+
+          {/* ── About You — Learner Profile ────────────────── */}
+          <div className="space-y-1.5">
+            <Label htmlFor="course-learner-profile" className="text-sm font-medium">
+              About You{" "}
+              <span className="text-muted-foreground font-normal">(optional — helps personalize the course)</span>
+            </Label>
+            <textarea
+              id="course-learner-profile"
+              placeholder="e.g. I'm a marketing manager with 5 years of experience looking to transition into data science…"
+              value={form.learnerProfile}
+              onChange={(e) => updateField("learnerProfile", e.target.value)}
+              disabled={isSubmitting}
+              rows={2}
+              maxLength={500}
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Describe your background, goals, or learning style so we can tailor the course to you.
+            </p>
           </div>
 
           {/* ── Abstract / PDF Upload ─────────────────────── */}

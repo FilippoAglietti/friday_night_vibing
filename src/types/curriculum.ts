@@ -218,6 +218,8 @@ export interface GenerateRequest {
   niche?: string;
   /** Optional abstract or course description text (plain text or extracted from PDF) */
   abstract?: string;
+  /** Optional learner profile — who they are and what they want to achieve */
+  learnerProfile?: string;
 }
 
 /** Success response from POST /api/generate */
