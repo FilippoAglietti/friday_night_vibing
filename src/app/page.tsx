@@ -10,7 +10,8 @@ import { useToast } from "@/components/ToastProvider";
 import { useState, useEffect, useCallback } from "react";
 import type { Curriculum } from "@/types/curriculum";
 import { exampleCurricula as fullExampleCurricula } from "@/data/exampleCurricula";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import ScrollProgress from "@/components/ScrollProgress";
 import { Button } from "@/components/ui/button";
 import { supabaseBrowser } from "@/lib/supabase";
 import {
@@ -49,17 +50,48 @@ import {
 /* ─── Animation Helpers ──────────────────────────────────── */
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
+  hidden: { opacity: 0, y: 40, filter: "blur(8px)" },
   visible: (i: number = 0) => ({
     opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
+const fadeScale = {
+  hidden: { opacity: 0, scale: 0.92, y: 24 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    scale: 1,
     y: 0,
     transition: { delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
+const slideFromLeft = {
+  hidden: { opacity: 0, x: -60, filter: "blur(6px)" },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    x: 0,
+    filter: "blur(0px)",
+    transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
+const slideFromRight = {
+  hidden: { opacity: 0, x: 60, filter: "blur(6px)" },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    x: 0,
+    filter: "blur(0px)",
+    transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
 const staggerContainer = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
+  visible: { transition: { staggerChildren: 0.1 } },
 };
 
 /* ─── Data ───────────────────────────────────────────────── */
@@ -233,18 +265,30 @@ export default function Home() {
 
   // Respect user motion preference
   const anim = prefersReduced ? {} : fadeUp;
+  const animScale = prefersReduced ? {} : fadeScale;
+  const animLeft = prefersReduced ? {} : slideFromLeft;
+  const animRight = prefersReduced ? {} : slideFromRight;
   const stagger = prefersReduced ? {} : staggerContainer;
+
+  // Parallax for ambient background
+  const { scrollY } = useScroll();
+  const bgY1 = useTransform(scrollY, [0, 3000], [0, -300]);
+  const bgY2 = useTransform(scrollY, [0, 3000], [0, -150]);
+  const bgY3 = useTransform(scrollY, [0, 3000], [0, -200]);
 
   return (
     <div className="relative flex flex-col min-h-screen overflow-x-hidden bg-background text-foreground transition-colors duration-300">
-      {/* ── Ambient Gradient Background ─────────────────── */}
+      {/* ── Scroll Progress Bar ─────────────────────────── */}
+      {!prefersReduced && <ScrollProgress />}
+
+      {/* ── Ambient Gradient Background with Parallax ──── */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
       >
-        <div className="absolute -top-[40%] -left-[20%] h-[80vh] w-[80vh] rounded-full bg-violet-600/[0.07] blur-[120px] dark:bg-violet-500/[0.12]" />
-        <div className="absolute -bottom-[30%] -right-[15%] h-[70vh] w-[70vh] rounded-full bg-cyan-500/[0.05] blur-[100px] dark:bg-cyan-400/[0.08]" />
-        <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 h-[50vh] w-[50vh] rounded-full bg-fuchsia-500/[0.04] blur-[80px] dark:bg-fuchsia-400/[0.06]" />
+        <motion.div style={{ y: bgY1 }} className="absolute -top-[40%] -left-[20%] h-[80vh] w-[80vh] rounded-full bg-violet-600/[0.07] blur-[120px] dark:bg-violet-500/[0.12]" />
+        <motion.div style={{ y: bgY2 }} className="absolute -bottom-[30%] -right-[15%] h-[70vh] w-[70vh] rounded-full bg-cyan-500/[0.05] blur-[100px] dark:bg-cyan-400/[0.08]" />
+        <motion.div style={{ y: bgY3 }} className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 h-[50vh] w-[50vh] rounded-full bg-fuchsia-500/[0.04] blur-[80px] dark:bg-fuchsia-400/[0.06]" />
       </div>
 
       {/* ── NAV ─────────────────────────────────────────── */}
@@ -493,7 +537,7 @@ export default function Home() {
               {steps.map((s, i) => (
                 <motion.div
                   key={i}
-                  variants={anim}
+                  variants={animScale}
                   custom={i}
                   className="group relative"
                 >
@@ -730,7 +774,7 @@ export default function Home() {
               variants={stagger}
             >
               {/* FREE PLAN */}
-              <motion.div variants={anim} custom={0}>
+              <motion.div variants={animScale} custom={0}>
                 <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
                   <CardHeader>
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -784,7 +828,7 @@ export default function Home() {
               </motion.div>
 
               {/* PRO PLAN */}
-              <motion.div variants={anim} custom={1} className="overflow-visible">
+              <motion.div variants={animScale} custom={1} className="overflow-visible">
                 <Card className="relative overflow-visible h-full border-violet-500/30 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
                   {/* Popular badge */}
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
@@ -833,7 +877,7 @@ export default function Home() {
               </motion.div>
 
               {/* 5-PACK */}
-              <motion.div variants={anim} custom={2}>
+              <motion.div variants={animScale} custom={2}>
                 <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
                   <CardHeader>
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">
@@ -896,7 +940,7 @@ export default function Home() {
             variants={stagger}
           >
             <motion.div
-              variants={anim}
+              variants={animScale}
               className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 backdrop-blur-sm"
             >
               <LayoutGrid className="mx-auto mb-4 size-8 text-violet-500" />
