@@ -39,6 +39,8 @@ export interface CurriculumFormProps {
   onGenerated?: (curriculum: Curriculum) => void;
   /** Called when generation starts */
   onLoadingChange?: (loading: boolean) => void;
+  /** Called when the user hits the free-tier generation limit */
+  onLimitReached?: () => void;
 }
 
 /* ─── Constants ──────────────────────────────────────────── */
@@ -85,6 +87,7 @@ function validate(data: CurriculumFormData): FormErrors {
 export default function CurriculumForm({
   onGenerated,
   onLoadingChange,
+  onLimitReached,
 }: CurriculumFormProps) {
   const [form, setForm] = useState<CurriculumFormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
