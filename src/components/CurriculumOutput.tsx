@@ -23,6 +23,7 @@ import {
   Sparkles,
   Target,
   Trophy,
+  FileText,
 } from "lucide-react";
 import { useState } from "react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
@@ -277,6 +278,67 @@ export default function CurriculumOutput({
     }
   };
 
+
+  const handleExportNotion = () => {
+    // Generate a rich markdown formatted for Notion import
+    const c = curriculum;
+    let md = `# ${c.title}\n\n`;
+    md += `> ${c.description}\n\n`;
+    md += `**Difficulty:** ${c.difficulty} · **Duration:** ${c.pacing?.totalHours || "N/A"}h · **Modules:** ${c.modules.length}\n\n`;
+    md += `---\n\n`;
+    if (c.objectives?.length) {
+      md += `## 🎯 Learning Objectives\n\n`;
+      c.objectives.forEach((obj: string) => { md += `- ${obj}\n`; });
+      md += `\n`;
+    }
+    if (c.prerequisites?.length) {
+      md += `## 📋 Prerequisites\n\n`;
+      c.prerequisites.forEach((p: string) => { md += `- ${p}\n`; });
+      md += `\n`;
+    }
+    c.modules.forEach((m: Module, mi: number) => {
+      md += `## Module ${mi + 1}: ${m.title}\n\n`;
+      if (m.description) md += `${m.description}\n\n`;
+      if (m.lessons?.length) {
+        m.lessons.forEach((l: Lesson, li: number) => {
+          md += `### ${mi + 1}.${li + 1} ${l.title}\n\n`;
+          if (l.content) md += `${l.content}\n\n`;
+          if (l.keyPoints?.length) {
+            md += `**Key Takeaways:**\n`;
+            l.keyPoints.forEach((kt: string) => { md += `- ${kt}\n`; });
+            md += `\n`;
+          }
+        });
+      }
+      if (m.quiz?.length) {
+        md += `### 📝 Quiz\n\n`;
+        m.quiz.forEach((q: QuizQuestion, qi: number) => {
+          md += `**Q${qi + 1}: ${q.question}**\n`;
+          q.options?.forEach((opt: string, oi: number) => {
+            md += `${oi === q.correctAnswer ? '✅' : '⬜'} ${opt}\n`;
+          });
+          md += `\n`;
+        });
+      }
+      md += `---\n\n`;
+    });
+    if (c.bonusResources?.length) {
+      md += `## 📚 Bonus Resources\n\n`;
+      c.bonusResources.forEach((r: BonusResource) => {
+        md += `- **${r.title}** (${r.type}) — ${r.description}\n`;
+      });
+    }
+
+    // Create a downloadable .md file optimized for Notion import
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${c.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_notion.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
 
@@ -467,6 +529,15 @@ export default function CurriculumOutput({
         >
           <Copy className="h-4 w-4" />
           {copied ? "Copied!" : "Copy as Markdown"}
+        </Button>
+        <Button
+          onClick={handleExportNotion}
+          variant="outline"
+          className="flex-1 gap-2 border-violet-500/30 text-violet-400 hover:bg-violet-500/10"
+          size="lg"
+        >
+          <FileText className="h-4 w-4" />
+          Export for Notion
         </Button>
         <Button
           onClick={onGenerateAnother}

@@ -45,6 +45,9 @@ import {
   Moon,
   Eye,
   X as XIcon,
+  Crown,
+  Mic,
+  Headphones,
 } from "lucide-react";
 
 /* ─── Animation Helpers (CSS-based, see globals.css) ──────── */
@@ -124,18 +127,28 @@ const freePlanFeatures = [
   { text: "1 free mini-course generation", included: true },
   { text: "Basic modules & lessons", included: true },
   { text: "JSON export", included: true },
+  { text: "Notion export", included: false },
   { text: "Quizzes & assessments", included: false },
-  { text: "Pacing schedules", included: false },
   { text: "Unlimited generations", included: false },
 ];
 
 const proPlanFeatures = [
   { text: "Unlimited generations", included: true },
   { text: "Full modules, lessons & quizzes", included: true },
-  { text: "JSON, Markdown & PDF export", included: true },
+  { text: "JSON, Markdown, PDF & Notion export", included: true },
   { text: "Quizzes & assessments", included: true },
   { text: "Custom pacing schedules", included: true },
   { text: "Priority AI processing", included: true },
+];
+
+const proMaxFeatures = [
+  { text: "Everything in Pro", included: true },
+  { text: "AI-generated audio lessons", included: true },
+  { text: "Full chapter content generation", included: true },
+  { text: "Premium Notion & PDF export", included: true },
+  { text: "Sell-ready course packages", included: true },
+  { text: "White-label branding", included: true },
+  { text: "Dedicated AI processing", included: true },
 ];
 
 const difficultyColor: Record<string, string> = {
@@ -609,7 +622,7 @@ export default function Home() {
               </h2>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-3 overflow-visible">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 overflow-visible">
               {/* FREE PLAN */}
               <div className="scroll-animate-scale" style={{ transitionDelay: '0s' }}>
                 <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
@@ -735,7 +748,7 @@ export default function Home() {
                       {[
                         "5 course generations",
                         "Full modules, lessons & quizzes",
-                        "JSON, Markdown & PDF export",
+                        "JSON, Markdown, PDF & Notion export",
                         "Custom pacing schedules",
                         "No recurring charges",
                       ].map((text, i) => (
@@ -761,6 +774,67 @@ export default function Home() {
                   </CardFooter>
                 </Card>
               </div>
+
+              {/* PRO MAX — COMING SOON */}
+              <div className="scroll-animate-scale" style={{ transitionDelay: '0.3s' }}>
+                <Card className="relative overflow-visible h-full border-amber-500/30 bg-gradient-to-b from-amber-500/[0.03] to-amber-900/[0.06] backdrop-blur-sm shadow-xl shadow-amber-500/5">
+                  {/* Coming Soon badge */}
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                    <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-semibold text-black border-0 shadow-lg shadow-amber-500/25">
+                      Coming Soon
+                    </Badge>
+                  </div>
+                  <CardHeader className="pt-6">
+                    <CardDescription className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-500">
+                      <Crown className="size-3.5" />
+                      Pro Max
+                    </CardDescription>
+                    <CardTitle className="text-3xl font-bold bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 bg-clip-text text-transparent">
+                      $79
+                      <span className="text-base font-normal text-muted-foreground">
+                        /month
+                      </span>
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      The complete toolkit to create & sell premium courses.
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {proMaxFeatures.map((f, i) => (
+                        <li
+                          key={i}
+                          className="flex items-center gap-2.5 text-sm"
+                        >
+                          <Check className="size-4 text-amber-500 shrink-0" />
+                          <span>{f.text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    {/* Audio highlight */}
+                    <div className="mt-5 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center gap-3">
+                      <div className="flex items-center justify-center size-8 rounded-lg bg-amber-500/10">
+                        <Headphones className="size-4 text-amber-500" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-amber-400">AI Audio Lessons</p>
+                        <p className="text-[10px] text-muted-foreground">Transform text into professional narrated audio</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="mt-auto">
+                    <Button
+                      disabled
+                      className="w-full rounded-full bg-gradient-to-r from-amber-600/50 to-yellow-600/50 text-white/70 border-0 cursor-not-allowed"
+                      size="lg"
+                    >
+                      <Crown className="size-4 mr-2" />
+                      Coming Soon
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </div>
+
             </div>
           </div>
         </section>
@@ -977,7 +1051,7 @@ export default function Home() {
       <AuthModal
         open={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onContinueAnonymous={() => {}}
+        
       />
 
       {/* ═══════════════════════════════════════════════════
