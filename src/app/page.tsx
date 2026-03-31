@@ -689,9 +689,13 @@ export default function Home() {
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible">
               {/* FREE PLAN */}
-              <div className="flex scroll-animate">
-                <Card className="flex flex-col w-full border-border/50 bg-card/50 backdrop-blur-sm">
-                  <CardHeader>
+              <div className="flex overflow-visible scroll-animate">
+                <Card className="relative flex flex-col w-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
+                  {/* Invisible spacer to align with badged cards */}
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 opacity-0 pointer-events-none">
+                    <Badge className="rounded-full px-4 py-1.5 text-xs">‌</Badge>
+                  </div>
+                  <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Free
                     </CardDescription>
@@ -781,9 +785,13 @@ export default function Home() {
               </div>
 
               {/* 5-PACK ONE-TIME */}
-              <div className="flex scroll-animate">
-                <Card className="flex flex-col w-full border-border/50 bg-card/50 backdrop-blur-sm">
-                  <CardHeader>
+              <div className="flex overflow-visible scroll-animate">
+                <Card className="relative flex flex-col w-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
+                  {/* Invisible spacer to align with badged cards */}
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 opacity-0 pointer-events-none">
+                    <Badge className="rounded-full px-4 py-1.5 text-xs">‌</Badge>
+                  </div>
+                  <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">
                       One-Time
                     </CardDescription>
@@ -832,7 +840,8 @@ export default function Home() {
                   {/* Gold shimmer accent */}
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-semibold text-black border-0 shadow-lg shadow-amber-500/25">
+                    <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-3.5 py-1.5 text-xs font-semibold text-black border-0 shadow-lg shadow-amber-500/30 flex items-center gap-1.5">
+                      <Sparkles className="size-3" />
                       Coming Soon
                     </Badge>
                   </div>
@@ -871,15 +880,16 @@ export default function Home() {
                       ))}
                     </ul>
                   </CardContent>
-                  <CardFooter className="mt-auto pt-0">
+                  <CardFooter className="mt-auto pt-0 flex-col gap-2">
                     <Button
-                      disabled
-                      className="w-full rounded-full bg-gradient-to-r from-amber-600/50 to-yellow-600/50 text-white/60 border-0 cursor-not-allowed"
+                      className="w-full rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 hover:border-amber-400/70 transition-all"
                       size="lg"
+                      onClick={() => toast("You're on the list! We'll notify you when Pro Max launches.", "success")}
                     >
-                      <Crown className="size-4 mr-2" />
-                      Coming Soon
+                      <Sparkles className="size-4 mr-2" />
+                      Join Waitlist
                     </Button>
+                    <p className="text-[11px] text-muted-foreground/60 text-center">We&apos;ll email you at launch — no spam.</p>
                   </CardFooter>
                 </Card>
               </div>
@@ -998,7 +1008,7 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/docs#faq"
                     className="hover:text-foreground transition-colors"
                   >
                     API
@@ -1013,7 +1023,7 @@ export default function Home() {
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li>
                   <a
-                    href="#"
+                    href="/docs"
                     className="hover:text-foreground transition-colors"
                   >
                     Documentation
@@ -1021,7 +1031,7 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/blog"
                     className="hover:text-foreground transition-colors"
                   >
                     Blog
@@ -1029,7 +1039,7 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/changelog"
                     className="hover:text-foreground transition-colors"
                   >
                     Changelog
@@ -1037,7 +1047,7 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/support"
                     className="hover:text-foreground transition-colors"
                   >
                     Support
@@ -1062,7 +1072,7 @@ export default function Home() {
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li>
                   <a
-                    href="#"
+                    href="/privacy"
                     className="hover:text-foreground transition-colors"
                   >
                     Privacy Policy
@@ -1070,7 +1080,7 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/terms"
                     className="hover:text-foreground transition-colors"
                   >
                     Terms of Service
@@ -1078,7 +1088,7 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/cookies"
                     className="hover:text-foreground transition-colors"
                   >
                     Cookie Policy
