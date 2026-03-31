@@ -50,11 +50,10 @@ import {
 /* ─── Animation Helpers ──────────────────────────────────── */
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 40, filter: "blur(8px)" },
+  hidden: { opacity: 0, y: 40 },
   visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   }),
 };
@@ -70,21 +69,19 @@ const fadeScale = {
 };
 
 const slideFromLeft = {
-  hidden: { opacity: 0, x: -60, filter: "blur(6px)" },
+  hidden: { opacity: 0, x: -60 },
   visible: (i: number = 0) => ({
     opacity: 1,
     x: 0,
-    filter: "blur(0px)",
     transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
 const slideFromRight = {
-  hidden: { opacity: 0, x: 60, filter: "blur(6px)" },
+  hidden: { opacity: 0, x: 60 },
   visible: (i: number = 0) => ({
     opacity: 1,
     x: 0,
-    filter: "blur(0px)",
     transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   }),
 };
