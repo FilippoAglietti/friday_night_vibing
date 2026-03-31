@@ -34,7 +34,6 @@ import {
   ArrowRight,
   Check,
   X,
-  ChevronRight,
   GraduationCap,
   LayoutGrid,
   FileText,
@@ -46,7 +45,6 @@ import {
   Eye,
   X as XIcon,
   Crown,
-  Mic,
   Headphones,
   Menu,
 } from "lucide-react";
@@ -159,25 +157,91 @@ const difficultyColor: Record<string, string> = {
     "bg-rose-500/10 text-rose-400 border-rose-500/20",
 };
 
+/* ─── Animation Variants ──────────────────────────────── */
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 80, damping: 20 },
+  },
+};
+
+const scaleUp = {
+  hidden: { opacity: 0, scale: 0.94, y: 16 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 90, damping: 22 },
+  },
+};
+
+const stagger = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
+  },
+};
+
+/* ─── Section Meta ────────────────────────────────────── */
+
+const sectionMeta = [
+  { id: "hero",             label: "Hero"          },
+  { id: "problem-solution", label: "The Problem"   },
+  { id: "how-it-works",     label: "How It Works"  },
+  { id: "generate",         label: "Try It Now"    },
+  { id: "examples",         label: "Examples"      },
+  { id: "pricing",          label: "Pricing"       },
+  { id: "final-cta",        label: "Get Started"   },
+];
+
+/* ─── Section Dots ────────────────────────────────────── */
+
+function SectionDots({ activeSection }: { activeSection: string }) {
+  return (
+    <div
+      className="fixed right-5 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-3.5 lg:flex"
+      aria-hidden="true"
+    >
+      {sectionMeta.map(({ id, label }) => (
+        <button
+          key={id}
+          onClick={() =>
+            document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
+          }
+          title={label}
+          className={`section-dot ${
+            activeSection === id ? "section-dot-active" : "section-dot-inactive"
+          }`}
+        />
+      ))}
+    </div>
+  );
+}
+
 /* ─── Page ───────────────────────────────────────────────── */
 
 export default function Home() {
   const [dark, setDark] = useState(true);
+  const [activeSection, setActiveSection] = useState("hero");
 
-  // Intersection Observer for scroll-triggered animations
+  // Section tracking for dots
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view');
-            observer.unobserve(entry.target);
-          }
-        });
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActiveSection(visible.target.id);
       },
-      { threshold: 0.15 }
+      { threshold: [0.3, 0.5] }
     );
-    document.querySelectorAll('.scroll-animate, .scroll-animate-scale').forEach((el) => observer.observe(el));
+    sectionMeta.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
     return () => observer.disconnect();
   }, []);
 
@@ -187,7 +251,6 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<unknown>(null);
-  // Registration is required before generating
   const [previewCurriculum, setPreviewCurriculum] = useState<Curriculum | null>(null);
   const { toast } = useToast();
   const closePreview = useCallback(() => setPreviewCurriculum(null), []);
@@ -234,21 +297,16 @@ export default function Home() {
     setShowPaywall(true);
   }, []);
 
-  // Dev mode bypass: add ?dev=true to URL to skip auth (for testing before Supabase is configured)
   const isDevMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("dev") === "true";
 
   const handleFormSubmitAttempt = useCallback(() => {
-    // Skip auth check in dev mode
     if (isDevMode) return true;
-    // Registration required before generating
     if (!user) {
       setShowAuthModal(true);
       return false;
     }
     return true;
   }, [user, isDevMode]);
-
-  // Respect user motion preference
 
   // Parallax for ambient background
   const { scrollY } = useScroll();
@@ -260,6 +318,9 @@ export default function Home() {
     <div className="relative flex flex-col min-h-screen overflow-x-hidden bg-background text-foreground transition-colors duration-300">
       {/* ── Scroll Progress Bar ─────────────────────────── */}
       <ScrollProgress />
+
+      {/* ── Section Navigation Dots ─────────────────────── */}
+      <SectionDots activeSection={activeSection} />
 
       {/* ── Ambient Gradient Background with Parallax ──── */}
       <div
@@ -377,79 +438,87 @@ export default function Home() {
 
       <main className="relative z-10 flex-1">
         {/* ═══════════════════════════════════════════════════
-            HERO SECTION
+            HERO
         ═══════════════════════════════════════════════════ */}
         <section
           id="hero"
-          className="relative flex items-center justify-center px-4 pt-24 pb-20 sm:pt-32 sm:pb-28 lg:pt-40 lg:pb-36"
+          className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 pt-16 pb-16"
         >
-          <div
-            className="mx-auto max-w-4xl text-center"
-          >
-            <div>
-              <div><Badge
-                variant="outline"
-                className="mb-6 rounded-full border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400"
+          {/* Hero radial spotlight */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute left-1/2 top-[45%] h-[640px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/[0.05] dark:bg-violet-500/[0.09] blur-[90px]" />
+          </div>
+
+          <div className="mx-auto max-w-4xl text-center">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={stagger}
+            >
+              <motion.div variants={fadeUp}>
+                <Badge
+                  variant="outline"
+                  className="mb-6 rounded-full border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400"
+                >
+                  <Sparkles className="mr-1.5 size-3" />
+                  AI-Powered Course Design
+                </Badge>
+              </motion.div>
+
+              <motion.h1
+                variants={fadeUp}
+                className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl"
               >
-                <Sparkles className="mr-1.5 size-3" />
-                AI-Powered Course Design
-              </Badge></div>
-            </div>
+                Turn Any Topic Into a
+                <br />
+                <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
+                  Complete Course
+                </span>
+                <br />
+                in Seconds
+              </motion.h1>
 
-            <h1
-              className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl"
-            >
-              Turn Any Topic Into a
-              <br />
-              <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
-                Complete Course
-              </span>
-              <br />
-              in Seconds
-            </h1>
-
-            <p
-
-
-              className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
-            >
-              AI-powered course design for course creators, educators, and
-              coaches. Stop staring at blank outlines — get a production-ready
-              course with modules, lessons, quizzes, and pacing.
-            </p>
-
-            <div
-
-
-              className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
-            >
-              <Button
-                id="hero-cta"
-                size="lg"
-                className="h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
-                onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
+              <motion.p
+                variants={fadeUp}
+                className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
               >
-                Generate Your First Course Free
-                <ArrowRight className="ml-2 size-4" />
-              </Button>
-              <Button
-                id="hero-secondary"
-                variant="outline"
-                size="lg"
-                className="h-12 w-full sm:w-auto rounded-full px-8 text-base"
-                onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })}
+                AI-powered course design for course creators, educators, and
+                coaches. Stop staring at blank outlines — get a production-ready
+                course with modules, lessons, quizzes, and pacing.
+              </motion.p>
+
+              <motion.div
+                variants={fadeUp}
+                className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
               >
-                See Example Courses
-              </Button>
-            </div>
+                <Button
+                  id="hero-cta"
+                  size="lg"
+                  className="h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                  onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Generate Your First Course Free
+                  <ArrowRight className="ml-2 size-4" />
+                </Button>
+                <Button
+                  id="hero-secondary"
+                  variant="outline"
+                  size="lg"
+                  className="h-12 w-full sm:w-auto rounded-full px-8 text-base"
+                  onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  See Example Courses
+                </Button>
+              </motion.div>
 
-            <p
-
-
-              className="mt-4 text-xs text-muted-foreground"
-            >
-              No credit card required · Free forever on the starter plan
-            </p>
+              <motion.p
+                variants={fadeUp}
+                className="mt-4 text-xs text-muted-foreground"
+              >
+                No credit card required · Free forever on the starter plan
+              </motion.p>
+            </motion.div>
           </div>
         </section>
 
@@ -458,41 +527,53 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section
           id="problem-solution"
-          className="relative px-4 py-20 sm:py-28"
+          className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-20"
         >
-          <div className="mx-auto max-w-6xl">
-            <div
+          {/* Section-specific accent */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -bottom-[25%] -left-[15%] h-[55vh] w-[55vh] rounded-full bg-rose-600/[0.04] blur-[100px] dark:bg-rose-500/[0.08]" />
+            <div className="absolute top-[8%] right-[3%] h-[35vh] w-[35vh] rounded-full bg-amber-500/[0.03] blur-[80px] dark:bg-amber-400/[0.05]" />
+          </div>
+
+          <div className="mx-auto max-w-6xl w-full">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={stagger}
               className="text-center mb-16"
             >
-              <p
-
+              <motion.p
+                variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
               >
                 The Problem
-              </p>
-              <h2
-
-
+              </motion.p>
+              <motion.h2
+                variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
               >
                 Building a course shouldn&apos;t feel like pulling teeth
-              </h2>
-              <p
-
-
+              </motion.h2>
+              <motion.p
+                variants={fadeUp}
                 className="mx-auto mt-4 max-w-2xl text-muted-foreground"
               >
                 Course creators waste 40+ hours just on the outline. You know
                 your material — you just need it structured into something
                 students can follow.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
 
-            <div
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              variants={stagger}
               className="grid gap-6 md:grid-cols-3"
             >
               {painPoints.map((p, i) => (
-                <div key={i}>
+                <motion.div key={i} variants={scaleUp}>
                   <Card className="group relative h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5">
                     <CardHeader>
                       <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-violet-500/10">
@@ -508,41 +589,55 @@ export default function Home() {
                       </p>
                     </CardContent>
                   </Card>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════
             HOW IT WORKS
         ═══════════════════════════════════════════════════ */}
-        <section id="how-it-works" className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-5xl">
-            <div
+        <section id="how-it-works" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-20">
+          {/* Section-specific accent */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute top-[5%] right-[0%] h-[55vh] w-[45vh] rounded-full bg-indigo-500/[0.04] blur-[100px] dark:bg-indigo-400/[0.07]" />
+            <div className="absolute bottom-[10%] left-[5%] h-[30vh] w-[30vh] rounded-full bg-cyan-500/[0.03] blur-[80px] dark:bg-cyan-400/[0.05]" />
+          </div>
+
+          <div className="mx-auto max-w-5xl w-full">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={stagger}
               className="text-center mb-16"
             >
-              <p
-
+              <motion.p
+                variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
               >
                 How It Works
-              </p>
-              <h2
-
-
+              </motion.p>
+              <motion.h2
+                variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
               >
                 Three steps. Zero headaches.
-              </h2>
-            </div>
+              </motion.h2>
+            </motion.div>
 
-            <div
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              variants={stagger}
               className="grid gap-8 md:grid-cols-3"
             >
               {steps.map((s, i) => (
-                <div
+                <motion.div
                   key={i}
+                  variants={scaleUp}
                   className="group relative"
                 >
                   {/* Connector line — hidden on mobile, shown between cards */}
@@ -564,25 +659,35 @@ export default function Home() {
                       {s.desc}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════
             TRY IT — CURRICULUM FORM / OUTPUT
+            Note: snap-section removed when curriculum is
+            showing so users can freely scroll through output
         ═══════════════════════════════════════════════════ */}
-        <section id="generate" className="relative px-4 py-20 sm:py-28">
-          <div
-            className="mx-auto max-w-3xl"
-          >
+        <section
+          id="generate"
+          className={`${curriculum || isGenerating ? "" : "snap-section"} relative min-h-screen flex flex-col px-4 py-20 ${
+            curriculum || isGenerating
+              ? "items-start justify-start pt-24"
+              : "items-center justify-center"
+          }`}
+        >
+          {/* Section-specific accent */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute left-1/2 top-1/3 h-[50vh] w-[60vh] -translate-x-1/2 rounded-full bg-violet-500/[0.03] blur-[80px] dark:bg-violet-500/[0.07]" />
+          </div>
+
+          <div className="mx-auto w-full max-w-3xl">
             {isGenerating ? (
               <LoadingSkeleton />
             ) : curriculum ? (
-              <div
-                key="output-view"
-              >
+              <div key="output-view">
                 <CurriculumOutput
                   curriculum={curriculum}
                   onGenerateAnother={() => setCurriculum(null)}
@@ -590,17 +695,31 @@ export default function Home() {
               </div>
             ) : (
               <>
-                <div
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  variants={stagger}
                   className="text-center mb-10"
                 >
-                  <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
+                  <motion.p
+                    variants={fadeUp}
+                    className="text-sm font-semibold uppercase tracking-widest text-violet-500"
+                  >
                     Try It Now
-                  </p>
-                  <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+                  </motion.p>
+                  <motion.h2
+                    variants={fadeUp}
+                    className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+                  >
                     Generate your course
-                  </h2>
-                </div>
-                <div
+                  </motion.h2>
+                </motion.div>
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  variants={fadeUp}
                   className="mx-auto max-w-xl"
                 >
                   <CurriculumForm
@@ -609,7 +728,7 @@ export default function Home() {
                     onLimitReached={handleLimitReached}
                     onSubmitAttempt={handleFormSubmitAttempt}
                   />
-                </div>
+                </motion.div>
               </>
             )}
           </div>
@@ -618,40 +737,52 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             EXAMPLE CURRICULA (SOCIAL PROOF)
         ═══════════════════════════════════════════════════ */}
-        <section id="examples" className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
-            <div
+        <section id="examples" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-20">
+          {/* Section-specific accent */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute top-[8%] left-[3%] h-[45vh] w-[45vh] rounded-full bg-violet-500/[0.04] blur-[100px] dark:bg-violet-400/[0.07]" />
+            <div className="absolute bottom-[5%] right-[5%] h-[30vh] w-[30vh] rounded-full bg-cyan-500/[0.03] blur-[80px] dark:bg-cyan-400/[0.05]" />
+          </div>
+
+          <div className="mx-auto max-w-6xl w-full">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={stagger}
               className="text-center mb-16"
             >
-              <p
-
+              <motion.p
+                variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
               >
                 Real Examples
-              </p>
-              <h2
-
-
+              </motion.p>
+              <motion.h2
+                variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
               >
                 See what Syllabi can create
-              </h2>
-              <p
-
-
+              </motion.h2>
+              <motion.p
+                variants={fadeUp}
                 className="mx-auto mt-4 max-w-2xl text-muted-foreground"
               >
                 These courses were generated in seconds. Each one includes
                 modules, lessons, quizzes, bonus resources, and a full pacing
                 schedule.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
 
-            <div
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              variants={stagger}
               className="grid gap-6 md:grid-cols-3"
             >
               {exampleCurricula.map((c, i) => (
-                <div key={i}>
+                <motion.div key={i} variants={scaleUp}>
                   <Card
                     className="group h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5 cursor-pointer"
                     onClick={() => setPreviewCurriculum(fullExampleCurricula[i])}
@@ -716,29 +847,53 @@ export default function Home() {
                       </div>
                     </CardContent>
                   </Card>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════
             PRICING
         ═══════════════════════════════════════════════════ */}
-        <section id="pricing" className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
-            <div className="text-center mb-16 scroll-animate">
-              <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
-                Pricing
-              </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-                Start free. Upgrade when you&apos;re ready.
-              </h2>
-            </div>
+        <section id="pricing" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-20">
+          {/* Section-specific accent */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[30vh] w-[80%] rounded-full bg-violet-500/[0.03] blur-[100px] dark:bg-violet-500/[0.06]" />
+            <div className="absolute bottom-[5%] right-[10%] h-[25vh] w-[25vh] rounded-full bg-amber-500/[0.03] blur-[80px] dark:bg-amber-500/[0.05]" />
+          </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible">
+          <div className="mx-auto max-w-6xl w-full">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={stagger}
+              className="text-center mb-16"
+            >
+              <motion.p
+                variants={fadeUp}
+                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
+              >
+                Pricing
+              </motion.p>
+              <motion.h2
+                variants={fadeUp}
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+              >
+                Start free. Upgrade when you&apos;re ready.
+              </motion.h2>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+              variants={stagger}
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible"
+            >
               {/* FREE PLAN */}
-              <div className="flex min-w-0 overflow-visible scroll-animate">
+              <motion.div variants={scaleUp} className="flex min-w-0 overflow-visible">
                 <Card className="relative flex flex-col w-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
                   {/* Invisible spacer to align with badged cards */}
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 opacity-0 pointer-events-none">
@@ -786,10 +941,10 @@ export default function Home() {
                     </Button>
                   </CardFooter>
                 </Card>
-              </div>
+              </motion.div>
 
               {/* PRO PLAN */}
-              <div className="flex min-w-0 overflow-visible scroll-animate">
+              <motion.div variants={scaleUp} className="flex min-w-0 overflow-visible">
                 <Card className="relative flex flex-col w-full overflow-visible border-violet-500/30 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                     <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">
@@ -831,10 +986,10 @@ export default function Home() {
                     </Button>
                   </CardFooter>
                 </Card>
-              </div>
+              </motion.div>
 
               {/* 5-PACK ONE-TIME */}
-              <div className="flex min-w-0 overflow-visible scroll-animate">
+              <motion.div variants={scaleUp} className="flex min-w-0 overflow-visible">
                 <Card className="relative flex flex-col w-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
                   {/* Invisible spacer to align with badged cards */}
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 opacity-0 pointer-events-none">
@@ -881,10 +1036,10 @@ export default function Home() {
                     </Button>
                   </CardFooter>
                 </Card>
-              </div>
+              </motion.div>
 
               {/* PRO MAX — COMING SOON */}
-              <div className="flex min-w-0 overflow-visible scroll-animate">
+              <motion.div variants={scaleUp} className="flex min-w-0 overflow-visible">
                 <Card className="relative flex flex-col w-full border-amber-500/30 bg-gradient-to-b from-amber-500/5 via-card/50 to-card/50 backdrop-blur-sm shadow-xl shadow-amber-500/5 overflow-visible">
                   {/* Gold shimmer accent */}
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
@@ -941,42 +1096,60 @@ export default function Home() {
                     <p className="text-[11px] text-muted-foreground/60 text-center">We&apos;ll email you at launch — no spam.</p>
                   </CardFooter>
                 </Card>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════
             FINAL CTA
         ═══════════════════════════════════════════════════ */}
-        <section className="relative px-4 py-20 sm:py-28">
-          <div
-            className="mx-auto max-w-3xl text-center"
-          >
-            <div
+        <section id="final-cta" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-20">
+          {/* Section-specific accent */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute left-1/2 top-1/2 h-[70vh] w-[70vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/[0.06] blur-[100px] dark:bg-violet-500/[0.11]" />
+            <div className="absolute bottom-[10%] right-[5%] h-[25vh] w-[25vh] rounded-full bg-indigo-500/[0.04] blur-[80px] dark:bg-indigo-400/[0.07]" />
+          </div>
 
+          <div className="mx-auto max-w-3xl text-center">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={stagger}
               className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 backdrop-blur-sm"
             >
-              <LayoutGrid className="mx-auto mb-4 size-8 text-violet-500" />
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              <motion.div variants={fadeUp}>
+                <LayoutGrid className="mx-auto mb-4 size-8 text-violet-500" />
+              </motion.div>
+              <motion.h2
+                variants={fadeUp}
+                className="text-3xl font-bold tracking-tight sm:text-4xl"
+              >
                 Ready to build your
                 <br />
                 first course?
-              </h2>
-              <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+              </motion.h2>
+              <motion.p
+                variants={fadeUp}
+                className="mx-auto mt-4 max-w-lg text-muted-foreground"
+              >
                 Join hundreds of course creators who save 40+ hours per course
                 with Syllabi. Your first generation is free — no credit card, no
                 catch.
-              </p>
-              <Button
-                id="bottom-cta"
-                size="lg"
-                className="mt-8 h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
-              >
-                Generate Your First Course Free
-                <ArrowRight className="ml-2 size-4" />
-              </Button>
-            </div>
+              </motion.p>
+              <motion.div variants={fadeUp}>
+                <Button
+                  id="bottom-cta"
+                  size="lg"
+                  className="mt-8 h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                  onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Generate Your First Course Free
+                  <ArrowRight className="ml-2 size-4" />
+                </Button>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
       </main>
