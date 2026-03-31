@@ -1100,7 +1100,7 @@ export default function Home() {
 
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/40 pt-8 sm:flex-row">
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Syllabi. All rights reserved.
+              © 2026 Syllabi. All rights reserved.
             </p>
             <p className="text-xs text-muted-foreground">
               Built with ❤️ for course creators
