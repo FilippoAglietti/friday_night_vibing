@@ -13,6 +13,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   // Admin client — bypasses RLS so anyone can insert without auth
   const supabaseAdmin = createClient(
@@ -20,6 +22,7 @@ export async function POST(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false, autoRefreshToken: false } }
   );
+
   try {
     const body = await req.json();
     const { email, source, utm } = body;

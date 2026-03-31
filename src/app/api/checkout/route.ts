@@ -14,6 +14,8 @@ import Stripe from "stripe";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 // ─── Supabase server helper ───────────────────────────────────
 
 async function getUser() {

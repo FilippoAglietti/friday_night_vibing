@@ -48,6 +48,7 @@ import {
   Crown,
   Mic,
   Headphones,
+  Menu,
 } from "lucide-react";
 
 /* ─── Data ───────────────────────────────────────────────── */
@@ -184,6 +185,7 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<unknown>(null);
   // Registration is required before generating
   const [previewCurriculum, setPreviewCurriculum] = useState<Curriculum | null>(null);
@@ -322,8 +324,55 @@ export default function Home() {
             >
               Get Started Free
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <XIcon className="size-5" /> : <Menu className="size-5" />}
+            </Button>
           </div>
         </div>
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl">
+            <div className="mx-auto max-w-6xl px-4 py-3 space-y-1">
+              <a
+                href="#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                How it works
+              </a>
+              <a
+                href="#examples"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                Examples
+              </a>
+              <a
+                href="#pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                Pricing
+              </a>
+              <div className="pt-2 pb-1">
+                <Button
+                  className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    document.getElementById("generate")?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  Get Started Free
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       <main className="relative z-10 flex-1">
@@ -377,7 +426,7 @@ export default function Home() {
               <Button
                 id="hero-cta"
                 size="lg"
-                className="h-12 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                className="h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
                 onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Generate Your First Course Free
@@ -387,7 +436,7 @@ export default function Home() {
                 id="hero-secondary"
                 variant="outline"
                 size="lg"
-                className="h-12 rounded-full px-8 text-base"
+                className="h-12 w-full sm:w-auto rounded-full px-8 text-base"
                 onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 See Example Courses
@@ -836,7 +885,7 @@ export default function Home() {
 
               {/* PRO MAX — COMING SOON */}
               <div className="flex scroll-animate">
-                <Card className="relative flex flex-col w-full border-amber-500/30 bg-gradient-to-b from-amber-500/5 via-card/50 to-card/50 backdrop-blur-sm shadow-xl shadow-amber-500/5 overflow-hidden">
+                <Card className="relative flex flex-col w-full border-amber-500/30 bg-gradient-to-b from-amber-500/5 via-card/50 to-card/50 backdrop-blur-sm shadow-xl shadow-amber-500/5 overflow-visible">
                   {/* Gold shimmer accent */}
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
@@ -922,7 +971,7 @@ export default function Home() {
               <Button
                 id="bottom-cta"
                 size="lg"
-                className="mt-8 h-12 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                className="mt-8 h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
               >
                 Generate Your First Course Free
                 <ArrowRight className="ml-2 size-4" />

@@ -21,6 +21,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 import { buildCurriculumPrompt } from "@/lib/prompts/curriculum";
 import type {
   GenerateRequest,

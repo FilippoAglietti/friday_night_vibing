@@ -122,7 +122,7 @@ export default function LoadingSkeleton() {
                 <ShimmerLine width="90%" />
               </div>
             </div>
-            <div className="flex gap-3 mt-4">
+            <div className="flex flex-wrap gap-3 mt-4">
               {[1, 2, 3, 4].map((i) => (
                 <ShimmerBlock key={i} className="h-7 w-24 rounded-full" />
               ))}
