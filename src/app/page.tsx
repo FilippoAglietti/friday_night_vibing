@@ -502,7 +502,7 @@ export default function Home() {
                 <Button
                   id="hero-cta"
                   size="lg"
-                  className="h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                  className="h-12 xl:h-14 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 xl:px-10 text-base xl:text-lg font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
                   onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Generate Your First Course Free
@@ -812,31 +812,31 @@ export default function Home() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5">
-                          <Layers className="mb-1 size-3.5 text-muted-foreground" />
-                          <span className="text-sm font-semibold">
+                      <div className="grid grid-cols-3 gap-3 xl:gap-5">
+                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5 xl:p-4">
+                          <Layers className="mb-1 size-3.5 xl:size-5 text-muted-foreground" />
+                          <span className="text-sm xl:text-lg font-semibold">
                             {c.modules}
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] xl:text-xs text-muted-foreground">
                             Modules
                           </span>
                         </div>
-                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5">
-                          <FileText className="mb-1 size-3.5 text-muted-foreground" />
-                          <span className="text-sm font-semibold">
+                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5 xl:p-4">
+                          <FileText className="mb-1 size-3.5 xl:size-5 text-muted-foreground" />
+                          <span className="text-sm xl:text-lg font-semibold">
                             {c.lessons}
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] xl:text-xs text-muted-foreground">
                             Lessons
                           </span>
                         </div>
-                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5">
-                          <Clock className="mb-1 size-3.5 text-muted-foreground" />
-                          <span className="text-sm font-semibold">
+                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5 xl:p-4">
+                          <Clock className="mb-1 size-3.5 xl:size-5 text-muted-foreground" />
+                          <span className="text-sm xl:text-lg font-semibold">
                             {c.hours}h
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] xl:text-xs text-muted-foreground">
                             Total
                           </span>
                         </div>
