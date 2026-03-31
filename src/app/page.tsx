@@ -326,6 +326,13 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Listen for AuthButton dispatching open-auth event (nav sign-in click)
+  useEffect(() => {
+    const handler = () => setShowAuthModal(true);
+    window.addEventListener("syllabi:open-auth", handler);
+    return () => window.removeEventListener("syllabi:open-auth", handler);
+  }, []);
+
   // Check for checkout success/error in URL params
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

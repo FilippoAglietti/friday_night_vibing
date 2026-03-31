@@ -10,7 +10,6 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 export default function AuthButton() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     supabaseBrowser.auth.getUser().then(({ data: { user } }) => {
@@ -26,20 +25,9 @@ export default function AuthButton() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleSignIn = useCallback(async () => {
-    setLoading(true);
-    try {
-      await supabaseBrowser.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-    } catch (err) {
-      console.error("Sign in error:", err);
-    } finally {
-      setLoading(false);
-    }
+  // Dispatch a custom event that page.tsx listens to and opens AuthModal
+  const handleSignIn = useCallback(() => {
+    window.dispatchEvent(new CustomEvent("syllabi:open-auth"));
   }, []);
 
   const handleSignOut = useCallback(async () => {
@@ -128,18 +116,13 @@ export default function AuthButton() {
       size="sm"
       className="rounded-full text-xs font-medium gap-1.5 hover:bg-violet-500/10 hover:text-violet-500 transition-colors"
       onClick={handleSignIn}
-      disabled={loading}
     >
-      {loading ? (
-        <div className="size-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-      ) : (
-        <>
-          <div className="flex items-center justify-center size-6 rounded-full bg-violet-500/15 text-violet-500">
-            <User className="size-3.5" />
-          </div>
-          <span className="hidden sm:inline">Sign in</span>
-        </>
-      )}
+      <>
+        <div className="flex items-center justify-center size-6 rounded-full bg-violet-500/15 text-violet-500">
+          <User className="size-3.5" />
+        </div>
+        <span className="hidden sm:inline">Sign in</span>
+      </>
     </Button>
   );
 }
