@@ -631,12 +631,10 @@ export default function Home() {
                     <div className="mb-5 flex size-14 xl:size-16 2xl:size-20 items-center justify-center rounded-2xl bg-violet-500/10">
                       <p.icon className="size-6 xl:size-7 2xl:size-9 text-violet-500" />
                     </div>
-                    {/* Problem label */}
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60 mb-2">
-                      {p.problem}
-                    </p>
-                    {/* Solution */}
-                    <p className="text-sm xl:text-base leading-relaxed text-muted-foreground">
+                    {/* Title */}
+                    <h3 className="text-lg xl:text-xl 2xl:text-2xl font-semibold">{p.problem}</h3>
+                    {/* Description */}
+                    <p className="mt-2 text-sm xl:text-base leading-relaxed text-muted-foreground">
                       {p.solution}
                     </p>
                   </div>
