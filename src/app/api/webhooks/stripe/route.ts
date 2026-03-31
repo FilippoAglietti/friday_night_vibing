@@ -14,18 +14,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-// ─── Stripe client ────────────────────────────────────────────
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
-
-// ─── Supabase admin client (bypasses RLS) ─────────────────────
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false, autoRefreshToken: false } }
-);
-
 // ─── Route config ─────────────────────────────────────────────
 
 // Disable body parsing — Stripe needs the raw body for signature verification
@@ -35,6 +23,12 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } }
+  );
   const signature = req.headers.get("stripe-signature");
 
   if (!signature) {

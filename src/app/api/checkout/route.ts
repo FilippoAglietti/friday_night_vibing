@@ -14,9 +14,7 @@ import Stripe from "stripe";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-// ─── Stripe client ────────────────────────────────────────────
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+export const dynamic = "force-dynamic";
 
 // ─── Supabase server helper ───────────────────────────────────
 
@@ -51,6 +49,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const { priceId } = await req.json();
 
     if (!priceId || typeof priceId !== "string") {

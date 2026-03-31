@@ -222,9 +222,9 @@ export default function ProfilePage() {
               <UserIcon className="size-8" />
             </div>
           )}
-          <div>
-            <h1 className="text-2xl font-bold">{name}</h1>
-            <p className="text-sm text-muted-foreground">{user?.email}</p>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold truncate">{name}</h1>
+            <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
             <div className="flex items-center gap-3 mt-1.5">
               <Badge variant="outline" className="text-xs border-violet-500/30 text-violet-500">
                 {generations.length} course{generations.length !== 1 ? "s" : ""} generated
