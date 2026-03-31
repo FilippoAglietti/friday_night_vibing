@@ -10,7 +10,7 @@ import { useToast } from "@/components/ToastProvider";
 import { useState, useEffect, useCallback } from "react";
 import type { Curriculum } from "@/types/curriculum";
 import { exampleCurricula as fullExampleCurricula } from "@/data/exampleCurricula";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import ScrollProgress from "@/components/ScrollProgress";
 import { Button } from "@/components/ui/button";
 import { supabaseBrowser } from "@/lib/supabase";
@@ -47,49 +47,7 @@ import {
   X as XIcon,
 } from "lucide-react";
 
-/* ─── Animation Helpers ──────────────────────────────────── */
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: (i: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
-
-const fadeScale = {
-  hidden: { opacity: 0, scale: 0.92, y: 24 },
-  visible: (i: number = 0) => ({
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
-
-const slideFromLeft = {
-  hidden: { opacity: 0, x: -60 },
-  visible: (i: number = 0) => ({
-    opacity: 1,
-    x: 0,
-    transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
-
-const slideFromRight = {
-  hidden: { opacity: 0, x: 60 },
-  visible: (i: number = 0) => ({
-    opacity: 1,
-    x: 0,
-    transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
-
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-};
+/* ─── Animation Helpers (CSS-based, see globals.css) ──────── */
 
 /* ─── Data ───────────────────────────────────────────────── */
 
@@ -201,7 +159,6 @@ export default function Home() {
   // Registration is required before generating
   const [previewCurriculum, setPreviewCurriculum] = useState<Curriculum | null>(null);
   const { toast } = useToast();
-  const prefersReduced = useReducedMotion();
   const closePreview = useCallback(() => setPreviewCurriculum(null), []);
 
   useEffect(() => {
@@ -260,23 +217,33 @@ export default function Home() {
     return true;
   }, [user, isDevMode]);
 
-  // Respect user motion preference
-  const anim = prefersReduced ? {} : fadeUp;
-  const animScale = prefersReduced ? {} : fadeScale;
-  const animLeft = prefersReduced ? {} : slideFromLeft;
-  const animRight = prefersReduced ? {} : slideFromRight;
-  const stagger = prefersReduced ? {} : staggerContainer;
-
   // Parallax for ambient background
   const { scrollY } = useScroll();
   const bgY1 = useTransform(scrollY, [0, 3000], [0, -300]);
   const bgY2 = useTransform(scrollY, [0, 3000], [0, -150]);
   const bgY3 = useTransform(scrollY, [0, 3000], [0, -200]);
 
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    document.querySelectorAll('.scroll-animate, .scroll-animate-scale').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="relative flex flex-col min-h-screen overflow-x-hidden bg-background text-foreground transition-colors duration-300">
       {/* ── Scroll Progress Bar ─────────────────────────── */}
-      {!prefersReduced && <ScrollProgress />}
+      <ScrollProgress />
 
       {/* ── Ambient Gradient Background with Parallax ──── */}
       <div
@@ -353,13 +320,8 @@ export default function Home() {
           id="hero"
           className="relative flex items-center justify-center px-4 pt-24 pb-20 sm:pt-32 sm:pb-28 lg:pt-40 lg:pb-36"
         >
-          <motion.div
-            className="mx-auto max-w-4xl text-center"
-            initial="hidden"
-            animate="visible"
-            variants={stagger}
-          >
-            <motion.div variants={anim} custom={0}>
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="animate-fade-up delay-0">
               <Badge
                 variant="outline"
                 className="mb-6 rounded-full border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400"
@@ -367,13 +329,9 @@ export default function Home() {
                 <Sparkles className="mr-1.5 size-3" />
                 AI-Powered Course Design
               </Badge>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              variants={anim}
-              custom={1}
-              className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl"
-            >
+            <h1 className="animate-fade-up delay-1 text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
               Turn Any Topic Into a
               <br />
               <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
@@ -381,23 +339,15 @@ export default function Home() {
               </span>
               <br />
               in Seconds
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              variants={anim}
-              custom={2}
-              className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
-            >
+            <p className="animate-fade-up delay-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
               AI-powered course design for course creators, educators, and
               coaches. Stop staring at blank outlines — get a production-ready
               course with modules, lessons, quizzes, and pacing.
-            </motion.p>
+            </p>
 
-            <motion.div
-              variants={anim}
-              custom={3}
-              className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
-            >
+            <div className="animate-fade-up delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button
                 id="hero-cta"
                 size="lg"
@@ -416,16 +366,12 @@ export default function Home() {
               >
                 See Example Courses
               </Button>
-            </motion.div>
+            </div>
 
-            <motion.p
-              variants={anim}
-              custom={4}
-              className="mt-4 text-xs text-muted-foreground"
-            >
+            <p className="animate-fade-up delay-4 mt-4 text-xs text-muted-foreground">
               No credit card required · Free forever on the starter plan
-            </motion.p>
-          </motion.div>
+            </p>
+          </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════
@@ -436,46 +382,23 @@ export default function Home() {
           className="relative px-4 py-20 sm:py-28"
         >
           <div className="mx-auto max-w-6xl">
-            <motion.div
-              className="text-center mb-16"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={stagger}
-            >
-              <motion.p
-                variants={anim}
-                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
-              >
+            <div className="text-center mb-16">
+              <p className="scroll-animate text-sm font-semibold uppercase tracking-widest text-violet-500">
                 The Problem
-              </motion.p>
-              <motion.h2
-                variants={anim}
-                custom={1}
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
-              >
+              </p>
+              <h2 className="scroll-animate scroll-delay-1 mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
                 Building a course shouldn&apos;t feel like pulling teeth
-              </motion.h2>
-              <motion.p
-                variants={anim}
-                custom={2}
-                className="mx-auto mt-4 max-w-2xl text-muted-foreground"
-              >
+              </h2>
+              <p className="scroll-animate scroll-delay-2 mx-auto mt-4 max-w-2xl text-muted-foreground">
                 Course creators waste 40+ hours just on the outline. You know
                 your material — you just need it structured into something
                 students can follow.
-              </motion.p>
-            </motion.div>
+              </p>
+            </div>
 
-            <motion.div
-              className="grid gap-6 md:grid-cols-3"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={stagger}
-            >
+            <div className="grid gap-6 md:grid-cols-3">
               {painPoints.map((p, i) => (
-                <motion.div key={i} variants={anim} custom={i}>
+                <div key={i} className="scroll-animate" style={{ transitionDelay: `${i * 0.12}s` }}>
                   <Card className="group relative h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5">
                     <CardHeader>
                       <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-violet-500/10">
@@ -491,9 +414,9 @@ export default function Home() {
                       </p>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </section>
 
@@ -502,41 +425,21 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section id="how-it-works" className="relative px-4 py-20 sm:py-28">
           <div className="mx-auto max-w-5xl">
-            <motion.div
-              className="text-center mb-16"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={stagger}
-            >
-              <motion.p
-                variants={anim}
-                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
-              >
+            <div className="text-center mb-16">
+              <p className="scroll-animate text-sm font-semibold uppercase tracking-widest text-violet-500">
                 How It Works
-              </motion.p>
-              <motion.h2
-                variants={anim}
-                custom={1}
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
-              >
+              </p>
+              <h2 className="scroll-animate scroll-delay-1 mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
                 Three steps. Zero headaches.
-              </motion.h2>
-            </motion.div>
+              </h2>
+            </div>
 
-            <motion.div
-              className="grid gap-8 md:grid-cols-3"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={stagger}
-            >
+            <div className="grid gap-8 md:grid-cols-3">
               {steps.map((s, i) => (
-                <motion.div
+                <div
                   key={i}
-                  variants={animScale}
-                  custom={i}
-                  className="group relative"
+                  className="scroll-animate-scale group relative"
+                  style={{ transitionDelay: `${i * 0.1}s` }}
                 >
                   {/* Connector line — hidden on mobile, shown between cards */}
                   {i < steps.length - 1 && (
@@ -557,9 +460,9 @@ export default function Home() {
                       {s.desc}
                     </p>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </section>
 
@@ -567,58 +470,37 @@ export default function Home() {
             TRY IT — CURRICULUM FORM / OUTPUT
         ═══════════════════════════════════════════════════ */}
         <section id="generate" className="relative px-4 py-20 sm:py-28">
-          <motion.div
-            className="mx-auto max-w-3xl"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={stagger}
-          >
+          <div className="mx-auto max-w-3xl">
             {isGenerating ? (
               <LoadingSkeleton />
             ) : curriculum ? (
-              <motion.div
-                key="output-view"
-                initial={{ opacity: 0, y: 32 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              >
+              <div key="output-view" className="animate-fade-up delay-0">
                 <CurriculumOutput
                   curriculum={curriculum}
                   onGenerateAnother={() => setCurriculum(null)}
                 />
-              </motion.div>
+              </div>
             ) : (
               <>
-                <motion.div
-                  className="text-center mb-10"
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                >
+                <div className="text-center mb-10 animate-fade-up delay-0">
                   <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
                     Try It Now
                   </p>
                   <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
                     Generate your course
                   </h2>
-                </motion.div>
-                <motion.div
-                  className="mx-auto max-w-xl"
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                >
+                </div>
+                <div className="mx-auto max-w-xl animate-fade-up delay-1">
                   <CurriculumForm
                     onGenerated={handleGenerated}
                     onLoadingChange={handleLoadingChange}
                     onLimitReached={handleLimitReached}
                     onSubmitAttempt={handleFormSubmitAttempt}
                   />
-                </motion.div>
+                </div>
               </>
             )}
-          </motion.div>
+          </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════
@@ -626,46 +508,23 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section id="examples" className="relative px-4 py-20 sm:py-28">
           <div className="mx-auto max-w-6xl">
-            <motion.div
-              className="text-center mb-16"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={stagger}
-            >
-              <motion.p
-                variants={anim}
-                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
-              >
+            <div className="text-center mb-16">
+              <p className="scroll-animate text-sm font-semibold uppercase tracking-widest text-violet-500">
                 Real Examples
-              </motion.p>
-              <motion.h2
-                variants={anim}
-                custom={1}
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
-              >
+              </p>
+              <h2 className="scroll-animate scroll-delay-1 mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
                 See what Syllabi can create
-              </motion.h2>
-              <motion.p
-                variants={anim}
-                custom={2}
-                className="mx-auto mt-4 max-w-2xl text-muted-foreground"
-              >
+              </h2>
+              <p className="scroll-animate scroll-delay-2 mx-auto mt-4 max-w-2xl text-muted-foreground">
                 These courses were generated in seconds. Each one includes
                 modules, lessons, quizzes, bonus resources, and a full pacing
                 schedule.
-              </motion.p>
-            </motion.div>
+              </p>
+            </div>
 
-            <motion.div
-              className="grid gap-6 md:grid-cols-3"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={stagger}
-            >
+            <div className="grid gap-6 md:grid-cols-3">
               {exampleCurricula.map((c, i) => (
-                <motion.div key={i} variants={anim} custom={i}>
+                <div key={i} className="scroll-animate" style={{ transitionDelay: `${i * 0.12}s` }}>
                   <Card
                     className="group h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5 cursor-pointer"
                     onClick={() => setPreviewCurriculum(fullExampleCurricula[i])}
@@ -730,9 +589,9 @@ export default function Home() {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </section>
 
@@ -741,37 +600,18 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section id="pricing" className="relative px-4 py-20 sm:py-28">
           <div className="mx-auto max-w-5xl">
-            <motion.div
-              className="text-center mb-16"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={stagger}
-            >
-              <motion.p
-                variants={anim}
-                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
-              >
+            <div className="text-center mb-16">
+              <p className="scroll-animate text-sm font-semibold uppercase tracking-widest text-violet-500">
                 Pricing
-              </motion.p>
-              <motion.h2
-                variants={anim}
-                custom={1}
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
-              >
+              </p>
+              <h2 className="scroll-animate scroll-delay-1 mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
                 Start free. Upgrade when you&apos;re ready.
-              </motion.h2>
-            </motion.div>
+              </h2>
+            </div>
 
-            <motion.div
-              className="grid gap-8 md:grid-cols-3 overflow-visible"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={stagger}
-            >
+            <div className="grid gap-8 md:grid-cols-3 overflow-visible">
               {/* FREE PLAN */}
-              <motion.div variants={animScale} custom={0}>
+              <div className="scroll-animate-scale" style={{ transitionDelay: '0s' }}>
                 <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
                   <CardHeader>
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -822,10 +662,10 @@ export default function Home() {
                     </Button>
                   </CardFooter>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* PRO PLAN */}
-              <motion.div variants={animScale} custom={1} className="overflow-visible">
+              <div className="scroll-animate-scale overflow-visible" style={{ transitionDelay: '0.1s' }}>
                 <Card className="relative overflow-visible h-full border-violet-500/30 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
                   {/* Popular badge */}
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
@@ -871,10 +711,10 @@ export default function Home() {
                     </Button>
                   </CardFooter>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* 5-PACK */}
-              <motion.div variants={animScale} custom={2}>
+              <div className="scroll-animate-scale" style={{ transitionDelay: '0.2s' }}>
                 <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
                   <CardHeader>
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">
@@ -920,8 +760,8 @@ export default function Home() {
                     </Button>
                   </CardFooter>
                 </Card>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -929,17 +769,8 @@ export default function Home() {
             FINAL CTA
         ═══════════════════════════════════════════════════ */}
         <section className="relative px-4 py-20 sm:py-28">
-          <motion.div
-            className="mx-auto max-w-3xl text-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={stagger}
-          >
-            <motion.div
-              variants={animScale}
-              className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 backdrop-blur-sm"
-            >
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="scroll-animate-scale mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 backdrop-blur-sm">
               <LayoutGrid className="mx-auto mb-4 size-8 text-violet-500" />
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Ready to build your
@@ -959,8 +790,8 @@ export default function Home() {
                 Generate Your First Course Free
                 <ArrowRight className="ml-2 size-4" />
               </Button>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </section>
       </main>
 
