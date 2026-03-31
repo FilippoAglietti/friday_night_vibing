@@ -39,7 +39,7 @@ Follow these pedagogical principles:
 • 70/30 theory-to-practice — every lesson must include a practical exercise or real-world task
 • Quiz questions test UNDERSTANDING, not memorisation
 • Course titles must be compelling and marketable
-• Every lesson MUST include detailed "keyPoints" (3-5 bullet points covering the core concepts, actionable takeaways, and practical tips) and "suggestedResources" (1-3 external resources with real URLs)
+• Every lesson MUST include detailed "keyPoints" (3-5 bullet points covering the core concepts, actionable takeaways, and practical tips), "suggestedResources" (1-3 external resources with REAL, working URLs to authoritative sources), and "content" (2-4 paragraphs of rich lesson body text in markdown with key concepts explained, real-world examples, and practical exercises)
 
 OUTPUT RULES (CRITICAL):
 - Respond with ONLY valid JSON — no markdown, no preamble, no explanation.
@@ -104,10 +104,11 @@ Return ONLY this exact JSON structure:
             "Common mistake to avoid or best practice",
             "How this connects to the next lesson or real-world application"
           ],
+          "content": "## Key Concept\\n\\nRich markdown lesson body (2-4 paragraphs). Explain core concepts clearly with **bold** for emphasis. Include real-world examples, step-by-step instructions, and practical exercises.\\n\\n### Try It Yourself\\n\\nDescribe a hands-on exercise the learner should complete.\\n\\n> **Pro Tip:** Include a practical insight or common pitfall to watch out for.",
           "suggestedResources": [
             {
-              "title": "Resource title",
-              "url": "https://example.com/real-link",
+              "title": "Resource title — from authoritative source",
+              "url": "https://real-domain.com/actual-page",
               "type": "article"
             }
           ],
@@ -158,9 +159,11 @@ Return ONLY this exact JSON structure:
 
 Requirements:
 - Each module must have 2-5 lessons and 2-3 quiz questions
+- Each lesson MUST have "content" (string, 2-4 paragraphs of rich markdown with real explanations, examples, exercises — NOT placeholder text)
 - Each lesson MUST have "keyPoints" (array of 3-5 strings) covering core concepts, practical tips, and actionable takeaways
-- Each lesson MUST have "suggestedResources" (array of 1-3 objects with title, url, type) with real, working URLs
+- Each lesson MUST have "suggestedResources" (array of 1-3 objects with title, url, type) with REAL, working URLs to well-known authoritative sites (e.g. MDN, official docs, Wikipedia, real blog posts, YouTube channels)
 - suggestedResources type must be one of: article, video, podcast, book, tool, documentation
+- URLs must be real and point to actual pages on well-known domains — never use example.com or placeholder URLs
 - Include 3-5 bonusResources with real, working URLs where possible
 - weeklyPlan must cover ALL module IDs
 - lesson format must be one of: video, reading, interactive, discussion, project, live-session

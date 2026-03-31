@@ -257,6 +257,11 @@ function toNotionMarkdown(c: Curriculum): string {
         lines.push("");
       }
 
+      if (l.content) {
+        lines.push(l.content);
+        lines.push("");
+      }
+
       if (l.keyPoints && l.keyPoints.length > 0) {
         lines.push("<details>");
         lines.push("<summary>\u{1F4A1} <b>Key Points</b></summary>");
@@ -429,7 +434,8 @@ function toNotionMarkdown(c: Curriculum): string {
 
 function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
   const [expanded, setExpanded] = useState(false);
-  const hasDetails = (lesson.keyPoints && lesson.keyPoints.length > 0) ||
+  const hasDetails = !!lesson.content ||
+                     (lesson.keyPoints && lesson.keyPoints.length > 0) ||
                      (lesson.suggestedResources && lesson.suggestedResources.length > 0);
 
   return (
@@ -455,9 +461,26 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
             </p>
           )}
 
-          {/* Expanded: Key Points + Suggested Resources */}
+          {/* Expanded: Content + Key Points + Suggested Resources */}
           {expanded && hasDetails && (
             <div className="mt-3 space-y-3">
+              {lesson.content && (
+                <div className="prose prose-sm dark:prose-invert max-w-none text-xs text-muted-foreground leading-relaxed">
+                  {lesson.content.split(/\n\n+/).filter(p => p.trim()).slice(0, 4).map((paragraph, i) => {
+                    const stripped = paragraph
+                      .replace(/^#{1,4}\s+/gm, "")
+                      .replace(/\*\*(.*?)\*\*/g, "$1")
+                      .replace(/\*(.*?)\*/g, "$1")
+                      .replace(/`([^`]+)`/g, "$1")
+                      .replace(/>\s*/g, "")
+                      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1")
+                      .trim();
+                    if (!stripped) return null;
+                    return <p key={i} className="mb-1.5 last:mb-0">{stripped}</p>;
+                  })}
+                </div>
+              )}
+
               {lesson.keyPoints && lesson.keyPoints.length > 0 && (
                 <div>
                   <div className="flex items-center gap-1.5 mb-1.5">

@@ -740,6 +740,24 @@ class PDFBuilder {
       });
     }
 
+    // Lesson content (markdown rendered as plain text)
+    if (lesson.content) {
+      this.gap(S.xs);
+      const contentParagraphs = this.stripMarkdown(lesson.content);
+      const maxParagraphs = 3; // Limit to first 3 paragraphs for conciseness
+      
+      contentParagraphs.slice(0, maxParagraphs).forEach((para) => {
+        this.ensureSpace(8);
+        this.font(F.small, "normal", [80, 80, 80] as RGB);
+        const lines = this.doc.splitTextToSize(para, PAGE.cw - 20) as string[];
+        for (const line of lines) {
+          this.doc.text(line, PAGE.ml + 10, this.y);
+          this.y += this.lh(F.small);
+        }
+        this.y += 1; // Extra spacing between paragraphs
+      });
+    }
+
     // Key points
     if (lesson.keyPoints && lesson.keyPoints.length > 0) {
       this.gap(S.xs);
@@ -1099,6 +1117,39 @@ class PDFBuilder {
     this.font(F.xs, "normal", C.textMuted);
     this.doc.text("Date", 62.5, this.y, { align: "center" });
     this.doc.text("Signature", 147.5, this.y, { align: "center" });
+  }
+
+  // ── Markdown Stripper ──────────────────────────────────────
+
+  /** Strips markdown formatting and returns plain text paragraphs */
+  private stripMarkdown(markdown: string): string[] {
+    if (!markdown) return [];
+    
+    // Split into paragraphs (separated by blank lines)
+    const paragraphs = markdown
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(p => p.length > 0);
+    
+    // Strip markdown formatting from each paragraph
+    return paragraphs.map(para => {
+      return para
+        // Remove headings (##, ###, etc.)
+        .replace(/^#+\s+/, '')
+        // Remove bold (**text**)
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        // Remove italic (*text* or _text_)
+        .replace(/[*_]([^*_]+)[*_]/g, '$1')
+        // Remove inline code (`code`)
+        .replace(/`([^`]+)`/g, '$1')
+        // Remove blockquotes (>)
+        .replace(/^\s*>\s+/gm, '')
+        // Remove links [text](url) -> text
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        // Clean up extra whitespace
+        .replace(/\s+/g, ' ')
+        .trim();
+    });
   }
 
   // ── Shared Section Header ───────────────────────────────────

@@ -261,8 +261,7 @@ export default function CurriculumForm({
           Generate Course
         </CardTitle>
         <CardDescription>
-          Describe your course and we&apos;ll build the full course — modules,
-          lessons, quizzes, and pacing — in seconds.
+          Describe your course and we&apos;ll build it in seconds.
         </CardDescription>
       </CardHeader>
 

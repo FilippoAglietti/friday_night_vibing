@@ -207,7 +207,7 @@
   height: 100svh;
   overflow-y: scroll;
   overflow-x: hidden;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
   scroll-behavior: smooth;
   scroll-padding-top: 3.5rem; /* 56px nav height */
 }

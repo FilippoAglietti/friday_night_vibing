@@ -85,6 +85,33 @@ function formatDuration(minutes: number): string {
 }
 
 /**
+ * Strip markdown formatting from text, converting to plain text
+ */
+function stripMarkdown(markdown: string): string {
+  return markdown
+    // Remove bold and italic
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/\*(.+?)\*/g, "$1")
+    .replace(/__(.+?)__/g, "$1")
+    .replace(/_(.+?)_/g, "$1")
+    // Remove headers
+    .replace(/^#+\s+/gm, "")
+    // Remove links
+    .replace(/\[(.+?)\]\(.+?\)/g, "$1")
+    // Remove inline code
+    .replace(/`(.+?)`/g, "$1")
+    // Remove code blocks
+    .replace(/```[\s\S]*?```/g, "")
+    // Remove lists
+    .replace(/^[\*\-\+]\s+/gm, "")
+    // Remove blockquotes
+    .replace(/^>\s+/gm, "")
+    // Clean up extra whitespace
+    .replace(/\n\n+/g, "\n\n")
+    .trim();
+}
+
+/**
  * Get badge color based on difficulty
  */
 function getDifficultyColor(difficulty: DifficultyLevel): string {
@@ -521,6 +548,12 @@ function addLessonSlide(pres: PptxGenJS, lesson: Lesson, moduleTitle: string) {
   const slide = pres.addSlide();
   slide.background = { color: COLORS.white };
   addAccentBar(pres);
+  
+  // Add lesson content as speaker notes if available
+  if (lesson.content) {
+    const plainTextContent = stripMarkdown(lesson.content);
+    slide.addNotes(plainTextContent);
+  }
   
   // Title bar accent
   const titleBox: Record<string, unknown> = {

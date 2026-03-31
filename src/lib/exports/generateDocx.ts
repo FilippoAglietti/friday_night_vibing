@@ -581,6 +581,51 @@ function createModuleSections(curriculum: Curriculum): Paragraph[] {
 }
 
 /**
+ * Strip basic markdown formatting from text and return plain text
+ */
+function stripMarkdown(markdown: string): string {
+  return markdown
+    .replace(/\*\*(.*?)\*\*/g, "$1") // Bold
+    .replace(/\*(.*?)\*/g, "$1") // Italic
+    .replace(/__(.*?)__/g, "$1") // Bold alternative
+    .replace(/_(.*?)_/g, "$1") // Italic alternative
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1") // Links
+    .replace(/^#+\s+/gm, "") // Headers
+    .replace(/^-\s+/gm, "") // Unordered lists
+    .replace(/^\d+\.\s+/gm, ""); // Ordered lists
+}
+
+/**
+ * Split markdown content into paragraphs and return as Paragraph objects
+ */
+function createContentParagraphs(markdown: string | undefined): Paragraph[] {
+  if (!markdown || !markdown.trim()) {
+    return [];
+  }
+
+  // Split by double newlines to get paragraphs
+  const paragraphTexts = markdown
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+
+  return paragraphTexts.map(
+    (text) =>
+      new Paragraph({
+        text: stripMarkdown(text),
+        spacing: { after: 120 },
+        children: [
+          new TextRun({
+            text: stripMarkdown(text),
+            size: 18,
+            color: COLORS.text,
+          }),
+        ],
+      })
+  );
+}
+
+/**
  * Create lesson content with title, format badge, duration, objectives, key points, and resources
  */
 function createLessonContent(
@@ -646,6 +691,17 @@ function createLessonContent(
       ],
     }),
   ];
+
+  // Lesson content (rich markdown body text)
+  if (lesson.content && lesson.content.trim()) {
+    paragraphs.push(...createContentParagraphs(lesson.content));
+    paragraphs.push(
+      new Paragraph({
+        text: "",
+        spacing: { after: 150 },
+      })
+    );
+  }
 
   // Lesson objectives
   if (lesson.objectives && lesson.objectives.length > 0) {

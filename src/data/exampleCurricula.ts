@@ -41,6 +41,29 @@ const mlFundamentalsModules: Module[] = [
           "ML powers recommendation systems, computer vision, NLP, and autonomous systems",
           "Training data quality is critical to model performance",
         ],
+        content: `## Understanding Machine Learning
+
+**Machine learning** is a subset of artificial intelligence that enables computer systems to learn and improve from experience without being explicitly programmed. Instead of following pre-written instructions, ML models identify patterns in data and make predictions or decisions based on those patterns. This paradigm has revolutionized how we build applications, from recommendation engines to autonomous vehicles.
+
+The key distinction of machine learning is that algorithms are data-driven rather than rule-driven. Rather than hardcoding every decision logic, we provide examples and let the algorithm learn the underlying patterns. As the amount and quality of data increases, model performance typically improves.
+
+## The Three Main Paradigms
+
+**Supervised learning** uses labeled data where the correct answers are known. Think of it as learning with a teacher—the algorithm learns to predict outputs from inputs by studying labeled examples. This is used for problems like predicting house prices (regression) or classifying emails as spam (classification).
+
+**Unsupervised learning** finds hidden patterns in unlabeled data without knowing the "correct" answers in advance. It's like exploring data without guidance. Common tasks include clustering similar customers or reducing data dimensions for visualization.
+
+**Reinforcement learning** trains agents through rewards and penalties, like teaching a dog new tricks with treats. The agent learns to maximize cumulative rewards through trial and error.
+
+## Real-World Applications
+
+Machine learning powers countless modern systems: streaming services use collaborative filtering to recommend shows, hospitals use image classification to detect diseases in X-rays, and banks use anomaly detection to prevent fraud. **Training data quality** is absolutely critical—garbage in, garbage out. Poor quality or biased training data will produce poor or biased models.
+
+### Try It Yourself
+
+Identify three ML applications in your daily life (e.g., email spam filtering, social media feeds, autocomplete). For each, determine whether it likely uses supervised, unsupervised, or reinforcement learning.
+
+> **Pro Tip:** Always start by understanding your problem before jumping to algorithms. Is it supervised or unsupervised? How much labeled data do you have? These questions matter more than the specific algorithm choice.`,
         suggestedResources: [
           {
             title: "ML Basics — Google Developers",
@@ -73,6 +96,33 @@ const mlFundamentalsModules: Module[] = [
           "Unsupervised learning is useful for exploration and discovering hidden patterns",
           "Semi-supervised learning combines labeled and unlabeled data",
         ],
+        content: `## Supervised vs. Unsupervised Learning: The Fundamental Divide
+
+Machine learning divides into two major approaches based on data availability and problem structure. **Supervised learning** requires labeled training data where each input has a known output. **Unsupervised learning** works with unlabeled data, discovering structure without explicit targets.
+
+## Supervised Learning: Learning from Examples
+
+In supervised learning, we have pairs of inputs and outputs: (feature, label). A spam filter learns from emails marked as "spam" or "not spam". A house price predictor learns from (house features, price) pairs. The algorithm searches for a function that maps inputs to outputs.
+
+There are two main types: **Regression** predicts continuous values (stock prices, temperature), while **Classification** predicts categories (disease vs. healthy, dog vs. cat). Both learn from labeled examples and evaluate by comparing predictions to known answers.
+
+## Unsupervised Learning: Finding Hidden Patterns
+
+Unsupervised learning has no labels—just raw data. **Clustering** groups similar items together without knowing categories in advance. **Dimensionality reduction** simplifies high-dimensional data for visualization or preprocessing. These methods excel at exploration: discovering customer segments, detecting anomalies, or visualizing data structure.
+
+## Semi-Supervised: Best of Both Worlds
+
+Semi-supervised learning combines small amounts of labeled data with large amounts of unlabeled data. This is practical—getting labels is expensive, but data is abundant. A company might manually label 500 emails, then use those to help classify millions of unlabeled messages.
+
+## Choosing Your Approach
+
+Choose supervised learning when you have labeled data and a clear prediction target. Choose unsupervised learning when you want to discover structure, have only unlabeled data, or need to reduce dimensionality. The choice depends on your data availability and business objective.
+
+### Try It Yourself
+
+Consider these scenarios: 1) Predicting customer churn (will they leave?), 2) Segmenting customers for marketing, 3) Detecting credit card fraud. For each, would you use supervised or unsupervised learning? Why?
+
+> **Pro Tip:** Getting labeled data is expensive. If you have limited labels, consider semi-supervised approaches that leverage abundant unlabeled data.`,
         suggestedResources: [
           {
             title: "Supervised vs. Unsupervised Learning",
@@ -105,6 +155,43 @@ const mlFundamentalsModules: Module[] = [
           "Model selection, training, and hyperparameter tuning require experimentation",
           "Evaluation on held-out test data prevents overfitting",
         ],
+        content: `## The Machine Learning Workflow: From Problem to Model
+
+Every successful ML project follows a structured workflow. Understanding this pipeline helps you avoid common pitfalls and build effective solutions. The workflow isn't linear—you often loop back to earlier stages as you learn from data and results.
+
+## Stage 1: Problem Definition and Data Collection
+
+Start by clearly defining your problem: What are you predicting? What decisions will the model inform? Is this a regression or classification problem? Supervised or unsupervised?
+
+Then gather data. Data quality determines model quality—spend time understanding your data source, potential biases, and collection process. More data usually beats better algorithms, so prioritize data collection and quality over algorithm sophistication.
+
+## Stage 2: Data Exploration and Preparation
+
+**Exploratory Data Analysis (EDA)** means visualizing and understanding your data. Look for patterns, outliers, missing values, and relationships between variables. Create summary statistics, distribution plots, and correlation matrices.
+
+**Data preprocessing** cleans the data: handle missing values, remove outliers, encode categorical variables, and scale numeric features. This unglamorous stage is crucial—models struggle with messy data.
+
+## Stage 3: Feature Engineering
+
+Transform raw data into useful features. Instead of using pixel intensities directly, a computer vision model might use edge detection. Raw timestamps might become day-of-week, hour, and seasonality features. **Feature engineering** often matters more than algorithm choice.
+
+## Stage 4: Model Selection and Training
+
+Choose an algorithm appropriate for your problem. Split data into training (70%), validation (15%), and test (15%) sets. Train on training data, tune hyperparameters on validation data, and evaluate on held-out test data. Never evaluate on training data—that shows memorization, not generalization.
+
+## Stage 5: Evaluation and Iteration
+
+Evaluate your model on test data using appropriate metrics. For classification, use accuracy, precision, recall, and F1-score. For regression, use MAE, RMSE, or R². If performance is poor, iterate: try different features, algorithms, or hyperparameters. Return to earlier stages if needed.
+
+## Stage 6: Deployment and Monitoring
+
+Once satisfied, deploy your model to production. Monitor performance continuously—data distribution shifts over time, and models degrade. Retrain periodically with new data.
+
+### Try It Yourself
+
+Outline the ML workflow for a problem you care about (predicting churn, classifying images, recommending products). For each stage, list the specific actions you'd take.
+
+> **Pro Tip:** Save 20% of your effort for deployment and monitoring. Most ML resources focus on model building, but production systems need monitoring, versioning, and maintenance.`,
         suggestedResources: [
           {
             title: "ML Workflow Guide",
@@ -184,6 +271,46 @@ const mlFundamentalsModules: Module[] = [
           "Check for duplicate rows and understand target variable distribution",
           "Memory usage analysis helps optimize data processing",
         ],
+        content: `## Loading and Inspecting Data: The First Critical Step
+
+Before building any model, you must understand your data intimately. Loading data correctly and inspecting it thoroughly sets the foundation for everything downstream.
+
+## Loading Data with Pandas
+
+**Pandas** is Python's go-to library for data manipulation. Loading CSV files is straightforward with \`pd.read_csv()\`. For other formats: \`read_excel()\` for Excel files, \`read_parquet()\` for Parquet, \`read_sql()\` for databases, and \`read_json()\` for JSON.
+
+When loading large files, consider parameters like \`nrows\` to load only a sample, \`dtype\` to specify data types, and \`index_col\` to set the index. Correctly specifying dtypes saves memory and prevents parsing errors.
+
+## First Inspection: Shape and Types
+
+Use \`df.shape\` to see dimensions, \`df.dtypes\` to see data types, and \`df.info()\` for a comprehensive overview. Check \`df.head()\` and \`df.tail()\` to see actual values. Watch for: unexpected data types, missing values, string columns that should be numeric.
+
+## Understanding Your Data
+
+Create \`df.describe()\` to see numeric summaries: mean, std, min, max, quartiles. For categorical columns, use \`df.value_counts()\` to see category frequencies. Check data ranges: does age go from 0 to 150? Does temperature seem plausible?
+
+## Detecting Issues
+
+Look for red flags: columns with single values (no variance means no predictive power), extremely skewed distributions, unrealistic values, or suspicious patterns. Missing values appear as NaN in pandas—check \`df.isnull().sum()\` to count them per column.
+
+## Documenting Findings
+
+Write down what you learn: approximate size, data types, value ranges, missing value patterns, and any anomalies. This documentation becomes crucial when building your preprocessing pipeline.
+
+### Try It Yourself
+
+Load a dataset from Kaggle (https://www.kaggle.com/datasets). Inspect shape, dtypes, missing values, and summary statistics. Write a brief summary of what you learn about the data.
+
+\`\`\`python
+import pandas as pd
+df = pd.read_csv('your_file.csv')
+print(df.shape)
+print(df.info())
+print(df.describe())
+print(df.isnull().sum())
+\`\`\`
+
+> **Pro Tip:** Never assume your data is clean. Invest time in inspection—problems discovered now are cheap to fix; problems discovered in production are expensive and embarrassing.`,
         suggestedResources: [
           {
             title: "pandas Documentation",
@@ -216,6 +343,59 @@ const mlFundamentalsModules: Module[] = [
           "Categorical encoding converts text to numerical representations",
           "Train-test split prevents data leakage during preprocessing",
         ],
+        content: `## Data Cleaning and Preprocessing: Making Messy Data Usable
+
+Real-world data is messy. It contains missing values, duplicates, typos, outliers, and inconsistencies. **Data preprocessing** transforms raw data into a form suitable for modeling. This unglamorous step often consumes 60-80% of project time but is absolutely critical.
+
+## Handling Missing Values
+
+Missing values appear as NaN in pandas. First, understand why values are missing: is the absence itself informative (user didn't provide age = they don't want to)? Or is it random?
+
+For numeric columns, **mean imputation** fills missing values with column mean. **Median imputation** is more robust to outliers. **Forward fill** uses the previous value (for time series). **Deletion** removes rows with missing values—but wastes data if many values are missing.
+
+For categorical columns, fill with mode (most frequent value) or a special "Unknown" category. Don't impute if missing values are informative.
+
+## Handling Duplicates
+
+Check \`df.duplicated()\` to find duplicate rows. \`df.drop_duplicates()\` removes them. Decide whether duplicates are errors or genuine duplicates in your data. Removing duplicates might improve model quality or lose valid data.
+
+## Encoding Categorical Variables
+
+**One-hot encoding** converts categories to binary columns: color "red" becomes \`red=1, blue=0, green=0\`. **Label encoding** maps categories to integers: \`red=0, blue=1, green=2\`. Use one-hot for algorithms like logistic regression; use label encoding for tree-based models.
+
+Avoid the "dummy variable trap" in linear models: if you have 3 color categories, create only 2 dummy variables (the third is implied when the others are 0).
+
+## Handling Outliers
+
+Outliers are extreme values that might be errors or genuine extremes. Visualize with boxplots or histograms. Some outliers are valuable (fraud detection), others are errors.
+
+**Capping** limits values to a range (e.g., salary > $1M becomes $1M). **Robust scaling** uses median and quartiles instead of mean and std, handling outliers better. **Removal** deletes obvious errors, but use sparingly.
+
+## Feature Scaling
+
+Many algorithms (KNN, SVM, neural networks) are sensitive to feature magnitude. **Standardization** (z-score) subtracts mean and divides by std: \`(x - mean) / std\`. **Normalization** (min-max) scales to [0, 1]: \`(x - min) / (max - min)\`. Tree-based models are scale-invariant and don't need scaling.
+
+### Try It Yourself
+
+Take a dataset with missing values and duplicates. For each column, decide on a strategy (impute, delete, or keep as-is). Implement it and document your decisions.
+
+\`\`\`python
+# Check missing values
+print(df.isnull().sum())
+
+# Fill with mean (numeric columns)
+df['age'].fillna(df['age'].mean(), inplace=True)
+
+# Remove duplicates
+df.drop_duplicates(inplace=True)
+
+# Scale numeric columns
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+df[['age', 'income']] = scaler.fit_transform(df[['age', 'income']])
+\`\`\`
+
+> **Pro Tip:** Keep a copy of your original data and document every preprocessing step. You'll often need to retrace your steps or explain what you did.`,
         suggestedResources: [
           {
             title: "Data Preprocessing Best Practices",
@@ -248,6 +428,62 @@ const mlFundamentalsModules: Module[] = [
           "Categorical features require bar charts and cross-tabulation analysis",
           "EDA guides feature selection and engineering decisions",
         ],
+        content: `## Exploratory Data Analysis (EDA): Seeing Your Data Clearly
+
+After loading and cleaning data, **Exploratory Data Analysis** reveals patterns, relationships, and anomalies. EDA informs feature engineering decisions, helps detect data quality issues, and provides insights into your problem.
+
+## Univariate Analysis: Single Variables
+
+Start with individual columns. For numeric variables, plot **histograms** to see distributions and identify skewness or multi-modality. **Boxplots** reveal outliers and quartile structure. For categorical variables, **bar charts** show category frequencies.
+
+Calculate statistics: mean, median, std, min, max, quartiles. Compare mean to median—if they differ greatly, the distribution is skewed. High std relative to mean indicates high variability.
+
+## Bivariate Analysis: Relationships Between Variables
+
+Create **scatter plots** to visualize relationships between numeric variables. Look for linear, non-linear, or clustered patterns. Calculate **correlation coefficients** (Pearson for linear, Spearman for monotonic) to quantify relationships.
+
+For categorical-categorical relationships, use **crosstabs** or **stacked bar charts**. For numeric-categorical relationships, create **boxplots** grouped by category or **violin plots** for distribution shape.
+
+## Correlation Analysis
+
+A **correlation matrix** shows pairwise relationships: values near 1 mean strong positive correlation, near -1 mean strong negative, near 0 mean no linear relationship. High correlation between features suggests redundancy; high correlation with target suggests predictive power.
+
+Visualize with **heatmaps** using \`seaborn.heatmap(df.corr())\`. But remember: correlation ≠ causation, and correlation captures only linear relationships.
+
+## Multivariate Analysis: Complex Patterns
+
+**Pairplots** create scatter plots for all numeric variable pairs, colored by a categorical target. **PCA** reduces dimensions for visualization. **Cluster analysis** reveals natural groupings.
+
+## Distribution Analysis
+
+Understand target variable distribution—imbalanced classification (99% negative, 1% positive) needs special handling. Skewed distributions (income, house prices) might need transformation (log, sqrt).
+
+## Temporal Analysis
+
+If your data has timestamps, plot over time: Do values trend? Show seasonality? Have abrupt changes? Temporal patterns inform time-series modeling decisions.
+
+### Try It Yourself
+
+For a dataset, create: 1) Histograms for key numeric variables, 2) Correlation heatmap, 3) Scatter plots between top correlated pairs, 4) Boxplots for categorical groups. What patterns emerge?
+
+\`\`\`python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Histogram
+plt.hist(df['age'], bins=30)
+plt.show()
+
+# Correlation heatmap
+sns.heatmap(df.corr(), annot=True)
+plt.show()
+
+# Scatter plot colored by category
+sns.scatterplot(data=df, x='age', y='income', hue='category')
+plt.show()
+\`\`\`
+
+> **Pro Tip:** EDA often leads to insights that become features. A temporal pattern you discover might become a seasonal feature; a relationship you notice might become a ratio feature. EDA is not wasted time—it's detective work that improves models.`,
         suggestedResources: [
           {
             title: "matplotlib & seaborn Documentation",
@@ -313,6 +549,52 @@ const mlFundamentalsModules: Module[] = [
           "Closed-form solutions exist for OLS regression with small datasets",
           "Feature scaling improves convergence and interpretation",
         ],
+        content: `## Linear Regression Fundamentals: Predicting Continuous Values
+
+**Linear regression** is the foundation of predictive modeling. It models the relationship between input features and a continuous target as a linear equation: \`y = mx + b\` in simple form, or \`y = β₀ + β₁x₁ + β₂x₂ + ... + βₙxₙ\` in multivariate form.
+
+## How Linear Regression Works
+
+The algorithm finds coefficients (β₀, β₁, ..., βₙ) that minimize prediction error. **Ordinary Least Squares (OLS)** minimizes the sum of squared errors: \`Σ(actual - predicted)²\`. Squaring errors penalizes large mistakes heavily, making regression sensitive to outliers.
+
+Interpretation is straightforward: coefficient β₁ means "one unit increase in x₁ leads to β₁ unit change in y, holding other variables constant." The intercept β₀ is the predicted value when all features are zero.
+
+## Assumptions and Limitations
+
+Linear regression assumes: 1) **Linearity**—the relationship is linear, 2) **Independence**—observations are independent, 3) **Homoscedasticity**—error variance is constant, 4) **Normality**—errors are normally distributed.
+
+When assumptions are violated, model performance suffers. Non-linear relationships, autocorrelated data (time series), or heteroscedastic errors invalidate standard inference.
+
+## Simple vs. Multiple Regression
+
+**Simple regression** uses one feature. **Multiple regression** uses many features. Multiple regression is more powerful but prone to overfitting if too many features exist relative to data size.
+
+## Interpreting Results
+
+\`R²\` (coefficient of determination) shows what fraction of variance is explained: R² = 0.75 means 75% of variance is explained. Higher is better, but context matters—some problems are inherently harder.
+
+\`p-values\` test whether coefficients differ significantly from zero. Low p-values (< 0.05) suggest significant predictors. High p-values suggest the variable might be noise.
+
+### Try It Yourself
+
+Build a simple linear regression model predicting house prices from square footage:
+
+\`\`\`python
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+X = df[['sqft']].values
+y = df['price'].values
+
+model = LinearRegression()
+model.fit(X, y)
+
+print(f"Coefficient: {model.coef_[0]}")
+print(f"Intercept: {model.intercept_}")
+print(f"R² Score: {model.score(X, y)}")
+\`\`\`
+
+> **Pro Tip:** Before fitting, scale your features. Unscaled features with different magnitudes produce coefficients that aren't directly comparable. Scaling makes interpretation clearer and often improves numerical stability.`,
         suggestedResources: [
           {
             title: "Linear Regression — scikit-learn",
@@ -345,6 +627,56 @@ const mlFundamentalsModules: Module[] = [
           "Elastic Net combines L1 and L2 penalties for balanced regularization",
           "Regularization strength (alpha) is tuned via cross-validation",
         ],
+        content: `## Regularization: Ridge and Lasso—Preventing Overfitting
+
+Overfitting happens when a model memorizes training data, learning noise alongside true patterns. **Regularization** prevents this by penalizing large coefficients, preferring simpler models that generalize better.
+
+## The Overfitting Problem
+
+Complex models fit training data perfectly but fail on new data. You notice this through: 1) High training accuracy but low test accuracy, 2) Large coefficients suggesting the model relies heavily on specific features, 3) Sensitivity to small data changes.
+
+The model has learned training-specific quirks rather than generalizable patterns. Regularization forces a tradeoff: accept slightly higher training error for much better test error.
+
+## Ridge Regression (L2 Regularization)
+
+**Ridge regression** adds an L2 penalty: minimize \`SSE + λΣ(β²)\`. The penalty term λ (lambda) controls strength. High λ shrinks coefficients toward zero—extreme λ makes all coefficients near zero.
+
+Ridge shrinks all coefficients but doesn't eliminate them. Features with small coefficients still remain. This is useful when all features are somewhat predictive, or when multicollinearity exists (correlated features).
+
+## Lasso Regression (L1 Regularization)
+
+**Lasso** adds an L1 penalty: minimize \`SSE + λΣ(|β|)\`. Unlike Ridge, Lasso can shrink coefficients exactly to zero, performing **feature selection**. The absolute value penalty has this zero-shrinking property mathematically.
+
+Lasso is useful when you suspect only some features matter. It automatically eliminates irrelevant features, simplifying interpretation.
+
+## Choosing λ
+
+The regularization strength λ controls the bias-variance tradeoff. Small λ ≈ no regularization (high variance, low bias). Large λ ≈ strong regularization (low variance, high bias, potential underfitting).
+
+Use **cross-validation** to choose λ: try a range of values, evaluate each with cross-validation, pick the one with best CV error. \`sklearn\` provides \`RidgeCV\` and \`LassoCV\` for this.
+
+## Elastic Net: The Hybrid
+
+**Elastic Net** combines Ridge and Lasso: minimize \`SSE + λ₁Σ(β²) + λ₂Σ(|β|)\`. It offers middle ground: some feature elimination like Lasso, but more stable like Ridge. Use it when unsure between Ridge and Lasso.
+
+### Try It Yourself
+
+Compare Ridge, Lasso, and Elastic Net on a dataset with many features:
+
+\`\`\`python
+from sklearn.linear_model import Ridge, Lasso, ElasticNet
+from sklearn.model_selection import cross_val_score
+
+ridge = Ridge(alpha=1.0)
+lasso = Lasso(alpha=0.1)
+elastic = ElasticNet(alpha=0.5, l1_ratio=0.5)
+
+for name, model in [('Ridge', ridge), ('Lasso', lasso), ('Elastic', elastic)]:
+    scores = cross_val_score(model, X, y, cv=5, scoring='r2')
+    print(f"{name}: {scores.mean():.3f} ± {scores.std():.3f}")
+\`\`\`
+
+> **Pro Tip:** Lasso is excellent for feature selection when you have many features and suspect only some matter. Ridge is better when all features are informative but correlated. Start with both and see which generalizes better.`,
         suggestedResources: [
           {
             title: "Ridge and Lasso Regression",
@@ -377,6 +709,55 @@ const mlFundamentalsModules: Module[] = [
           "Cross-validation estimates real-world performance on unseen data",
           "Residual plots reveal systematic errors and assumption violations",
         ],
+        content: `## Regression Model Evaluation: Measuring Prediction Quality
+
+After training a regression model, you must evaluate how well it predicts. Different metrics reveal different aspects of performance. Always evaluate on **held-out test data**, never on training data.
+
+## Key Evaluation Metrics
+
+**Mean Absolute Error (MAE)** averages absolute prediction errors: \`MAE = Σ|actual - predicted| / n\`. Units match the target variable. A MAE of $5,000 for house prices is interpretable: predictions are off by $5,000 on average.
+
+**Mean Squared Error (MSE)** and **Root Mean Squared Error (RMSE)** square errors before averaging. Squaring emphasizes large errors. RMSE is popular because it's in original units like MAE. For houses, RMSE of $7,000 means typical error is larger than MAE, due to large outlier errors.
+
+**R² (Coefficient of Determination)** measures explained variance: R² = 1 - (SSresidual / SStotal). R² = 0.85 means the model explains 85% of variance. R² = 0 means the model's no better than predicting mean. Negative R² means the model's worse than mean prediction.
+
+## Residual Analysis
+
+**Residuals** are prediction errors: \`residual = actual - predicted\`. Plot residuals vs. predictions. A good model has: 1) Residuals centered at zero, 2) Constant spread (homoscedasticity), 3) No patterns, 4) Normal distribution.
+
+If residuals have patterns—increasing spread, non-zero mean, curves—your model violates assumptions. This suggests: missing variables, non-linearity, or heteroscedasticity. Investigate and consider model changes.
+
+## Cross-Validation
+
+**k-Fold Cross-Validation** repeatedly splits data into k folds, trains on k-1 and tests on 1. Repeat k times, evaluating each fold. Average results show typical performance on unseen data. k=5 or k=10 is standard.
+
+Cross-validation catches overfitting: if train error is far below CV error, you're overfitting. It also provides error variance—high variance means performance is unstable.
+
+## Comparing Models
+
+When choosing between models, use cross-validation scores. Model A with CV mean 0.85 and std 0.02 is more reliable than Model B with mean 0.86 and std 0.15—B's higher variability suggests instability.
+
+Don't cherry-pick the test set. Use multiple metrics and cross-validation. Pick the model that generalizes best, not the one that overfits most.
+
+### Try It Yourself
+
+Train three models (linear regression, Ridge, Lasso) on a regression dataset. For each, calculate MAE, RMSE, R², and 5-fold cross-validation score. Compare results.
+
+\`\`\`python
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+for name, model in [('Linear', LinearRegression()), ('Ridge', Ridge()), ('Lasso', Lasso())]:
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    mae = mean_absolute_error(y_test, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    r2 = r2_score(y_test, y_pred)
+    cv_score = cross_val_score(model, X_train, y_train, cv=5).mean()
+    print(f"{name}: MAE={mae:.2f}, RMSE={rmse:.2f}, R²={r2:.3f}, CV={cv_score:.3f}")
+\`\`\`
+
+> **Pro Tip:** Always use cross-validation and multiple metrics. A single metric on a single test set is unreliable. Multiple perspectives catch problems single metrics miss.`,
         suggestedResources: [
           {
             title: "Model Evaluation Metrics",
@@ -441,6 +822,57 @@ const mlFundamentalsModules: Module[] = [
           "Logistic regression provides interpretable coefficients",
           "Calibration ensures predicted probabilities match empirical frequencies",
         ],
+        content: `## Logistic Regression and Classification Basics: Predicting Categories
+
+While linear regression predicts continuous values, **logistic regression** predicts probabilities and classes. Despite its name, it's a classification algorithm, not regression.
+
+## Classification vs. Regression
+
+Classification predicts categorical targets (spam/not spam, disease/healthy, cat/dog). Logistic regression outputs probabilities: P(class=1) between 0 and 1. Threshold (usually 0.5) determines final class: if P(class=1) > 0.5, predict class 1; else predict class 0.
+
+Binary classification has 2 classes. Multi-class has 3+. Logistic regression extends to multi-class using **One-vs-Rest** (train k binary classifiers) or **Multinomial** approach.
+
+## The Logistic Function
+
+Linear regression's predictions can exceed [0, 1]. We need a function that always outputs probabilities. The **logistic function** maps any input to [0, 1]: \`P(y=1) = 1 / (1 + e^(-z))\` where z is the linear combination \`β₀ + β₁x₁ + ...\`
+
+The S-shaped curve represents confidence: near 0 (very negative z) = nearly 0 probability, near 1 (very positive z) = nearly 1 probability, at 0 (z=0) = 0.5 probability.
+
+## Training and Coefficients
+
+Logistic regression finds coefficients maximizing **likelihood** (probability of observing the data), not minimizing sum of squared errors. This is called **Maximum Likelihood Estimation (MLE)**.
+
+Interpretation: positive coefficient means feature increases P(class=1); negative decreases it. Magnitude shows strength.
+
+## Decision Boundary
+
+The decision boundary where P(class=1) = 0.5 separates classes. For 2D data, it's a line. Higher dimensions = hyperplane. The model's complexity depends on whether the boundary is linear (logistic regression) or curved (non-linear models).
+
+## Predictions vs. Probabilities
+
+Always distinguish: **probabilities** output by \`predict_proba()\` show confidence; **classes** output by \`predict()\` apply a threshold. For imbalanced data, adjust the threshold—lower threshold favors minority class.
+
+### Try It Yourself
+
+Build a binary classifier predicting email spam:
+
+\`\`\`python
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Get probabilities and predictions
+probs = model.predict_proba(X_test)[:, 1]  # Probability of class 1
+preds = model.predict(X_test)
+
+# Evaluate
+print(classification_report(y_test, preds))
+print(confusion_matrix(y_test, preds))
+\`\`\`
+
+> **Pro Tip:** Always check probabilities, not just predictions. A prediction with 51% confidence is less reliable than 99% confidence. For high-stakes decisions, require high confidence probabilities.`,
         suggestedResources: [
           {
             title: "Logistic Regression — scikit-learn",
@@ -474,6 +906,57 @@ const mlFundamentalsModules: Module[] = [
           "Gradient Boosting sequentially fits models to residuals",
           "XGBoost and LightGBM provide efficient implementations with regularization",
         ],
+        content: `## Decision Trees and Ensemble Methods: Beyond Simple Models
+
+**Decision trees** grow hierarchical models by recursively splitting data on features, creating an interpretable flowchart. **Ensemble methods** combine multiple models for better performance.
+
+## How Decision Trees Work
+
+A tree starts with all data at the root. It finds the feature and split value that best separate classes (minimize impurity). This recursively continues on each subset until leaves are pure (single class) or stopping criteria are met.
+
+Trees are interpretable—you can literally trace a path from root to leaf to see why a specific prediction was made. No feature scaling needed; trees handle non-linearity naturally.
+
+## Tree Depth and Overfitting
+
+Deep trees memorize training data, overfitting. **Pruning** limits depth or requires minimum samples per leaf. A tree that's too shallow underfits; too deep overfits. Use cross-validation to find optimal depth.
+
+## Ensemble Methods: Wisdom of Crowds
+
+Single models have bias and variance. **Ensemble methods** combine multiple models (often weak learners) for robust predictions. If individual models disagree, ensemble votes.
+
+**Random Forests** train many decision trees on random data subsets, each split considering random feature subsets. This variance in training creates diverse trees. Averaging predictions reduces overfitting dramatically. Forests are powerful, scalable, and handle high-dimensional data well.
+
+**Gradient Boosting** (XGBoost, LightGBM, CatBoost) builds trees sequentially, each correcting previous errors. Early trees make rough predictions; later trees focus on hard examples. This sequential refinement often beats Random Forests.
+
+**Bagging** trains models on bootstrap samples (random with replacement), averaging predictions. **Boosting** trains sequentially, each model weighted by previous errors.
+
+## Feature Importance
+
+Both trees and ensembles show feature importance—which features matter most. Tree-based feature importance is more reliable than correlation: it captures non-linear relationships and interactions.
+
+### Try It Yourself
+
+Compare Decision Tree, Random Forest, and Gradient Boosting on a classification task:
+
+\`\`\`python
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+
+models = {
+    'Tree': DecisionTreeClassifier(max_depth=5),
+    'RF': RandomForestClassifier(n_estimators=100),
+    'XGB': GradientBoostingClassifier(n_estimators=100)
+}
+
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    score = model.score(X_test, y_test)
+    print(f"{name}: {score:.3f}")
+    print(f"Feature importance: {model.feature_importances_}")
+\`\`\`
+
+> **Pro Tip:** Random Forests and Gradient Boosting are among the best off-the-shelf algorithms. If linear models fail and you're not sure what to try, start with Random Forest—it's hard to beat and requires minimal tuning.`,
         suggestedResources: [
           {
             title: "Decision Trees and Ensembles",
@@ -507,6 +990,70 @@ const mlFundamentalsModules: Module[] = [
           "ROC-AUC measures discrimination ability across thresholds",
           "Stratified cross-validation ensures balanced class representation",
         ],
+        content: `## Classification Metrics and Evaluation: Beyond Accuracy
+
+**Accuracy** (proportion correct) misleads with imbalanced data. If 99% of cases are negative, a model predicting always "negative" achieves 99% accuracy but is useless. Use multiple metrics to understand true performance.
+
+## Confusion Matrix
+
+The **confusion matrix** breaks down predictions:
+- **True Positives (TP)**: Correctly predicted positive
+- **False Positives (FP)**: Incorrectly predicted positive (false alarms)
+- **True Negatives (TN)**: Correctly predicted negative
+- **False Negatives (FN)**: Missed positives (missed detections)
+
+From this matrix, calculate meaningful metrics.
+
+## Precision and Recall
+
+**Precision** = TP / (TP + FP): "Of predicted positives, how many were correct?" Use when false alarms are costly (spam filter—don't annoy users).
+
+**Recall** = TP / (TP + FN): "Of actual positives, how many were found?" Use when missing positives is costly (disease detection—don't miss sick patients).
+
+These metrics trade off: high precision means few false alarms but miss cases; high recall means few misses but many false alarms.
+
+## F1-Score and Precision-Recall Curve
+
+**F1-Score** = 2 × (Precision × Recall) / (Precision + Recall): harmonic mean balancing precision and recall. Use when you care about both equally. Range 0-1, higher is better.
+
+**Precision-Recall curve** plots precision vs. recall at different decision thresholds. Lower thresholds (more aggressive classification) increase recall but decrease precision. Choose threshold based on your use case.
+
+## ROC-AUC
+
+**Receiver Operating Characteristic (ROC)** plots True Positive Rate (recall) vs. False Positive Rate (1 - specificity) at different thresholds. **AUC** (Area Under Curve) is a single metric: AUC=0.5 means random guessing, AUC=1.0 means perfect classification.
+
+ROC is useful for comparing models and choosing thresholds. AUC is robust to class imbalance.
+
+## Handling Imbalanced Data
+
+For imbalanced data, use **weighted classes** (penalize misclassifying minority class), **oversampling** (duplicate minority class), **undersampling** (remove majority class), or **SMOTE** (synthetic minority oversampling).
+
+### Try It Yourself
+
+Evaluate a classifier on imbalanced data:
+
+\`\`\`python
+from sklearn.metrics import confusion_matrix, precision_score, recall_score
+from sklearn.metrics import f1_score, roc_auc_score, roc_curve
+import matplotlib.pyplot as plt
+
+y_pred = model.predict(X_test)
+y_probs = model.predict_proba(X_test)[:, 1]
+
+print(confusion_matrix(y_test, y_pred))
+print(f"Precision: {precision_score(y_test, y_pred):.3f}")
+print(f"Recall: {recall_score(y_test, y_pred):.3f}")
+print(f"F1: {f1_score(y_test, y_pred):.3f}")
+print(f"AUC: {roc_auc_score(y_test, y_probs):.3f}")
+
+# Plot ROC curve
+fpr, tpr, _ = roc_curve(y_test, y_probs)
+plt.plot(fpr, tpr)
+plt.plot([0, 1], [0, 1], 'k--')  # Random baseline
+plt.show()
+\`\`\`
+
+> **Pro Tip:** Don't rely on accuracy alone. For imbalanced data, use precision and recall. For comparing models, use AUC. Different metrics reveal different aspects—use multiple to make informed decisions.`,
         suggestedResources: [
           {
             title: "Classification Metrics",
@@ -572,6 +1119,64 @@ const mlFundamentalsModules: Module[] = [
           "Label encoding assigns integers; use only if ordinal relationship exists",
           "Target encoding uses target variable statistics; careful of data leakage",
         ],
+        content: `## Feature Scaling and Encoding: Preparing Features for Learning
+
+Raw data has features with different magnitudes and types. **Feature scaling** standardizes numeric ranges. **Encoding** converts categorical variables to numeric form. Both are crucial preprocessing steps.
+
+## Why Scaling Matters
+
+Many algorithms (KNN, SVM, neural networks, linear models) are sensitive to feature magnitude. If "age" ranges 0-100 and "income" ranges 0-1,000,000, income dominates the model because its values are larger.
+
+Distance-based algorithms compute distances between points—unstandardized features with large ranges dominate these calculations. Gradient-based optimization also improves with scaling: smaller gradients means more stable training.
+
+Trees and tree ensembles are scale-invariant (splits work the same regardless of scale), so they don't need scaling.
+
+## Standardization (Z-score Normalization)
+
+**Standardization** transforms features to mean 0, std 1: \`x_scaled = (x - mean) / std\`. Use \`StandardScaler\` in sklearn. Interpretation: values represent standard deviations from mean. Works well with normally distributed features.
+
+## Normalization (Min-Max Scaling)
+
+**Normalization** scales to [0, 1]: \`x_scaled = (x - min) / (max - min)\`. Use \`MinMaxScaler\`. Bounded range is useful for neural networks (which initialize weights near 0). Sensitive to outliers—one extreme value spreads others to narrow range.
+
+## Robust Scaling
+
+**RobustScaler** uses median and interquartile range instead of mean and std: \`x_scaled = (x - median) / IQR\`. Robust to outliers. Use when data has extreme values.
+
+## Encoding Categorical Variables
+
+**One-hot encoding** creates binary columns for categories: category "A" becomes \`[1, 0, 0]\`, "B" becomes \`[0, 1, 0]\`. Use \`OneHotEncoder\`. Careful with many categories—10 categories become 10 columns, inflating dimensionality.
+
+**Label encoding** maps categories to integers: "A"→0, "B"→1, "C"→2. Use \`LabelEncoder\`. Works for tree models but implies order (0 < 1 < 2), misleading for unordered categories.
+
+**Target encoding** replaces each category with the mean target value for that category. Powerful but risks overfitting if categories have few samples.
+
+## Handling Ordinal Variables
+
+**Ordinal variables** have meaningful order: education level (high school < bachelor < master). Use integer encoding preserving the order: high school=1, bachelor=2, master=3. Trees will respect this order.
+
+### Try It Yourself
+
+Scale and encode a mixed dataset:
+
+\`\`\`python
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+
+# Define preprocessing
+numeric_features = ['age', 'income']
+categorical_features = ['color', 'size']
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), numeric_features),
+        ('cat', OneHotEncoder(), categorical_features)
+    ])
+
+X_processed = preprocessor.fit_transform(X_train)
+\`\`\`
+
+> **Pro Tip:** Fit scalers on training data only, then apply to test data. Fitting on test data leaks information—test performance becomes artificially optimistic.`,
         suggestedResources: [
           {
             title: "Preprocessing — scikit-learn",
@@ -604,6 +1209,65 @@ const mlFundamentalsModules: Module[] = [
           "Permutation importance estimates each feature's contribution to predictions",
           "Curse of dimensionality: too many features hurt generalization",
         ],
+        content: `## Feature Selection Methods: Keeping What Matters
+
+Raw datasets often have many features, many irrelevant. Too many features lead to overfitting, slow training, and confusing models. **Feature selection** identifies the most important features, improving performance and interpretability.
+
+## Why Feature Selection?
+
+More features don't always mean better models. Extra features introduce noise, increase overfitting risk, slow training, and complicate interpretation. Irrelevant features distract the model from true signals.
+
+## Filter Methods: Simple Statistical Tests
+
+**Filter methods** rank features by statistics, independent of the model. Examples:
+- **Correlation** with target: select features with high |correlation|
+- **Mutual Information**: measures dependency between feature and target
+- **Chi-square**: for categorical features and targets
+- **Variance threshold**: remove low-variance features (no signal)
+
+Filter methods are fast, model-agnostic, but ignore feature interactions and don't account for redundancy (two correlated features both ranked high).
+
+## Wrapper Methods: Model-Based Selection
+
+**Wrapper methods** train models with different feature subsets, selecting subsets with best performance.
+
+**Recursive Feature Elimination (RFE)** starts with all features, trains a model, removes the least important feature, repeats. RFE leverages the model's feature importance, capturing interactions.
+
+**Forward selection** starts empty, adds features one-by-one that most improve performance. **Backward elimination** starts full, removes worst-performing features iteratively.
+
+Wrapper methods are computationally expensive (train many models) but effective because they optimize for actual model performance.
+
+## Embedded Methods: Feature Selection During Training
+
+Some algorithms perform feature selection inherently. **Lasso** shrinks unimportant coefficients to zero, selecting features. **Tree-based models** provide feature importance scores.
+
+These methods are efficient (single training) and account for interactions, but limited to specific algorithms.
+
+## Multicollinearity and Redundancy
+
+High correlation between features (multicollinearity) causes problems: coefficients become unstable, interpretation becomes difficult. Remove or combine redundant features. **Variance Inflation Factor (VIF)** quantifies multicollinearity—VIF > 5-10 suggests problematic correlation.
+
+### Try It Yourself
+
+Compare feature selection methods:
+
+\`\`\`python
+from sklearn.feature_selection import SelectKBest, f_classif, RFE
+from sklearn.linear_model import LogisticRegression
+
+# Filter method: top 5 features by f-score
+selector = SelectKBest(f_classif, k=5)
+X_filtered = selector.fit_transform(X_train, y_train)
+print(f"Selected features (filter): {X_train.columns[selector.get_support()].tolist()}")
+
+# Wrapper method: RFE
+model = LogisticRegression()
+rfe = RFE(model, n_features_to_select=5)
+X_rfe = rfe.fit_transform(X_train, y_train)
+print(f"Selected features (RFE): {X_train.columns[rfe.support_].tolist()}")
+\`\`\`
+
+> **Pro Tip:** Start with filter methods for quick initial selection, then use RFE or embedded methods for final selection. Combine domain knowledge with statistical methods—sometimes business intuition trumps statistics.`,
         suggestedResources: [
           {
             title: "Feature Selection — scikit-learn",
@@ -636,6 +1300,65 @@ const mlFundamentalsModules: Module[] = [
           "Binning/discretization converts continuous to categorical",
           "Time-based features (day of week, month, trend) for temporal data",
         ],
+        content: `## Feature Engineering Techniques: Creating Better Features
+
+**Feature engineering** transforms raw variables into informative features that improve model performance. This is where domain expertise shines—a well-engineered feature can outperform algorithm choice.
+
+## Polynomial Features
+
+Polynomial features capture non-linear relationships. If \`y = x²\`, linear regression on \`x\` fails; linear regression on \`x²\` succeeds. Create \`x²\`, \`x³\`, interaction terms \`x₁×x₂\` to model non-linearity.
+
+Beware: many polynomial features lead to overfitting. Keep polynomial degree low and use regularization.
+
+## Interaction Terms
+
+Interaction terms multiply features: \`x₁ × x₂\`. Sometimes the combination matters more than individual features. Marketing effectiveness depends on both budget and audience size; budget alone or audience alone misses the synergy.
+
+Select interactions intelligently—not all combinations are meaningful. Domain knowledge guides selection.
+
+## Binning and Discretization
+
+Group continuous variables into bins. Income brackets (low, medium, high) are more interpretable than raw values. Binning captures non-linear relationships—tiny salary increases jump from "low" to "medium" income category.
+
+Lose information through binning—use when interpretability matters and you have enough data per bin.
+
+## Temporal Features
+
+Extract components from timestamps: year, month, day-of-week, hour, is_weekend, days_since_event. These capture seasonality and temporal patterns that raw timestamps miss. Log sales increase before holidays—holiday feature captures this.
+
+## Domain-Specific Features
+
+This is where intuition matters. For credit scoring: debt-to-income ratio combines two features better than either alone. For e-commerce: days_since_last_purchase indicates customer engagement better than raw timestamps.
+
+Domain expertise and business logic drive these features.
+
+## Feature Combinations
+
+Ratios, sums, products, and differences combine features. Revenue/employees = productivity. Distance from center/max_distance = relative location. These engineered features often outperform original variables.
+
+## Log and Root Transformations
+
+Skewed distributions (log-normal) improve with transformation. \`log(income)\` is more normal than raw income. \`sqrt(count)\` stabilizes variance. Interpretation changes—coefficient on log(x) means "1% increase in x leads to β change in y."
+
+### Try It Yourself
+
+Engineer features for a dataset:
+
+\`\`\`python
+df['age_squared'] = df['age'] ** 2
+df['income_age'] = df['income'] * df['age']  # Interaction
+df['log_income'] = np.log1p(df['income'])  # Log transform
+df['high_income'] = (df['income'] > df['income'].median()).astype(int)  # Binning
+
+# Test which improve model performance
+for col in ['age_squared', 'income_age', 'log_income', 'high_income']:
+    X_new = X.copy()
+    X_new[col] = df[col]
+    score = cross_val_score(model, X_new, y, cv=5).mean()
+    print(f"{col}: {score:.3f}")
+\`\`\`
+
+> **Pro Tip:** Feature engineering is 80% art, 20% science. Brainstorm features with domain experts. Test many combinations—some will shine, others will flop. The best features come from deep understanding of the problem.`,
         suggestedResources: [
           {
             title: "Feature Engineering Handbook",
@@ -701,6 +1424,61 @@ const mlFundamentalsModules: Module[] = [
           "Leave-One-Out CV: k=n, useful for small datasets but computationally expensive",
           "Nested CV for hyperparameter tuning: inner loop for tuning, outer for evaluation",
         ],
+        content: `## Cross-Validation Strategies: Robust Model Evaluation
+
+**Cross-validation** estimates true model performance without a separate test set. It trains and evaluates multiple times on different data splits, averaging results for robust estimates.
+
+## K-Fold Cross-Validation
+
+**k-Fold** splits data into k equal parts (folds). Train on k-1 folds, test on 1 fold. Repeat k times with different held-out folds. Average the k test scores.
+
+k=5 is standard (trains 5 models, evaluates 5 times). k=10 is more rigorous but slower. k=n (leave-one-out) is computationally expensive but low-bias—every sample is test and train data, minimizing variance.
+
+## Stratified Cross-Validation
+
+Regular k-fold can create imbalanced folds: if 90% of data is negative, a random fold might be 95% negative, another 85%. **Stratified k-fold** preserves class distributions in each fold. For classification with imbalanced data, always use stratified CV.
+
+Similarly, **stratified grouping** applies to regression with ordinal targets (low, medium, high income).
+
+## Time Series Cross-Validation
+
+Regular cross-validation shuffles data, breaking temporal order. For time-series data, **walk-forward validation** respects order: train on past data, test on future, slide forward.
+
+Split: train on 2020-2021 data, test on 2022-01-31. Then train on 2020-2022 Q1, test on Q2. Never train on future data to predict the past.
+
+## Leave-One-Out Cross-Validation (LOOCV)
+
+**LOOCV** leaves one sample out each iteration. Train on n-1 samples, test on 1. Repeat n times. Theoretically ideal (maximum training data, minimal bias) but computationally expensive for large datasets. Use for small datasets (< 1000 samples).
+
+## Nested Cross-Validation
+
+For **hyperparameter tuning**, use nested CV: outer loop evaluates models with tuned hyperparameters; inner loop tunes hyperparameters. Prevents overfitting to the test set through hyperparameter tuning.
+
+Outer loop: k-fold. Inner loop: k-fold for each fold. Computationally expensive but prevents optimistic bias.
+
+### Try It Yourself
+
+Implement cross-validation:
+
+\`\`\`python
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+
+# Standard 5-fold CV
+scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+print(f"CV Score: {scores.mean():.3f} ± {scores.std():.3f}")
+
+# Stratified 5-fold for imbalanced data
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+scores = cross_val_score(model, X, y, cv=skf, scoring='f1')
+print(f"Stratified CV Score: {scores.mean():.3f} ± {scores.std():.3f}")
+
+# Time series cross-validation
+from sklearn.model_selection import TimeSeriesSplit
+tscv = TimeSeriesSplit(n_splits=5)
+scores = cross_val_score(model, X, y, cv=tscv)
+\`\`\`
+
+> **Pro Tip:** Always use cross-validation, not just train-test split. A single test set can be lucky or unlucky. Cross-validation averages over multiple splits, giving robust estimates of true performance.`,
         suggestedResources: [
           {
             title: "Cross-Validation — scikit-learn",
@@ -733,6 +1511,60 @@ const mlFundamentalsModules: Module[] = [
           "Bayesian optimization intelligently samples promising regions",
           "Parallel processing accelerates search using all CPU cores",
         ],
+        content: `## Hyperparameter Tuning: Grid and Random Search
+
+**Hyperparameters** are settings configured before training (tree depth, regularization strength, learning rate). Unlike coefficients learned during training, hyperparameters are chosen by us. Choosing good hyperparameters dramatically impacts performance.
+
+## Hyperparameter Types
+
+**Tree depth** controls model complexity. **Learning rate** in boosting controls step size—small is slow but stable, large is fast but risky. **Regularization strength (λ)** controls overfitting. **Number of trees** in forests affects variance and training time.
+
+## Grid Search
+
+**Grid Search** tries all combinations in a predefined grid. Define ranges: \`tree_depth = [3, 5, 7, 10]\`, \`learning_rate = [0.01, 0.1, 1.0]\`. Try all 12 combinations, evaluate each with cross-validation, pick the best.
+
+Grid Search is exhaustive but computationally expensive. 10 hyperparameters with 5 values each = 10 million combinations. For high-dimensional hyperparameter spaces, this is infeasible.
+
+## Random Search
+
+**Random Search** samples randomly from hyperparameter distributions. Instead of grid, define ranges: \`tree_depth ~ uniform(3, 10)\`, \`learning_rate ~ loguniform(0.001, 1.0)\`. Sample randomly and evaluate. Often finds good solutions faster than grid search, especially in high dimensions.
+
+Empirically, random search with 10× the grid size often outperforms standard grid search because it explores broader space.
+
+## Bayesian Optimization
+
+**Bayesian optimization** uses a statistical model to predict which hyperparameters are promising, focusing search on promising regions. After each evaluation, update beliefs about the hyperparameter landscape.
+
+More sophisticated than grid/random search, often requires fewer evaluations. Libraries like Optuna, Hyperopt implement this efficiently.
+
+## Practical Guidelines
+
+Use **cross-validation** to evaluate each hyperparameter combination—single train-test split is unreliable. Start with coarse grids (wide ranges), refine based on results.
+
+Prioritize the most important hyperparameters. Tree depth and regularization often matter more than learning rate. Experiment iteratively: initial grid, observe patterns, refine ranges.
+
+### Try It Yourself
+
+Tune hyperparameters with Grid and Random Search:
+
+\`\`\`python
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+
+# Grid Search
+param_grid = {'max_depth': [3, 5, 7], 'min_samples_split': [2, 5, 10]}
+grid = GridSearchCV(DecisionTreeClassifier(), param_grid, cv=5, scoring='f1')
+grid.fit(X_train, y_train)
+print(f"Best params: {grid.best_params_}")
+print(f"Best CV score: {grid.best_score_:.3f}")
+
+# Random Search
+param_dist = {'max_depth': [3, 5, 7, 10], 'min_samples_split': range(2, 10)}
+random = RandomizedSearchCV(DecisionTreeClassifier(), param_dist, n_iter=20, cv=5)
+random.fit(X_train, y_train)
+print(f"Best params: {random.best_params_}")
+\`\`\`
+
+> **Pro Tip:** Use random search first for quick exploration of hyperparameter space. Once you've identified promising ranges, use grid search or Bayesian optimization for refinement. Random search + grid search is faster and smarter than grid search alone.`,
         suggestedResources: [
           {
             title: "Grid Search and Hyperparameter Tuning",
@@ -765,6 +1597,69 @@ const mlFundamentalsModules: Module[] = [
           "High bias with small gap: model too simple; add complexity",
           "High variance with large gap: overfitting; simplify model or get more data",
         ],
+        content: `## Bias-Variance Tradeoff and Model Selection: Finding the Sweet Spot
+
+Every model has **bias** (systematic errors from wrong assumptions) and **variance** (sensitivity to training data fluctuations). The **bias-variance tradeoff** is the central tension in machine learning: simple models have high bias, low variance; complex models have low bias, high variance.
+
+## Bias: Underfitting
+
+High bias means the model makes systematic errors. A linear model applied to non-linear data has high bias—it can't capture true patterns. The model is too simple, underfitting.
+
+Signs: high training error, high test error, error similar on both sets. The model struggles even on training data.
+
+## Variance: Overfitting
+
+High variance means the model is sensitive to training data details. A very deep tree memorizes training data quirks, learning noise. Test performance collapses because test data has different noise.
+
+Signs: low training error, high test error, large gap between them. The model fits training data perfectly but fails on test data.
+
+## The Tradeoff
+
+Ideal models balance bias and variance. Slightly higher training error (accepting some bias) for much lower test error (reducing variance). This tradeoff curve resembles a U-shape: optimal complexity is where training and test error sum to minimum.
+
+## Detecting Your Position
+
+Compare train vs. test error:
+- Train error high, test error high: **high bias** (underfitting). Add features, use more complex model.
+- Train error low, test error high: **high variance** (overfitting). Use regularization, get more data, simplify model.
+- Both low: **good model**. You're in the sweet spot.
+
+## Strategies to Balance
+
+**Increase model complexity** (more features, deeper trees, more parameters) to reduce bias. **Increase regularization** (higher λ, tree depth limits) to reduce variance. **Get more data**—variance decreases as data size increases because the model has harder time memorizing noise.
+
+## Model Selection
+
+Compare models with cross-validation scores and their standard deviations. Model A: mean 0.85, std 0.03 (consistent). Model B: mean 0.86, std 0.12 (variable). Model A is more reliable despite lower mean—Model B's high variance suggests instability.
+
+Complex models sometimes give worse CV scores than simple models—the complexity introduces variance faster than it reduces bias.
+
+### Try It Yourself
+
+Visualize bias-variance tradeoff:
+
+\`\`\`python
+train_errors = []
+test_errors = []
+depths = range(1, 20)
+
+for depth in depths:
+    model = DecisionTreeClassifier(max_depth=depth)
+    model.fit(X_train, y_train)
+    train_err = 1 - model.score(X_train, y_train)
+    test_err = 1 - model.score(X_test, y_test)
+    train_errors.append(train_err)
+    test_errors.append(test_err)
+
+import matplotlib.pyplot as plt
+plt.plot(depths, train_errors, label='Train Error')
+plt.plot(depths, test_errors, label='Test Error')
+plt.axvline(x=depths[np.argmin(test_errors)], color='r', linestyle='--', label='Optimal Depth')
+plt.legend()
+plt.show()
+\`\`\`
+
+> **Pro Tip:** The bias-variance tradeoff is fundamental. When tuning models, explicitly think about it: are you trying to reduce bias (model too simple) or variance (model too complex)? This mental model guides every tuning decision.`,
         suggestedResources: [
           {
             title: "Bias-Variance Tradeoff",
@@ -830,6 +1725,65 @@ const mlFundamentalsModules: Module[] = [
           "Hierarchical clustering builds dendrograms showing cluster relationships",
           "Agglomerative (bottom-up) vs. divisive (top-down) approaches",
         ],
+        content: `## K-Means and Hierarchical Clustering: Grouping Similar Data
+
+**Clustering** groups similar data points without labels. **K-Means** is the most popular clustering algorithm. It's simple, fast, and interpretable.
+
+## How K-Means Works
+
+Start with k random "centers." Assign each point to the nearest center. Recalculate center positions as cluster means. Repeat until convergence (centers don't move).
+
+K-Means minimizes within-cluster distances: it tries to make clusters tight and compact. The algorithm converges (guaranteed) but might find local optima—run multiple times with different initializations, pick best result.
+
+## Choosing k: The Elbow Method
+
+How many clusters? **Elbow method** plots within-cluster sum of squares (WCSS) for different k. WCSS decreases as k increases (more clusters = tighter clusters). The "elbow" where WCSS decreases sharply then flattens suggests good k.
+
+**Silhouette score** measures cluster cohesion and separation: samples should be close to their cluster, far from others. Silhouette ∈ [-1, 1]; higher is better. Plot silhouette for different k values.
+
+## Limitations and Assumptions
+
+K-Means assumes spherical clusters of similar size. Elongated or imbalanced clusters fool it. Requires specifying k upfront, sensitive to initialization. Euclidean distance assumption means features need scaling.
+
+## Hierarchical Clustering
+
+**Hierarchical clustering** builds a tree of nested clusters. **Agglomerative** (bottom-up) starts with each point as its own cluster, merging closest pairs iteratively. **Divisive** (top-down) starts with one cluster, splitting recursively.
+
+Hierarchical clustering produces a **dendrogram**—a tree visualization showing how clusters merge. Cut the dendrogram at different heights to get different cluster numbers.
+
+Unlike K-Means, hierarchical doesn't require specifying k. Dendrograms provide insights into cluster structure. But it's slower (O(n²) memory) and sensitive to linkage choice (single, complete, average, Ward).
+
+## Linkage Methods
+
+**Single linkage** uses closest pair distance (tends to create long chains). **Complete linkage** uses farthest pair distance (tight clusters). **Average linkage** uses average distance. **Ward** minimizes variance increase when merging (often best).
+
+### Try It Yourself
+
+Cluster data with K-Means and Hierarchical methods:
+
+\`\`\`python
+from sklearn.cluster import KMeans
+from scipy.cluster.hierarchy import dendrogram, linkage
+import matplotlib.pyplot as plt
+
+# K-Means with elbow method
+wcss = []
+for k in range(1, 11):
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X)
+    wcss.append(kmeans.inertia_)
+
+plt.plot(range(1, 11), wcss)
+plt.axvline(x=3, color='r', linestyle='--')
+plt.show()
+
+# Hierarchical clustering dendrogram
+Z = linkage(X, method='ward')
+dendrogram(Z)
+plt.show()
+\`\`\`
+
+> **Pro Tip:** K-Means is fast and scalable—great for large datasets. Hierarchical clustering provides more insight into structure. Use K-Means for quick results, hierarchical when you want to understand cluster relationships.`,
         suggestedResources: [
           {
             title: "Clustering — scikit-learn",
@@ -862,6 +1816,64 @@ const mlFundamentalsModules: Module[] = [
           "No need to specify k in advance",
           "Suitable for outlier detection and non-convex clusters",
         ],
+        content: `## Density-Based Clustering and DBSCAN: Finding Arbitrary Shapes
+
+**DBSCAN** (Density-Based Spatial Clustering of Applications with Noise) clusters dense regions and identifies outliers. Unlike K-Means, it finds arbitrary-shaped clusters and handles outliers naturally.
+
+## How DBSCAN Works
+
+Define two parameters: **eps** (neighborhood radius) and **min_samples** (minimum neighbors to form core point). A point is **core** if it has ≥ min_samples neighbors within eps. **Border** points are non-core but within eps of a core point. **Noise** points are neither core nor border.
+
+DBSCAN clusters core points that are density-connected, treating noise points as outliers. This is powerful—it finds non-spherical clusters and automatically detects outliers.
+
+## Parameter Tuning
+
+**eps** is critical. Small eps creates tiny clusters and treats most points as noise. Large eps merges distinct clusters. **k-distance graph** helps: sort distances to k-th nearest neighbor, plot. The "knee" in the plot suggests good eps.
+
+**min_samples** typically equals data dimensionality (for 2D, min_samples=2-4). Higher values require denser clusters.
+
+## Advantages and Limitations
+
+DBSCAN handles arbitrary shapes (K-Means struggles with crescent-shaped clusters). It naturally detects outliers. No need to specify number of clusters upfront.
+
+Limitations: performance degrades in high dimensions (curse of dimensionality). Clusters with varying density can confuse it. Parameters eps and min_samples require tuning.
+
+## Alternatives: OPTICS and HDBSCAN
+
+**OPTICS** extends DBSCAN, automatically finding eps. **HDBSCAN** works well with varying density and is more scalable.
+
+## Clustering Metrics
+
+**Silhouette score** works for any clustering. **Davies-Bouldin Index** measures cluster separation (lower is better). For unlabeled data, these intrinsic metrics help evaluate clustering quality.
+
+For labeled data (benchmarking), **Adjusted Rand Index** and **Normalized Mutual Information** measure agreement with ground truth.
+
+### Try It Yourself
+
+Use DBSCAN and compare with K-Means:
+
+\`\`\`python
+from sklearn.cluster import DBSCAN
+from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics import silhouette_score
+
+# Find eps using k-distance graph
+neighbors = NearestNeighbors(n_neighbors=4)
+neighbors_fit = neighbors.fit(X)
+distances, indices = neighbors_fit.kneighbors(X)
+distances = np.sort(distances[:, -1], axis=0)
+plt.plot(distances)
+plt.ylabel("4-NN Distance")
+plt.show()  # Look for knee
+
+# DBSCAN
+dbscan = DBSCAN(eps=0.5, min_samples=5)
+labels = dbscan.fit_predict(X)
+print(f"Clusters: {len(set(labels))}, Noise points: {sum(labels == -1)}")
+print(f"Silhouette: {silhouette_score(X, labels):.3f}")
+\`\`\`
+
+> **Pro Tip:** Use DBSCAN when you expect non-spherical clusters or have outliers you want to identify. It's more realistic than K-Means for many real-world datasets. Plot your data first—if clusters look arbitrary, DBSCAN likely outperforms K-Means.`,
         suggestedResources: [
           {
             title: "DBSCAN — scikit-learn",
@@ -894,6 +1906,67 @@ const mlFundamentalsModules: Module[] = [
           "UMAP combines benefits of PCA and t-SNE with better scalability",
           "Curse of dimensionality: remove irrelevant features to improve performance",
         ],
+        content: `## Dimensionality Reduction: PCA and t-SNE—Simplifying High-Dimensional Data
+
+High-dimensional data is curse and blessing: more features mean more information but also more noise, computational cost, and overfitting risk. **Dimensionality reduction** simplifies data while preserving essential information.
+
+## Principal Component Analysis (PCA)
+
+**PCA** finds directions (principal components) of maximum variance. First component points in the direction where data varies most. Second component (orthogonal to first) has second-most variance. Continue for d components.
+
+PCA projects data onto these components. Keeping top k components captures most variance while reducing dimensionality.
+
+Advantages: linear, interpretable (components are linear combinations of features), fast. Disadvantages: assumes linear relationships, doesn't preserve local structure well.
+
+## Explained Variance
+
+Plot **explained variance ratio** for each component. Component 1 might explain 40%, component 2 might explain 25%, etc. Cumulative variance shows how many components capture 95% of variance. Typically, 95% variance is preserved with drastically fewer dimensions.
+
+Use this to choose k: how many dimensions are needed?
+
+## t-SNE: Visualization-Focused Reduction
+
+**t-SNE** (t-Distributed Stochastic Neighbor Embedding) excels at visualization. It preserves local structure: nearby points in high-dimensional space stay nearby in 2D/3D. Non-linear and computationally intensive, but produces beautiful visualizations.
+
+t-SNE is not suitable for classification (distances in t-SNE don't directly correspond to original distances). Use for exploration and visualization, not feature engineering.
+
+## Other Reduction Techniques
+
+**UMAP** (Uniform Manifold Approximation and Projection) is faster than t-SNE, preserves global structure better. **Autoencoders** use neural networks to learn compressed representations. **Factor Analysis** assumes underlying factors.
+
+## When to Use Reduction
+
+Use PCA for: feature engineering in downstream models, visualization, preprocessing before expensive algorithms, noise reduction. Use t-SNE/UMAP for: visualization and exploration. Use autoencoders for: complex non-linear reduction.
+
+### Try It Yourself
+
+Apply PCA and visualize:
+
+\`\`\`python
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+# PCA for dimensionality reduction
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X)
+
+print(f"Explained variance: {pca.explained_variance_ratio_}")
+print(f"Cumulative: {pca.explained_variance_ratio_.cumsum()}")
+
+# Plot
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y)
+plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]:.1%})")
+plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]:.1%})")
+plt.show()
+
+# t-SNE for visualization
+from sklearn.manifold import TSNE
+X_tsne = TSNE(n_components=2).fit_transform(X)
+plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=y)
+plt.show()
+\`\`\`
+
+> **Pro Tip:** PCA is fast and great for preprocessing. t-SNE is beautiful but only for visualization—don't use its output as features. UMAP is increasingly popular as a middle ground: faster visualization, preserves structure better than t-SNE.`,
         suggestedResources: [
           {
             title: "PCA — scikit-learn",
@@ -958,6 +2031,61 @@ const mlFundamentalsModules: Module[] = [
           "Build MVP quickly; iterate with feedback rather than perfecting initial version",
           "Monitor for data drift: retraining requirements and performance degradation",
         ],
+        content: `## From Problem to Production: The Complete ML Workflow
+
+Building a production ML system is far more than training a model. It involves problem definition, data pipeline, model deployment, monitoring, and continuous improvement. Production-ready systems require engineering rigor.
+
+## Problem Definition and Scoping
+
+Start with the business problem: What decision should the model inform? What's the cost of errors? What's the acceptable latency? What's the data availability?
+
+Define success metrics aligned with business goals (not just accuracy). Understand constraints: latency, computational budget, regulatory requirements.
+
+## Data Pipeline
+
+Real systems need **data pipelines** that continuously collect, validate, and preprocess data. Data quality degrades—distributions shift, missing values emerge, formats change. Automated monitoring catches issues.
+
+**Data versioning** tracks datasets used for training—reproducing results requires exactly the same data. **Feature pipelines** compute features consistently in training and production.
+
+## Model Development in Context
+
+Train multiple models, compare rigorously with cross-validation. But remember: model building is 5-10% of project time. Data quality, feature engineering, and operational concerns dominate.
+
+Document your decisions: why you chose this architecture, what you tried, what worked and didn't. Future you (and collaborators) will appreciate it.
+
+## Model Deployment
+
+**Batch prediction** processes data offline, storing predictions. Simple, scalable, good for non-time-sensitive predictions.
+
+**Online prediction** scores in real-time as requests arrive. Lower latency, higher infrastructure cost. Use for time-sensitive applications (recommenders, fraud detection).
+
+## Model Monitoring and Maintenance
+
+**Performance degradation** happens: data distributions shift, world changes, model decays. Monitor key metrics in production—accuracy, precision, recall, latency, throughput.
+
+Set **alerts** for metric drops. Retrain periodically with new data. A/B test new models against production baseline.
+
+## Responsible AI
+
+Consider fairness: does the model discriminate against groups? **Bias** comes from biased training data, not just the algorithm. Understand model decisions (explainability). Plan for adversarial robustness.
+
+## The Complete Workflow
+
+Problem → Data → Features → Modeling → Evaluation → Deployment → Monitoring → Iterate. It's not linear—monitoring reveals issues requiring retraining or feature rethinking.
+
+### Try It Yourself
+
+Sketch a production ML system for a real problem:
+
+1. Define the business problem and success metrics
+2. Outline data collection and quality checks
+3. Design feature engineering pipeline
+4. Choose evaluation strategy (cross-validation, holdout test)
+5. Plan deployment: batch or online?
+6. List monitoring metrics and alert thresholds
+7. Describe feedback loops for continuous improvement
+
+> **Pro Tip:** Start simple. A simple model deployed and monitored beats a complex model left on a laptop. Iterate incrementally—measure, learn, improve. Production-first thinking from the start makes projects successful.`,
         suggestedResources: [
           {
             title: "ML Ops and Model Deployment",
@@ -990,6 +2118,89 @@ const mlFundamentalsModules: Module[] = [
           "Model registry manages model versions and deployment candidates",
           "Containerization (Docker) ensures consistency across environments",
         ],
+        content: `## Model Versioning and Reproducibility: Keeping Track of Everything
+
+In production, you'll train hundreds of models. Which one is deployed? How was it trained? With which data? Which version is that? **Model versioning** tracks models, code, data, and hyperparameters for reproducibility and rollbacks.
+
+## Version Control
+
+Use **Git** for code versioning. Every experiment should be traceable: commit code, note hyperparameters, save metrics.
+
+**Data versioning** with tools like **DVC** (Data Version Control) tracks datasets similarly to Git. Commit data references (hashes), not raw files. This enables reproducing exact training conditions.
+
+## Experiment Tracking
+
+**MLflow** or **Weights & Biases** track experiments: hyperparameters, metrics, artifacts (plots, models). View comparisons across experiments. Query: which hyperparameters gave best results?
+
+These tools eliminate the chaos of spreadsheets and scattered notes. Experiments become reproducible and comparable.
+
+## Model Serialization
+
+Save trained models for deployment. **Pickle** in Python saves objects but is language-specific and potentially unsafe. **ONNX** (Open Neural Network Exchange) standardizes model format across libraries. **ModelDeploy** formats like MLflow Models bundle code and dependencies.
+
+Include **model cards**: what data was used, performance metrics, limitations, intended use, creator, date. This documentation is crucial.
+
+## Configuration Management
+
+Hardcoded hyperparameters buried in code are hard to change. Use **config files** (YAML, JSON) to specify model parameters, data paths, hyperparameters. Code reads config, making it reusable across experiments.
+
+Example YAML:
+\`\`\`yaml
+model:
+  type: random_forest
+  n_estimators: 100
+  max_depth: 10
+data:
+  train_path: data/train_2024_01.csv
+  test_path: data/test_2024_01.csv
+\`\`\`
+
+## Reproducibility Practices
+
+Set random seeds (\`random_state\` in sklearn). Document environment (Python version, package versions). Use containerization (**Docker**) to freeze environment exactly.
+
+Reproducibility isn't automatic—it requires discipline. But it's essential for science, debugging, and production systems.
+
+## Drift Detection
+
+When deployed, monitor whether training and production distributions differ. **Data drift** (feature distributions change) causes performance degradation. **Concept drift** (target distribution changes) means the problem itself changed.
+
+Detect drift by monitoring feature statistics and model performance. High drift triggers retraining.
+
+### Try It Yourself
+
+Set up experiment tracking:
+
+\`\`\`python
+import mlflow
+
+mlflow.start_run()
+
+# Log hyperparameters
+mlflow.log_params({
+    'n_estimators': 100,
+    'max_depth': 10,
+    'learning_rate': 0.1
+})
+
+# Train model
+model = RandomForestClassifier(n_estimators=100, max_depth=10)
+model.fit(X_train, y_train)
+
+# Log metrics
+accuracy = model.score(X_test, y_test)
+mlflow.log_metric('accuracy', accuracy)
+
+# Save model
+mlflow.sklearn.log_model(model, 'model')
+
+mlflow.end_run()
+
+# Later: query best experiment
+best_run = mlflow.search_runs(order_by=['metrics.accuracy DESC']).iloc[0]
+\`\`\`
+
+> **Pro Tip:** Reproducibility and experiment tracking feel like overhead initially. They pay massive dividends: understanding what worked, why, and when. Start these practices early—it's far harder to retrofit later.`,
         suggestedResources: [
           {
             title: "Data Version Control (DVC)",
@@ -1022,6 +2233,90 @@ const mlFundamentalsModules: Module[] = [
           "A/B testing validates new models before full deployment",
           "Shadow mode: run new model in parallel without affecting predictions",
         ],
+        content: `## Model Monitoring and Maintenance: Keeping Models Healthy
+
+A model deployed to production degrades over time. Data distributions shift, the world changes, competitors adapt. **Monitoring** detects degradation; **maintenance** keeps models fresh.
+
+## Key Monitoring Metrics
+
+**Model performance**: accuracy, precision, recall, AUC in production. Compare to baseline (previous model, human). Large drops signal problems.
+
+**Business metrics**: the ultimate judges. If accuracy stays high but revenue drops, something's wrong upstream. Monitor metrics that matter to the business.
+
+**Operational metrics**: latency (prediction time), throughput (predictions per second), error rate (failures). Even accurate models are useless if they're slow or fail constantly.
+
+## Data Monitoring
+
+**Feature distributions**: In production, feature statistics should match training. Monitor mean, std, min, max, quantiles. Differences signal data quality issues or distribution shift.
+
+**Missing values**: Increasing NaN rates indicate upstream data pipeline problems. Set alerts if missing rate exceeds thresholds.
+
+**Outliers**: Unusual values might be data errors or genuine new phenomena. Flag for investigation.
+
+## Drift Detection
+
+**Data drift**: feature distributions shift (loan amounts decrease during economic downturn). Model trained on historical data performs worse.
+
+**Concept drift**: the relationship between features and target changes (prediction task changes). A fraud detector trained pre-COVID might fail post-COVID as fraud patterns changed.
+
+Detect drift by comparing train and production distributions using statistical tests (Kolmogorov-Smirnov) or domain-specific checks.
+
+## Triggering Retraining
+
+Establish thresholds: if performance drops 5%, accuracy drops below 92%, or drift metrics exceed limits, automatically retrain on fresh data.
+
+**Continuous training** periodically retrains models on recent data. **Trigger-based retraining** responds to detected problems. **Online learning** updates models incrementally with each new sample (when feasible).
+
+## A/B Testing
+
+Before replacing production model, **A/B test** new model: route some traffic to new model, rest to old. Compare performance. This catches edge cases and unexpected issues.
+
+Statistical significance requires sufficient samples. A 0.1% improvement on 1 million predictions is significant; on 100 samples, it's noise.
+
+## Rollback Procedures
+
+When a deployed model fails, have **rollback procedures** ready. Keep previous model versions; revert quickly if issues arise. Minutes of poor performance are better than hours of investigation.
+
+## Maintenance Workflows
+
+- **Weekly**: Check key metrics, alert on anomalies
+- **Monthly**: Review drift metrics, plan retraining if needed
+- **Quarterly**: Refresh data, retrain on latest data, A/B test improvements
+- **Yearly**: Large reviews, architectural changes, algorithm improvements
+
+### Try It Yourself
+
+Set up basic monitoring:
+
+\`\`\`python
+import pandas as pd
+from scipy.stats import ks_2samp
+
+# Compare train vs production data
+train_features = X_train['age']
+prod_features = X_prod['age']  # Current production data
+
+# Statistical test for drift
+statistic, p_value = ks_2samp(train_features, prod_features)
+if p_value < 0.05:
+    print("Data drift detected!")
+
+# Monitor performance
+accuracy_prod = model.score(X_prod, y_prod)
+if accuracy_prod < 0.92:
+    print("Accuracy below threshold! Consider retraining.")
+
+# Log metrics
+metrics = {
+    'timestamp': datetime.now(),
+    'accuracy': accuracy_prod,
+    'n_samples': len(X_prod),
+    'drift_p_value': p_value
+}
+# Send to monitoring system (Datadog, CloudWatch, etc.)
+\`\`\`
+
+> **Pro Tip:** Monitoring is where real ML engineering happens. Models in production are investment—protect them. Spend as much effort on monitoring as on model building. Early detection of problems prevents disasters.`,
         suggestedResources: [
           {
             title: "Model Monitoring Strategies",
@@ -1214,6 +2509,49 @@ const uxCurriculum: Curriculum = {
             "Research ethics: informed consent, privacy, and minimizing harm",
             "User research requires recruitment, incentives, and proper documentation",
           ],
+          content: `# Research Methods: Qualitative vs. Quantitative
+
+Understanding your users is the foundation of effective design, but user research comes in many forms. Two fundamental approaches—**qualitative** and **quantitative** research—answer different questions and provide distinct types of insights that together create a complete picture of your users' needs, behaviors, and motivations.
+
+## Qualitative Research: Understanding the Why
+
+**Qualitative research** explores the depth and nuance of human experience. It answers questions like "Why do users avoid our checkout flow?" or "How do users think about saving money?" Through methods like interviews, contextual inquiry, and observations, qualitative research captures the rich details of user behavior in context.
+
+The power of qualitative research lies in its ability to uncover **motivations, emotions, and mental models**. When you conduct an interview and ask a user to describe their workflow, you learn not just what they do, but why they do it. You discover their frustrations before they become support tickets and their unmet needs before your competitors find them. The iterative nature of qualitative methods—where follow-up questions lead to deeper insights—makes them invaluable for exploring new problem spaces or understanding surprising user behaviors.
+
+However, qualitative findings apply to the specific individuals you studied. You cannot say "70% of our users prefer this feature" based on five interviews. That's where quantitative research enters.
+
+## Quantitative Research: Understanding the Scale
+
+**Quantitative research** measures prevalence, frequency, and statistical relationships across large populations. It answers questions like "What percentage of users encounter errors in our signup process?" or "Is Feature A preferred over Feature B?" Through surveys, analytics, and experiments, quantitative research provides the statistical confidence you need to make business decisions.
+
+The strength of quantitative methods is their **generalizability and reliability**. If you survey 500 users and 60% report a specific pain point, you can confidently say this matters to your market. Quantitative research also excels at measuring the **impact of changes**—did your redesign reduce page load time? Did your new onboarding flow improve retention? Analytics provide the answer.
+
+The challenge is depth: a survey might tell you that users are frustrated, but it won't tell you why or how they currently solve the problem.
+
+## Triangulation: Combining Methods for Richer Insights
+
+The most effective research strategies combine qualitative and quantitative approaches. This practice, called **triangulation**, lets you:
+
+- Use qualitative research to identify potential problems and generate hypotheses
+- Use quantitative research to validate those hypotheses across your user base
+- Use qualitative follow-up interviews to understand why the quantitative patterns exist
+
+For example: A/B test results show that Version B gets 15% higher conversion (quantitative), but user interviews with visitors who saw Version B explain that they found the new layout more intuitive and discovered features they didn't know existed (qualitative).
+
+## Research Ethics: Protecting Your Users
+
+Conducting research ethically is not optional—it's fundamental to good design practice. **Informed consent** means users understand what you're studying and how you'll use their data. **Privacy protection** means storing user information securely and following data regulations like GDPR. **Minimizing harm** means recognizing that your research methods—especially those exploring sensitive topics—can affect participants.
+
+Research ethics also means transparency with stakeholders. Misrepresenting research findings or cherry-picking data to support predetermined conclusions undermines the entire purpose of user research.
+
+### Try It Yourself
+
+1. **Define your research question** — Pick a feature or workflow in a product you use. Write down a specific question you'd like to answer: "Why do users abandon their carts?" vs. "What percentage of users complete purchase on mobile?"
+2. **Match method to question** — For your question, would qualitative or quantitative research be more helpful? Why?
+3. **Design recruitment** — For either method, list what characteristics your ideal participants should have and where you'd find them.
+
+> **Pro Tip:** Start with qualitative research when entering a new domain. Five well-conducted user interviews will teach you more about an unfamiliar user segment than any survey. Once you understand the landscape, use quantitative methods to measure prevalence and validate patterns.`,
           suggestedResources: [
             {
               title: "User Research Guide — Nielsen Norman Group",
@@ -1246,6 +2584,64 @@ const uxCurriculum: Curriculum = {
             "Recruit diverse participants representing your target users",
             "Document insights systematically: transcription, notes, video",
           ],
+          content: `# Conducting Effective User Interviews
+
+One-on-one user interviews are the gold standard of qualitative research. There's simply no substitute for sitting down with a real user, listening to their stories, and asking thoughtful follow-up questions. Effective interviews reveal not just what users do, but why they do it—and often, what they didn't even know they needed.
+
+## The Power of Open-Ended Questions
+
+The difference between a useful interview and a wasted hour often comes down to how you ask questions. **Open-ended questions** invite elaboration: "Tell me about a time when you tried to return an item online." These questions typically start with "How," "What," "Tell me about," or "Describe for me."
+
+**Closed questions** shut down conversation: "Did you find that confusing?" or "Is our checkout easy?" Users will answer yes or no, and the conversation ends. Even worse, closed questions can bias responses—many users default to polite agreement rather than honest feedback.
+
+The best interview guides contain mostly open-ended questions. You're not testing whether users can use your product (that's usability testing). You're exploring their mental models, needs, workflows, and pain points. Every question should give them space to think, reflect, and share stories.
+
+## Active Listening: The Interview Superpower
+
+Most people are trained to respond, defend, or explain. In a user interview, you must **listen without judgment**. This means:
+
+- **Listening to understand**, not listening to reply. Don't plan your next question while they're talking.
+- **Focusing on the user**, not on defending your product. If they say something negative about your design, that's data, not criticism.
+- **Creating comfort**, so users feel safe being honest. This means warm body language, eye contact, and validating their experiences: "That's really helpful to know."
+
+Active listening also means noticing **emotional cues**. When someone's voice changes, when they hesitate, when they light up—these moments often contain the deepest insights.
+
+## Powerful Follow-Up Techniques
+
+After an open-ended question, follow-up probes go deeper:
+
+- **"Tell me more about that..."** — Invites elaboration on something interesting they just said.
+- **"Why was that important to you?"** — Uncovers motivations and values.
+- **"How did you feel when that happened?"** — Explores emotional responses and frustration points.
+- **"What did you do next?"** — Traces the complete user journey, including workarounds.
+- **"Have you ever experienced anything similar?"** — Builds patterns across their experiences.
+
+These probes sound natural in conversation, not scripted. The best interviews feel like engaging conversations where the user wants to share because you're genuinely curious.
+
+## Recruiting the Right Participants
+
+Interviews are only as valuable as the participants you recruit. **Diversity matters**—not just demographic diversity (age, gender, location) but also **behavioral diversity**: power users and novices, early adopters and skeptics, people who love your product and people who hate it.
+
+Target the **specific segment** you're trying to understand. If you're researching mobile payment adoption, recruiting only smartphone enthusiasts won't tell you why others aren't adopting. If you're studying accessibility needs, recruiting only non-disabled users wastes everyone's time.
+
+Offer **reasonable incentives**: money, gift cards, or services. Compensating participants respects their time and often yields better, more honest feedback. Uncompensated interviews tend to attract only the most passionate users—and the most opinionated ones—skewing your sample.
+
+## Documentation: Capturing the Gold
+
+You'll forget most of what you heard in an interview within hours. **Document systematically**:
+
+- **Audio or video recording** (with permission) — Allows you to review exact phrasing and tone later. Quote users directly in reports—their exact words are more powerful than paraphrasing.
+- **Live notes** — Jot down key phrases, quotes, and observations during the interview. Note emotional moments and contradictions.
+- **Transcription** — For important interviews, full transcripts enable careful analysis and sharing with your team.
+- **Debrief immediately** — After the interview, while memory is fresh, write down your immediate impressions and key themes you noticed.
+
+### Try It Yourself
+
+1. **Develop an interview guide** — Write 6-8 open-ended questions about a daily activity (how you choose what to eat, how you decide what to buy). Notice how the questions feel.
+2. **Conduct a practice interview** — Ask a friend the questions. Record audio or video (with permission). Notice when you want to defend an idea instead of listening.
+3. **Review your recording** — Listen back and count how many times you asked closed questions or interrupted. Reflect on what you could improve.
+
+> **Pro Tip:** Never interview your own coworkers or close friends unless absolutely necessary. They often tell you what they think you want to hear, not what they truly think. Genuine user feedback comes from people with no stake in your success.`,
           suggestedResources: [
             {
               title: "User Interview Best Practices — NN/g",
@@ -1309,6 +2705,68 @@ const uxCurriculum: Curriculum = {
             "Quote users directly when creating personas and presenting findings",
             "Validate themes by checking if they resonate with stakeholders",
           ],
+          content: `# Synthesizing User Research Data
+
+You've conducted your interviews, surveys, and observations. You have pages of notes, video recordings, and survey responses. Now what? **Research synthesis** is the process of transforming that raw data into actionable insights—the themes, patterns, and surprising discoveries that will inform your design decisions.
+
+## From Raw Data to Themes: The Coding Process
+
+**Coding** means systematically labeling insights with consistent tags. You might code interview transcripts by marking every mention of "time pressure" with one color, "confusion about pricing" with another, and "frustrated with mobile" with a third.
+
+The goal isn't perfection—it's to make patterns visible. As you code more data, you'll refine your codes. A code that seemed distinct ("password reset is hard") might merge with a broader code ("authentication friction"). New codes emerge as you discover unexpected themes.
+
+Tools like Dovetail or Otter automate parts of this process, but many teams start with the simplest approach: **print out interview quotes, cut them into individual sticky notes, and physically arrange them on a wall**. This tactile approach forces you to confront every data point and makes patterns impossible to miss.
+
+## Affinity Mapping: Finding Structure in Chaos
+
+**Affinity mapping** is the team version of synthesis. In a typical affinity mapping session:
+
+1. Team members place sticky notes (one insight per note) on a large wall or table
+2. The group collectively moves notes into piles based on similarity
+3. These piles gradually reveal broader clusters—themes that emerge from the data
+4. Each cluster gets a descriptive label
+
+This exercise is powerful because it surfaces different interpretations. When team members disagree about which cluster a note belongs to, that disagreement reveals assumptions worth examining. A product manager might see "I have to call support" as a customer service opportunity; an engineer sees it as a documentation failure. Both perspectives are data.
+
+Affinity mapping also builds shared understanding. Instead of one researcher presenting findings, the entire team engages in discovery together. When people help build the synthesis, they own the insights.
+
+## Pattern Recognition: The Art and the Science
+
+Pattern recognition combines systematic coding with intuition and domain knowledge. You're looking for:
+
+- **Consensus themes** — Multiple users mention the same pain point or desire
+- **Contradictions** — Different users have opposite needs or behaviors. Who's right? Maybe both: different segments need different solutions.
+- **Surprising discoveries** — Something no one predicted. These are often the most valuable insights because they challenge assumptions.
+- **Intensity** — Some themes emerge because multiple people care deeply, not just because multiple people mentioned them.
+
+Watch for your own biases. If you expected users to struggle with X, you might over-code for it. If something contradicts your beliefs, you might dismiss it. The best synthesis happens when diverse team members challenge each other's interpretations.
+
+## Using Direct Quotes to Bring Research to Life
+
+Numbers tell one story; user quotes tell another. "75% of users experienced errors in checkout" is data. "I almost gave up three times during checkout—I thought my card was declined and I couldn't find the order confirmation" is a user story that makes you feel the problem.
+
+**Quote users directly** in your synthesis documents, personas, and design presentations. Include their exact words, even if imperfect grammar. Real quotes are more persuasive than polished paraphrasing. When stakeholders hear authentic user voices, they remember the insight and feel motivated to solve the problem.
+
+Ethical practice: Always ask permission before using someone's quote in public presentations. Anonymize details that could identify them, unless they've explicitly agreed to attribution.
+
+## Validating Your Themes: Reality Check
+
+After you've identified themes, sense-check them with other team members and, ideally, with additional users. Ask:
+
+- Do these themes ring true to customer support teams, who interact with users daily?
+- Do they align with behavioral data from analytics?
+- Do new research participants confirm these patterns, or do they introduce new themes?
+
+Validation doesn't mean unanimous agreement—you might have discovered a real pattern that some team members resist because it challenges their vision. But validation means the pattern is real, grounded in data, and not a projection of your own assumptions.
+
+### Try It Yourself
+
+1. **Collect raw data** — Record yourself or a friend describing their morning routine (how they wake up, get ready, eat breakfast). Aim for 5-10 minutes of natural conversation.
+2. **Transcribe and code** — Write down the transcript. Use three different colors of highlighter to mark insights about different themes you notice.
+3. **Affinity map with sticky notes** — Extract 10-15 key quotes or observations. Write each on a separate sticky note. Arrange them into clusters. What themes emerge?
+4. **Create a theme summary** — For each cluster, write a descriptive label and list the data points supporting it.
+
+> **Pro Tip:** Include perspectives from people who were not in the research. Your customer support team, sales team, or even customers who weren't interviewed might see patterns you missed. Fresh eyes catch blind spots.`,
           suggestedResources: [
             {
               title: "Synthesis Techniques — NN/g",
@@ -1341,6 +2799,75 @@ const uxCurriculum: Curriculum = {
             "Avoid perfection: realistic personas have strengths and flaws",
             "Create 3-5 primary personas representing key segments",
           ],
+          content: `# Creating Compelling User Personas
+
+A user persona is a realistic representation of a segment of your users. Unlike an average user (which doesn't actually exist), a persona represents a distinct type of person with specific goals, behaviors, and frustrations. Personas make abstract research findings concrete and actionable. They help teams make decisions aligned with real user needs.
+
+## From Research to Persona: Data-Driven, Not Fictional
+
+Many companies create "personas" that are actually stereotypes—invented characters that reflect what the team assumes users are like. Real personas are **grounded in research data**. Every detail in an effective persona came from your interviews, surveys, or analytics.
+
+Your research synthesis identified themes and segments. Each persona represents one segment. If your affinity mapping revealed that some users are "pragmatic minimalists" (want the fastest solution) while others are "feature explorers" (want to understand all options), you have two personas.
+
+Include the **evidence** backing each persona detail. "Sarah is a busy executive" is vague. "Sarah manages eight people and checks email every 15 minutes during work hours" is specific and based on data. "Sarah has mentioned time pressure in 5 of our 8 interviews with busy executives" is transparent about the evidence.
+
+## What to Include: Goals, Pain Points, Behaviors, Context
+
+Effective personas contain:
+
+- **Behavioral patterns** — How do they currently accomplish the task? Do they use analogous products? What tools do they prefer?
+- **Goals and motivations** — What are they trying to achieve? Why does it matter to them?
+- **Pain points** — What's frustrating or difficult about their current approach? Where do they struggle?
+- **Technology comfort** — Are they early adopters or late adopters? Do they prefer simple or feature-rich solutions?
+- **Context** — Where are they when they use your product? Are they multitasking or focused? Are they on mobile, desktop, or both?
+- **Success metrics** — How would they define success? What would delight them?
+
+Avoid including details unrelated to your product or research. Personas don't need favorite colors, hobbies, or demographic data unless those factors actually influence how they use your product. Overly detailed personas encourage people to treat personas as characters rather than research summaries.
+
+## Naming Personas: Making Them Real and Memorable
+
+A persona named "Power User" is forgettable. A persona named "Samira, the Efficient Operator" sticks in memory. **Names should sound like real people** and hint at their archetype.
+
+Personas often include a small photo—a stock photo of a real person, not a designer's illustration. This visual representation makes personas more memorable and makes it harder for teams to dismiss them as invented characters. (Always use stock photos with proper licensing, or your team's own diverse colleagues if they're willing.)
+
+Some teams use a short tagline: "Samira gets things done fast. She doesn't tolerate friction." This one-liner helps teams quickly remember the persona's core priority.
+
+## Avoid the Perfection Trap: Real Personas Have Flaws
+
+Ineffective personas are idealized—"The perfect user who knows exactly what they want and uses our product exactly how we designed it." **Real personas are complex**. They have contradictions, limited knowledge, competing priorities, and sometimes make inefficient choices.
+
+A persona might be tech-savvy but impatient—they'll try new features quickly but abandon them if they don't immediately deliver value. Or they're motivated by cost-savings but willing to pay for premium support. Or they love your product's core feature but never use the advanced options because they don't understand them.
+
+These flaws and contradictions are data. They tell you where your design must accommodate real human behavior, not ideal behavior.
+
+## Primary vs. Secondary Personas: Start with 3-5
+
+Most products have 3-5 primary personas representing your core user segments. Primary personas are the people you're optimizing for. If you optimize for everyone equally, you optimize for no one.
+
+Secondary personas represent important edge cases: power users, new users, accessibility-focused users, or users in specific contexts. You don't optimize for them, but you design in ways that don't exclude them.
+
+Some research identifies anti-personas: users who should NOT be your focus. A budgeting app might identify "people who want zero financial discipline" as an anti-persona. That understanding helps you say no to feature requests that would distract from your core value.
+
+## Using Personas to Guide Design
+
+Once created, personas should be visible and referenced constantly:
+
+- Print personas and post them in your design space
+- Reference them in design critiques: "Is this optimized for Samira's workflow?"
+- Consult them when prioritizing features
+- Use them to inform interaction patterns: should the UI assume expertise or guide new users?
+- Test with participants matching your personas—see if your design assumptions hold
+
+Personas lose value if they're created, presented once, and archived. Living personas are consulted regularly and evolve as you learn more about your users.
+
+### Try It Yourself
+
+1. **Identify a segment** — From research data (real or imagined), pick one user segment: busy professionals, budget-conscious shoppers, or another group.
+2. **Create a persona** — Write a 1-page description including their goal, main pain point, current workflow, tech comfort, and success metric. Give them a realistic name.
+3. **Test it** — Describe the persona to someone who interacts with users (customer support, sales). Do they recognize this person? What details surprised them or seemed wrong?
+4. **Refine** — Based on feedback, adjust the persona with more specific details or different characteristics.
+
+> **Pro Tip:** Regularly update personas as you collect new research. Personas are hypotheses about your users, and hypotheses improve with evidence. Quarterly research reviews should confirm or adjust personas—especially if your product attracts new user segments or your market evolves.`,
           suggestedResources: [
             {
               title: "Personas — NN/g",
@@ -1405,6 +2932,92 @@ const uxCurriculum: Curriculum = {
             "Friday: Test with real users and gather feedback",
             "Facilitator role: keep energy up, enforce timeboxes, ensure participation",
           ],
+          content: `# Design Sprint Overview and Planning
+
+A **Design Sprint** is a structured five-day process for solving problems and testing solutions quickly. Instead of debating ideas in meetings for weeks, sprints compress research, ideation, prototyping, and testing into an intensive, focused week. The method was developed at Google and has become standard practice for product teams wanting to validate ideas before investing in full development.
+
+## Why a Sprint? The Power of Rapid Iteration
+
+Design sprints work because they **constrain scope and time**. With unlimited time, teams endlessly refine, debate, and modify. With a five-day deadline, you make decisions, create something testable, and learn from real users. You fail fast and cheaply, pivoting before you've invested months in development.
+
+Sprints are ideal when:
+- You're tackling a new problem or market
+- Key stakeholders disagree about the best solution
+- You want to validate an idea before major investment
+- You want to explore multiple competing solutions side-by-side
+
+The sprint doesn't replace traditional development—it comes before it. Sprint outcomes inform which direction deserves full investment.
+
+## Monday: Mapping and Focus
+
+**Monday** starts with alignment. You map the problem: What is the core challenge? What are we trying to solve? What success looks like? Who are the users?
+
+By day's end, the team selects a **focus area**—the specific part of the problem you'll tackle. You won't solve everything in five days. You might focus on: "How do new users discover premium features?" or "How do we reduce mobile checkout abandonment?" This focused scope makes progress possible.
+
+Preparation is crucial: Have your user research, personas, and competitive analysis ready. Share it Monday morning so everyone's building on shared understanding.
+
+## Tuesday: Sketching and Ideation
+
+**Tuesday** is about **individual sketching**. Don't brainstorm as a group yet. Instead, each person sketches their own solution ideas—rough, quick sketches, not polished designs. Paper and pen are fine.
+
+Why individual work? Groupthink is real. The loudest voice in the room often dominates brainstorming, and group dynamics suppress unconventional ideas. When everyone sketches alone first, you surface diverse ideas. That quiet designer who usually stays silent might sketch the most elegant solution.
+
+Sketches should be low-detail: "user logs in" → "sees recommendation" → "clicks to learn more" → "sees details." The goal is rapid exploration of multiple approaches, not finished design.
+
+## Wednesday: Deciding Together
+
+**Wednesday** is decision day. The team reviews all sketches, discusses the approaches, and votes on which solution to prototype. Often, you combine elements from multiple sketches—the best entry flow from one, the clearest information architecture from another.
+
+**Voting democratizes decision-making**. Rather than the most senior person choosing, everyone votes silently and discusses why each idea appeals to them. This surfaces different perspectives: "I voted for Sketch 3 because it minimizes steps, but Sketch 1 is clearer for first-time users—maybe we blend them?"
+
+By end of Wednesday, you've committed to a direction. No more second-guessing during building.
+
+## Thursday: Prototyping Fast
+
+**Thursday**, you build a **prototype**—something realistic enough to test but quick enough to complete in a day. Your prototype doesn't need to be fully functional. A clickable prototype in Figma, a video walkthrough, even an Invision prototype with static screens—anything testable works.
+
+Key principle: **Make it realistic but incomplete**. Test participants can't evaluate your solution if it looks rough, but you're wasting time polishing details. Prototype the core experience and UI patterns, but leave secondary features out.
+
+Realistic means: genuine product data, not lorem ipsum. Use real customer names, real product images, real pricing. Participants evaluate more honestly when the prototype feels real.
+
+## Friday: Testing and Learning
+
+**Friday morning**, you recruit 5-6 test participants and conduct moderated testing sessions. In the afternoon, you debrief: What worked? What confused people? Where did they expect different behavior?
+
+This isn't a formal usability study. It's a quick learning session. You're not gathering statistically significant data; you're getting qualitative feedback that informs next steps. Is the overall direction sound, or did testing reveal fundamental misunderstandings?
+
+After Friday, you have a decision: continue developing this solution, pivot based on feedback, or abandon the direction and sprint on an alternative.
+
+## The Facilitator: Timekeeper and Energy Manager
+
+A good **sprint facilitator** is crucial. They're responsible for:
+
+- **Keeping pace** — Enforcing timeboxes so you don't get stuck on Monday's problem definition
+- **Managing energy** — Keeping morale up during intense week, taking breaks, celebrating progress
+- **Ensuring participation** — Making sure quieter voices are heard, preventing any one person from dominating
+- **Removing blockers** — Tracking decisions, preventing scope creep, ensuring necessary resources are available
+- **Documentation** — Capturing outcomes and key insights for teams who weren't in the sprint
+
+Facilitators should be respected but neutral—ideally not strongly attached to any particular solution. They ask questions to surface thinking rather than pushing their own opinions.
+
+## Preparing for Your Sprint
+
+Success starts before Monday:
+
+- **Gather data** — Have research, personas, competitive analysis, and context ready
+- **Assemble the team** — Include decision-makers, design/product, engineering, and ideally customer-facing roles
+- **Book the space** — You need a room with walls for sketches and prototypes, sticky notes, whiteboards
+- **Schedule users** — Before the sprint starts, recruit 5-6 test participants for Friday
+- **Communicate timeline** — Everyone should know they're unavailable Monday-Friday for other meetings
+
+### Try It Yourself
+
+1. **Choose a sprint challenge** — Pick a real problem: "How can we make onboarding faster?" or "How do we encourage feature discovery?"
+2. **Plan your Monday** — Write an agenda: problem definition (30 min), research review (45 min), focus selection (30 min)
+3. **Draft a prototype brief** — By Wednesday evening, write one paragraph describing the solution you'll build Thursday
+4. **Create a test guide** — Write 5-6 tasks and questions you'd ask test participants Friday
+
+> **Pro Tip:** Run your first sprint with a small problem, not a company-critical one. Learn the rhythm when stakes are lower. Then run bigger sprints with confidence.`,
           suggestedResources: [
             {
               title: "Design Sprint by Google",
@@ -1437,6 +3050,95 @@ const uxCurriculum: Curriculum = {
             "Ask open questions: 'What are you thinking?', 'How would you do X?'",
             "Analyze patterns: which features confused users? What delighted them?",
           ],
+          content: `# Prototyping and User Testing
+
+Moving from design sprint sketches to a testable prototype and then validating that prototype with real users is where design thinking becomes real insight. Prototyping is iterative: you create something, test it, learn what works and what doesn't, and improve. The faster you cycle through this process, the faster you learn which direction to pursue.
+
+## Matching Prototype Fidelity to Your Goals
+
+**Fidelity** refers to how finished and detailed your prototype looks and functions. Different testing goals demand different fidelity levels.
+
+**Low-fidelity prototypes** (paper sketches, wireframes, simple clickable prototypes) test the *concept*. Is this general approach resonating with users? Do they understand the core idea? Test before investing in detailed visual design. This is perfect for design sprint prototypes where you have limited time.
+
+**Medium-fidelity prototypes** (Figma mockups with basic interactions, rough visual design) test the *interaction and information architecture*. Is the flow intuitive? Do people find information in expected places? This works for testing with small groups before design refinement.
+
+**High-fidelity prototypes** (pixel-perfect mockups, animation, realistic content) test the *details*. Does the visual hierarchy guide attention? Does the design feel professional? When does aesthetic matter? When testing with stakeholders or investors, high-fidelity helps them imagine the finished product. When testing with users exploring concepts, it's wasted effort.
+
+**A common mistake**: Creating high-fidelity prototypes before you've tested the core idea. You spend days making everything look perfect, only to learn the fundamental approach doesn't resonate. Build low-fidelity first, validate direction, then invest in details.
+
+## Tools for Prototyping
+
+You have many options:
+
+- **Figma** — Excellent for interactive prototypes. Create screens, add hotspots and flows, share a link with testers.
+- **Adobe XD** — Similar to Figma, strong prototyping features, good for transitions and animations.
+- **Paper and pen** — Surprisingly effective. Users understand you're testing the concept, not the visual design. Useful for early ideation.
+- **Protopie, Framer, Webflow** — Specialized prototyping tools for more complex interactions.
+- **Video walkthrough** — For complex flows, record yourself explaining the concept while clicking through a slide deck. Narration bridges gaps in the prototype.
+- **Coded prototype** — For testing highly interactive experiences, HTML/CSS/JavaScript gives maximum fidelity.
+
+Choose tools matching your timeline and testing depth. A design sprint prototype in Figma is fast enough. A venture pitch needs more polish.
+
+## Recruiting Test Participants: Small and Diverse
+
+You don't need hundreds of test participants. **Nielsen Norman research shows that 5 users uncover about 85% of usability issues**. More users add diminishing returns. With 5 testers, you identify most problems. With 10 testers, you're mostly confirming what you learned from the first 5.
+
+**Diversity matters more than size**. Five participants who represent different use cases, expertise levels, and contexts reveal more than five homogeneous participants. If you're designing for busy professionals and casual users, include both.
+
+Recruit people matching your personas. If you're testing an app for remote workers, recruit actual remote workers—not office workers imagining remote work. Recruit a mix: people who've used similar products, people new to the category, power users, and casual users.
+
+Offer **compensation**: \$50-100 gift cards are standard, making recruitment easier and signaling respect for participants' time. Compensated participants are more willing to give honest feedback than volunteers motivated by niceness.
+
+## Moderated Testing: The Gold Standard
+
+**Moderated usability testing** means you're present (in-person or via Zoom) watching someone use your prototype and asking questions. This is different from unmoderated testing (where users record themselves), which works for quick feedback but loses the nuance of observing confusion in real-time.
+
+In a moderated session:
+
+1. **Set context** — Explain the task: "Imagine you're looking for a way to track your podcast subscriptions. Here's our prototype. Try to accomplish this task..."
+2. **Observe silently** — Let them interact without guidance. Resist the urge to help when they struggle; their struggle is data.
+3. **Ask open questions** — "What were you thinking when you clicked there?" "Why did you try that approach?" "What would you do next?" These questions reveal their mental model, not just their actions.
+4. **Probe deeper** — "Tell me more about that" when something interesting happens.
+5. **Identify blockers** — Note where they got stuck, confused, or frustrated. These are design opportunities.
+
+**Never defend the design.** When a tester says "This button is confusing," don't explain why you designed it that way. Their confusion is feedback, not criticism.
+
+Record sessions (with permission) so you can review them later and spot details you missed in the moment. Watch for non-verbal cues: hesitation, frustration, delight. These moments reveal authentic reactions.
+
+## Analyzing Patterns: From Observations to Insights
+
+After testing all 5 participants, you'll have pages of notes and video recordings. Look for **patterns**:
+
+- **Consensus problems** — All 5 users struggled with the same task. This is a clear design issue.
+- **Segment-specific problems** — Three power users breezed through; two new users were confused. This suggests you need better onboarding or progressive disclosure.
+- **Delights** — Where did users smile, nod in satisfaction, or express surprise positively? Amplify those.
+- **Unexpected uses** — Did users try to accomplish the task differently than you expected? Maybe your mental model differs from theirs.
+
+Avoid over-generalizing from small sample sizes. "All users wanted X" from 5 people means "these 5 people wanted X"—it's insightful but not statistical proof. Quantitative research with larger samples provides different insight.
+
+Quote users directly in your report. "When I saw the modal pop up, I thought I was supposed to fill it out before I could continue" is more compelling than "Users found the modal jarring."
+
+## From Testing to Iteration
+
+Testing insights fuel the next cycle. Did testing validate your direction? Great—move forward with confidence. Did it reveal fundamental issues? Pivot. Did it surface specific problems with solutions? Iterate.
+
+Common outcomes:
+
+- **"This direction works; let's refine details"** — Move to higher-fidelity design and development.
+- **"The core concept doesn't resonate"** — Run another design sprint exploring alternatives.
+- **"They don't understand this feature"** — Redesign onboarding or simplify the feature itself.
+- **"Everyone wants Feature X, not Feature Y"** — Adjust priorities; rebalance development resources.
+
+The speed of this cycle is your competitive advantage. While competitors debate for months, you've tested with users and already refined your approach.
+
+### Try It Yourself
+
+1. **Build a quick prototype** — Using Figma or paper, create a low-fidelity prototype of a task: signing up, searching, or checking out. Aim for 30 minutes of work—rough is fine.
+2. **Write a test script** — Draft 4-5 tasks for testers and 5-6 open-ended questions about their experience.
+3. **Test with one person** — Recruit a friend or colleague matching your target user. Conduct a 30-minute session, asking them to complete tasks while narrating their thinking.
+4. **Identify patterns** — What confused them? What delighted them? What would you change based on this one test?
+
+> **Pro Tip:** The first test always generates the most insights. You'll feel tempted to make changes between Test 1 and Test 2. Resist. Test all 5 first, then analyze patterns together. Individual quirks from Test 1 often don't represent real problems—run at least three tests before making changes.`,
           suggestedResources: [
             {
               title: "Prototyping Techniques",
@@ -1569,6 +3271,103 @@ const tsCurriculum: Curriculum = {
             "Generic functions infer types automatically in most cases",
             "Default type parameters provide fallback types: <T = string>",
           ],
+          content: `# Generics and Type Constraints
+
+**Generics** are one of TypeScript's most powerful features, allowing you to write flexible, reusable code while maintaining strict type safety. Instead of writing the same function multiple times for different types, generics let you create a single implementation that works across many types.
+
+## Understanding Type Parameters
+
+Think of a generic type parameter like a placeholder for a real type that will be specified later. The most common type parameter is \`<T>\` (short for "Type"), but you can use any name:
+
+\`\`\`typescript
+function identity<T>(value: T): T {
+  return value;
+}
+
+// TypeScript infers the type from the argument
+const str = identity("hello");      // T is string
+const num = identity(42);           // T is number
+const bool = identity(true);        // T is boolean
+\`\`\`
+
+You can have multiple type parameters:
+
+\`\`\`typescript
+function pair<K, V>(key: K, value: V): [K, V] {
+  return [key, value];
+}
+
+const result = pair("age", 25);  // [string, number]
+\`\`\`
+
+## Type Constraints
+
+Without constraints, generic types can be too broad and lose type safety. **Constraints** narrow what types are acceptable:
+
+\`\`\`typescript
+// Constrain T to types that have a length property
+function getLength<T extends { length: number }>(value: T): number {
+  return value.length;
+}
+
+getLength("hello");        // OK: string has length
+getLength([1, 2, 3]);      // OK: array has length
+getLength(42);             // ERROR: number doesn't have length
+
+// Constrain T to string types only
+function toUpperCase<T extends string>(value: T): T {
+  return value.toUpperCase() as T;
+}
+\`\`\`
+
+## Generic Classes and Interfaces
+
+Generics shine in data structures and API designs:
+
+\`\`\`typescript
+class Stack<T> {
+  private items: T[] = [];
+
+  push(item: T): void {
+    this.items.push(item);
+  }
+
+  pop(): T | undefined {
+    return this.items.pop();
+  }
+
+  peek(): T | undefined {
+    return this.items[this.items.length - 1];
+  }
+}
+
+interface Repository<T> {
+  findById(id: string): Promise<T | null>;
+  save(item: T): Promise<void>;
+  delete(id: string): Promise<void>;
+}
+\`\`\`
+
+## Default Type Parameters
+
+Just like function parameters, type parameters can have defaults:
+
+\`\`\`typescript
+// Default T to string if not specified
+function log<T = string>(value: T): void {
+  console.log(value);
+}
+
+log("hello");        // T is string
+log<number>(42);     // T is number
+\`\`\`
+
+### Try It Yourself
+
+Create a generic \`FilterList\` function that takes an array of type \`T\` and a predicate function, returning only items that match. Then test it with different types (numbers, strings, objects).
+
+> **Pro Tip:** Use meaningful type parameter names! While \`T\` is standard, use \`K\` for keys, \`V\` for values, \`Item\` for array items, etc. This makes generic code much more readable. Also, **always constrain your generics** — unconstrained generics often hide bugs and make code harder to understand.
+`,
           suggestedResources: [
             {
               title: "Generics — TypeScript Handbook",
@@ -1601,6 +3400,132 @@ const tsCurriculum: Curriculum = {
             "Utility types (Pick, Omit, Record) are implemented using mapped types",
             "Combining conditional and mapped types solves complex typing challenges",
           ],
+          content: `# Conditional and Mapped Types
+
+**Conditional types** and **mapped types** are advanced TypeScript features that enable powerful type transformations. They let you create types that change based on conditions or transform object structures dynamically.
+
+## Conditional Types
+
+Conditional types use ternary syntax to create types that behave differently based on what they're applied to:
+
+\`\`\`typescript
+type IsString<T> = T extends string ? true : false;
+
+type A = IsString<"hello">;     // true
+type B = IsString<number>;      // false
+\`\`\`
+
+This is especially powerful for creating utility types:
+
+\`\`\`typescript
+type Flatten<T> = T extends Array<infer U> ? U : T;
+
+type Str = Flatten<string[]>;    // string
+type Num = Flatten<number>;      // number
+\`\`\`
+
+The \`infer\` keyword extracts types from complex structures:
+
+\`\`\`typescript
+// Extract the promise value type
+type Awaited<T> = T extends Promise<infer U> ? U : T;
+
+type Result = Awaited<Promise<string>>;  // string
+
+// Extract function return type
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+type Fn = (x: number) => string;
+type FnReturn = ReturnType<Fn>;  // string
+\`\`\`
+
+## Distributive Conditional Types
+
+When you apply conditional types to unions, TypeScript distributes the type over each member:
+
+\`\`\`typescript
+type ToArray<T> = T extends any ? T[] : never;
+
+// With union: applied to each member
+type StrOrNum = ToArray<string | number>;  
+// Result: string[] | number[]
+
+// This is useful for filtering unions
+type Flatten<T> = T extends Array<infer U> ? U : T;
+type Mixed = Flatten<string | number[]>;   // string | number
+\`\`\`
+
+## Mapped Types
+
+**Mapped types** let you create new object types by transforming the properties of existing types:
+
+\`\`\`typescript
+// Make all properties optional
+type Optional<T> = {
+  [K in keyof T]?: T[K];
+};
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+type OptionalUser = Optional<User>;
+// { id?: number; name?: string; email?: string }
+\`\`\`
+
+Real-world mapped type examples:
+
+\`\`\`typescript
+// Make all properties readonly
+type ReadOnly<T> = {
+  readonly [K in keyof T]: T[K];
+};
+
+// Get all properties as getters
+type Getters<T> = {
+  [K in keyof T as \`get\${Capitalize<string & K>}\`]: () => T[K];
+};
+
+type Person = { name: string; age: number };
+type PersonGetters = Getters<Person>;
+// { getName: () => string; getAge: () => number }
+
+// Extract only properties of a certain type
+type StringPropertiesOnly<T> = {
+  [K in keyof T as T[K] extends string ? K : never]: T[K];
+};
+\`\`\`
+
+## Combining Conditional and Mapped Types
+
+Together, they solve complex typing problems:
+
+\`\`\`typescript
+// Type-safe event emitter
+type Events = {
+  click: { x: number; y: number };
+  submit: { data: string };
+};
+
+type EventHandlers<T> = {
+  [K in keyof T]: (event: T[K]) => void;
+};
+
+const handlers: EventHandlers<Events> = {
+  click: (e) => console.log(e.x),      // OK
+  submit: (e) => console.log(e.data),  // OK
+  // missing: (e) => {},               // ERROR!
+};
+\`\`\`
+
+### Try It Yourself
+
+Create a \`Readonly\` mapped type that makes all properties immutable, then create a \`Mutable\` type that removes \`readonly\`. Test both on a complex object type.
+
+> **Pro Tip:** Mapped types are the foundation of TypeScript's utility types like \`Partial\`, \`Required\`, \`Readonly\`, and \`Record\`. Understanding how they work helps you build powerful domain-specific types. Use \`as\` clauses to rename keys during mapping—this unlocks incredible flexibility!
+`,
           suggestedResources: [
             {
               title: "Conditional Types — TypeScript Handbook",
@@ -1633,6 +3558,156 @@ const tsCurriculum: Curriculum = {
             "Partial<T>, Required<T>, Readonly<T> modify object types",
             "Record<K, V>, Pick<T, K>, Omit<T, K> select and reshape object types",
           ],
+          content: `# Type Inference and Utility Types
+
+**Type inference** allows TypeScript to automatically determine types without explicit annotations, reducing boilerplate while maintaining type safety. **Utility types** are built-in generic types that transform other types in useful ways.
+
+## How Type Inference Works
+
+TypeScript's type inference system is remarkably sophisticated. It analyzes context to determine the intended type:
+
+\`\`\`typescript
+// Simple inference
+let x = 42;           // x is number
+let name = "Alice";   // name is string
+let active = true;    // active is boolean
+
+// Inference from function return
+function add(a: number, b: number) {
+  return a + b;       // inferred as number
+}
+
+const result = add(1, 2);  // result is number
+
+// Inference from array contents
+const numbers = [1, 2, 3];           // number[]
+const mixed = [1, "two", true];      // (number | string | boolean)[]
+\`\`\`
+
+Contextual inference helps with callbacks and complex scenarios:
+
+\`\`\`typescript
+const users = [
+  { id: 1, name: "Alice" },
+  { id: 2, name: "Bob" },
+];
+
+users.forEach(user => {
+  // user is inferred as { id: number; name: string }
+  console.log(user.id);
+});
+\`\`\`
+
+## The as const Assertion
+
+The \`as const\` assertion tells TypeScript to treat a value as a literal type, enabling powerful patterns:
+
+\`\`\`typescript
+// Without as const: "north" | "south" | "east" | "west"
+const direction = "north" as const;
+
+// Create a readonly tuple
+const coords = [10, 20] as const;  // readonly [10, 20]
+
+// Perfect for literal type switches
+const themeColors = {
+  light: "#ffffff" as const,
+  dark: "#000000" as const,
+} as const;
+
+type ThemeName = keyof typeof themeColors;  // "light" | "dark"
+\`\`\`
+
+## typeof and keyof Operators
+
+Extract types from values and objects:
+
+\`\`\`typescript
+const person = {
+  name: "Alice",
+  age: 30,
+  email: "alice@example.com",
+};
+
+type PersonType = typeof person;
+// { name: string; age: number; email: string }
+
+type PersonKeys = keyof typeof person;  // "name" | "age" | "email"
+
+// Use in generic constraints
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+const name = getProperty(person, "name");  // string
+\`\`\`
+
+## Essential Utility Types
+
+### Object Modification Utilities
+
+\`\`\`typescript
+interface Task {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+// Partial<T> — all properties optional
+type PartialTask = Partial<Task>;
+// { id?: number; title?: string; completed?: boolean }
+
+// Required<T> — all properties required
+type RequiredTask = Required<PartialTask>;
+
+// Readonly<T> — all properties immutable
+type ReadonlyTask = Readonly<Task>;
+
+// Pick<T, K> — select specific properties
+type TaskPreview = Pick<Task, "id" | "title">;
+// { id: number; title: string }
+
+// Omit<T, K> — exclude specific properties
+type TaskUpdate = Omit<Task, "id">;
+// { title: string; completed: boolean }
+\`\`\`
+
+### Type Selection and Transformation
+
+\`\`\`typescript
+// Record<K, V> — create an object with specific keys
+type RolePermissions = Record<"admin" | "user" | "guest", string[]>;
+// { admin: string[]; user: string[]; guest: string[] }
+
+// Extract<T, U> — get types that match a condition
+type StringOrBool = string | number | boolean;
+type Strings = Extract<StringOrBool, string>;  // string
+
+// Exclude<T, U> — remove types that match
+type NotBool = Exclude<StringOrBool, boolean>;  // string | number
+\`\`\`
+
+### Function and Promise Utilities
+
+\`\`\`typescript
+type MyFunction = (a: string, b: number) => boolean;
+
+// ReturnType<T> — extract return type
+type FnReturn = ReturnType<MyFunction>;  // boolean
+
+// Parameters<T> — extract parameter types
+type FnParams = Parameters<MyFunction>;  // [a: string, b: number]
+
+// Awaited<T> — unwrap Promise
+type PromiseValue = Awaited<Promise<string>>;  // string
+\`\`\`
+
+### Try It Yourself
+
+Create a type \`DeepPartial<T>\` that makes all properties optional recursively (including nested objects). Test it on a complex nested type structure.
+
+> **Pro Tip:** Leverage type inference to reduce type annotations—let TypeScript do the work! Use \`as const\` when you need precise literal types. Utility types are powerful but can make code hard to follow, so document complex type transformations with comments. TypeScript Playground is your friend for experimenting with these patterns!
+`,
           suggestedResources: [
             {
               title: "Type Inference — TypeScript Handbook",
@@ -1698,6 +3773,168 @@ const tsCurriculum: Curriculum = {
             "Enables easy mocking for unit testing and alternative implementations",
             "Popular TypeScript DI libraries: InversifyJS, Awilix, TypeDI",
           ],
+          content: `# Dependency Injection and IoC Containers
+
+**Dependency Injection (DI)** is a design pattern that improves code maintainability, testability, and flexibility by decoupling components. Instead of classes creating their dependencies, dependencies are **provided** (injected) from outside.
+
+## The Problem With Hardcoded Dependencies
+
+Without DI, classes create their own dependencies, which creates tight coupling:
+
+\`\`\`typescript
+class UserService {
+  private emailService: EmailService;
+
+  constructor() {
+    // Hard-coded dependency - can't use alternative implementations
+    this.emailService = new EmailService();
+  }
+
+  createUser(email: string) {
+    this.emailService.sendWelcomeEmail(email);
+  }
+}
+
+// Testing is difficult - always uses real EmailService
+const service = new UserService();
+\`\`\`
+
+Problems:
+- Can't swap implementations for testing
+- Can't use different configurations
+- Hard to understand what a class needs
+- Changes to dependencies ripple through code
+
+## Constructor Injection
+
+The simplest form of DI: pass dependencies as constructor parameters:
+
+\`\`\`typescript
+interface EmailService {
+  sendWelcomeEmail(email: string): Promise<void>;
+}
+
+class UserService {
+  constructor(private emailService: EmailService) {}
+
+  async createUser(email: string) {
+    await this.emailService.sendWelcomeEmail(email);
+  }
+}
+
+// Production: use real service
+const emailService = new RealEmailService();
+const userService = new UserService(emailService);
+
+// Testing: use mock
+class MockEmailService implements EmailService {
+  async sendWelcomeEmail(email: string) {
+    console.log(\`Mock: would send email to \${email}\`);
+  }
+}
+
+const mockService = new UserService(new MockEmailService());
+\`\`\`
+
+## Inversion of Control (IoC) Containers
+
+As applications grow, manually managing dependencies becomes unwieldy. **IoC containers** automate this:
+
+\`\`\`typescript
+// With InversifyJS
+import { Container, injectable, inject } from "inversify";
+
+const TYPES = {
+  EmailService: Symbol.for("EmailService"),
+  UserService: Symbol.for("UserService"),
+};
+
+@injectable()
+class EmailService {
+  async send(to: string, subject: string, body: string) {
+    console.log(\`Sending \${subject} to \${to}\`);
+  }
+}
+
+@injectable()
+class UserService {
+  constructor(@inject(TYPES.EmailService) private email: EmailService) {}
+
+  async createUser(email: string) {
+    await this.email.send(email, "Welcome", "Welcome to our app!");
+  }
+}
+
+// Setup the container
+const container = new Container();
+container.bind(TYPES.EmailService).to(EmailService);
+container.bind(TYPES.UserService).to(UserService);
+
+// The container resolves all dependencies automatically
+const userService = container.get<UserService>(TYPES.UserService);
+await userService.createUser("user@example.com");
+\`\`\`
+
+## Benefits in Action
+
+### Easy Testing
+
+\`\`\`typescript
+@injectable()
+class OrderService {
+  constructor(
+    @inject(TYPES.PaymentGateway) private payment: PaymentGateway,
+    @inject(TYPES.EmailService) private email: EmailService
+  ) {}
+
+  async processOrder(orderId: string) {
+    const result = await this.payment.charge(orderId);
+    await this.email.sendConfirmation(orderId);
+    return result;
+  }
+}
+
+// In tests: inject mocks
+class MockPayment implements PaymentGateway {
+  async charge(orderId: string) {
+    return { success: true, transactionId: "test-123" };
+  }
+}
+
+const testContainer = new Container();
+testContainer.bind(TYPES.PaymentGateway).to(MockPayment);
+testContainer.bind(TYPES.EmailService).to(MockEmail);
+
+const service = testContainer.get<OrderService>(TYPES.OrderService);
+// Now you can test without hitting real APIs
+\`\`\`
+
+### Different Implementations
+
+\`\`\`typescript
+// Switch implementations without changing code
+if (process.env.NODE_ENV === "production") {
+  container.bind(TYPES.CacheService).to(RedisCacheService);
+  container.bind(TYPES.Database).to(PostgresDatabase);
+} else {
+  container.bind(TYPES.CacheService).to(InMemoryCacheService);
+  container.bind(TYPES.Database).to(MockDatabase);
+}
+\`\`\`
+
+## Popular TypeScript DI Libraries
+
+- **InversifyJS**: Powerful, decorator-based, great for large applications
+- **Awilix**: Simple, lightweight, functional style
+- **TypeDI**: Microsoft-endorsed, integrates well with TypeORM
+- **tsyringe**: Microsoft's dependency injection library
+
+### Try It Yourself
+
+Refactor a tightly coupled class that creates its own dependencies. Extract the dependencies into interfaces, add constructor injection, and write unit tests that use mock implementations.
+
+> **Pro Tip:** Always depend on **abstractions (interfaces), not concrete implementations**. This is the Dependency Inversion Principle from SOLID. Use IoC containers for complex applications, but for simpler projects, manual constructor injection can be sufficient and easier to understand. In tests, you often don't need a container—just instantiate with mocks directly!
+`,
           suggestedResources: [
             {
               title: "Dependency Injection in TypeScript",
@@ -1730,6 +3967,277 @@ const tsCurriculum: Curriculum = {
             "Interface Segregation: clients should depend on specific, focused interfaces",
             "Dependency Inversion: depend on abstractions, not concrete implementations",
           ],
+          content: `# SOLID Principles in TypeScript
+
+**SOLID** is an acronym for five principles that make code more maintainable, flexible, and testable. When applied consistently, SOLID principles result in systems that are easier to extend, test, and modify.
+
+## Single Responsibility Principle (SRP)
+
+Each class should have **one and only one reason to change**. A class should have a single responsibility.
+
+### Violation Example
+
+\`\`\`typescript
+// BAD: UserManager handles too much
+class UserManager {
+  createUser(name: string, email: string) {
+    // Validate email format
+    if (!email.includes("@")) throw new Error("Invalid email");
+    
+    // Save to database
+    const user = { id: Date.now(), name, email };
+    this.saveToDatabase(user);
+    
+    // Send email
+    this.sendWelcomeEmail(email);
+    
+    // Log activity
+    console.log(\`User created: \${name}\`);
+  }
+
+  private saveToDatabase(user: any) { /* ... */ }
+  private sendWelcomeEmail(email: string) { /* ... */ }
+}
+\`\`\`
+
+### Better Approach
+
+\`\`\`typescript
+// GOOD: Each class has one responsibility
+interface EmailValidator {
+  validate(email: string): boolean;
+}
+
+interface UserRepository {
+  save(user: User): Promise<void>;
+}
+
+interface NotificationService {
+  sendWelcomeEmail(email: string): Promise<void>;
+}
+
+@injectable()
+class UserCreationService {
+  constructor(
+    private emailValidator: EmailValidator,
+    private userRepository: UserRepository,
+    private notificationService: NotificationService
+  ) {}
+
+  async createUser(name: string, email: string) {
+    if (!this.emailValidator.validate(email)) {
+      throw new Error("Invalid email");
+    }
+
+    const user = new User(name, email);
+    await this.userRepository.save(user);
+    await this.notificationService.sendWelcomeEmail(email);
+  }
+}
+\`\`\`
+
+## Open/Closed Principle (OCP)
+
+Classes should be **open for extension** but **closed for modification**. Add new behavior without changing existing code.
+
+### Violation Example
+
+\`\`\`typescript
+// BAD: Must modify for each new discount type
+class PricingCalculator {
+  calculatePrice(amount: number, customerType: string): number {
+    if (customerType === "gold") return amount * 0.9;
+    if (customerType === "silver") return amount * 0.95;
+    if (customerType === "bronze") return amount * 0.98;
+    return amount;
+  }
+}
+\`\`\`
+
+### Better Approach
+
+\`\`\`typescript
+// GOOD: Extend through composition, not modification
+interface DiscountStrategy {
+  apply(amount: number): number;
+}
+
+class GoldCustomerDiscount implements DiscountStrategy {
+  apply(amount: number): number {
+    return amount * 0.9;
+  }
+}
+
+class SilverCustomerDiscount implements DiscountStrategy {
+  apply(amount: number): number {
+    return amount * 0.95;
+  }
+
+// Add new discounts without modifying existing code
+class PlatinumCustomerDiscount implements DiscountStrategy {
+  apply(amount: number): number {
+    return amount * 0.85;
+  }
+}
+
+class PricingCalculator {
+  constructor(private discountStrategy: DiscountStrategy) {}
+
+  calculatePrice(amount: number): number {
+    return this.discountStrategy.apply(amount);
+  }
+}
+\`\`\`
+
+## Liskov Substitution Principle (LSP)
+
+**Subtypes must be substitutable for their base types**. If \`S\` is a subtype of \`T\`, you should be able to use \`S\` wherever \`T\` is expected.
+
+### Violation Example
+
+\`\`\`typescript
+// BAD: Square violates Rectangle's contract
+class Rectangle {
+  setWidth(w: number) { this.width = w; }
+  setHeight(h: number) { this.height = h; }
+  area(): number { return this.width * this.height; }
+}
+
+class Square extends Rectangle {
+  setWidth(w: number) { this.width = w; this.height = w; }  // Forces both
+  setHeight(h: number) { this.width = h; this.height = h; }
+}
+
+// This breaks with Square!
+function testRectangle(rect: Rectangle) {
+  rect.setWidth(5);
+  rect.setHeight(10);
+  console.assert(rect.area() === 50); // Fails for Square!
+}
+\`\`\`
+
+### Better Approach
+
+\`\`\`typescript
+// GOOD: Separate interfaces, no forced inheritance
+interface Shape {
+  area(): number;
+}
+
+class Rectangle implements Shape {
+  constructor(private width: number, private height: number) {}
+  area(): number { return this.width * this.height; }
+}
+
+class Square implements Shape {
+  constructor(private side: number) {}
+  area(): number { return this.side * this.side; }
+}
+\`\`\`
+
+## Interface Segregation Principle (ISP)
+
+Clients should depend on **specific, focused interfaces**, not broad, general-purpose ones.
+
+### Violation Example
+
+\`\`\`typescript
+// BAD: Fat interface forces implementations to do too much
+interface Worker {
+  work(): void;
+  eat(): void;
+  sleep(): void;
+  code(): void;
+  debug(): void;
+}
+
+class Robot implements Worker {
+  work() { /* ... */ }
+  eat() { /* Robots don't eat! */ }
+  sleep() { /* Robots don't sleep! */ }
+  code() { /* ... */ }
+  debug() { /* ... */ }
+}
+\`\`\`
+
+### Better Approach
+
+\`\`\`typescript
+// GOOD: Segregated, focused interfaces
+interface Workable {
+  work(): void;
+}
+
+interface Eatable {
+  eat(): void;
+}
+
+interface Debuggable {
+  debug(): void;
+}
+
+class Developer implements Workable, Eatable, Debuggable {
+  work() { console.log("Coding..."); }
+  eat() { console.log("Eating lunch..."); }
+  debug() { console.log("Finding bugs..."); }
+}
+
+class Robot implements Workable, Debuggable {
+  work() { console.log("Processing..."); }
+  debug() { console.log("Checking logs..."); }
+  // No need to implement Eatable
+}
+\`\`\`
+
+## Dependency Inversion Principle (DIP)
+
+**High-level modules should not depend on low-level modules.** Both should depend on abstractions.
+
+### Violation Example
+
+\`\`\`typescript
+// BAD: High-level depends on low-level concrete class
+class PaymentService {
+  constructor(private stripe: StripeGateway) {} // Concrete dependency
+  
+  processPayment(amount: number) {
+    return this.stripe.charge(amount);
+  }
+}
+\`\`\`
+
+### Better Approach
+
+\`\`\`typescript
+// GOOD: Both depend on abstraction
+interface PaymentGateway {
+  charge(amount: number): Promise<{ success: boolean }>;
+}
+
+class PaymentService {
+  constructor(private gateway: PaymentGateway) {} // Abstraction
+  
+  processPayment(amount: number) {
+    return this.gateway.charge(amount);
+  }
+}
+
+// Can use any implementation
+class StripeGateway implements PaymentGateway {
+  async charge(amount: number) { /* ... */ }
+}
+
+class PayPalGateway implements PaymentGateway {
+  async charge(amount: number) { /* ... */ }
+}
+\`\`\`
+
+### Try It Yourself
+
+Take a large, complex class and refactor it to follow SOLID principles. Extract responsibilities into separate classes, use interfaces, and apply dependency injection.
+
+> **Pro Tip:** SOLID principles aren't absolute rules—they're guidelines. Over-applying them can lead to over-engineering. Start with SRP and DIP as they provide the most immediate value. Use the "reason to change" test: if you can think of multiple reasons a class might need to change, it probably violates SRP!
+`,
           suggestedResources: [
             {
               title: "SOLID Principles — Robert C. Martin",
@@ -1762,6 +4270,265 @@ const tsCurriculum: Curriculum = {
             "Fluent interface: builder methods return 'this' for method chaining",
             "Both patterns reduce coupling and improve testability",
           ],
+          content: `# Creational Patterns: Factory and Builder
+
+**Creational patterns** address how objects are instantiated. The **Factory** and **Builder** patterns provide flexible, maintainable ways to create objects, especially when construction is complex or varies by context.
+
+## Factory Pattern
+
+The **Factory Pattern** encapsulates object creation logic, allowing clients to create objects without knowing the specific classes.
+
+### Simple Factory
+
+\`\`\`typescript
+interface Database {
+  connect(): Promise<void>;
+  query(sql: string): Promise<any[]>;
+}
+
+class PostgresDatabase implements Database {
+  async connect() { console.log("Connecting to Postgres..."); }
+  async query(sql: string) { return []; }
+}
+
+class MongoDatabase implements Database {
+  async connect() { console.log("Connecting to MongoDB..."); }
+  async query(sql: string) { return []; }
+}
+
+// Factory function
+function createDatabase(type: "postgres" | "mongo"): Database {
+  switch (type) {
+    case "postgres":
+      return new PostgresDatabase();
+    case "mongo":
+      return new MongoDatabase();
+    default:
+      throw new Error(\`Unknown database type: \${type}\`);
+  }
+}
+
+// Usage: clients don't know which class is instantiated
+const db = createDatabase(process.env.DB_TYPE);
+await db.connect();
+\`\`\`
+
+### Abstract Factory
+
+For creating **families of related objects**:
+
+\`\`\`typescript
+// UI components for different themes
+interface Button {
+  render(): string;
+}
+
+interface Checkbox {
+  render(): string;
+}
+
+// Dark theme family
+class DarkButton implements Button {
+  render() { return '<button style="background: #333">'; }
+}
+
+class DarkCheckbox implements Checkbox {
+  render() { return '<input type="checkbox" style="color: #fff">'; }
+}
+
+// Light theme family
+class LightButton implements Button {
+  render() { return '<button style="background: #fff">'; }
+}
+
+class LightCheckbox implements Checkbox {
+  render() { return '<input type="checkbox" style="color: #000">'; }
+}
+
+// Abstract factory interface
+interface UIFactory {
+  createButton(): Button;
+  createCheckbox(): Checkbox;
+}
+
+class DarkThemeFactory implements UIFactory {
+  createButton() { return new DarkButton(); }
+  createCheckbox() { return new DarkCheckbox(); }
+}
+
+class LightThemeFactory implements UIFactory {
+  createButton() { return new LightButton(); }
+  createCheckbox() { return new LightCheckbox(); }
+}
+
+// Client code uses factory without knowing concrete classes
+function renderForm(factory: UIFactory) {
+  const button = factory.createButton();
+  const checkbox = factory.createCheckbox();
+  return button.render() + checkbox.render();
+}
+
+const theme = process.env.THEME === "dark" ? new DarkThemeFactory() : new LightThemeFactory();
+const form = renderForm(theme);
+\`\`\`
+
+### Benefits
+
+- Encapsulates object creation logic
+- Easy to swap implementations
+- Simple to test with factory mocks
+- Decouples client code from concrete classes
+
+## Builder Pattern
+
+The **Builder Pattern** handles object construction when:
+- Objects have many optional parameters
+- Construction has multiple steps
+- You want readable, fluent API
+
+### Without Builder (Problem)
+
+\`\`\`typescript
+// Too many overloads or unclear parameters
+class SqlQuery {
+  constructor(
+    select: string,
+    from: string,
+    where?: string,
+    orderBy?: string,
+    limit?: number,
+    offset?: number,
+    distinct?: boolean,
+    groupBy?: string
+  ) { /* ... */ }
+}
+
+// Unclear what parameters mean
+const query = new SqlQuery("*", "users", "age > 18", undefined, 10, 0, true);
+\`\`\`
+
+### With Builder (Solution)
+
+\`\`\`typescript
+class SqlQueryBuilder {
+  private select: string = "*";
+  private from: string = "";
+  private where?: string;
+  private orderBy?: string;
+  private limit?: number;
+  private offset?: number;
+  private distinct: boolean = false;
+  private groupBy?: string;
+
+  // Fluent interface: methods return 'this'
+  setSelect(columns: string) {
+    this.select = columns;
+    return this;
+  }
+
+  setFrom(table: string) {
+    this.from = table;
+    return this;
+  }
+
+  setWhere(condition: string) {
+    this.where = condition;
+    return this;
+  }
+
+  setOrderBy(order: string) {
+    this.orderBy = order;
+    return this;
+  }
+
+  setLimit(limit: number) {
+    this.limit = limit;
+    return this;
+  }
+
+  setOffset(offset: number) {
+    this.offset = offset;
+    return this;
+  }
+
+  setDistinct(distinct: boolean) {
+    this.distinct = distinct;
+    return this;
+  }
+
+  setGroupBy(columns: string) {
+    this.groupBy = columns;
+    return this;
+  }
+
+  build(): string {
+    let query = \`SELECT \`;
+    if (this.distinct) query += "DISTINCT ";
+    query += \`\${this.select} FROM \${this.from}\`;
+    if (this.where) query += \` WHERE \${this.where}\`;
+    if (this.groupBy) query += \` GROUP BY \${this.groupBy}\`;
+    if (this.orderBy) query += \` ORDER BY \${this.orderBy}\`;
+    if (this.limit) query += \` LIMIT \${this.limit}\`;
+    if (this.offset) query += \` OFFSET \${this.offset}\`;
+    return query;
+  }
+}
+
+// Usage: clear, readable, chainable
+const query = new SqlQueryBuilder()
+  .setSelect("id, name, email")
+  .setFrom("users")
+  .setWhere("age > 18")
+  .setDistinct(true)
+  .setOrderBy("name ASC")
+  .setLimit(10)
+  .build();
+\`\`\`
+
+### Real-World Example: Request Builder
+
+\`\`\`typescript
+class HttpRequestBuilder {
+  private url: string = "";
+  private method: string = "GET";
+  private headers: Record<string, string> = {};
+  private body?: any;
+  private timeout: number = 30000;
+
+  setUrl(url: string) { this.url = url; return this; }
+  setMethod(method: "GET" | "POST" | "PUT" | "DELETE") { this.method = method; return this; }
+  addHeader(key: string, value: string) { this.headers[key] = value; return this; }
+  setBody(body: any) { this.body = body; return this; }
+  setTimeout(ms: number) { this.timeout = ms; return this; }
+
+  build() {
+    return {
+      url: this.url,
+      method: this.method,
+      headers: this.headers,
+      body: this.body,
+      timeout: this.timeout,
+    };
+  }
+}
+
+// Usage: fluent and clear intent
+const request = new HttpRequestBuilder()
+  .setUrl("https://api.example.com/users")
+  .setMethod("POST")
+  .addHeader("Content-Type", "application/json")
+  .addHeader("Authorization", "Bearer token123")
+  .setBody({ name: "Alice", email: "alice@example.com" })
+  .setTimeout(5000)
+  .build();
+\`\`\`
+
+### Try It Yourself
+
+Create a \`ReportBuilder\` that constructs reports with various sections (title, summary, tables, charts). Use fluent interface for clear, chainable API.
+
+> **Pro Tip:** Use Builder for any complex object with multiple optional parameters. The fluent interface makes code incredibly readable—it reads almost like natural language. TypeScript's method chaining (returning \`this\`) combined with proper typing makes builders incredibly powerful and safe!
+`,
           suggestedResources: [
             {
               title: "Factory Pattern Examples",
@@ -1826,6 +4593,289 @@ const tsCurriculum: Curriculum = {
             "Logging and monitoring track errors in production",
             "Distinguish recoverable errors from fatal errors requiring immediate handling",
           ],
+          content: `# Error Handling Strategies
+
+Robust error handling is critical for production applications. **Effective error handling** requires strategy: knowing when to throw, when to catch, and what information to provide.
+
+## Custom Error Classes
+
+Create specific error types for different failure scenarios:
+
+\`\`\`typescript
+// Base custom error class
+class ApplicationError extends Error {
+  public readonly timestamp: Date;
+  public readonly context?: Record<string, any>;
+
+  constructor(
+    message: string,
+    public readonly code: string,
+    context?: Record<string, any>
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+    this.timestamp = new Date();
+    this.context = context;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+// Domain-specific errors
+class ValidationError extends ApplicationError {
+  constructor(message: string, context?: Record<string, any>) {
+    super(message, "VALIDATION_ERROR", context);
+  }
+}
+
+class NotFoundError extends ApplicationError {
+  constructor(resource: string, id: string) {
+    super(
+      \`\${resource} with id \${id} not found\`,
+      "NOT_FOUND",
+      { resource, id }
+    );
+  }
+}
+
+class DatabaseError extends ApplicationError {
+  constructor(message: string, context?: Record<string, any>) {
+    super(message, "DATABASE_ERROR", context);
+  }
+}
+
+class AuthenticationError extends ApplicationError {
+  constructor(message: string = "Authentication failed") {
+    super(message, "AUTH_ERROR");
+  }
+}
+\`\`\`
+
+## Throwing Errors with Context
+
+Always provide enough context to understand and debug failures:
+
+\`\`\`typescript
+async function fetchUser(userId: string) {
+  try {
+    const response = await fetch(\`/api/users/\${userId}\`);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new NotFoundError("User", userId);
+      }
+      throw new ApplicationError(
+        "Failed to fetch user",
+        "FETCH_ERROR",
+        { status: response.status, userId }
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof ApplicationError) {
+      throw error; // Re-throw known errors
+    }
+
+    // Wrap unknown errors with context
+    throw new ApplicationError(
+      "Unexpected error fetching user",
+      "UNKNOWN_ERROR",
+      { userId, originalError: error }
+    );
+  }
+}
+\`\`\`
+
+## Catching and Handling Specific Errors
+
+Handle different error types differently:
+
+\`\`\`typescript
+async function updateUser(userId: string, updates: UserUpdate) {
+  try {
+    // Validate input
+    if (!updates.email && !updates.name) {
+      throw new ValidationError(
+        "At least one field must be provided",
+        { providedFields: Object.keys(updates) }
+      );
+    }
+
+    await fetchUser(userId); // Ensure user exists
+    return await saveUserUpdates(userId, updates);
+
+  } catch (error) {
+    // Handle specific error types
+    if (error instanceof NotFoundError) {
+      console.error(\`User not found: \${error.message}\`);
+      // Handle not found gracefully
+      return { success: false, reason: "user_not_found" };
+    }
+
+    if (error instanceof ValidationError) {
+      console.error(\`Validation failed: \${error.message}\`);
+      return { success: false, reason: "validation_failed", details: error.context };
+    }
+
+    if (error instanceof ApplicationError) {
+      // Log with full context for debugging
+      logger.error({
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        context: error.context,
+        timestamp: error.timestamp,
+        stack: error.stack,
+      });
+      
+      // Respond appropriately
+      throw new ApplicationError(
+        "Operation failed",
+        "UPDATE_FAILED",
+        { userId }
+      );
+    }
+
+    // Unexpected error
+    logger.error({ error, userId });
+    throw error;
+  }
+}
+\`\`\`
+
+## Error Boundaries (Frontend)
+
+In React, error boundaries prevent a single component failure from crashing the app:
+
+\`\`\`typescript
+interface Props {
+  children: React.ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+}
+
+class ErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Log to monitoring service
+    logger.error({
+      error: error.message,
+      componentStack: errorInfo.componentStack,
+    });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="error-fallback">
+          <h2>Something went wrong</h2>
+          <p>{this.state.error?.message}</p>
+          <button onClick={() => window.location.reload()}>
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Usage
+<ErrorBoundary>
+  <UserProfile userId="123" />
+</ErrorBoundary>
+\`\`\`
+
+## Logging and Monitoring
+
+Capture errors with sufficient context for production debugging:
+
+\`\`\`typescript
+interface ErrorLog {
+  timestamp: Date;
+  level: "error" | "warn" | "info";
+  message: string;
+  code?: string;
+  context?: Record<string, any>;
+  stack?: string;
+  userId?: string;
+  requestId?: string;
+}
+
+class Logger {
+  error(error: Error | ApplicationError, context?: Record<string, any>) {
+    const log: ErrorLog = {
+      timestamp: new Date(),
+      level: "error",
+      message: error.message,
+      stack: error.stack,
+      code: (error as ApplicationError).code,
+      context: (error as ApplicationError).context || context,
+    };
+
+    // Log to console in development
+    if (process.env.NODE_ENV === "development") {
+      console.error(log);
+    }
+
+    // Send to monitoring service
+    this.sendToMonitoring(log);
+  }
+
+  private sendToMonitoring(log: ErrorLog) {
+    // Send to Sentry, DataDog, etc.
+    fetch("/api/logs", { method: "POST", body: JSON.stringify(log) });
+  }
+}
+\`\`\`
+
+## Recoverable vs. Fatal Errors
+
+Distinguish between errors you can recover from and those that require shutdown:
+
+\`\`\`typescript
+// Recoverable: retry or show user message
+if (error instanceof ValidationError) {
+  // Show validation errors to user
+  displayFormErrors(error.context);
+  return;
+}
+
+if (error instanceof NotFoundError) {
+  // Gracefully handle missing resources
+  return notFoundPage();
+}
+
+// Fatal: application cannot continue
+if (error instanceof DatabaseError && isConnectionError(error)) {
+  logger.error("Database connection lost", error);
+  process.exit(1);
+}
+
+if (error instanceof ApplicationError && error.code === "CRITICAL_SECURITY_BREACH") {
+  logger.error("Security breach detected", error);
+  process.exit(1);
+}
+\`\`\`
+
+### Try It Yourself
+
+Build an error handling system for a real API endpoint. Create custom errors for different failure scenarios (validation, auth, not found, server error). Test that errors propagate correctly with full context.
+
+> **Pro Tip:** Always include a **error code** in custom errors—it helps with monitoring and debugging. Provide **context** (relevant IDs, timestamps, values) with every error. Never hide error information; let it propagate up so it can be logged and monitored properly. In production, log errors to a service like Sentry or DataDog, not just to console!
+`,
           suggestedResources: [
             {
               title: "Exception Handling Best Practices",
@@ -1858,6 +4908,260 @@ const tsCurriculum: Curriculum = {
             "Business logic validation enforces domain rules and invariants",
             "Type guards and assertion functions enhance type safety",
           ],
+          content: `# Validation Strategies and Libraries
+
+TypeScript provides powerful **static type checking** at development time, but types disappear at runtime. **Runtime validation** is essential to ensure data matches expected types when it enters your system from external sources.
+
+## The Runtime Validation Problem
+
+\`\`\`typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+}
+
+// This looks type-safe, but...
+async function processUser(data: User) {
+  console.log(\`User \${data.name} is \${data.age} years old\`);
+}
+
+// At runtime, data could be anything!
+const data = JSON.parse(userInput);
+await processUser(data);
+
+// data might be:
+// { name: "Alice" }                                    // missing fields
+// { id: "not-a-number", name: "Bob", email: "...", age: "invalid" }
+// { id: 1, name: 123, email: null, age: {} }         // wrong types
+\`\`\`
+
+TypeScript's types are **compile-time only**. They're erased during transpilation—runtime has no knowledge of them.
+
+## Schema Validation with Zod
+
+**Zod** is a TypeScript-first schema validation library with excellent developer experience:
+
+\`\`\`typescript
+import { z } from "zod";
+
+const UserSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string().min(1).max(100),
+  email: z.string().email(),
+  age: z.number().int().min(0).max(150),
+  role: z.enum(["admin", "user", "guest"]).default("user"),
+});
+
+// Infer TypeScript type from schema
+type User = z.infer<typeof UserSchema>;
+
+// Validate data
+function processUser(data: unknown) {
+  const result = UserSchema.safeParse(data);
+
+  if (!result.success) {
+    console.error("Validation failed:", result.error.errors);
+    return;
+  }
+
+  // result.data is guaranteed to be User type
+  const user: User = result.data;
+  console.log(\`User \${user.name} is \${user.age} years old\`);
+}
+
+// Parse throws if invalid
+try {
+  const user = UserSchema.parse(JSON.parse(userInput));
+} catch (error) {
+  console.error("Invalid user data", error);
+}
+\`\`\`
+
+## Validation at API Boundaries
+
+Protect your application by validating at entry points:
+
+\`\`\`typescript
+import express from "express";
+import { z } from "zod";
+
+const CreateUserSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  password: z.string().min(8),
+  age: z.number().int().min(18).optional(),
+});
+
+app.post("/users", (req, res) => {
+  // Validate request body
+  const validation = CreateUserSchema.safeParse(req.body);
+
+  if (!validation.success) {
+    return res.status(400).json({
+      error: "Invalid request",
+      details: validation.error.errors,
+    });
+  }
+
+  // Request body is now guaranteed valid
+  const userData = validation.data;
+  createUser(userData);
+  res.json({ success: true });
+});
+\`\`\`
+
+## Type Guards and Assertion Functions
+
+Create runtime type checks that narrow types:
+
+\`\`\`typescript
+// Type guard function: returns boolean and narrows type
+function isUser(data: any): data is User {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    typeof data.id === "number" &&
+    typeof data.name === "string" &&
+    typeof data.email === "string"
+  );
+}
+
+function processData(data: unknown) {
+  if (isUser(data)) {
+    // Inside this block, data is User type
+    console.log(data.name); // OK
+  } else {
+    console.error("Data is not a valid user");
+  }
+}
+
+// Assertion function: throws if invalid
+function assertIsUser(data: unknown): asserts data is User {
+  if (!isUser(data)) {
+    throw new Error("Data is not a valid user");
+  }
+}
+
+const data = fetchData();
+assertIsUser(data);
+// data is now guaranteed to be User type
+console.log(data.name); // OK
+\`\`\`
+
+## Complex Validation Scenarios
+
+### Conditional Validation
+
+\`\`\`typescript
+const OrderSchema = z.object({
+  items: z.array(z.object({ id: z.string(), quantity: z.number() })),
+  shippingAddress: z.string(),
+  paymentMethod: z.enum(["credit_card", "paypal", "bank_transfer"]),
+  // Only require cardToken if payment method is credit_card
+  cardToken: z.string().optional(),
+}).refine(
+  (data) => data.paymentMethod !== "credit_card" || !!data.cardToken,
+  {
+    message: "cardToken required for credit_card payment",
+    path: ["cardToken"],
+  }
+);
+\`\`\`
+
+### Custom Domain Validation
+
+\`\`\`typescript
+const PasswordSchema = z.string()
+  .min(8, "Must be at least 8 characters")
+  .regex(/[A-Z]/, "Must contain uppercase letter")
+  .regex(/[a-z]/, "Must contain lowercase letter")
+  .regex(/[0-9]/, "Must contain digit")
+  .regex(/[!@#$%^&*]/, "Must contain special character");
+
+const UserRegistrationSchema = z.object({
+  email: z.string().email(),
+  password: PasswordSchema,
+  confirmPassword: z.string(),
+}).refine(
+  (data) => data.password === data.confirmPassword,
+  { message: "Passwords don't match", path: ["confirmPassword"] }
+);
+\`\`\`
+
+### Validating Collections
+
+\`\`\`typescript
+const BatchUserSchema = z.object({
+  users: z.array(UserSchema).min(1).max(100),
+  source: z.string(),
+});
+
+function processBatch(data: unknown) {
+  const validation = BatchUserSchema.safeParse(data);
+
+  if (!validation.success) {
+    console.error("Batch validation failed");
+    return;
+  }
+
+  // Each user is guaranteed valid
+  for (const user of validation.data.users) {
+    processUser(user);
+  }
+}
+\`\`\`
+
+## Business Logic Validation
+
+Validate not just types, but business rules:
+
+\`\`\`typescript
+class Order {
+  private items: OrderItem[];
+  private discountPercent: number;
+
+  constructor(items: OrderItem[], discountPercent: number = 0) {
+    this.validateBusinessRules(items, discountPercent);
+    this.items = items;
+    this.discountPercent = discountPercent;
+  }
+
+  private validateBusinessRules(items: OrderItem[], discount: number) {
+    if (items.length === 0) {
+      throw new Error("Order must have at least one item");
+    }
+
+    if (discount < 0 || discount > 100) {
+      throw new Error("Discount must be between 0 and 100");
+    }
+
+    const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+    const minimumOrderValue = 50;
+
+    if (totalPrice < minimumOrderValue) {
+      throw new Error(\`Minimum order value is \${minimumOrderValue}\`);
+    }
+  }
+
+  applyPromoCode(code: string) {
+    const discount = getDiscountForCode(code);
+    
+    // Re-validate with new discount
+    this.validateBusinessRules(this.items, discount);
+    
+    this.discountPercent = discount;
+  }
+}
+\`\`\`
+
+### Try It Yourself
+
+Create a Zod schema for a complex domain object (e.g., Product, BlogPost, Invoice). Include conditional validation, custom error messages, and collections. Write validation at an API boundary.
+
+> **Pro Tip:** Always validate at **system boundaries**—API endpoints, file uploads, database reads. Don't validate internal transfers between functions that you control. Use Zod's \`transform\` and \`refine\` methods for powerful validation and transformation pipelines. Schema validation in TypeScript combines type safety with runtime guarantees!
+`,
           suggestedResources: [
             {
               title: "Zod Validation Library",
@@ -1890,6 +5194,263 @@ const tsCurriculum: Curriculum = {
             "Libraries: neverthrow, ts-results provide Result types",
             "Reduces reliance on exceptions for control flow",
           ],
+          content: `# Result Types and Railway-Oriented Programming
+
+**Result types** provide a functional approach to error handling that makes errors explicit and composable. Instead of throwing exceptions, functions return either a successful result or an error, allowing you to chain operations elegantly.
+
+## The Problem With Exceptions
+
+Exceptions break the linear flow of code and can be silent:
+
+\`\`\`typescript
+// What can go wrong here? Not obvious!
+function processPayment(userId: string, amount: number) {
+  const user = findUser(userId);        // throws NotFound?
+  validateAmount(amount);               // throws Validation?
+  const account = user.getAccount();    // throws?
+  const balance = account.getBalance(); // throws?
+  
+  if (balance < amount) {
+    throw new InsufficientFundsError();
+  }
+
+  return account.deduct(amount);        // throws?
+}
+
+// Caller must know all possible exceptions
+try {
+  processPayment("123", 100);
+} catch (error) {
+  // What went wrong? NotFound? Validation? Insufficient funds?
+  // Unclear from function signature
+}
+\`\`\`
+
+## Result Types: Success or Failure
+
+**Result types** make the contract explicit:
+
+\`\`\`typescript
+type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+
+// Helper functions
+function Ok<T, E>(value: T): Result<T, E> {
+  return { ok: true, value };
+}
+
+function Err<T, E>(error: E): Result<T, E> {
+  return { ok: false, error };
+}
+
+// Now the function's contract is clear!
+function processPayment(
+  userId: string,
+  amount: number
+): Result<PaymentReceipt, PaymentError> {
+  // ...
+  return Ok({ transactionId: "123", amount, timestamp: new Date() });
+  // or return Err({ code: "INSUFFICIENT_FUNDS" });
+}
+
+// Caller knows exactly what can happen
+const result = processPayment("123", 100);
+if (result.ok) {
+  console.log("Payment successful", result.value);
+} else {
+  console.error("Payment failed", result.error);
+}
+\`\`\`
+
+## Railway-Oriented Programming
+
+Think of two parallel "railways": the **happy path** (success) and the **error path** (failure). Operations stay on their respective paths:
+
+\`\`\`typescript
+// Imagine code flowing on tracks:
+//
+// Happy path ——→ Ok(data) ——→ Ok(data) ——→ Ok(result)
+//
+// Error path ←—— Err(e) ←———— Err(e) ←———— Err(e)
+
+// Each operation accepts an input from its track
+// and returns output on the same track
+
+type Result<T, E> = 
+  | { ok: true; value: T } 
+  | { ok: false; error: E };
+
+// Map: happy path only
+function map<T, U, E>(
+  result: Result<T, E>,
+  transform: (value: T) => U
+): Result<U, E> {
+  return result.ok ? Ok(transform(result.value)) : result;
+}
+
+// FlatMap (bind): compose operations that return Results
+function flatMap<T, U, E>(
+  result: Result<T, E>,
+  next: (value: T) => Result<U, E>
+): Result<U, E> {
+  return result.ok ? next(result.value) : result;
+}
+
+// Practical example
+function findUser(id: string): Result<User, { code: "NOT_FOUND" }> {
+  const user = database.find(id);
+  return user ? Ok(user) : Err({ code: "NOT_FOUND" });
+}
+
+function validateAmount(
+  amount: number
+): Result<number, { code: "INVALID_AMOUNT" }> {
+  return amount > 0 ? Ok(amount) : Err({ code: "INVALID_AMOUNT" });
+}
+
+function processPayment(
+  userId: string,
+  amount: number
+): Result<PaymentReceipt, PaymentError> {
+  return flatMap(findUser(userId), (user) =>
+    flatMap(validateAmount(amount), (validAmount) =>
+      flatMap(user.getAccount(), (account) =>
+        flatMap(account.deductFunds(validAmount), (newBalance) =>
+          Ok({
+            userId,
+            amount: validAmount,
+            newBalance,
+            timestamp: new Date(),
+          })
+        )
+      )
+    )
+  );
+}
+\`\`\`
+
+## Using Neverthrow Library
+
+Real-world Result implementation:
+
+\`\`\`typescript
+import { ok, err, Result } from "neverthrow";
+
+type UserError = { code: "NOT_FOUND" } | { code: "INVALID_EMAIL" };
+
+function findUser(id: string): Result<User, UserError> {
+  const user = database.get(id);
+  return user ? ok(user) : err({ code: "NOT_FOUND" });
+}
+
+function validateEmail(email: string): Result<string, UserError> {
+  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)
+    ? ok(email)
+    : err({ code: "INVALID_EMAIL" });
+}
+
+function updateUserEmail(
+  userId: string,
+  newEmail: string
+): Result<User, UserError> {
+  return findUser(userId)
+    .andThen((user) => validateEmail(newEmail).map(() => user))
+    .andThen((user) => {
+      user.email = newEmail;
+      return ok(user);
+    });
+}
+
+// Usage
+const result = updateUserEmail("123", "alice@example.com");
+
+if (result.isOk()) {
+  console.log("Updated user:", result.value);
+} else {
+  console.error("Failed:", result.error.code);
+}
+\`\`\`
+
+## Composing Operations
+
+Chain multiple fallible operations elegantly:
+
+\`\`\`typescript
+type PaymentError =
+  | { type: "USER_NOT_FOUND" }
+  | { type: "INSUFFICIENT_FUNDS" }
+  | { type: "INVALID_CARD" }
+  | { type: "PAYMENT_DECLINED" };
+
+function processCompletePayment(
+  userId: string,
+  cardToken: string,
+  amount: number
+): Result<PaymentReceipt, PaymentError> {
+  return findUser(userId)
+    .andThen((user) =>
+      validateCard(cardToken).map((card) => ({ user, card }))
+    )
+    .andThen(({ user, card }) =>
+      checkBalance(user, amount).map(() => ({ user, card }))
+    )
+    .andThen(({ user, card }) =>
+      chargeCard(card, amount)
+        .map((charge) => ({ user, card, charge }))
+        .mapErr((e) => ({
+          type: "PAYMENT_DECLINED" as const,
+          reason: e,
+        }))
+    )
+    .andThen(({ user, charge }) =>
+      recordTransaction(user, charge).map(() => charge)
+    )
+    .map((charge) => ({
+      transactionId: charge.id,
+      amount: charge.amount,
+      timestamp: new Date(),
+    }));
+}
+
+// Error propagates automatically—no try/catch needed!
+\`\`\`
+
+## Error Recovery
+
+Unlike exceptions, Results allow elegant recovery:
+
+\`\`\`typescript
+function getOrDefault<T, E>(
+  result: Result<T, E>,
+  defaultValue: T
+): T {
+  return result.isOk() ? result.value : defaultValue;
+}
+
+function getOrElse<T, E>(
+  result: Result<T, E>,
+  recover: (error: E) => T
+): T {
+  return result.isOk() ? result.value : recover(result.error);
+}
+
+// Usage
+const user = findUser("123")
+  .map((u) => u.name)
+  .andThen((name) =>
+    fetchUserDetails(name)
+  )
+  .getOrElse((error) => {
+    console.log("Using cached data due to:", error);
+    return getCachedUser();
+  });
+\`\`\`
+
+### Try It Yourself
+
+Refactor a function that uses try/catch to use Result types instead. Create helper functions for common operations (map, flatMap, getOrElse). Notice how the error flow becomes explicit and composable.
+
+> **Pro Tip:** Result types make error handling **explicit and composable**—you can chain operations without worrying about exceptions interrupting flow. They're perfect for APIs, parsers, and any place where operations can fail predictably. Once you get used to the pattern, it's much more elegant than try/catch!
+`,
           suggestedResources: [
             {
               title: "Railway Oriented Programming",
