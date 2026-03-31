@@ -803,48 +803,50 @@ export default function Home() {
                     {/* Difficulty badge */}
                     <Badge
                       variant="outline"
-                      className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold shadow-lg ${difficultyColor[c.difficulty]}`}
+                      className={`absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full px-4 py-1 text-sm font-bold tracking-wide shadow-lg ${difficultyColor[c.difficulty]}`}
                     >
                       {c.difficulty}
                     </Badge>
 
                     {/* Preview hint on hover */}
-                    <div className="absolute top-4 right-4 flex items-center gap-1 text-xs text-violet-400 opacity-0 transition-all group-hover:opacity-100">
-                      <Eye className="size-3.5" />
-                      <span>Preview</span>
+                    <div className="absolute top-4 right-4 flex items-center gap-1.5 text-xs text-violet-400 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                      <Eye className="size-4" />
+                      <span className="font-medium">Preview</span>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="mt-2 text-lg xl:text-xl 2xl:text-2xl font-semibold leading-snug">
-                      {c.title}
-                    </h3>
+                    {/* Title — fixed height so stats grid aligns across cards */}
+                    <div className="mt-3 flex h-16 xl:h-18 items-center justify-center">
+                      <h3 className="text-xl xl:text-2xl 2xl:text-[1.7rem] font-semibold leading-tight">
+                        {c.title}
+                      </h3>
+                    </div>
 
                     {/* Stats */}
-                    <div className="mt-5 grid w-full grid-cols-3 gap-3 xl:gap-4">
-                      <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3 xl:p-4">
-                        <Layers className="mb-1.5 size-4 xl:size-5 text-violet-500" />
-                        <span className="text-base xl:text-lg font-semibold">{c.modules}</span>
-                        <span className="text-[10px] xl:text-xs text-muted-foreground">Modules</span>
+                    <div className="mt-6 grid w-full grid-cols-3 gap-3 xl:gap-4">
+                      <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3.5 xl:p-4">
+                        <Layers className="mb-2 size-5 xl:size-6 text-violet-500" />
+                        <span className="text-lg xl:text-xl font-bold">{c.modules}</span>
+                        <span className="text-[11px] xl:text-xs text-muted-foreground font-medium">Modules</span>
                       </div>
-                      <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3 xl:p-4">
-                        <FileText className="mb-1.5 size-4 xl:size-5 text-violet-500" />
-                        <span className="text-base xl:text-lg font-semibold">{c.lessons}</span>
-                        <span className="text-[10px] xl:text-xs text-muted-foreground">Lessons</span>
+                      <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3.5 xl:p-4">
+                        <FileText className="mb-2 size-5 xl:size-6 text-violet-500" />
+                        <span className="text-lg xl:text-xl font-bold">{c.lessons}</span>
+                        <span className="text-[11px] xl:text-xs text-muted-foreground font-medium">Lessons</span>
                       </div>
-                      <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3 xl:p-4">
-                        <Clock className="mb-1.5 size-4 xl:size-5 text-violet-500" />
-                        <span className="text-base xl:text-lg font-semibold">{c.hours}h</span>
-                        <span className="text-[10px] xl:text-xs text-muted-foreground">Total</span>
+                      <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3.5 xl:p-4">
+                        <Clock className="mb-2 size-5 xl:size-6 text-violet-500" />
+                        <span className="text-lg xl:text-xl font-bold">{c.hours}h</span>
+                        <span className="text-[11px] xl:text-xs text-muted-foreground font-medium">Total</span>
                       </div>
                     </div>
 
                     {/* Tags */}
-                    <div className="mt-5 flex flex-wrap justify-center gap-2">
+                    <div className="mt-6 flex flex-wrap justify-center gap-2">
                       {c.tags.map((t) => (
                         <Badge
                           key={t}
                           variant="secondary"
-                          className="rounded-full px-3 py-1 text-[10px] xl:text-xs"
+                          className="rounded-full px-3.5 py-1 text-xs font-medium"
                         >
                           {t}
                         </Badge>
