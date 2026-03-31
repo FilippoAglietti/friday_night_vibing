@@ -623,24 +623,23 @@ export default function Home() {
               </motion.p>
             </AnimateInView>
 
-            <AnimateInView containerRef={containerRef} amount={0.15} variants={stagger} className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-12">
+            <AnimateInView containerRef={containerRef} amount={0.15} variants={stagger} className="grid gap-8 md:grid-cols-3 xl:gap-10 2xl:gap-14">
               {painPoints.map((p, i) => (
-                <motion.div key={i} variants={scaleUp}>
-                  <Card className="group relative h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-xl hover:shadow-violet-500/5">
-                    <CardHeader className="xl:p-8">
-                      <div className="mb-3 flex size-10 xl:size-12 items-center justify-center rounded-lg bg-violet-500/10">
-                        <p.icon className="size-5 xl:size-6 text-violet-500" />
-                      </div>
-                      <CardTitle className="text-base xl:text-lg font-semibold text-destructive/80 dark:text-red-400 line-through decoration-muted-foreground/30">
-                        {p.problem}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="xl:px-8 xl:pb-8">
-                      <p className="text-sm xl:text-base leading-relaxed text-muted-foreground">
-                        {p.solution}
-                      </p>
-                    </CardContent>
-                  </Card>
+                <motion.div key={i} variants={scaleUp} className="group relative">
+                  <div className="relative flex flex-col items-center text-center p-8 xl:p-10 2xl:p-12 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60 hover:shadow-xl hover:shadow-violet-500/5 h-full">
+                    {/* Icon */}
+                    <div className="mb-5 flex size-14 xl:size-16 2xl:size-20 items-center justify-center rounded-2xl bg-violet-500/10">
+                      <p.icon className="size-6 xl:size-7 2xl:size-9 text-violet-500" />
+                    </div>
+                    {/* Problem label */}
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60 mb-2">
+                      {p.problem}
+                    </p>
+                    {/* Solution */}
+                    <p className="text-sm xl:text-base leading-relaxed text-muted-foreground">
+                      {p.solution}
+                    </p>
+                  </div>
                 </motion.div>
               ))}
             </AnimateInView>
@@ -657,7 +656,7 @@ export default function Home() {
             <div className="absolute bottom-[10%] left-[5%] h-[30vh] w-[30vh] rounded-full bg-cyan-500/[0.03] blur-[80px] dark:bg-cyan-400/[0.05]" />
           </div>
 
-          <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl w-full">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
             <AnimateInView containerRef={containerRef} amount={0.2} variants={stagger} className="text-center mb-16">
               <motion.p
                 variants={fadeUp}
