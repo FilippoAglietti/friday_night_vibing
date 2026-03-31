@@ -204,7 +204,7 @@
 
 /* ─── Scroll Snap ─────────────────────────────────────── */
 .snap-scroll-container {
-  height: 100vh;
+  height: 100svh;
   overflow-y: scroll;
   overflow-x: hidden;
   scroll-snap-type: y mandatory;

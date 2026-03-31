@@ -54,7 +54,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-[95] flex items-center justify-center p-4"
           >
-            <div className="relative w-full max-w-sm rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl shadow-violet-500/10 overflow-hidden">
+            <div className="relative w-[92%] sm:w-full max-w-sm rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl shadow-violet-500/10 overflow-hidden">
               <button
                 onClick={onClose}
                 className="absolute top-4 right-4 z-10 rounded-full p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
@@ -62,7 +62,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
                 <X className="size-5" />
               </button>
 
-              <div className="flex flex-col items-center px-8 pt-10 pb-8">
+              <div className="flex flex-col items-center px-6 sm:px-8 pt-8 sm:pt-10 pb-6 sm:pb-8">
                 <div className="flex items-center justify-center size-14 rounded-2xl bg-violet-500/10 mb-5">
                   <Shield className="size-7 text-violet-500" />
                 </div>

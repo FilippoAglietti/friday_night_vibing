@@ -254,8 +254,8 @@ export default function CurriculumForm({
   const topicError = touched.topic ? errors.topic : undefined;
 
   return (
-    <Card className="w-full max-w-xl border-border/50 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
-      <CardHeader className="pb-2">
+    <Card className="w-full border-border/50 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
+      <CardHeader className="pb-1">
         <CardTitle className="flex items-center gap-2 text-xl font-bold">
           <Sparkles className="size-5 text-violet-500" />
           Generate Course
@@ -267,7 +267,7 @@ export default function CurriculumForm({
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
 
           {/* ── Course Topic ──────────────────────────────── */}
           <div className="space-y-1.5">
@@ -425,7 +425,7 @@ export default function CurriculumForm({
               value={form.abstract}
               onChange={(e) => updateField("abstract", e.target.value)}
               disabled={isSubmitting || pdfExtracting}
-              rows={3}
+              rows={2}
               maxLength={4000}
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y min-h-[72px]"
             />
