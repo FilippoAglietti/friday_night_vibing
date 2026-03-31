@@ -18,15 +18,22 @@ import {
   Download,
   ExternalLink,
   FileText,
+  GraduationCap,
   HelpCircle,
+  LayoutGrid,
   Lightbulb,
   RefreshCw,
+  Share2,
   Sparkles,
   Target,
   Trophy,
 } from "lucide-react";
 import { useState } from "react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
+import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
+import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
+import { generateScormPackage } from "@/lib/exports/generateScorm";
+import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
 import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource } from "@/types/curriculum";
 
 interface CurriculumOutputProps {
@@ -563,6 +570,7 @@ export default function CurriculumOutput({
   onGenerateAnother,
 }: CurriculumOutputProps) {
   const [copied, setCopied] = useState(false);
+  const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
 
   const totalLessons = curriculum.modules.reduce(
     (acc, m) => acc + (m.lessons?.length || 0),
@@ -572,6 +580,8 @@ export default function CurriculumOutput({
     (acc, m) => acc + (m.quiz?.length || 0),
     0
   );
+
+  const sanitizeFilename = (title: string) => title.replace(/[^a-z0-9]/gi, "_").toLowerCase();
 
   // ── Copy as Markdown ──
   const handleCopy = async () => {
@@ -583,7 +593,7 @@ export default function CurriculumOutput({
   const handleDownloadPDF = () => {
     try {
       const pdf = generateCurriculumPDF(curriculum);
-      pdf.save(`${curriculum.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_syllabus.pdf`);
+      pdf.save(`${sanitizeFilename(curriculum.title)}_syllabus.pdf`);
     } catch (e) {
       console.error("Failed to generate PDF:", e);
     }
@@ -595,11 +605,79 @@ export default function CurriculumOutput({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_notion.md`;
+    a.download = `${sanitizeFilename(curriculum.title)}_notion.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportDocx = async () => {
+    try {
+      setLoadingExports((prev) => ({ ...prev, docx: true }));
+      const blob = await generateCurriculumDocx(curriculum);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${sanitizeFilename(curriculum.title)}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Failed to generate Word document:", e);
+    } finally {
+      setLoadingExports((prev) => ({ ...prev, docx: false }));
+    }
+  };
+
+  const handleExportPptx = async () => {
+    try {
+      setLoadingExports((prev) => ({ ...prev, pptx: true }));
+      const blob = await generateCurriculumPptx(curriculum);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${sanitizeFilename(curriculum.title)}_slides.pptx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Failed to generate presentation:", e);
+    } finally {
+      setLoadingExports((prev) => ({ ...prev, pptx: false }));
+    }
+  };
+
+  const handleExportScorm = async () => {
+    try {
+      setLoadingExports((prev) => ({ ...prev, scorm: true }));
+      const blob = await generateScormPackage(curriculum);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${sanitizeFilename(curriculum.title)}_scorm.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Failed to generate SCORM package:", e);
+    } finally {
+      setLoadingExports((prev) => ({ ...prev, scorm: false }));
+    }
+  };
+
+  const handleShareLink = async () => {
+    try {
+      const shareUrl = generateShareableUrl(curriculum);
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      console.error("Failed to generate share link:", e);
+    }
   };
 
   return (
@@ -775,41 +853,80 @@ export default function CurriculumOutput({
       )}
 
       {/* ── Action Buttons ── */}
-      <div className="flex flex-col sm:flex-row flex-wrap gap-3 pb-8">
-        <Button
-          onClick={handleDownloadPDF}
-          className="flex-1 gap-2 min-w-[140px]"
-          size="lg"
-        >
-          <Download className="h-4 w-4" />
-          Download PDF
-        </Button>
-        <Button
-          onClick={handleExportNotion}
-          className="flex-1 gap-2 min-w-[140px] bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 hover:from-violet-700 hover:to-purple-700"
-          size="lg"
-        >
-          <FileText className="h-4 w-4" />
-          Export for Notion
-        </Button>
-        <Button
-          onClick={handleCopy}
-          variant="outline"
-          className="flex-1 gap-2 min-w-[140px]"
-          size="lg"
-        >
-          <Copy className="h-4 w-4" />
-          {copied ? "Copied!" : "Copy Markdown"}
-        </Button>
-        <Button
-          onClick={onGenerateAnother}
-          variant="ghost"
-          className="flex-1 gap-2 min-w-[140px]"
-          size="lg"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Generate Another
-        </Button>
+      <div className="space-y-3 pb-8">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+          <Button
+            onClick={handleDownloadPDF}
+            className="flex-1 gap-2 min-w-[140px]"
+            size="lg"
+          >
+            <Download className="h-4 w-4" />
+            Download PDF
+          </Button>
+          <Button
+            onClick={handleExportNotion}
+            className="flex-1 gap-2 min-w-[140px] bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 hover:from-violet-700 hover:to-purple-700"
+            size="lg"
+          >
+            <FileText className="h-4 w-4" />
+            Export for Notion
+          </Button>
+          <Button
+            onClick={handleCopy}
+            variant="outline"
+            className="flex-1 gap-2 min-w-[140px]"
+            size="lg"
+          >
+            <Copy className="h-4 w-4" />
+            {copied ? "Copied!" : "Copy Markdown"}
+          </Button>
+          <Button
+            onClick={onGenerateAnother}
+            variant="ghost"
+            className="flex-1 gap-2 min-w-[140px]"
+            size="lg"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Generate Another
+          </Button>
+        </div>
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+          <Button
+            onClick={handleExportDocx}
+            disabled={loadingExports.docx}
+            className="flex-1 gap-2 min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white border-0"
+            size="lg"
+          >
+            <FileText className="h-4 w-4" />
+            {loadingExports.docx ? "Generating..." : "Word"}
+          </Button>
+          <Button
+            onClick={handleExportPptx}
+            disabled={loadingExports.pptx}
+            className="flex-1 gap-2 min-w-[140px] bg-orange-600 hover:bg-orange-700 text-white border-0"
+            size="lg"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            {loadingExports.pptx ? "Generating..." : "Slides"}
+          </Button>
+          <Button
+            onClick={handleExportScorm}
+            disabled={loadingExports.scorm}
+            className="flex-1 gap-2 min-w-[140px] bg-emerald-600 hover:bg-emerald-700 text-white border-0"
+            size="lg"
+          >
+            <GraduationCap className="h-4 w-4" />
+            {loadingExports.scorm ? "Generating..." : "SCORM"}
+          </Button>
+          <Button
+            onClick={handleShareLink}
+            className="flex-1 gap-2 min-w-[140px] bg-cyan-600 hover:bg-cyan-700 text-white border-0"
+            size="lg"
+          >
+            <Share2 className="h-4 w-4" />
+            {copied ? "Link Copied!" : "Share"}
+          </Button>
+        </div>
       </div>
     </div>
   );
