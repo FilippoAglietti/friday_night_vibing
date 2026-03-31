@@ -12,7 +12,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { generateWelcomeEmail } from "@/lib/emails/welcome-email";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy-init Resend inside the handler to avoid build-time errors
+// when RESEND_API_KEY env var isn't available during static analysis
+let _resend: Resend | null = null;
+function getResend(): Resend | null {
+  if (!process.env.RESEND_API_KEY) return null;
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,7 +36,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Don't send if Resend isn't configured
-    if (!process.env.RESEND_API_KEY) {
+    const resend = getResend();
+    if (!resend) {
       console.warn("[welcome-email] RESEND_API_KEY not set, skipping email send");
       return NextResponse.json({ success: false, reason: "Email service not configured" });
     }
