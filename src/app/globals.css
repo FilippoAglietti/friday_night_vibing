@@ -201,3 +201,17 @@
     transition: none !important;
   }
 }
+
+/* ── Snap Scroll (large screens only) ─────────────────────────── */
+@media (min-width: 1024px) {
+  html {
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 56px;
+    scroll-behavior: smooth;
+  }
+  .snap-section {
+    scroll-snap-align: start;
+    min-height: 100vh;
+  }
+}

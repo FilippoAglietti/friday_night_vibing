@@ -381,10 +381,10 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section
           id="hero"
-          className="relative flex items-center justify-center px-4 pt-24 pb-20 sm:pt-32 sm:pb-28 lg:pt-40 lg:pb-36"
+          className="snap-section relative flex items-center justify-center px-4 pt-24 pb-20 sm:pt-32 sm:pb-28 lg:pt-0 lg:pb-0"
         >
           <div
-            className="mx-auto max-w-4xl text-center"
+            className="mx-auto max-w-4xl text-center xl:max-w-5xl"
           >
             <div>
               <div><Badge
@@ -397,7 +397,7 @@ export default function Home() {
             </div>
 
             <h1
-              className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl"
+              className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
             >
               Turn Any Topic Into a
               <br />
@@ -411,7 +411,7 @@ export default function Home() {
             <p
 
 
-              className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
+              className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl xl:text-2xl xl:max-w-3xl"
             >
               AI-powered course design for course creators, educators, and
               coaches. Stop staring at blank outlines — get a production-ready
@@ -426,7 +426,7 @@ export default function Home() {
               <Button
                 id="hero-cta"
                 size="lg"
-                className="h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                className="h-12 xl:h-14 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 xl:px-10 text-base xl:text-lg font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
                 onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Generate Your First Course Free
@@ -458,9 +458,9 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section
           id="problem-solution"
-          className="relative px-4 py-20 sm:py-28"
+          className="snap-section relative px-4 py-20 sm:py-28 lg:flex lg:flex-col lg:justify-center"
         >
-          <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl">
             <div
               className="text-center mb-16"
             >
@@ -473,7 +473,7 @@ export default function Home() {
               <h2
 
 
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
                 Building a course shouldn&apos;t feel like pulling teeth
               </h2>
@@ -489,21 +489,21 @@ export default function Home() {
             </div>
 
             <div
-              className="grid gap-6 md:grid-cols-3"
+              className="grid gap-6 md:grid-cols-3 xl:gap-10"
             >
               {painPoints.map((p, i) => (
                 <div key={i}>
                   <Card className="group relative h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5">
                     <CardHeader>
-                      <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-violet-500/10">
-                        <p.icon className="size-5 text-violet-500" />
+                      <div className="mb-3 xl:mb-5 flex size-10 xl:size-16 items-center justify-center rounded-lg xl:rounded-2xl bg-violet-500/10">
+                        <p.icon className="size-5 xl:size-8 text-violet-500" />
                       </div>
-                      <CardTitle className="text-base font-semibold text-destructive/80 dark:text-red-400 line-through decoration-muted-foreground/30">
+                      <CardTitle className="text-base xl:text-xl font-semibold text-destructive/80 dark:text-red-400 line-through decoration-muted-foreground/30">
                         {p.problem}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
+                      <p className="text-sm xl:text-base leading-relaxed text-muted-foreground">
                         {p.solution}
                       </p>
                     </CardContent>
@@ -517,8 +517,8 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             HOW IT WORKS
         ═══════════════════════════════════════════════════ */}
-        <section id="how-it-works" className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-5xl">
+        <section id="how-it-works" className="snap-section relative px-4 py-20 sm:py-28 lg:flex lg:flex-col lg:justify-center">
+          <div className="mx-auto max-w-5xl xl:max-w-7xl">
             <div
               className="text-center mb-16"
             >
@@ -531,14 +531,14 @@ export default function Home() {
               <h2
 
 
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
                 Three steps. Zero headaches.
               </h2>
             </div>
 
             <div
-              className="grid gap-8 md:grid-cols-3"
+              className="grid gap-8 md:grid-cols-3 xl:gap-12"
             >
               {steps.map((s, i) => (
                 <div
@@ -550,17 +550,17 @@ export default function Home() {
                     <div className="absolute top-12 -right-4 hidden h-px w-8 bg-gradient-to-r from-border to-transparent md:block" />
                   )}
 
-                  <div className="relative flex flex-col items-center text-center p-8 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60">
+                  <div className="relative flex flex-col items-center text-center p-8 xl:p-12 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60">
                     {/* Step number */}
                     <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-0.5 text-xs font-bold text-white shadow-lg shadow-violet-500/25">
                       {s.num}
                     </span>
 
-                    <div className="mt-4 mb-5 flex size-14 items-center justify-center rounded-2xl bg-violet-500/10">
-                      <s.icon className="size-6 text-violet-500" />
+                    <div className="mt-4 mb-5 flex size-14 xl:size-20 items-center justify-center rounded-2xl bg-violet-500/10">
+                      <s.icon className="size-6 xl:size-9 text-violet-500" />
                     </div>
-                    <h3 className="text-lg font-semibold">{s.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    <h3 className="text-lg xl:text-2xl font-semibold">{s.title}</h3>
+                    <p className="mt-2 text-sm xl:text-base leading-relaxed text-muted-foreground">
                       {s.desc}
                     </p>
                   </div>
@@ -573,9 +573,9 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             TRY IT — CURRICULUM FORM / OUTPUT
         ═══════════════════════════════════════════════════ */}
-        <section id="generate" className="relative px-4 py-20 sm:py-28">
+        <section id="generate" className="snap-section relative px-4 py-20 sm:py-28 lg:flex lg:flex-col lg:justify-center">
           <div
-            className="mx-auto max-w-3xl"
+            className="mx-auto max-w-3xl xl:max-w-4xl"
           >
             {isGenerating ? (
               <LoadingSkeleton />
@@ -596,12 +596,12 @@ export default function Home() {
                   <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
                     Try It Now
                   </p>
-                  <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+                  <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl">
                     Generate your course
                   </h2>
                 </div>
                 <div
-                  className="mx-auto max-w-xl"
+                  className="mx-auto max-w-xl xl:max-w-2xl"
                 >
                   <CurriculumForm
                     onGenerated={handleGenerated}
@@ -618,8 +618,8 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             EXAMPLE CURRICULA (SOCIAL PROOF)
         ═══════════════════════════════════════════════════ */}
-        <section id="examples" className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
+        <section id="examples" className="snap-section relative px-4 py-20 sm:py-28 lg:flex lg:flex-col lg:justify-center">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl">
             <div
               className="text-center mb-16"
             >
@@ -632,7 +632,7 @@ export default function Home() {
               <h2
 
 
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
                 See what Syllabi can create
               </h2>
@@ -648,7 +648,7 @@ export default function Home() {
             </div>
 
             <div
-              className="grid gap-6 md:grid-cols-3"
+              className="grid gap-6 md:grid-cols-3 xl:gap-10"
             >
               {exampleCurricula.map((c, i) => (
                 <div key={i}>
@@ -669,36 +669,36 @@ export default function Home() {
                           <span>Preview</span>
                         </div>
                       </div>
-                      <CardTitle className="mt-2 text-lg font-semibold leading-snug">
+                      <CardTitle className="mt-2 text-lg xl:text-2xl font-semibold leading-snug">
                         {c.title}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5">
-                          <Layers className="mb-1 size-3.5 text-muted-foreground" />
-                          <span className="text-sm font-semibold">
+                      <div className="grid grid-cols-3 gap-3 xl:gap-5">
+                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5 xl:p-4">
+                          <Layers className="mb-1 size-3.5 xl:size-5 text-muted-foreground" />
+                          <span className="text-sm xl:text-xl font-semibold">
                             {c.modules}
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] xl:text-xs text-muted-foreground">
                             Modules
                           </span>
                         </div>
-                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5">
-                          <FileText className="mb-1 size-3.5 text-muted-foreground" />
-                          <span className="text-sm font-semibold">
+                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5 xl:p-4">
+                          <FileText className="mb-1 size-3.5 xl:size-5 text-muted-foreground" />
+                          <span className="text-sm xl:text-xl font-semibold">
                             {c.lessons}
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] xl:text-xs text-muted-foreground">
                             Lessons
                           </span>
                         </div>
-                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5">
-                          <Clock className="mb-1 size-3.5 text-muted-foreground" />
-                          <span className="text-sm font-semibold">
+                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5 xl:p-4">
+                          <Clock className="mb-1 size-3.5 xl:size-5 text-muted-foreground" />
+                          <span className="text-sm xl:text-xl font-semibold">
                             {c.hours}h
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] xl:text-xs text-muted-foreground">
                             Total
                           </span>
                         </div>
@@ -725,18 +725,18 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             PRICING
         ═══════════════════════════════════════════════════ */}
-        <section id="pricing" className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl">
+        <section id="pricing" className="snap-section relative px-4 py-20 sm:py-28 lg:flex lg:flex-col lg:justify-center">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl">
             <div className="text-center mb-16 scroll-animate">
               <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
                 Pricing
               </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl">
                 Start free. Upgrade when you&apos;re ready.
               </h2>
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible">
+            <div className="grid gap-6 xl:gap-8 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible">
               {/* FREE PLAN */}
               <div className="flex min-w-0 overflow-visible scroll-animate">
                 <Card className="relative flex flex-col w-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
@@ -748,7 +748,7 @@ export default function Home() {
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Free
                     </CardDescription>
-                    <CardTitle className="text-3xl font-bold">
+                    <CardTitle className="text-3xl xl:text-4xl font-bold">
                       $0
                       <span className="text-base font-normal text-muted-foreground">
                         /forever
@@ -800,7 +800,7 @@ export default function Home() {
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">
                       Pro
                     </CardDescription>
-                    <CardTitle className="text-3xl font-bold">
+                    <CardTitle className="text-3xl xl:text-4xl font-bold">
                       $29
                       <span className="text-base font-normal text-muted-foreground">
                         /month
@@ -844,7 +844,7 @@ export default function Home() {
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">
                       One-Time
                     </CardDescription>
-                    <CardTitle className="text-3xl font-bold">
+                    <CardTitle className="text-3xl xl:text-4xl font-bold">
                       $39
                       <span className="text-base font-normal text-muted-foreground">
                         {" "}one-time
@@ -899,7 +899,7 @@ export default function Home() {
                       <Crown className="size-3.5" />
                       Pro Max
                     </CardDescription>
-                    <CardTitle className="text-3xl font-bold">
+                    <CardTitle className="text-3xl xl:text-4xl font-bold">
                       $79
                       <span className="text-base font-normal text-muted-foreground">
                         /month
@@ -949,21 +949,21 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             FINAL CTA
         ═══════════════════════════════════════════════════ */}
-        <section className="relative px-4 py-20 sm:py-28">
+        <section className="snap-section relative px-4 py-20 sm:py-28 lg:flex lg:flex-col lg:justify-center">
           <div
-            className="mx-auto max-w-3xl text-center"
+            className="mx-auto max-w-3xl xl:max-w-5xl text-center"
           >
             <div
 
-              className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 backdrop-blur-sm"
+              className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 xl:p-24 backdrop-blur-sm"
             >
-              <LayoutGrid className="mx-auto mb-4 size-8 text-violet-500" />
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              <LayoutGrid className="mx-auto mb-4 size-8 xl:size-12 text-violet-500" />
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl xl:text-6xl">
                 Ready to build your
                 <br />
                 first course?
               </h2>
-              <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+              <p className="mx-auto mt-4 max-w-lg xl:max-w-2xl xl:text-xl text-muted-foreground">
                 Join hundreds of course creators who save 40+ hours per course
                 with Syllabi. Your first generation is free — no credit card, no
                 catch.
@@ -971,7 +971,7 @@ export default function Home() {
               <Button
                 id="bottom-cta"
                 size="lg"
-                className="mt-8 h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                className="mt-8 h-12 xl:h-14 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 xl:px-12 text-base xl:text-lg font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
               >
                 Generate Your First Course Free
                 <ArrowRight className="ml-2 size-4" />
