@@ -357,8 +357,8 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
 async function createSupabaseServer() {
   const cookieStore = await cookies();
   return createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
@@ -415,18 +415,35 @@ async function saveGeneration(
 
   const supabase = await createSupabaseServer();
 
-  // Save the generation to the generations table
-  await supabase.from("generations").insert({
+  // Save to courses table (new schema v2)
+  const { data: course, error } = await supabase.from("courses").insert({
     user_id: userId,
+    title: curriculum.title ?? request.topic,
     topic: request.topic,
     audience: request.audience,
     length: request.length,
     niche: request.niche ?? null,
-    curriculum: curriculum, // stored as jsonb in Supabase
-  });
+    language: "en",
+    level: request.audience as "beginner" | "intermediate" | "advanced",
+    content_type: "text",
+    curriculum: curriculum as unknown as Record<string, unknown>,
+    description: curriculum.subtitle ?? null,
+    status: "ready",
+  }).select("id").single();
 
-  // Increment the user's generation counter
-  await supabase.rpc("increment_generations_used", { user_id: userId });
+  if (error) {
+    console.error("[/api/generate] Failed to save course:", error);
+    return;
+  }
+
+  // Increment generation counter and log usage event atomically
+  if (course?.id) {
+    await supabase.rpc("increment_generation_usage", {
+      p_user_id: userId,
+      p_course_id: course.id,
+      p_event_type: "course_generated",
+    });
+  }
 }
 
 // ─── Route handler ────────────────────────────────────────────
