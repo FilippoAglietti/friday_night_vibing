@@ -459,8 +459,7 @@ export default function Home() {
           <div className="mx-auto max-w-4xl xl:max-w-5xl 2xl:max-w-6xl text-center">
             <motion.div
               initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              animate="visible"
               variants={stagger}
             >
               <motion.div variants={fadeUp}>
@@ -546,7 +545,7 @@ export default function Home() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: true, amount: 0.2, root: containerRef }}
               variants={stagger}
               className="text-center mb-16"
             >
@@ -575,7 +574,7 @@ export default function Home() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.15 }}
+              viewport={{ once: true, amount: 0.15, root: containerRef }}
               variants={stagger}
               className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-12"
             >
@@ -616,7 +615,7 @@ export default function Home() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: true, amount: 0.2, root: containerRef }}
               variants={stagger}
               className="text-center mb-16"
             >
@@ -637,7 +636,7 @@ export default function Home() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.15 }}
+              viewport={{ once: true, amount: 0.15, root: containerRef }}
               variants={stagger}
               className="grid gap-8 md:grid-cols-3 xl:gap-10 2xl:gap-14"
             >
@@ -705,7 +704,7 @@ export default function Home() {
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: true, amount: 0.3, root: containerRef }}
                   variants={stagger}
                   className="text-center mb-10"
                 >
@@ -725,7 +724,7 @@ export default function Home() {
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: true, amount: 0.3, root: containerRef }}
                   variants={fadeUp}
                   className="mx-auto w-full max-w-xl sm:max-w-2xl"
                 >
@@ -755,7 +754,7 @@ export default function Home() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: true, amount: 0.2, root: containerRef }}
               variants={stagger}
               className="text-center mb-16"
             >
@@ -784,7 +783,7 @@ export default function Home() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.15 }}
+              viewport={{ once: true, amount: 0.15, root: containerRef }}
               variants={stagger}
               className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-10"
             >
@@ -874,7 +873,7 @@ export default function Home() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+              viewport={{ once: true, amount: 0.2, root: containerRef }}
               variants={stagger}
               className="text-center mb-16"
             >
@@ -895,7 +894,7 @@ export default function Home() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
+              viewport={{ once: true, amount: 0.1, root: containerRef }}
               variants={stagger}
               className="grid gap-6 xl:gap-8 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible"
             >
@@ -1122,7 +1121,7 @@ export default function Home() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: true, amount: 0.3, root: containerRef }}
               variants={stagger}
               className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 xl:p-20 2xl:p-24 backdrop-blur-sm"
             >
