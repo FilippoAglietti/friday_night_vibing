@@ -103,7 +103,7 @@ export default function AuthButton() {
                   className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-xs font-medium text-foreground hover:bg-violet-500/10 hover:text-violet-500 transition-colors"
                 >
                   <BookOpen className="size-3.5" />
-                  My Courses
+                  Dashboard
                 </a>
                 <button
                   onClick={handleSignOut}
