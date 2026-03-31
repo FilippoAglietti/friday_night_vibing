@@ -203,10 +203,12 @@
 }
 
 /* ─── Scroll Snap ─────────────────────────────────────── */
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   html {
+    overflow-y: scroll;            /* CRITICAL: makes html the explicit scroll container */
     scroll-snap-type: y mandatory;
     scroll-padding-top: 3.5rem; /* nav height = 56px */
+    scroll-behavior: smooth;
   }
 }
 
