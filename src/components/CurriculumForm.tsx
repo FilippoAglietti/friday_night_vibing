@@ -255,8 +255,8 @@ export default function CurriculumForm({
 
   return (
     <Card className="w-full border-border/50 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
-      <CardHeader className="pb-1">
-        <CardTitle className="flex items-center gap-2 text-xl font-bold">
+      <CardHeader className="pb-1 px-4 md:px-6">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-bold">
           <Sparkles className="size-5 text-violet-500" />
           Generate Course
         </CardTitle>
@@ -265,8 +265,8 @@ export default function CurriculumForm({
         </CardDescription>
       </CardHeader>
 
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <CardContent className="px-4 md:px-6">
+        <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4" noValidate>
 
           {/* ── Course Topic ──────────────────────────────── */}
           <div className="space-y-1.5">

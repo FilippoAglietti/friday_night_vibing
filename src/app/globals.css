@@ -130,6 +130,15 @@
   }
 }
 
+/* ── Hide scrollbar for horizontal scroll (mobile pricing) ──── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Shimmer animation for loading skeletons ────────────────── */
 @keyframes shimmer {
   100% {
@@ -212,6 +221,13 @@
   scroll-padding-top: 3.5rem; /* 56px nav height */
 }
 
+/* Disable snap scroll on mobile — content overflows single screens */
+@media (max-width: 767px) {
+  .snap-scroll-container {
+    scroll-snap-type: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .snap-scroll-container {
     scroll-snap-type: none !important;
@@ -221,6 +237,14 @@
 .snap-section {
   scroll-snap-align: start;
   min-height: 100vh;
+}
+
+/* On mobile, let sections be natural height instead of forcing viewport */
+@media (max-width: 767px) {
+  .snap-section {
+    scroll-snap-align: none;
+    min-height: auto;
+  }
 }
 
 /* ─── Section Dots ────────────────────────────────────── */

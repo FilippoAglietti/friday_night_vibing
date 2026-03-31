@@ -487,22 +487,22 @@ export default function ProfilePage() {
         </div>
       </nav>
 
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8 sm:px-6">
         {/* ── Profile Header ──────────────────────────────── */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
           {avatarUrl ? (
             <img
               src={avatarUrl}
               alt={name}
-              className="size-16 rounded-2xl ring-2 ring-violet-500/30 shadow-lg shrink-0"
+              className="size-12 sm:size-16 rounded-2xl ring-2 ring-violet-500/30 shadow-lg shrink-0"
             />
           ) : (
-            <div className="flex items-center justify-center size-16 rounded-2xl bg-violet-500/15 text-violet-500 ring-2 ring-violet-500/30 shrink-0">
-              <UserIcon className="size-8" />
+            <div className="flex items-center justify-center size-12 sm:size-16 rounded-2xl bg-violet-500/15 text-violet-500 ring-2 ring-violet-500/30 shrink-0">
+              <UserIcon className="size-6 sm:size-8" />
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold truncate">{name}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold truncate">{name}</h1>
             <p className="text-sm text-muted-foreground truncate">
               {user?.email}
             </p>
@@ -527,14 +527,14 @@ export default function ProfilePage() {
         </div>
 
         {/* ── Tab Navigation ──────────────────────────────── */}
-        <div className="flex gap-0 mb-8 border-b border-border/40">
+        <div className="flex gap-0 mb-6 sm:mb-8 border-b border-border/40 overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? "text-violet-500 border-violet-500"
                     : "text-muted-foreground border-transparent hover:text-foreground"
@@ -726,32 +726,32 @@ export default function ProfilePage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm">Quick Actions</CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-2">
+                <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+                    className="text-xs justify-start h-10 sm:h-auto sm:justify-center"
                     onClick={() => (window.location.href = "/")}
                   >
-                    <Sparkles className="size-3.5 mr-1.5 text-violet-500" />
+                    <Sparkles className="size-3.5 mr-1.5 text-violet-500 shrink-0" />
                     Generate New Course
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+                    className="text-xs justify-start h-10 sm:h-auto sm:justify-center"
                     onClick={() => setActiveTab("courses")}
                   >
-                    <BookOpen className="size-3.5 mr-1.5 text-violet-500" />
+                    <BookOpen className="size-3.5 mr-1.5 text-violet-500 shrink-0" />
                     Browse All Courses
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+                    className="text-xs justify-start h-10 sm:h-auto sm:justify-center"
                     onClick={() => setActiveTab("settings")}
                   >
-                    <Settings className="size-3.5 mr-1.5 text-muted-foreground" />
+                    <Settings className="size-3.5 mr-1.5 text-muted-foreground shrink-0" />
                     Account Settings
                   </Button>
                 </CardContent>
