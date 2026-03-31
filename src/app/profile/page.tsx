@@ -58,12 +58,12 @@ export default function ProfilePage() {
 
       if (user) {
         const { data, error } = await supabaseBrowser
-          .from("generations")
-          .select("*")
+          .from("courses")
+          .select("id, topic, audience, length, niche, curriculum, created_at")
           .order("created_at", { ascending: false });
 
         if (data && !error) {
-          setGenerations(data as Generation[]);
+          setGenerations(data as unknown as Generation[]);
         }
       }
       setLoading(false);
