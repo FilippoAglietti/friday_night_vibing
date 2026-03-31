@@ -50,8 +50,6 @@ import {
   Headphones,
 } from "lucide-react";
 
-/* ─── Animation Helpers (CSS-based, see globals.css) ──────── */
-
 /* ─── Data ───────────────────────────────────────────────── */
 
 const painPoints = [
@@ -164,6 +162,24 @@ const difficultyColor: Record<string, string> = {
 
 export default function Home() {
   const [dark, setDark] = useState(true);
+
+  // Intersection Observer for scroll-triggered animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    document.querySelectorAll('.scroll-animate, .scroll-animate-scale').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   const [curriculum, setCurriculum] = useState<Curriculum | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -230,28 +246,13 @@ export default function Home() {
     return true;
   }, [user, isDevMode]);
 
+  // Respect user motion preference
+
   // Parallax for ambient background
   const { scrollY } = useScroll();
   const bgY1 = useTransform(scrollY, [0, 3000], [0, -300]);
   const bgY2 = useTransform(scrollY, [0, 3000], [0, -150]);
   const bgY3 = useTransform(scrollY, [0, 3000], [0, -200]);
-
-  // Intersection Observer for scroll animations
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-    document.querySelectorAll('.scroll-animate, .scroll-animate-scale').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div className="relative flex flex-col min-h-screen overflow-x-hidden bg-background text-foreground transition-colors duration-300">
@@ -333,18 +334,22 @@ export default function Home() {
           id="hero"
           className="relative flex items-center justify-center px-4 pt-24 pb-20 sm:pt-32 sm:pb-28 lg:pt-40 lg:pb-36"
         >
-          <div className="mx-auto max-w-4xl text-center">
-            <div className="entrance-up delay-0">
-              <Badge
+          <div
+            className="mx-auto max-w-4xl text-center"
+          >
+            <div>
+              <div><Badge
                 variant="outline"
                 className="mb-6 rounded-full border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400"
               >
                 <Sparkles className="mr-1.5 size-3" />
                 AI-Powered Course Design
-              </Badge>
+              </Badge></div>
             </div>
 
-            <h1 className="entrance-up delay-1 text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
+            <h1
+              className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl"
+            >
               Turn Any Topic Into a
               <br />
               <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
@@ -354,13 +359,21 @@ export default function Home() {
               in Seconds
             </h1>
 
-            <p className="entrance-up delay-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+            <p
+
+
+              className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
+            >
               AI-powered course design for course creators, educators, and
               coaches. Stop staring at blank outlines — get a production-ready
               course with modules, lessons, quizzes, and pacing.
             </p>
 
-            <div className="entrance-up delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <div
+
+
+              className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
+            >
               <Button
                 id="hero-cta"
                 size="lg"
@@ -381,7 +394,11 @@ export default function Home() {
               </Button>
             </div>
 
-            <p className="entrance-up delay-4 mt-4 text-xs text-muted-foreground">
+            <p
+
+
+              className="mt-4 text-xs text-muted-foreground"
+            >
               No credit card required · Free forever on the starter plan
             </p>
           </div>
@@ -395,23 +412,38 @@ export default function Home() {
           className="relative px-4 py-20 sm:py-28"
         >
           <div className="mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <p className="scroll-animate text-sm font-semibold uppercase tracking-widest text-violet-500">
+            <div
+              className="text-center mb-16"
+            >
+              <p
+
+                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
+              >
                 The Problem
               </p>
-              <h2 className="scroll-animate scroll-delay-1 mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2
+
+
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+              >
                 Building a course shouldn&apos;t feel like pulling teeth
               </h2>
-              <p className="scroll-animate scroll-delay-2 mx-auto mt-4 max-w-2xl text-muted-foreground">
+              <p
+
+
+                className="mx-auto mt-4 max-w-2xl text-muted-foreground"
+              >
                 Course creators waste 40+ hours just on the outline. You know
                 your material — you just need it structured into something
                 students can follow.
               </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
+            <div
+              className="grid gap-6 md:grid-cols-3"
+            >
               {painPoints.map((p, i) => (
-                <div key={i} className="scroll-animate" style={{ transitionDelay: `${i * 0.12}s` }}>
+                <div key={i}>
                   <Card className="group relative h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5">
                     <CardHeader>
                       <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-violet-500/10">
@@ -438,21 +470,31 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section id="how-it-works" className="relative px-4 py-20 sm:py-28">
           <div className="mx-auto max-w-5xl">
-            <div className="text-center mb-16">
-              <p className="scroll-animate text-sm font-semibold uppercase tracking-widest text-violet-500">
+            <div
+              className="text-center mb-16"
+            >
+              <p
+
+                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
+              >
                 How It Works
               </p>
-              <h2 className="scroll-animate scroll-delay-1 mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2
+
+
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+              >
                 Three steps. Zero headaches.
               </h2>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-3">
+            <div
+              className="grid gap-8 md:grid-cols-3"
+            >
               {steps.map((s, i) => (
                 <div
                   key={i}
-                  className="scroll-animate-scale group relative"
-                  style={{ transitionDelay: `${i * 0.1}s` }}
+                  className="group relative"
                 >
                   {/* Connector line — hidden on mobile, shown between cards */}
                   {i < steps.length - 1 && (
@@ -483,11 +525,15 @@ export default function Home() {
             TRY IT — CURRICULUM FORM / OUTPUT
         ═══════════════════════════════════════════════════ */}
         <section id="generate" className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-3xl">
+          <div
+            className="mx-auto max-w-3xl"
+          >
             {isGenerating ? (
               <LoadingSkeleton />
             ) : curriculum ? (
-              <div key="output-view" className="entrance-up delay-0">
+              <div
+                key="output-view"
+              >
                 <CurriculumOutput
                   curriculum={curriculum}
                   onGenerateAnother={() => setCurriculum(null)}
@@ -495,7 +541,9 @@ export default function Home() {
               </div>
             ) : (
               <>
-                <div className="text-center mb-10 entrance-up delay-0">
+                <div
+                  className="text-center mb-10"
+                >
                   <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
                     Try It Now
                   </p>
@@ -503,7 +551,9 @@ export default function Home() {
                     Generate your course
                   </h2>
                 </div>
-                <div className="mx-auto max-w-xl entrance-up delay-1">
+                <div
+                  className="mx-auto max-w-xl"
+                >
                   <CurriculumForm
                     onGenerated={handleGenerated}
                     onLoadingChange={handleLoadingChange}
@@ -521,23 +571,38 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section id="examples" className="relative px-4 py-20 sm:py-28">
           <div className="mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <p className="scroll-animate text-sm font-semibold uppercase tracking-widest text-violet-500">
+            <div
+              className="text-center mb-16"
+            >
+              <p
+
+                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
+              >
                 Real Examples
               </p>
-              <h2 className="scroll-animate scroll-delay-1 mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2
+
+
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+              >
                 See what Syllabi can create
               </h2>
-              <p className="scroll-animate scroll-delay-2 mx-auto mt-4 max-w-2xl text-muted-foreground">
+              <p
+
+
+                className="mx-auto mt-4 max-w-2xl text-muted-foreground"
+              >
                 These courses were generated in seconds. Each one includes
                 modules, lessons, quizzes, bonus resources, and a full pacing
                 schedule.
               </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
+            <div
+              className="grid gap-6 md:grid-cols-3"
+            >
               {exampleCurricula.map((c, i) => (
-                <div key={i} className="scroll-animate" style={{ transitionDelay: `${i * 0.12}s` }}>
+                <div key={i}>
                   <Card
                     className="group h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5 cursor-pointer"
                     onClick={() => setPreviewCurriculum(fullExampleCurricula[i])}
@@ -612,20 +677,20 @@ export default function Home() {
             PRICING
         ═══════════════════════════════════════════════════ */}
         <section id="pricing" className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-5xl">
-            <div className="text-center mb-16">
-              <p className="scroll-animate text-sm font-semibold uppercase tracking-widest text-violet-500">
+          <div className="mx-auto max-w-6xl">
+            <div className="text-center mb-16 scroll-animate">
+              <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
                 Pricing
               </p>
-              <h2 className="scroll-animate scroll-delay-1 mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
                 Start free. Upgrade when you&apos;re ready.
               </h2>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 overflow-visible">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible">
               {/* FREE PLAN */}
-              <div className="scroll-animate-scale" style={{ transitionDelay: '0s' }}>
-                <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
+              <div className="flex scroll-animate">
+                <Card className="flex flex-col w-full border-border/50 bg-card/50 backdrop-blur-sm">
                   <CardHeader>
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Free
@@ -640,30 +705,23 @@ export default function Home() {
                       Perfect for trying Syllabi out. No strings attached.
                     </p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-1">
                     <ul className="space-y-3">
                       {freePlanFeatures.map((f, i) => (
-                        <li
-                          key={i}
-                          className="flex items-center gap-2.5 text-sm"
-                        >
+                        <li key={i} className="flex items-center gap-2.5 text-sm">
                           {f.included ? (
                             <Check className="size-4 text-emerald-500 shrink-0" />
                           ) : (
                             <X className="size-4 text-muted-foreground/40 shrink-0" />
                           )}
-                          <span
-                            className={
-                              f.included ? "" : "text-muted-foreground/50"
-                            }
-                          >
+                          <span className={f.included ? "" : "text-muted-foreground/50"}>
                             {f.text}
                           </span>
                         </li>
                       ))}
                     </ul>
                   </CardContent>
-                  <CardFooter className="mt-auto">
+                  <CardFooter className="mt-auto pt-0">
                     <Button
                       id="pricing-free-cta"
                       variant="outline"
@@ -678,15 +736,14 @@ export default function Home() {
               </div>
 
               {/* PRO PLAN */}
-              <div className="scroll-animate-scale overflow-visible" style={{ transitionDelay: '0.1s' }}>
-                <Card className="relative overflow-visible h-full border-violet-500/30 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
-                  {/* Popular badge */}
+              <div className="flex overflow-visible scroll-animate">
+                <Card className="relative flex flex-col w-full overflow-visible border-violet-500/30 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                     <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">
                       Most Popular
                     </Badge>
                   </div>
-                  <CardHeader className="pt-6">
+                  <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">
                       Pro
                     </CardDescription>
@@ -697,23 +754,20 @@ export default function Home() {
                       </span>
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      For serious course creators who ship courses regularly.
+                      For serious course creators who ship regularly.
                     </p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-1">
                     <ul className="space-y-3">
                       {proPlanFeatures.map((f, i) => (
-                        <li
-                          key={i}
-                          className="flex items-center gap-2.5 text-sm"
-                        >
+                        <li key={i} className="flex items-center gap-2.5 text-sm">
                           <Check className="size-4 text-violet-500 shrink-0" />
                           <span>{f.text}</span>
                         </li>
                       ))}
                     </ul>
                   </CardContent>
-                  <CardFooter className="mt-auto">
+                  <CardFooter className="mt-auto pt-0">
                     <Button
                       id="pricing-pro-cta"
                       className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all hover:scale-[1.02]"
@@ -726,9 +780,9 @@ export default function Home() {
                 </Card>
               </div>
 
-              {/* 5-PACK */}
-              <div className="scroll-animate-scale" style={{ transitionDelay: '0.2s' }}>
-                <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm">
+              {/* 5-PACK ONE-TIME */}
+              <div className="flex scroll-animate">
+                <Card className="flex flex-col w-full border-border/50 bg-card/50 backdrop-blur-sm">
                   <CardHeader>
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">
                       One-Time
@@ -740,10 +794,10 @@ export default function Home() {
                       </span>
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      5 course generations. No subscription, no commitment.
+                      5 course generations. No subscription needed.
                     </p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-1">
                     <ul className="space-y-3">
                       {[
                         "5 course generations",
@@ -752,17 +806,14 @@ export default function Home() {
                         "Custom pacing schedules",
                         "No recurring charges",
                       ].map((text, i) => (
-                        <li
-                          key={i}
-                          className="flex items-center gap-2.5 text-sm"
-                        >
+                        <li key={i} className="flex items-center gap-2.5 text-sm">
                           <Check className="size-4 text-cyan-500 shrink-0" />
                           <span>{text}</span>
                         </li>
                       ))}
                     </ul>
                   </CardContent>
-                  <CardFooter className="mt-auto">
+                  <CardFooter className="mt-auto pt-0">
                     <Button
                       id="pricing-5pack-cta"
                       className="w-full rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all hover:scale-[1.02]"
@@ -776,56 +827,54 @@ export default function Home() {
               </div>
 
               {/* PRO MAX — COMING SOON */}
-              <div className="scroll-animate-scale" style={{ transitionDelay: '0.3s' }}>
-                <Card className="relative overflow-visible h-full border-amber-500/30 bg-gradient-to-b from-amber-500/[0.03] to-amber-900/[0.06] backdrop-blur-sm shadow-xl shadow-amber-500/5">
-                  {/* Coming Soon badge */}
+              <div className="flex scroll-animate">
+                <Card className="relative flex flex-col w-full border-amber-500/30 bg-gradient-to-b from-amber-500/5 via-card/50 to-card/50 backdrop-blur-sm shadow-xl shadow-amber-500/5 overflow-hidden">
+                  {/* Gold shimmer accent */}
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                     <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-1.5 text-xs font-semibold text-black border-0 shadow-lg shadow-amber-500/25">
                       Coming Soon
                     </Badge>
                   </div>
-                  <CardHeader className="pt-6">
-                    <CardDescription className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-500">
+                  <CardHeader className="pt-8">
+                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
                       <Crown className="size-3.5" />
                       Pro Max
                     </CardDescription>
-                    <CardTitle className="text-3xl font-bold bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 bg-clip-text text-transparent">
+                    <CardTitle className="text-3xl font-bold">
                       $79
                       <span className="text-base font-normal text-muted-foreground">
                         /month
                       </span>
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      The complete toolkit to create & sell premium courses.
+                      The ultimate toolkit to create &amp; sell courses.
                     </p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-1">
+                    {/* AI Audio highlight */}
+                    <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center gap-3">
+                      <div className="flex items-center justify-center size-9 rounded-lg bg-amber-500/10">
+                        <Headphones className="size-5 text-amber-500" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-amber-500">AI Audio Lessons</p>
+                        <p className="text-[11px] text-muted-foreground">Generate narrated audio for every lesson</p>
+                      </div>
+                    </div>
                     <ul className="space-y-3">
                       {proMaxFeatures.map((f, i) => (
-                        <li
-                          key={i}
-                          className="flex items-center gap-2.5 text-sm"
-                        >
+                        <li key={i} className="flex items-center gap-2.5 text-sm">
                           <Check className="size-4 text-amber-500 shrink-0" />
                           <span>{f.text}</span>
                         </li>
                       ))}
                     </ul>
-                    {/* Audio highlight */}
-                    <div className="mt-5 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center gap-3">
-                      <div className="flex items-center justify-center size-8 rounded-lg bg-amber-500/10">
-                        <Headphones className="size-4 text-amber-500" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-amber-400">AI Audio Lessons</p>
-                        <p className="text-[10px] text-muted-foreground">Transform text into professional narrated audio</p>
-                      </div>
-                    </div>
                   </CardContent>
-                  <CardFooter className="mt-auto">
+                  <CardFooter className="mt-auto pt-0">
                     <Button
                       disabled
-                      className="w-full rounded-full bg-gradient-to-r from-amber-600/50 to-yellow-600/50 text-white/70 border-0 cursor-not-allowed"
+                      className="w-full rounded-full bg-gradient-to-r from-amber-600/50 to-yellow-600/50 text-white/60 border-0 cursor-not-allowed"
                       size="lg"
                     >
                       <Crown className="size-4 mr-2" />
@@ -834,7 +883,6 @@ export default function Home() {
                   </CardFooter>
                 </Card>
               </div>
-
             </div>
           </div>
         </section>
@@ -843,8 +891,13 @@ export default function Home() {
             FINAL CTA
         ═══════════════════════════════════════════════════ */}
         <section className="relative px-4 py-20 sm:py-28">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="scroll-animate-scale mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 backdrop-blur-sm">
+          <div
+            className="mx-auto max-w-3xl text-center"
+          >
+            <div
+
+              className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 backdrop-blur-sm"
+            >
               <LayoutGrid className="mx-auto mb-4 size-8 text-violet-500" />
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
                 Ready to build your
@@ -1051,7 +1104,6 @@ export default function Home() {
       <AuthModal
         open={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        
       />
 
       {/* ═══════════════════════════════════════════════════

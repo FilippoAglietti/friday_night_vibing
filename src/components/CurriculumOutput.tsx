@@ -17,13 +17,13 @@ import {
   Copy,
   Download,
   ExternalLink,
+  FileText,
   HelpCircle,
   Lightbulb,
   RefreshCw,
   Sparkles,
   Target,
   Trophy,
-  FileText,
 } from "lucide-react";
 import { useState } from "react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
@@ -103,6 +103,171 @@ function toMarkdown(c: Curriculum): string {
       lines.push(`- **${r.title}** *(${r.type})*: ${r.description}`)
     );
   }
+
+  return lines.join("\n");
+}
+
+function toNotionMarkdown(c: Curriculum): string {
+  const lines: string[] = [];
+  const divider = "---";
+
+  // ── Header block with metadata
+  lines.push(`# ${c.title}`);
+  lines.push("");
+  lines.push(`> ${c.subtitle}`);
+  lines.push("");
+  lines.push(divider);
+  lines.push("");
+
+  // ── Course overview table
+  lines.push("## \u{1F4CB} Course Overview");
+  lines.push("");
+  lines.push("| Detail | Info |");
+  lines.push("|---|---|");
+  lines.push(`| **Difficulty** | ${c.difficulty.charAt(0).toUpperCase() + c.difficulty.slice(1)} |`);
+  lines.push(`| **Target Audience** | ${c.targetAudience} |`);
+  lines.push(`| **Total Modules** | ${c.modules.length} |`);
+  const totalLessons = c.modules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0);
+  lines.push(`| **Total Lessons** | ${totalLessons} |`);
+  lines.push(`| **Estimated Duration** | ${c.pacing?.totalHours || "N/A"} hours |`);
+  lines.push(`| **Pacing** | ${c.pacing?.hoursPerWeek || "N/A"} hours/week over ${c.pacing?.totalWeeks || "N/A"} weeks |`);
+  lines.push("");
+
+  // ── Description
+  lines.push(`${c.description}`);
+  lines.push("");
+  lines.push(divider);
+  lines.push("");
+
+  // ── Learning Objectives
+  lines.push("## \u{1F3AF} Learning Objectives");
+  lines.push("");
+  c.objectives.forEach((obj) => lines.push(`- [ ] ${obj}`));
+  lines.push("");
+
+  // ── Prerequisites
+  if (c.prerequisites && c.prerequisites.length > 0) {
+    lines.push("## \u{1F4D6} Prerequisites");
+    lines.push("");
+    c.prerequisites.forEach((p) => lines.push(`- ${p}`));
+    lines.push("");
+  }
+
+  lines.push(divider);
+  lines.push("");
+
+  // ── Modules & Lessons
+  lines.push("## \u{1F4DA} Course Curriculum");
+  lines.push("");
+
+  c.modules.forEach((mod) => {
+    const modNum = (mod.order !== undefined ? mod.order : 0) + 1;
+    lines.push(`### Module ${modNum}: ${mod.title}`);
+    lines.push("");
+    lines.push(`> ${mod.description}`);
+    lines.push("");
+
+    if (mod.objectives && mod.objectives.length > 0) {
+      lines.push("**Module Objectives:**");
+      lines.push("");
+      mod.objectives.forEach((o) => lines.push(`- ${o}`));
+      lines.push("");
+    }
+
+    // Lessons table
+    lines.push("| # | Lesson | Duration | Format |");
+    lines.push("|---|---|---|---|");
+    mod.lessons?.forEach((l, idx) => {
+      lines.push(`| ${idx + 1} | ${l.title} | ${l.durationMinutes} min | ${l.format || "reading"} |`);
+    });
+    lines.push("");
+
+    // Detailed lesson content
+    mod.lessons?.forEach((l, idx) => {
+      lines.push(`#### Lesson ${idx + 1}: ${l.title}`);
+      lines.push("");
+      if (l.objectives && l.objectives.length > 0) {
+        lines.push("**Objectives:**");
+        l.objectives.forEach((o) => lines.push(`- ${o}`));
+        lines.push("");
+      }
+      if (l.keyPoints && l.keyPoints.length > 0) {
+        lines.push("\u{1F4A1} **Key Points:**");
+        lines.push("");
+        l.keyPoints.forEach((kp) => lines.push(`- ${kp}`));
+        lines.push("");
+      }
+      if (l.suggestedResources && l.suggestedResources.length > 0) {
+        lines.push("\u{1F517} **Resources:**");
+        lines.push("");
+        l.suggestedResources.forEach((r) => lines.push(`- [${r.title}](${r.url}) *(${r.type})*`));
+        lines.push("");
+      }
+    });
+
+    // Module quiz
+    if (mod.quiz && mod.quiz.length > 0) {
+      lines.push(`#### \u{2753} Module ${modNum} Quiz`);
+      lines.push("");
+      mod.quiz.forEach((q, i) => {
+        lines.push(`**Q${i + 1}:** ${q.question}`);
+        lines.push("");
+        if (q.options) {
+          q.options.forEach((opt, optIdx) => {
+            const marker = opt === q.correctAnswer || optIdx === q.correctAnswer ? "\u2705" : "\u2B1C";
+            lines.push(`${marker} ${opt}`);
+          });
+          lines.push("");
+        }
+        const answerText = typeof q.correctAnswer === "number" && q.options
+          ? q.options[q.correctAnswer]
+          : q.correctAnswer;
+        lines.push(`<details><summary>Show Answer</summary>`);
+        lines.push("");
+        lines.push(`**Answer:** ${answerText}`);
+        if (q.explanation) {
+          lines.push(`**Why:** ${q.explanation}`);
+        }
+        lines.push("");
+        lines.push(`</details>`);
+        lines.push("");
+      });
+    }
+
+    lines.push(divider);
+    lines.push("");
+  });
+
+  // ── Pacing Schedule
+  if (c.pacing && c.pacing.weeklyPlan && c.pacing.weeklyPlan.length > 0) {
+    lines.push("## \u{1F4C5} Weekly Pacing Schedule");
+    lines.push("");
+    lines.push("| Week | Focus | Hours |");
+    lines.push("|---|---|---|");
+    c.pacing.weeklyPlan.forEach((w) => {
+      const label = w.label || (w.moduleIds?.length ? `Modules ${w.moduleIds.join(", ")}` : "Course Content");
+      lines.push(`| Week ${w.week} | ${label} | ${c.pacing.hoursPerWeek}h |`);
+    });
+    lines.push("");
+    lines.push(divider);
+    lines.push("");
+  }
+
+  // ── Bonus Resources
+  if (c.bonusResources && c.bonusResources.length > 0) {
+    lines.push("## \u2728 Bonus Resources");
+    lines.push("");
+    c.bonusResources.forEach((r) => {
+      lines.push(`- **${r.title}** *(${r.type})* — ${r.description || ""}`);
+    });
+    lines.push("");
+    lines.push(divider);
+    lines.push("");
+  }
+
+  // ── Footer
+  lines.push(`> *Generated by [Syllabi.ai](https://syllabi.ai) — AI-Powered Course Design*`);
+  lines.push("");
 
   return lines.join("\n");
 }
@@ -278,64 +443,16 @@ export default function CurriculumOutput({
     }
   };
 
-
   const handleExportNotion = () => {
-    // Generate a rich markdown formatted for Notion import
-    const c = curriculum;
-    let md = `# ${c.title}\n\n`;
-    md += `> ${c.description}\n\n`;
-    md += `**Difficulty:** ${c.difficulty} · **Duration:** ${c.pacing?.totalHours || "N/A"}h · **Modules:** ${c.modules.length}\n\n`;
-    md += `---\n\n`;
-    if (c.objectives?.length) {
-      md += `## 🎯 Learning Objectives\n\n`;
-      c.objectives.forEach((obj: string) => { md += `- ${obj}\n`; });
-      md += `\n`;
-    }
-    if (c.prerequisites?.length) {
-      md += `## 📋 Prerequisites\n\n`;
-      c.prerequisites.forEach((p: string) => { md += `- ${p}\n`; });
-      md += `\n`;
-    }
-    c.modules.forEach((m: Module, mi: number) => {
-      md += `## Module ${mi + 1}: ${m.title}\n\n`;
-      if (m.description) md += `${m.description}\n\n`;
-      if (m.lessons?.length) {
-        m.lessons.forEach((l: Lesson, li: number) => {
-          md += `### ${mi + 1}.${li + 1} ${l.title}\n\n`;
-          if (l.content) md += `${l.content}\n\n`;
-          if (l.keyPoints?.length) {
-            md += `**Key Takeaways:**\n`;
-            l.keyPoints.forEach((kt: string) => { md += `- ${kt}\n`; });
-            md += `\n`;
-          }
-        });
-      }
-      if (m.quiz?.length) {
-        md += `### 📝 Quiz\n\n`;
-        m.quiz.forEach((q: QuizQuestion, qi: number) => {
-          md += `**Q${qi + 1}: ${q.question}**\n`;
-          q.options?.forEach((opt: string, oi: number) => {
-            md += `${oi === q.correctAnswer ? '✅' : '⬜'} ${opt}\n`;
-          });
-          md += `\n`;
-        });
-      }
-      md += `---\n\n`;
-    });
-    if (c.bonusResources?.length) {
-      md += `## 📚 Bonus Resources\n\n`;
-      c.bonusResources.forEach((r: BonusResource) => {
-        md += `- **${r.title}** (${r.type}) — ${r.description}\n`;
-      });
-    }
-
-    // Create a downloadable .md file optimized for Notion import
-    const blob = new Blob([md], { type: "text/markdown" });
+    const md = toNotionMarkdown(curriculum);
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${c.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_notion.md`;
+    a.download = `${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_notion.md`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
@@ -512,37 +629,36 @@ export default function CurriculumOutput({
       )}
 
       {/* ── Action Buttons ── */}
-      <div className="flex flex-col sm:flex-row gap-3 pb-8">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-3 pb-8">
         <Button
           onClick={handleDownloadPDF}
-          className="flex-1 gap-2"
+          className="flex-1 gap-2 min-w-[140px]"
           size="lg"
         >
           <Download className="h-4 w-4" />
           Download PDF
         </Button>
         <Button
-          onClick={handleCopy}
-          variant="outline"
-          className="flex-1 gap-2"
-          size="lg"
-        >
-          <Copy className="h-4 w-4" />
-          {copied ? "Copied!" : "Copy as Markdown"}
-        </Button>
-        <Button
           onClick={handleExportNotion}
-          variant="outline"
-          className="flex-1 gap-2 border-violet-500/30 text-violet-400 hover:bg-violet-500/10"
+          className="flex-1 gap-2 min-w-[140px] bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 hover:from-violet-700 hover:to-purple-700"
           size="lg"
         >
           <FileText className="h-4 w-4" />
           Export for Notion
         </Button>
         <Button
+          onClick={handleCopy}
+          variant="outline"
+          className="flex-1 gap-2 min-w-[140px]"
+          size="lg"
+        >
+          <Copy className="h-4 w-4" />
+          {copied ? "Copied!" : "Copy Markdown"}
+        </Button>
+        <Button
           onClick={onGenerateAnother}
           variant="ghost"
-          className="flex-1 gap-2"
+          className="flex-1 gap-2 min-w-[140px]"
           size="lg"
         >
           <RefreshCw className="h-4 w-4" />
