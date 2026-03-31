@@ -738,7 +738,7 @@ export default function Home() {
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible">
               {/* FREE PLAN */}
-              <div className="flex overflow-visible scroll-animate">
+              <div className="flex min-w-0 overflow-visible scroll-animate">
                 <Card className="relative flex flex-col w-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
                   {/* Invisible spacer to align with badged cards */}
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 opacity-0 pointer-events-none">
@@ -789,7 +789,7 @@ export default function Home() {
               </div>
 
               {/* PRO PLAN */}
-              <div className="flex overflow-visible scroll-animate">
+              <div className="flex min-w-0 overflow-visible scroll-animate">
                 <Card className="relative flex flex-col w-full overflow-visible border-violet-500/30 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                     <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">
@@ -834,7 +834,7 @@ export default function Home() {
               </div>
 
               {/* 5-PACK ONE-TIME */}
-              <div className="flex overflow-visible scroll-animate">
+              <div className="flex min-w-0 overflow-visible scroll-animate">
                 <Card className="relative flex flex-col w-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
                   {/* Invisible spacer to align with badged cards */}
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 opacity-0 pointer-events-none">
@@ -884,7 +884,7 @@ export default function Home() {
               </div>
 
               {/* PRO MAX — COMING SOON */}
-              <div className="flex scroll-animate">
+              <div className="flex min-w-0 overflow-visible scroll-animate">
                 <Card className="relative flex flex-col w-full border-amber-500/30 bg-gradient-to-b from-amber-500/5 via-card/50 to-card/50 backdrop-blur-sm shadow-xl shadow-amber-500/5 overflow-visible">
                   {/* Gold shimmer accent */}
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
@@ -912,10 +912,10 @@ export default function Home() {
                   <CardContent className="flex-1">
                     {/* AI Audio highlight */}
                     <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center gap-3">
-                      <div className="flex items-center justify-center size-9 rounded-lg bg-amber-500/10">
+                      <div className="flex items-center justify-center size-9 shrink-0 rounded-lg bg-amber-500/10">
                         <Headphones className="size-5 text-amber-500" />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-xs font-semibold text-amber-500">AI Audio Lessons</p>
                         <p className="text-[11px] text-muted-foreground">Generate narrated audio for every lesson</p>
                       </div>
