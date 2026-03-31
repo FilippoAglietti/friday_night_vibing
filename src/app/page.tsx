@@ -321,7 +321,7 @@ export default function Home() {
           className="relative flex items-center justify-center px-4 pt-24 pb-20 sm:pt-32 sm:pb-28 lg:pt-40 lg:pb-36"
         >
           <div className="mx-auto max-w-4xl text-center">
-            <div className="animate-fade-up delay-0">
+            <div className="entrance-up delay-0">
               <Badge
                 variant="outline"
                 className="mb-6 rounded-full border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400"
@@ -331,7 +331,7 @@ export default function Home() {
               </Badge>
             </div>
 
-            <h1 className="animate-fade-up delay-1 text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
+            <h1 className="entrance-up delay-1 text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
               Turn Any Topic Into a
               <br />
               <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
@@ -341,13 +341,13 @@ export default function Home() {
               in Seconds
             </h1>
 
-            <p className="animate-fade-up delay-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+            <p className="entrance-up delay-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
               AI-powered course design for course creators, educators, and
               coaches. Stop staring at blank outlines — get a production-ready
               course with modules, lessons, quizzes, and pacing.
             </p>
 
-            <div className="animate-fade-up delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <div className="entrance-up delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button
                 id="hero-cta"
                 size="lg"
@@ -368,7 +368,7 @@ export default function Home() {
               </Button>
             </div>
 
-            <p className="animate-fade-up delay-4 mt-4 text-xs text-muted-foreground">
+            <p className="entrance-up delay-4 mt-4 text-xs text-muted-foreground">
               No credit card required · Free forever on the starter plan
             </p>
           </div>
@@ -474,7 +474,7 @@ export default function Home() {
             {isGenerating ? (
               <LoadingSkeleton />
             ) : curriculum ? (
-              <div key="output-view" className="animate-fade-up delay-0">
+              <div key="output-view" className="entrance-up delay-0">
                 <CurriculumOutput
                   curriculum={curriculum}
                   onGenerateAnother={() => setCurriculum(null)}
@@ -482,7 +482,7 @@ export default function Home() {
               </div>
             ) : (
               <>
-                <div className="text-center mb-10 animate-fade-up delay-0">
+                <div className="text-center mb-10 entrance-up delay-0">
                   <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
                     Try It Now
                   </p>
@@ -490,7 +490,7 @@ export default function Home() {
                     Generate your course
                   </h2>
                 </div>
-                <div className="mx-auto max-w-xl animate-fade-up delay-1">
+                <div className="mx-auto max-w-xl entrance-up delay-1">
                   <CurriculumForm
                     onGenerated={handleGenerated}
                     onLoadingChange={handleLoadingChange}

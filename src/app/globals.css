@@ -148,11 +148,11 @@
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-.animate-fade-up {
+.entrance-up {
   animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.animate-fade-scale {
+.entrance-scale {
   animation: fadeScale 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -191,8 +191,8 @@
 .scroll-delay-3 { transition-delay: 0.3s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up,
-  .animate-fade-scale,
+  .entrance-up,
+  .entrance-scale,
   .scroll-animate,
   .scroll-animate-scale {
     animation: none !important;
