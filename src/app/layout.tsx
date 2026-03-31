@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import ToastProvider from "@/components/ToastProvider";
+import CookieConsent from "@/components/CookieConsent";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -62,6 +63,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
         <ToastProvider>{children}</ToastProvider>
+        <CookieConsent />
         <Analytics />
         <SpeedInsights />
       </body>

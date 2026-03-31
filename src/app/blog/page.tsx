@@ -137,12 +137,9 @@ export default function BlogPage() {
               </p>
               <div className="flex items-center justify-between mt-auto">
                 <span className="text-xs text-muted-foreground/60">{post.date}</span>
-                <a
-                  href={post.slug}
-                  className="flex items-center gap-1 text-xs font-medium text-violet-400 hover:text-violet-300 transition-colors"
-                >
-                  Read more <ArrowRight className="size-3" />
-                </a>
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground px-2 py-1 rounded bg-muted/50">
+                  Coming Soon
+                </span>
               </div>
             </article>
           ))}

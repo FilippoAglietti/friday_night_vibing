@@ -353,7 +353,6 @@ export default function Home() {
   }, []);
 
   const handleGenerated = useCallback((c: Curriculum) => {
-    console.log("[DEBUG] handleGenerated called, data:", JSON.stringify(c)?.slice(0, 200));
     setCurriculum(c);
     toast("Course generated successfully!", "success");
   }, [toast]);
@@ -406,7 +405,7 @@ export default function Home() {
       <nav className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <a
-            href="#"
+            href="/"
             id="nav-logo"
             className="flex items-center gap-2 text-lg font-bold tracking-tight"
           >
@@ -1159,7 +1158,7 @@ export default function Home() {
             {/* Brand */}
             <div className="col-span-1 lg:col-span-1">
               <a
-                href="#"
+                href="/"
                 className="flex items-center gap-2 text-lg font-bold tracking-tight"
               >
                 <GraduationCap className="size-5 text-violet-500" />
@@ -1173,21 +1172,21 @@ export default function Home() {
               </p>
               <div className="mt-4 flex gap-3">
                 <a
-                  href="#"
+                  href="https://twitter.com/syllabi_ai"
                   className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label="Twitter"
                 >
                   <MessageCircle className="size-4" />
                 </a>
                 <a
-                  href="#"
+                  href="https://github.com/syllabi-ai"
                   className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label="GitHub"
                 >
                   <Globe className="size-4" />
                 </a>
                 <a
-                  href="#"
+                  href="mailto:hello@syllabi.ai"
                   className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label="Email"
                 >
@@ -1318,7 +1317,7 @@ export default function Home() {
 
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/40 pt-8 sm:flex-row">
             <p className="text-xs text-muted-foreground">
-              © 2026 Syllabi. All rights reserved.
+              © {new Date().getFullYear()} Syllabi. All rights reserved.
             </p>
             <p className="text-xs text-muted-foreground">
               Built with ❤️ for course creators

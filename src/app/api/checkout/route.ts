@@ -59,6 +59,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const VALID_PRICE_IDS = [
+      process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
+      process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID,
+    ].filter(Boolean);
+
+    if (VALID_PRICE_IDS.length > 0 && !VALID_PRICE_IDS.includes(priceId)) {
+      return NextResponse.json({ error: "Invalid price ID" }, { status: 400 });
+    }
+
     // Get authenticated user (optional — allows anonymous checkout)
     const user = await getUser();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";

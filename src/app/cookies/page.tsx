@@ -291,7 +291,7 @@ export default function CookiesPage() {
       <footer className="border-t border-border/40 mt-8">
         <div className="mx-auto max-w-4xl px-4 py-6">
           <p className="text-xs text-muted-foreground text-center">
-            © 2026 Syllabi. All rights reserved.
+            © {new Date().getFullYear()} Syllabi. All rights reserved.
           </p>
         </div>
       </footer>
