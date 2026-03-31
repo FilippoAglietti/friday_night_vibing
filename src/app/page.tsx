@@ -793,73 +793,64 @@ export default function Home() {
               </motion.p>
             </AnimateInView>
 
-            <AnimateInView containerRef={containerRef} amount={0.15} variants={stagger} className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-10">
+            <AnimateInView containerRef={containerRef} amount={0.15} variants={stagger} className="grid gap-8 md:grid-cols-3 xl:gap-10 2xl:gap-14">
               {exampleCurricula.map((c, i) => (
-                <motion.div key={i} variants={scaleUp}>
-                  <Card
-                    className="group h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5 cursor-pointer"
+                <motion.div key={i} variants={scaleUp} className="group relative">
+                  <div
+                    className="relative flex flex-col items-center text-center p-8 xl:p-10 2xl:p-12 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60 hover:shadow-xl hover:shadow-violet-500/5 h-full cursor-pointer"
                     onClick={() => setPreviewCurriculum(fullExampleCurricula[i])}
                   >
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
+                    {/* Difficulty badge */}
+                    <Badge
+                      variant="outline"
+                      className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-xs font-semibold shadow-lg ${difficultyColor[c.difficulty]}`}
+                    >
+                      {c.difficulty}
+                    </Badge>
+
+                    {/* Preview hint on hover */}
+                    <div className="absolute top-4 right-4 flex items-center gap-1 text-xs text-violet-400 opacity-0 transition-all group-hover:opacity-100">
+                      <Eye className="size-3.5" />
+                      <span>Preview</span>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="mt-2 text-lg xl:text-xl 2xl:text-2xl font-semibold leading-snug">
+                      {c.title}
+                    </h3>
+
+                    {/* Stats */}
+                    <div className="mt-5 grid w-full grid-cols-3 gap-3 xl:gap-4">
+                      <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3 xl:p-4">
+                        <Layers className="mb-1.5 size-4 xl:size-5 text-violet-500" />
+                        <span className="text-base xl:text-lg font-semibold">{c.modules}</span>
+                        <span className="text-[10px] xl:text-xs text-muted-foreground">Modules</span>
+                      </div>
+                      <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3 xl:p-4">
+                        <FileText className="mb-1.5 size-4 xl:size-5 text-violet-500" />
+                        <span className="text-base xl:text-lg font-semibold">{c.lessons}</span>
+                        <span className="text-[10px] xl:text-xs text-muted-foreground">Lessons</span>
+                      </div>
+                      <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3 xl:p-4">
+                        <Clock className="mb-1.5 size-4 xl:size-5 text-violet-500" />
+                        <span className="text-base xl:text-lg font-semibold">{c.hours}h</span>
+                        <span className="text-[10px] xl:text-xs text-muted-foreground">Total</span>
+                      </div>
+                    </div>
+
+                    {/* Tags */}
+                    <div className="mt-5 flex flex-wrap justify-center gap-2">
+                      {c.tags.map((t) => (
                         <Badge
-                          variant="outline"
-                          className={`rounded-full text-[10px] font-semibold ${difficultyColor[c.difficulty]}`}
+                          key={t}
+                          variant="secondary"
+                          className="rounded-full px-3 py-1 text-[10px] xl:text-xs"
                         >
-                          {c.difficulty}
+                          {t}
                         </Badge>
-                        <div className="flex items-center gap-1 text-xs text-violet-400 opacity-0 transition-all group-hover:opacity-100">
-                          <Eye className="size-3.5" />
-                          <span>Preview</span>
-                        </div>
-                      </div>
-                      <CardTitle className="mt-2 text-lg xl:text-xl font-semibold leading-snug">
-                        {c.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-3 gap-3 xl:gap-5">
-                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5 xl:p-4">
-                          <Layers className="mb-1 size-3.5 xl:size-5 text-muted-foreground" />
-                          <span className="text-sm xl:text-lg font-semibold">
-                            {c.modules}
-                          </span>
-                          <span className="text-[10px] xl:text-xs text-muted-foreground">
-                            Modules
-                          </span>
-                        </div>
-                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5 xl:p-4">
-                          <FileText className="mb-1 size-3.5 xl:size-5 text-muted-foreground" />
-                          <span className="text-sm xl:text-lg font-semibold">
-                            {c.lessons}
-                          </span>
-                          <span className="text-[10px] xl:text-xs text-muted-foreground">
-                            Lessons
-                          </span>
-                        </div>
-                        <div className="flex flex-col items-center rounded-lg bg-muted/50 p-2.5 xl:p-4">
-                          <Clock className="mb-1 size-3.5 xl:size-5 text-muted-foreground" />
-                          <span className="text-sm xl:text-lg font-semibold">
-                            {c.hours}h
-                          </span>
-                          <span className="text-[10px] xl:text-xs text-muted-foreground">
-                            Total
-                          </span>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex flex-wrap gap-1.5">
-                        {c.tags.map((t) => (
-                          <Badge
-                            key={t}
-                            variant="secondary"
-                            className="rounded-full text-[10px]"
-                          >
-                            {t}
-                          </Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                      ))}
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </AnimateInView>
