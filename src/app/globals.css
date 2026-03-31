@@ -203,21 +203,24 @@
 }
 
 /* ─── Scroll Snap ─────────────────────────────────────── */
-@media (min-width: 768px) {
-  html {
-    scroll-snap-type: y mandatory;
-    scroll-padding-top: 3.5rem; /* nav height = 56px */
-  }
+.snap-scroll-container {
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scroll-padding-top: 3.5rem; /* 56px nav height */
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
+  .snap-scroll-container {
     scroll-snap-type: none !important;
   }
 }
 
 .snap-section {
   scroll-snap-align: start;
+  min-height: 100vh;
 }
 
 /* ─── Section Dots ────────────────────────────────────── */

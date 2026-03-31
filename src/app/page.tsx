@@ -7,7 +7,7 @@ import PaywallModal from "@/components/PaywallModal";
 import AuthModal from "@/components/AuthModal";
 import AuthButton from "@/components/AuthButton";
 import { useToast } from "@/components/ToastProvider";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { Curriculum } from "@/types/curriculum";
 import { exampleCurricula as fullExampleCurricula } from "@/data/exampleCurricula";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -308,16 +308,21 @@ export default function Home() {
     return true;
   }, [user, isDevMode]);
 
-  // Parallax for ambient background
-  const { scrollY } = useScroll();
+  // Snap scroll container — drives both snap behaviour and parallax
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Parallax for ambient background — track the snap container, not window
+  const { scrollY } = useScroll({ container: containerRef });
   const bgY1 = useTransform(scrollY, [0, 3000], [0, -300]);
   const bgY2 = useTransform(scrollY, [0, 3000], [0, -150]);
   const bgY3 = useTransform(scrollY, [0, 3000], [0, -200]);
 
   return (
-    <div className="relative flex flex-col min-h-screen overflow-x-hidden bg-background text-foreground transition-colors duration-300">
+    <div
+      className="relative overflow-x-hidden bg-background text-foreground transition-colors duration-300"
+    >
       {/* ── Scroll Progress Bar ─────────────────────────── */}
-      <ScrollProgress />
+      <ScrollProgress container={containerRef} />
 
       {/* ── Section Navigation Dots ─────────────────────── */}
       <SectionDots activeSection={activeSection} />
@@ -333,7 +338,7 @@ export default function Home() {
       </div>
 
       {/* ── NAV ─────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-xl">
+      <nav className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <a
             href="#"
@@ -436,7 +441,9 @@ export default function Home() {
         )}
       </nav>
 
-      <main className="relative z-10 flex-1">
+      {/* ── Snap Container: wraps ONLY the 7 sections; footer stays outside ── */}
+      <div ref={containerRef} className="snap-scroll-container relative z-10">
+      <main>
         {/* ═══════════════════════════════════════════════════
             HERO
         ═══════════════════════════════════════════════════ */}
@@ -449,7 +456,7 @@ export default function Home() {
             <div className="absolute left-1/2 top-[45%] h-[640px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/[0.05] dark:bg-violet-500/[0.09] blur-[90px]" />
           </div>
 
-          <div className="mx-auto max-w-4xl text-center">
+          <div className="mx-auto max-w-4xl xl:max-w-5xl 2xl:max-w-6xl text-center">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -468,7 +475,7 @@ export default function Home() {
 
               <motion.h1
                 variants={fadeUp}
-                className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl"
+                className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
               >
                 Turn Any Topic Into a
                 <br />
@@ -481,7 +488,7 @@ export default function Home() {
 
               <motion.p
                 variants={fadeUp}
-                className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl"
+                className="mx-auto mt-6 max-w-2xl xl:max-w-3xl text-lg leading-relaxed text-muted-foreground sm:text-xl xl:text-2xl"
               >
                 AI-powered course design for course creators, educators, and
                 coaches. Stop staring at blank outlines — get a production-ready
@@ -535,7 +542,7 @@ export default function Home() {
             <div className="absolute top-[8%] right-[3%] h-[35vh] w-[35vh] rounded-full bg-amber-500/[0.03] blur-[80px] dark:bg-amber-400/[0.05]" />
           </div>
 
-          <div className="mx-auto max-w-6xl w-full">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -551,7 +558,7 @@ export default function Home() {
               </motion.p>
               <motion.h2
                 variants={fadeUp}
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
                 Building a course shouldn&apos;t feel like pulling teeth
               </motion.h2>
@@ -570,21 +577,21 @@ export default function Home() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.15 }}
               variants={stagger}
-              className="grid gap-6 md:grid-cols-3"
+              className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-12"
             >
               {painPoints.map((p, i) => (
                 <motion.div key={i} variants={scaleUp}>
-                  <Card className="group relative h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5">
-                    <CardHeader>
-                      <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-violet-500/10">
-                        <p.icon className="size-5 text-violet-500" />
+                  <Card className="group relative h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-xl hover:shadow-violet-500/5">
+                    <CardHeader className="xl:p-8">
+                      <div className="mb-3 flex size-10 xl:size-12 items-center justify-center rounded-lg bg-violet-500/10">
+                        <p.icon className="size-5 xl:size-6 text-violet-500" />
                       </div>
-                      <CardTitle className="text-base font-semibold text-destructive/80 dark:text-red-400 line-through decoration-muted-foreground/30">
+                      <CardTitle className="text-base xl:text-lg font-semibold text-destructive/80 dark:text-red-400 line-through decoration-muted-foreground/30">
                         {p.problem}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
+                    <CardContent className="xl:px-8 xl:pb-8">
+                      <p className="text-sm xl:text-base leading-relaxed text-muted-foreground">
                         {p.solution}
                       </p>
                     </CardContent>
@@ -605,7 +612,7 @@ export default function Home() {
             <div className="absolute bottom-[10%] left-[5%] h-[30vh] w-[30vh] rounded-full bg-cyan-500/[0.03] blur-[80px] dark:bg-cyan-400/[0.05]" />
           </div>
 
-          <div className="mx-auto max-w-5xl w-full">
+          <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl w-full">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -621,7 +628,7 @@ export default function Home() {
               </motion.p>
               <motion.h2
                 variants={fadeUp}
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
                 Three steps. Zero headaches.
               </motion.h2>
@@ -632,7 +639,7 @@ export default function Home() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.15 }}
               variants={stagger}
-              className="grid gap-8 md:grid-cols-3"
+              className="grid gap-8 md:grid-cols-3 xl:gap-10 2xl:gap-14"
             >
               {steps.map((s, i) => (
                 <motion.div
@@ -645,17 +652,17 @@ export default function Home() {
                     <div className="absolute top-12 -right-4 hidden h-px w-8 bg-gradient-to-r from-border to-transparent md:block" />
                   )}
 
-                  <div className="relative flex flex-col items-center text-center p-8 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60">
+                  <div className="relative flex flex-col items-center text-center p-8 xl:p-10 2xl:p-12 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60 hover:shadow-xl hover:shadow-violet-500/5">
                     {/* Step number */}
                     <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-0.5 text-xs font-bold text-white shadow-lg shadow-violet-500/25">
                       {s.num}
                     </span>
 
-                    <div className="mt-4 mb-5 flex size-14 items-center justify-center rounded-2xl bg-violet-500/10">
-                      <s.icon className="size-6 text-violet-500" />
+                    <div className="mt-4 mb-5 flex size-14 xl:size-16 2xl:size-20 items-center justify-center rounded-2xl bg-violet-500/10">
+                      <s.icon className="size-6 xl:size-7 2xl:size-9 text-violet-500" />
                     </div>
-                    <h3 className="text-lg font-semibold">{s.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    <h3 className="text-lg xl:text-xl 2xl:text-2xl font-semibold">{s.title}</h3>
+                    <p className="mt-2 text-sm xl:text-base leading-relaxed text-muted-foreground">
                       {s.desc}
                     </p>
                   </div>
@@ -683,7 +690,7 @@ export default function Home() {
             <div className="absolute left-1/2 top-1/3 h-[50vh] w-[60vh] -translate-x-1/2 rounded-full bg-violet-500/[0.03] blur-[80px] dark:bg-violet-500/[0.07]" />
           </div>
 
-          <div className="mx-auto w-full max-w-3xl">
+          <div className="mx-auto w-full max-w-3xl xl:max-w-4xl 2xl:max-w-5xl">
             {isGenerating ? (
               <LoadingSkeleton />
             ) : curriculum ? (
@@ -710,7 +717,7 @@ export default function Home() {
                   </motion.p>
                   <motion.h2
                     variants={fadeUp}
-                    className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+                    className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
                   >
                     Generate your course
                   </motion.h2>
@@ -720,7 +727,7 @@ export default function Home() {
                   whileInView="visible"
                   viewport={{ once: true, amount: 0.3 }}
                   variants={fadeUp}
-                  className="mx-auto max-w-xl"
+                  className="mx-auto max-w-xl xl:max-w-2xl"
                 >
                   <CurriculumForm
                     onGenerated={handleGenerated}
@@ -744,7 +751,7 @@ export default function Home() {
             <div className="absolute bottom-[5%] right-[5%] h-[30vh] w-[30vh] rounded-full bg-cyan-500/[0.03] blur-[80px] dark:bg-cyan-400/[0.05]" />
           </div>
 
-          <div className="mx-auto max-w-6xl w-full">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -760,7 +767,7 @@ export default function Home() {
               </motion.p>
               <motion.h2
                 variants={fadeUp}
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
                 See what Syllabi can create
               </motion.h2>
@@ -779,7 +786,7 @@ export default function Home() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.15 }}
               variants={stagger}
-              className="grid gap-6 md:grid-cols-3"
+              className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-10"
             >
               {exampleCurricula.map((c, i) => (
                 <motion.div key={i} variants={scaleUp}>
@@ -800,7 +807,7 @@ export default function Home() {
                           <span>Preview</span>
                         </div>
                       </div>
-                      <CardTitle className="mt-2 text-lg font-semibold leading-snug">
+                      <CardTitle className="mt-2 text-lg xl:text-xl font-semibold leading-snug">
                         {c.title}
                       </CardTitle>
                     </CardHeader>
@@ -863,7 +870,7 @@ export default function Home() {
             <div className="absolute bottom-[5%] right-[10%] h-[25vh] w-[25vh] rounded-full bg-amber-500/[0.03] blur-[80px] dark:bg-amber-500/[0.05]" />
           </div>
 
-          <div className="mx-auto max-w-6xl w-full">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -879,7 +886,7 @@ export default function Home() {
               </motion.p>
               <motion.h2
                 variants={fadeUp}
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl"
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
                 Start free. Upgrade when you&apos;re ready.
               </motion.h2>
@@ -890,7 +897,7 @@ export default function Home() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.1 }}
               variants={stagger}
-              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible"
+              className="grid gap-6 xl:gap-8 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible"
             >
               {/* FREE PLAN */}
               <motion.div variants={scaleUp} className="flex min-w-0 overflow-visible">
@@ -1111,20 +1118,20 @@ export default function Home() {
             <div className="absolute bottom-[10%] right-[5%] h-[25vh] w-[25vh] rounded-full bg-indigo-500/[0.04] blur-[80px] dark:bg-indigo-400/[0.07]" />
           </div>
 
-          <div className="mx-auto max-w-3xl text-center">
+          <div className="mx-auto max-w-3xl xl:max-w-4xl 2xl:max-w-5xl text-center">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               variants={stagger}
-              className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 backdrop-blur-sm"
+              className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 xl:p-20 2xl:p-24 backdrop-blur-sm"
             >
               <motion.div variants={fadeUp}>
-                <LayoutGrid className="mx-auto mb-4 size-8 text-violet-500" />
+                <LayoutGrid className="mx-auto mb-4 size-8 xl:size-10 text-violet-500" />
               </motion.div>
               <motion.h2
                 variants={fadeUp}
-                className="text-3xl font-bold tracking-tight sm:text-4xl"
+                className="text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl 2xl:text-6xl"
               >
                 Ready to build your
                 <br />
@@ -1132,7 +1139,7 @@ export default function Home() {
               </motion.h2>
               <motion.p
                 variants={fadeUp}
-                className="mx-auto mt-4 max-w-lg text-muted-foreground"
+                className="mx-auto mt-4 max-w-lg xl:max-w-2xl xl:text-lg text-muted-foreground"
               >
                 Join hundreds of course creators who save 40+ hours per course
                 with Syllabi. Your first generation is free — no credit card, no
@@ -1142,7 +1149,7 @@ export default function Home() {
                 <Button
                   id="bottom-cta"
                   size="lg"
-                  className="mt-8 h-12 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 text-base font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                  className="mt-8 xl:mt-10 h-12 xl:h-14 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 xl:px-12 text-base xl:text-lg font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
                   onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Generate Your First Course Free
@@ -1153,6 +1160,7 @@ export default function Home() {
           </div>
         </section>
       </main>
+      </div> {/* end snap-scroll-container */}
 
       {/* ═══════════════════════════════════════════════════
           FOOTER
