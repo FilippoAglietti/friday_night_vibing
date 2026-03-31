@@ -10,7 +10,7 @@ import { useToast } from "@/components/ToastProvider";
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Curriculum } from "@/types/curriculum";
 import { exampleCurricula as fullExampleCurricula } from "@/data/exampleCurricula";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useAnimation, type Variants } from "framer-motion";
 import ScrollProgress from "@/components/ScrollProgress";
 import { Button } from "@/components/ui/button";
 import { supabaseBrowser } from "@/lib/supabase";
@@ -185,6 +185,62 @@ const stagger = {
   },
 };
 
+/* ─── Scroll-triggered animation wrapper (SSR-safe) ──── */
+/* Framer-motion's viewport.root doesn't work with SSR because the
+   ref is null during hydration. This component creates a native
+   IntersectionObserver in a useEffect (after mount), guaranteeing
+   the container ref is set before observing.                       */
+
+function AnimateInView({
+  containerRef,
+  amount = 0.2,
+  variants,
+  className,
+  children,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  amount?: number;
+  variants: Variants;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const controls = useAnimation();
+  const triggered = useRef(false);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const element = ref.current;
+    if (!container || !element || triggered.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !triggered.current) {
+          triggered.current = true;
+          controls.start("visible");
+          observer.disconnect();
+        }
+      },
+      { root: container, threshold: amount }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [containerRef, controls, amount]);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={variants}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 /* ─── Section Meta ────────────────────────────────────── */
 
 const sectionMeta = [
@@ -227,8 +283,10 @@ export default function Home() {
   const [dark, setDark] = useState(true);
   const [activeSection, setActiveSection] = useState("hero");
 
-  // Section tracking for dots
+  // Section tracking for dots — observes inside the snap container
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -236,7 +294,7 @@ export default function Home() {
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (visible) setActiveSection(visible.target.id);
       },
-      { threshold: [0.3, 0.5] }
+      { root: container, threshold: [0.3, 0.5] }
     );
     sectionMeta.forEach(({ id }) => {
       const el = document.getElementById(id);
@@ -542,13 +600,7 @@ export default function Home() {
           </div>
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2, root: containerRef }}
-              variants={stagger}
-              className="text-center mb-16"
-            >
+            <AnimateInView containerRef={containerRef} amount={0.2} variants={stagger} className="text-center mb-16">
               <motion.p
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
@@ -569,15 +621,9 @@ export default function Home() {
                 your material — you just need it structured into something
                 students can follow.
               </motion.p>
-            </motion.div>
+            </AnimateInView>
 
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.15, root: containerRef }}
-              variants={stagger}
-              className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-12"
-            >
+            <AnimateInView containerRef={containerRef} amount={0.15} variants={stagger} className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-12">
               {painPoints.map((p, i) => (
                 <motion.div key={i} variants={scaleUp}>
                   <Card className="group relative h-full border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:shadow-xl hover:shadow-violet-500/5">
@@ -597,7 +643,7 @@ export default function Home() {
                   </Card>
                 </motion.div>
               ))}
-            </motion.div>
+            </AnimateInView>
           </div>
         </section>
 
@@ -612,13 +658,7 @@ export default function Home() {
           </div>
 
           <div className="mx-auto max-w-5xl xl:max-w-6xl 2xl:max-w-7xl w-full">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2, root: containerRef }}
-              variants={stagger}
-              className="text-center mb-16"
-            >
+            <AnimateInView containerRef={containerRef} amount={0.2} variants={stagger} className="text-center mb-16">
               <motion.p
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
@@ -631,15 +671,9 @@ export default function Home() {
               >
                 Three steps. Zero headaches.
               </motion.h2>
-            </motion.div>
+            </AnimateInView>
 
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.15, root: containerRef }}
-              variants={stagger}
-              className="grid gap-8 md:grid-cols-3 xl:gap-10 2xl:gap-14"
-            >
+            <AnimateInView containerRef={containerRef} amount={0.15} variants={stagger} className="grid gap-8 md:grid-cols-3 xl:gap-10 2xl:gap-14">
               {steps.map((s, i) => (
                 <motion.div
                   key={i}
@@ -667,7 +701,7 @@ export default function Home() {
                   </div>
                 </motion.div>
               ))}
-            </motion.div>
+            </AnimateInView>
           </div>
         </section>
 
@@ -701,13 +735,7 @@ export default function Home() {
               </div>
             ) : (
               <>
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.3, root: containerRef }}
-                  variants={stagger}
-                  className="text-center mb-10"
-                >
+                <AnimateInView containerRef={containerRef} amount={0.3} variants={stagger} className="text-center mb-10">
                   <motion.p
                     variants={fadeUp}
                     className="text-sm font-semibold uppercase tracking-widest text-violet-500"
@@ -720,21 +748,15 @@ export default function Home() {
                   >
                     Generate your course
                   </motion.h2>
-                </motion.div>
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.3, root: containerRef }}
-                  variants={fadeUp}
-                  className="mx-auto w-full max-w-xl sm:max-w-2xl"
-                >
+                </AnimateInView>
+                <AnimateInView containerRef={containerRef} amount={0.3} variants={fadeUp} className="mx-auto w-full max-w-xl sm:max-w-2xl">
                   <CurriculumForm
                     onGenerated={handleGenerated}
                     onLoadingChange={handleLoadingChange}
                     onLimitReached={handleLimitReached}
                     onSubmitAttempt={handleFormSubmitAttempt}
                   />
-                </motion.div>
+                </AnimateInView>
               </>
             )}
           </div>
@@ -751,13 +773,7 @@ export default function Home() {
           </div>
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2, root: containerRef }}
-              variants={stagger}
-              className="text-center mb-16"
-            >
+            <AnimateInView containerRef={containerRef} amount={0.2} variants={stagger} className="text-center mb-16">
               <motion.p
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
@@ -778,15 +794,9 @@ export default function Home() {
                 modules, lessons, quizzes, bonus resources, and a full pacing
                 schedule.
               </motion.p>
-            </motion.div>
+            </AnimateInView>
 
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.15, root: containerRef }}
-              variants={stagger}
-              className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-10"
-            >
+            <AnimateInView containerRef={containerRef} amount={0.15} variants={stagger} className="grid gap-6 md:grid-cols-3 xl:gap-8 2xl:gap-10">
               {exampleCurricula.map((c, i) => (
                 <motion.div key={i} variants={scaleUp}>
                   <Card
@@ -855,7 +865,7 @@ export default function Home() {
                   </Card>
                 </motion.div>
               ))}
-            </motion.div>
+            </AnimateInView>
           </div>
         </section>
 
@@ -870,13 +880,7 @@ export default function Home() {
           </div>
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2, root: containerRef }}
-              variants={stagger}
-              className="text-center mb-16"
-            >
+            <AnimateInView containerRef={containerRef} amount={0.2} variants={stagger} className="text-center mb-16">
               <motion.p
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
@@ -889,15 +893,9 @@ export default function Home() {
               >
                 Start free. Upgrade when you&apos;re ready.
               </motion.h2>
-            </motion.div>
+            </AnimateInView>
 
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1, root: containerRef }}
-              variants={stagger}
-              className="grid gap-6 xl:gap-8 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible"
-            >
+            <AnimateInView containerRef={containerRef} amount={0.1} variants={stagger} className="grid gap-6 xl:gap-8 sm:grid-cols-2 lg:grid-cols-4 items-stretch overflow-visible">
               {/* FREE PLAN */}
               <motion.div variants={scaleUp} className="flex min-w-0 overflow-visible">
                 <Card className="relative flex flex-col w-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
@@ -1103,7 +1101,7 @@ export default function Home() {
                   </CardFooter>
                 </Card>
               </motion.div>
-            </motion.div>
+            </AnimateInView>
           </div>
         </section>
 
@@ -1118,13 +1116,7 @@ export default function Home() {
           </div>
 
           <div className="mx-auto max-w-3xl xl:max-w-4xl 2xl:max-w-5xl text-center">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3, root: containerRef }}
-              variants={stagger}
-              className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 xl:p-20 2xl:p-24 backdrop-blur-sm"
-            >
+            <AnimateInView containerRef={containerRef} amount={0.3} variants={stagger} className="mx-auto rounded-3xl border border-violet-500/20 bg-gradient-to-b from-violet-500/5 to-indigo-500/5 p-10 sm:p-16 xl:p-20 2xl:p-24 backdrop-blur-sm">
               <motion.div variants={fadeUp}>
                 <LayoutGrid className="mx-auto mb-4 size-8 xl:size-10 text-violet-500" />
               </motion.div>
@@ -1155,7 +1147,7 @@ export default function Home() {
                   <ArrowRight className="ml-2 size-4" />
                 </Button>
               </motion.div>
-            </motion.div>
+            </AnimateInView>
           </div>
         </section>
       </main>
