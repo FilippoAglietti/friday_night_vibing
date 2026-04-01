@@ -97,22 +97,17 @@ function DiscountBadge({ original, discounted }: { original: number; discounted:
 function CountdownBar({ target }: { target: Date }) {
   const { days, hours, mins, secs, expired } = useCountdown(target);
   if (expired) return null;
-  const unit = (val: number, label: string) => (
-    <div className="flex flex-col items-center">
-      <span className="text-lg md:text-xl font-bold tabular-nums bg-white/5 rounded-lg px-2 py-1 min-w-[2.5rem] text-center border border-white/10">{String(val).padStart(2, "0")}</span>
-      <span className="text-[9px] uppercase tracking-widest text-muted-foreground mt-1">{label}</span>
-    </div>
-  );
+  const p = (v: number) => String(v).padStart(2, "0");
   return (
-    <div className="flex items-center justify-center gap-3 md:gap-4">
-      {unit(days, "Days")}
-      <span className="text-muted-foreground/40 text-lg font-light mt-[-14px]">:</span>
-      {unit(hours, "Hrs")}
-      <span className="text-muted-foreground/40 text-lg font-light mt-[-14px]">:</span>
-      {unit(mins, "Min")}
-      <span className="text-muted-foreground/40 text-lg font-light mt-[-14px]">:</span>
-      {unit(secs, "Sec")}
-    </div>
+    <span className="inline-flex items-center gap-1 font-mono text-xs font-semibold tabular-nums text-muted-foreground">
+      <span className="text-foreground">{p(days)}</span>d
+      <span className="text-muted-foreground/30">:</span>
+      <span className="text-foreground">{p(hours)}</span>h
+      <span className="text-muted-foreground/30">:</span>
+      <span className="text-foreground">{p(mins)}</span>m
+      <span className="text-muted-foreground/30">:</span>
+      <span className="text-foreground">{p(secs)}</span>s
+    </span>
   );
 }
 
@@ -1034,18 +1029,17 @@ export default function Home() {
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
             <AnimateInView containerRef={containerRef} amount={0.2} variants={stagger} className="text-center mb-8 md:mb-16">
-              {/* Launch promo banner */}
+              {/* Launch promo banner — compact single-line */}
               {LAUNCH_PROMO.active && (
-                <motion.div variants={fadeUp} className="mb-6">
-                  <div className="mx-auto inline-flex flex-col items-center gap-3 rounded-2xl border border-rose-500/20 bg-gradient-to-r from-rose-500/5 via-violet-500/5 to-amber-500/5 px-6 py-4 backdrop-blur-sm">
-                    <div className="flex items-center gap-2">
-                      <Flame className="size-4 text-rose-400 animate-pulse" />
-                      <span className="text-sm font-bold uppercase tracking-widest bg-gradient-to-r from-rose-400 via-violet-400 to-amber-400 bg-clip-text text-transparent">
-                        {LAUNCH_PROMO.label}
-                      </span>
-                      <Flame className="size-4 text-rose-400 animate-pulse" />
-                    </div>
-                    <p className="text-xs text-muted-foreground">{LAUNCH_PROMO.tagline}</p>
+                <motion.div variants={fadeUp} className="mb-5">
+                  <div className="mx-auto inline-flex items-center gap-2.5 rounded-full border border-rose-500/20 bg-gradient-to-r from-rose-500/5 via-violet-500/5 to-amber-500/5 px-4 py-2 backdrop-blur-sm">
+                    <Flame className="size-3.5 text-rose-400 animate-pulse shrink-0" />
+                    <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-rose-400 via-violet-400 to-amber-400 bg-clip-text text-transparent">
+                      {LAUNCH_PROMO.label}
+                    </span>
+                    <span className="text-muted-foreground/30">·</span>
+                    <span className="text-xs text-muted-foreground">{LAUNCH_PROMO.tagline}</span>
+                    <span className="text-muted-foreground/30">·</span>
                     <CountdownBar target={LAUNCH_PROMO.expiresAt} />
                   </div>
                 </motion.div>
