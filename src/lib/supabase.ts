@@ -19,6 +19,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "@/types/database.types";
 
 // ─── Environment variable helpers ────────────────────────────
@@ -61,20 +62,18 @@ export const SUPABASE_ANON_KEY =
  * Singleton Supabase client for use in React client components and hooks.
  * Uses the anon key, so Row Level Security (RLS) policies apply.
  *
+ * IMPORTANT: Uses createBrowserClient from @supabase/ssr so that the session
+ * is stored in cookies (not localStorage). This is critical — server-side
+ * route handlers and middleware read auth state from cookies. Without this,
+ * the server has no way to know who the user is.
+ *
  * Usage:
  *   import { supabaseBrowser } from '@/lib/supabase'
  *   const { data } = await supabaseBrowser.from('generations').select('*')
  */
-export const supabaseBrowser = createClient<Database>(
+export const supabaseBrowser = createBrowserClient<Database>(
   SUPABASE_URL,
-  SUPABASE_ANON_KEY,
-  {
-    auth: {
-      // Persist session in localStorage so users stay logged in across page refreshes
-      persistSession: true,
-      autoRefreshToken: true,
-    },
-  }
+  SUPABASE_ANON_KEY
 );
 
 // ─── Admin client (server only — never expose to client) ──────
