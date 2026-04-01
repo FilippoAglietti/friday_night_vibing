@@ -366,6 +366,21 @@ async function createSupabaseServer() {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
+        set(name: string, value: string, options: Record<string, unknown>) {
+          try {
+            cookieStore.set({ name, value, ...options });
+          } catch {
+            // set() can throw in read-only contexts (e.g. during static generation)
+            // This is safe to ignore — the session refresh will be retried on next request
+          }
+        },
+        remove(name: string, options: Record<string, unknown>) {
+          try {
+            cookieStore.delete({ name, ...options });
+          } catch {
+            // Same as above — safe to ignore in read-only contexts
+          }
+        },
       },
     }
   );
@@ -413,8 +428,12 @@ async function saveGeneration(
   request: GenerateRequest,
   curriculum: Curriculum
 ): Promise<void> {
-  if (!userId) return; // Don't save anonymous generations
+  if (!userId) {
+    console.warn("[/api/generate] Skipping save — no userId (anonymous generation)");
+    return;
+  }
 
+  console.log("[/api/generate] Saving course for user:", userId);
   const supabase = await createSupabaseServer();
 
   // Save to courses table (new schema v2)
@@ -434,17 +453,22 @@ async function saveGeneration(
   }).select("id").single();
 
   if (error) {
-    console.error("[/api/generate] Failed to save course:", error);
+    console.error("[/api/generate] Failed to save course:", error.message, error.details);
     return;
   }
 
+  console.log("[/api/generate] Course saved successfully, id:", course?.id);
+
   // Increment generation counter and log usage event atomically
   if (course?.id) {
-    await supabase.rpc("increment_generation_usage", {
+    const { error: rpcError } = await supabase.rpc("increment_generation_usage", {
       p_user_id: userId,
       p_course_id: course.id,
       p_event_type: "course_generated",
     });
+    if (rpcError) {
+      console.error("[/api/generate] increment_generation_usage RPC failed:", rpcError.message);
+    }
   }
 }
 
@@ -497,10 +521,16 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
     const supabase = await createSupabaseServer();
     const {
       data: { user },
+      error: authError,
     } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.warn("[/api/generate] auth.getUser() returned error:", authError.message);
+    }
 
     if (user) {
       userId = user.id;
+      console.log("[/api/generate] Authenticated user:", userId, user.email);
       const canGenerate = await checkGenerationLimit(userId);
       if (!canGenerate) {
         return NextResponse.json(
@@ -513,11 +543,12 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
           { status: 403 }
         );
       }
+    } else {
+      console.warn("[/api/generate] No user session found — proceeding as anonymous");
     }
-    // If no user, allow 1 anonymous generation (rate-limited above)
-  } catch {
+  } catch (err) {
     // Auth errors are non-fatal — proceed without user context
-    console.warn("[/api/generate] Auth check failed, proceeding anonymously.");
+    console.error("[/api/generate] Auth check exception:", err);
   }
 
   // ── Step 4: Generate curriculum via Claude ──────────────────
