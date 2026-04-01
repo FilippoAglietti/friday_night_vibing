@@ -357,6 +357,40 @@ export default function Home() {
     toast("Course generated successfully!", "success");
   }, [toast]);
 
+  /* ── Join Pro Max waitlist ────────────────────────────────── */
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const handleJoinWaitlist = useCallback(async () => {
+    // Get the user's email from auth state
+    const email = (user as { email?: string } | null)?.email;
+    if (!email) {
+      // If not logged in, prompt sign in first
+      setShowAuthModal(true);
+      toast("Please sign in first so we can add you to the waitlist.", "info");
+      return;
+    }
+
+    setWaitlistLoading(true);
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "promax_pricing" }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Could not join waitlist");
+      }
+
+      toast("You're on the list! We'll notify you when Pro Max launches.", "success");
+    } catch (err) {
+      console.error("[waitlist] Error:", err);
+      toast("Something went wrong. Please try again.", "error");
+    } finally {
+      setWaitlistLoading(false);
+    }
+  }, [user, toast]);
+
   const handleLimitReached = useCallback(() => {
     setShowPaywall(true);
   }, []);
@@ -1109,10 +1143,20 @@ export default function Home() {
                     <Button
                       className="w-full rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 hover:border-amber-400/70 transition-all"
                       size="lg"
-                      onClick={() => toast("You're on the list! We'll notify you when Pro Max launches.", "success")}
+                      disabled={waitlistLoading}
+                      onClick={handleJoinWaitlist}
                     >
-                      <Sparkles className="size-4 mr-2" />
-                      Join Waitlist
+                      {waitlistLoading ? (
+                        <span className="flex items-center gap-2">
+                          <div className="size-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+                          Joining…
+                        </span>
+                      ) : (
+                        <>
+                          <Sparkles className="size-4 mr-2" />
+                          Join Waitlist
+                        </>
+                      )}
                     </Button>
                     <p className="text-[11px] text-muted-foreground/60 text-center">We&apos;ll email you at launch — no spam.</p>
                   </CardFooter>
@@ -1253,8 +1297,17 @@ export default function Home() {
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5 flex-col gap-1.5">
-                      <Button className="w-full rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" size="sm" onClick={() => toast("You're on the list! We'll notify you when Pro Max launches.", "success")}>
-                        <Sparkles className="size-3.5 mr-1.5" />Join Waitlist
+                      <Button className="w-full rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" size="sm" disabled={waitlistLoading} onClick={handleJoinWaitlist}>
+                        {waitlistLoading ? (
+                          <span className="flex items-center gap-2">
+                            <div className="size-3.5 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+                            Joining…
+                          </span>
+                        ) : (
+                          <>
+                            <Sparkles className="size-3.5 mr-1.5" />Join Waitlist
+                          </>
+                        )}
                       </Button>
                       <p className="text-[10px] text-muted-foreground/60 text-center">No spam — email at launch only.</p>
                     </CardFooter>
