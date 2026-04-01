@@ -468,6 +468,8 @@ async function saveGeneration(
     });
     if (rpcError) {
       console.error("[/api/generate] increment_generation_usage RPC failed:", rpcError.message);
+    } else {
+      console.log("[/api/generate] Generation counter incremented for user:", userId);
     }
   }
 }
@@ -567,10 +569,17 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
     );
   }
 
-  // ── Step 5: Save to Supabase (fire and forget) ──────────────
-  saveGeneration(userId, generateRequest, curriculum).catch((err) => {
+  // ── Step 5: Save to Supabase ────────────────────────────────
+  // IMPORTANT: We await saveGeneration instead of fire-and-forget.
+  // In Vercel serverless, the runtime can terminate after sending the
+  // response, which was cutting off the RPC call to increment the
+  // generation counter (the INSERT completed but the RPC did not).
+  try {
+    await saveGeneration(userId, generateRequest, curriculum);
+  } catch (err) {
+    // Save errors are non-fatal — the user still gets their curriculum
     console.error("[/api/generate] Failed to save generation:", err);
-  });
+  }
 
   // ── Step 6: Return the curriculum ──────────────────────────
   // Return { success: true, data: curriculum } to match GenerateResponse type
