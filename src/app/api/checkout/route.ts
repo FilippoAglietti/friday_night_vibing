@@ -28,6 +28,20 @@ async function getUser() {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
+        set(name: string, value: string, options: Record<string, unknown>) {
+          try {
+            cookieStore.set({ name, value, ...options });
+          } catch {
+            // Safe to ignore in read-only contexts
+          }
+        },
+        remove(name: string, options: Record<string, unknown>) {
+          try {
+            cookieStore.delete({ name, ...options });
+          } catch {
+            // Safe to ignore in read-only contexts
+          }
+        },
       },
     }
   );
@@ -59,9 +73,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate against all known price IDs (Pro, 5-Pack, Pro Max)
     const VALID_PRICE_IDS = [
       process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
       process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID,
+      process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID,
     ].filter(Boolean);
 
     if (VALID_PRICE_IDS.length > 0 && !VALID_PRICE_IDS.includes(priceId)) {
@@ -73,9 +89,9 @@ export async function POST(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     // Determine if this is a subscription or one-time payment
-    // Compare against the known 5-pack price ID from env, otherwise check Stripe price object
+    // 5-Pack is the only one-time payment; Pro and Pro Max are subscriptions
     const fivePackPriceId = process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "";
-    const isOneTime = priceId === fivePackPriceId || priceId.includes("5pack");
+    const isOneTime = priceId === fivePackPriceId;
     const session = await stripe.checkout.sessions.create({
       mode: isOneTime ? "payment" : "subscription",
       payment_method_types: ["card"],

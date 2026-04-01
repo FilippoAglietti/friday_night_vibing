@@ -5,6 +5,10 @@
  *
  * Handles:
  *   - checkout.session.completed → upgrades user plan in Supabase
+ *   - invoice.paid → confirms subscription is active
+ *   - invoice.payment_failed → flags user for retry
+ *   - customer.subscription.updated → syncs plan changes
+ *   - customer.subscription.deleted → downgrades to free
  *
  * POST /api/webhooks/stripe
  * ─────────────────────────────────────────────────────────────
@@ -18,6 +22,49 @@ import { createClient } from "@supabase/supabase-js";
 
 // Disable body parsing — Stripe needs the raw body for signature verification
 export const dynamic = "force-dynamic";
+
+// ─── Helpers ──────────────────────────────────────────────────
+
+/**
+ * Looks up a user profile by Stripe customer ID.
+ * Returns the profile id or null if not found.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function findUserByCustomerId(
+  supabaseAdmin: any,
+  customerId: string
+): Promise<string | null> {
+  const { data: profiles } = await supabaseAdmin
+    .from("profiles")
+    .select("id")
+    .eq("stripe_customer_id", customerId);
+
+  return profiles && profiles.length > 0 ? profiles[0].id : null;
+}
+
+/**
+ * Maps a Stripe price ID to our internal plan type.
+ * Uses env vars for the active price IDs (launch or original).
+ */
+function getPlanFromPriceId(priceId: string): "pro" | "5pack" | "promax" | "unknown" {
+  const proPriceId = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "";
+  const fivePackPriceId = process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "";
+  const proMaxPriceId = process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "";
+
+  if (priceId === proPriceId) return "pro";
+  if (priceId === fivePackPriceId) return "5pack";
+  if (priceId === proMaxPriceId) return "promax";
+
+  // Fallback: check if the price ID matches any known original/launch IDs
+  // Pro price IDs (original + launch)
+  if (["price_1THTSs3kBvceiBKLWaWvcHef", "price_1THU2d3kBvceiBKLeH3Hrq1l"].includes(priceId)) return "pro";
+  // 5-Pack price IDs (original + launch)
+  if (["price_1THTSs3kBvceiBKLi04yrG5U", "price_1THU2e3kBvceiBKLZByaCJhs"].includes(priceId)) return "5pack";
+  // Pro Max price IDs (original + launch)
+  if (["price_1THTSt3kBvceiBKLu18Yziia", "price_1THU2f3kBvceiBKL88FKLczZ"].includes(priceId)) return "promax";
+
+  return "unknown";
+}
 
 // ─── Route handler ────────────────────────────────────────────
 
@@ -65,19 +112,23 @@ export async function POST(req: NextRequest) {
 
   // ── Handle events ─────────────────────────────────────────
   switch (event.type) {
+    // ─────────────────────────────────────────────────────────
+    // CHECKOUT COMPLETED — User paid successfully
+    // ─────────────────────────────────────────────────────────
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.userId;
-      const priceId = session.metadata?.priceId;
+      const priceId = session.metadata?.priceId || "";
 
       if (!userId || userId === "anonymous") {
         console.warn("[stripe-webhook] No userId in session metadata, skipping profile update");
         break;
       }
 
-      console.log(`[stripe-webhook] Checkout completed for user ${userId}, price: ${priceId}`);
+      const plan = getPlanFromPriceId(priceId);
+      console.log(`[stripe-webhook] Checkout completed for user ${userId}, price: ${priceId}, plan: ${plan}`);
 
-      if (priceId?.includes("5pack")) {
+      if (plan === "5pack") {
         // ── 5-Pack: Add 5 generations to the user's limit ──
         const { data: profile } = await supabaseAdmin
           .from("profiles")
@@ -96,9 +147,22 @@ export async function POST(req: NextRequest) {
           })
           .eq("id", userId);
 
-        console.log(`[stripe-webhook] Added 5 generations for user ${userId}`);
+        console.log(`[stripe-webhook] Added 5 generations for user ${userId} (new limit: ${currentLimit + 5})`);
+      } else if (plan === "pro" || plan === "promax") {
+        // ── Pro / Pro Max subscription: Set plan with unlimited generations ──
+        await supabaseAdmin
+          .from("profiles")
+          .update({
+            plan: plan === "promax" ? "pro" : "pro", // both map to "pro" in DB for now
+            generations_limit: 999999,
+            stripe_customer_id: session.customer as string,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+
+        console.log(`[stripe-webhook] Upgraded user ${userId} to ${plan}`);
       } else {
-        // ── Pro subscription: Set plan to pro with unlimited generations ──
+        console.warn(`[stripe-webhook] Unknown plan for price ${priceId}, treating as Pro`);
         await supabaseAdmin
           .from("profiles")
           .update({
@@ -108,35 +172,141 @@ export async function POST(req: NextRequest) {
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
-
-        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro`);
       }
 
       break;
     }
 
-    case "customer.subscription.deleted": {
-      // ── Pro cancellation: Downgrade to free ──
+    // ─────────────────────────────────────────────────────────
+    // INVOICE PAID — Subscription renewed successfully
+    // ─────────────────────────────────────────────────────────
+    case "invoice.paid": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customerId = invoice.customer as string;
+
+      // Skip the first invoice — already handled by checkout.session.completed
+      if (invoice.billing_reason === "subscription_create") {
+        console.log("[stripe-webhook] Skipping invoice.paid for new subscription (handled by checkout)");
+        break;
+      }
+
+      const userId = await findUserByCustomerId(supabaseAdmin, customerId);
+      if (!userId) {
+        console.warn(`[stripe-webhook] invoice.paid: no user found for customer ${customerId}`);
+        break;
+      }
+
+      // Confirm subscription is active — re-enable if it was flagged
+      await supabaseAdmin
+        .from("profiles")
+        .update({
+          plan: "pro",
+          generations_limit: 999999,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId);
+
+      console.log(`[stripe-webhook] Invoice paid — confirmed pro for user ${userId}`);
+      break;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // INVOICE PAYMENT FAILED — Card declined on renewal
+    // ─────────────────────────────────────────────────────────
+    case "invoice.payment_failed": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customerId = invoice.customer as string;
+
+      const userId = await findUserByCustomerId(supabaseAdmin, customerId);
+      if (!userId) {
+        console.warn(`[stripe-webhook] invoice.payment_failed: no user found for customer ${customerId}`);
+        break;
+      }
+
+      // Don't immediately downgrade — Stripe retries up to 3 times.
+      // Log the event so we can track it, but keep the user on pro
+      // until subscription.deleted fires after all retries fail.
+      console.warn(`[stripe-webhook] Payment failed for user ${userId} (attempt ${invoice.attempt_count}). Stripe will retry.`);
+
+      // Log a usage event for monitoring
+      await supabaseAdmin
+        .from("usage_events")
+        .insert({
+          user_id: userId,
+          event_type: "payment_failed",
+          metadata: {
+            attempt_count: invoice.attempt_count,
+            amount_due: invoice.amount_due,
+            currency: invoice.currency,
+          },
+        });
+
+      break;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // SUBSCRIPTION UPDATED — Plan changed (upgrade/downgrade)
+    // ─────────────────────────────────────────────────────────
+    case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
       const customerId = subscription.customer as string;
 
-      const { data: profiles } = await supabaseAdmin
-        .from("profiles")
-        .select("id")
-        .eq("stripe_customer_id", customerId);
+      const userId = await findUserByCustomerId(supabaseAdmin, customerId);
+      if (!userId) {
+        console.warn(`[stripe-webhook] subscription.updated: no user found for customer ${customerId}`);
+        break;
+      }
 
-      if (profiles && profiles.length > 0) {
+      // Check if subscription is being cancelled at period end
+      if (subscription.cancel_at_period_end) {
+        console.log(`[stripe-webhook] Subscription set to cancel at period end for user ${userId}`);
+        // Don't downgrade yet — they keep access until the period ends
+        break;
+      }
+
+      // Sync the current plan from the subscription's price
+      const currentPriceId = subscription.items.data[0]?.price?.id || "";
+      const plan = getPlanFromPriceId(currentPriceId);
+
+      if (plan === "pro" || plan === "promax") {
         await supabaseAdmin
           .from("profiles")
           .update({
-            plan: "free",
-            generations_limit: 1,
+            plan: "pro",
+            generations_limit: 999999,
             updated_at: new Date().toISOString(),
           })
-          .eq("id", profiles[0].id);
+          .eq("id", userId);
 
-        console.log(`[stripe-webhook] Downgraded user ${profiles[0].id} to free`);
+        console.log(`[stripe-webhook] Subscription updated — user ${userId} on ${plan}`);
       }
+
+      break;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // SUBSCRIPTION DELETED — Cancelled (after all retries)
+    // ─────────────────────────────────────────────────────────
+    case "customer.subscription.deleted": {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId = subscription.customer as string;
+
+      const userId = await findUserByCustomerId(supabaseAdmin, customerId);
+      if (!userId) {
+        console.warn(`[stripe-webhook] subscription.deleted: no user found for customer ${customerId}`);
+        break;
+      }
+
+      await supabaseAdmin
+        .from("profiles")
+        .update({
+          plan: "free",
+          generations_limit: 1,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId);
+
+      console.log(`[stripe-webhook] Downgraded user ${userId} to free`);
       break;
     }
 

@@ -28,7 +28,7 @@ const plans = [
     id: "pro",
     name: "Syllabi Pro",
     price: PROMO_ACTIVE ? "$19" : "$29",
-    originalPrice: "$29",
+    originalPrice: "$29/mo",
     period: "/month",
     description: "Unlimited curriculum generations for serious course creators.",
     badge: PROMO_ACTIVE ? "Launch Special" : "Most Popular",

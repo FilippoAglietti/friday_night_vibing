@@ -47,163 +47,7 @@ import {
   Crown,
   Headphones,
   Menu,
-  Flame,
-  Timer,
 } from "lucide-react";
-
-/* ─── Launch Promotion Config ────────────────────────── */
-
-const LAUNCH_PROMO = {
-  active: true,
-  expiresAt: new Date("2026-05-11T23:59:59Z"), // May 11 — master number 11 (abundance in numerology & kabbalah)
-  label: "Launch Special",
-  tagline: "Early-bird pricing ends May 11",
-  prices: {
-    pro:     { original: 29, discounted: 19, suffix: "/mo" },
-    oneTime: { original: 39, discounted: 29, suffix: " one-time" },
-    proMax:  { original: 79, discounted: 69, suffix: "/mo" },
-  },
-  discountPct: (orig: number, disc: number) => Math.round(((orig - disc) / orig) * 100),
-};
-
-/* ─── Countdown Hook ─────────────────────────────────── */
-
-function useCountdown(target: Date) {
-  const [now, setNow] = useState(new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  const diff = Math.max(0, target.getTime() - now.getTime());
-  const days  = Math.floor(diff / 86_400_000);
-  const hours = Math.floor((diff % 86_400_000) / 3_600_000);
-  const mins  = Math.floor((diff % 3_600_000) / 60_000);
-  const secs  = Math.floor((diff % 60_000) / 1000);
-  return { days, hours, mins, secs, expired: diff === 0 };
-}
-
-/* ─── Promo Components ───────────────────────────────── */
-
-function DiscountBadge({ original, discounted }: { original: number; discounted: number }) {
-  const pct = LAUNCH_PROMO.discountPct(original, discounted);
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-400 border border-rose-500/20 uppercase tracking-wider">
-      <Flame className="size-3" />
-      -{pct}%
-    </span>
-  );
-}
-
-function CountdownBar({ target }: { target: Date }) {
-  const { days, hours, mins, secs, expired } = useCountdown(target);
-  if (expired) return null;
-  const unit = (val: number, label: string) => (
-    <div className="flex flex-col items-center">
-      <span className="text-sm font-bold tabular-nums bg-white/5 rounded-md px-1.5 py-0.5 min-w-[2rem] text-center border border-white/10">{String(val).padStart(2, "0")}</span>
-      <span className="text-[8px] uppercase tracking-widest text-muted-foreground mt-0.5">{label}</span>
-    </div>
-  );
-  return (
-    <div className="flex items-center gap-1.5">
-      {unit(days, "Days")}
-      <span className="text-muted-foreground/30 text-sm font-light mt-[-10px]">:</span>
-      {unit(hours, "Hrs")}
-      <span className="text-muted-foreground/30 text-sm font-light mt-[-10px]">:</span>
-      {unit(mins, "Min")}
-      <span className="text-muted-foreground/30 text-sm font-light mt-[-10px]">:</span>
-      {unit(secs, "Sec")}
-    </div>
-  );
-}
-
-/* ─── Newsletter Modal for Pro Max ───────────────────── */
-
-function NewsletterModal({ open, onClose, toast: toastFn }: { open: boolean; onClose: () => void; toast: (msg: string, type?: "success" | "error" | "info") => void }) {
-  const [email, setEmail] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), source: "promax_waitlist" }),
-      });
-      if (res.ok) {
-        toastFn("You're on the list! We'll notify you when Pro Max launches.", "success");
-        setEmail("");
-        onClose();
-      } else {
-        toastFn("Something went wrong. Please try again.", "error");
-      }
-    } catch {
-      toastFn("Network error. Please try again.", "error");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  if (!open) return null;
-
-  return (
-    <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed inset-0 z-[95] flex items-center justify-center p-4"
-      >
-        <div className="relative w-full max-w-md rounded-2xl border border-amber-500/30 bg-background/95 backdrop-blur-xl shadow-2xl shadow-amber-500/10 overflow-hidden p-6">
-          <button onClick={onClose} className="absolute top-4 right-4 rounded-full p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
-            <X className="size-5" />
-          </button>
-          <div className="text-center mb-6">
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <Crown className="size-5 text-amber-500" />
-              <span className="text-sm font-semibold text-amber-500 uppercase tracking-wider">Pro Max</span>
-            </div>
-            <h3 className="text-xl font-bold tracking-tight">Get notified at launch</h3>
-            <p className="mt-2 text-sm text-muted-foreground">Be the first to know when Pro Max drops. Early subscribers get priority access.</p>
-          </div>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              className="w-full rounded-full border border-amber-500/30 bg-amber-500/5 px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
-            />
-            <Button
-              type="submit"
-              disabled={submitting}
-              className="w-full rounded-full border border-amber-500/50 bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-semibold hover:from-amber-400 hover:to-yellow-400 transition-all"
-              size="lg"
-            >
-              {submitting ? (
-                <span className="flex items-center gap-2"><div className="size-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />Subscribing…</span>
-              ) : (
-                <span className="flex items-center gap-2"><Mail className="size-4" />Subscribe to Waitlist</span>
-              )}
-            </Button>
-          </form>
-          <p className="text-[11px] text-muted-foreground/60 text-center mt-3">No spam — only launch updates.</p>
-        </div>
-      </motion.div>
-    </>
-  );
-}
 
 /* ─── Data ───────────────────────────────────────────────── */
 
@@ -466,7 +310,6 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<unknown>(null);
   const [previewCurriculum, setPreviewCurriculum] = useState<Curriculum | null>(null);
-  const [showNewsletterModal, setShowNewsletterModal] = useState(false);
   const { toast } = useToast();
   const closePreview = useCallback(() => setPreviewCurriculum(null), []);
 
@@ -1035,23 +878,6 @@ export default function Home() {
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
             <AnimateInView containerRef={containerRef} amount={0.2} variants={stagger} className="text-center mb-8 md:mb-16">
-              {/* Launch promo banner */}
-              {LAUNCH_PROMO.active && (
-                <motion.div variants={fadeUp} className="mb-5">
-                  <div className="mx-auto inline-flex flex-col items-center gap-2 rounded-xl border border-rose-500/20 bg-gradient-to-r from-rose-500/5 via-violet-500/5 to-amber-500/5 px-5 py-3 backdrop-blur-sm">
-                    <div className="flex items-center gap-2">
-                      <Flame className="size-3.5 text-rose-400 animate-pulse" />
-                      <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-rose-400 via-violet-400 to-amber-400 bg-clip-text text-transparent">
-                        {LAUNCH_PROMO.label}
-                      </span>
-                      <span className="text-muted-foreground/30">·</span>
-                      <span className="text-xs text-muted-foreground">{LAUNCH_PROMO.tagline}</span>
-                      <Flame className="size-3.5 text-rose-400 animate-pulse" />
-                    </div>
-                    <CountdownBar target={LAUNCH_PROMO.expiresAt} />
-                  </div>
-                </motion.div>
-              )}
               <motion.p
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
@@ -1064,6 +890,13 @@ export default function Home() {
               >
                 Start free. Upgrade when you&apos;re ready.
               </motion.h2>
+              <motion.div variants={fadeUp} className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5">
+                <span className="relative flex size-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
+                </span>
+                <span className="text-sm font-semibold text-emerald-500">Launch Special — limited time pricing</span>
+              </motion.div>
             </AnimateInView>
 
             {/* Mobile: horizontal scroll; Desktop: 4-column grid */}
@@ -1128,19 +961,19 @@ export default function Home() {
                     </Badge>
                   </div>
                   <CardHeader className="pt-8">
-                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500 flex items-center gap-2">
+                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">
                       Pro
-                      {LAUNCH_PROMO.active && <DiscountBadge original={LAUNCH_PROMO.prices.pro.original} discounted={LAUNCH_PROMO.prices.pro.discounted} />}
                     </CardDescription>
-                    <CardTitle className="text-3xl font-bold flex items-baseline gap-2">
-                      ${LAUNCH_PROMO.active ? LAUNCH_PROMO.prices.pro.discounted : 29}
+                    <CardTitle className="text-3xl font-bold">
+                      $19
                       <span className="text-base font-normal text-muted-foreground">
                         /month
                       </span>
-                      {LAUNCH_PROMO.active && (
-                        <span className="text-lg font-normal text-muted-foreground/50 line-through">${LAUNCH_PROMO.prices.pro.original}</span>
-                      )}
                     </CardTitle>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm line-through text-muted-foreground/60">$29/mo</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Save 34%</span>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       For serious course creators who ship regularly.
                     </p>
@@ -1162,7 +995,7 @@ export default function Home() {
                       size="lg"
                       onClick={() => setShowPaywall(true)}
                     >
-                      Start Pro — ${LAUNCH_PROMO.active ? "19" : "29"}/mo
+                      Start Pro — $19/mo
                     </Button>
                   </CardFooter>
                 </Card>
@@ -1176,19 +1009,19 @@ export default function Home() {
                     <Badge className="rounded-full px-4 py-1.5 text-xs">‌</Badge>
                   </div>
                   <CardHeader className="pt-8">
-                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500 flex items-center gap-2">
+                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">
                       One-Time
-                      {LAUNCH_PROMO.active && <DiscountBadge original={LAUNCH_PROMO.prices.oneTime.original} discounted={LAUNCH_PROMO.prices.oneTime.discounted} />}
                     </CardDescription>
-                    <CardTitle className="text-3xl font-bold flex items-baseline gap-2">
-                      ${LAUNCH_PROMO.active ? LAUNCH_PROMO.prices.oneTime.discounted : 39}
+                    <CardTitle className="text-3xl font-bold">
+                      $29
                       <span className="text-base font-normal text-muted-foreground">
                         {" "}one-time
                       </span>
-                      {LAUNCH_PROMO.active && (
-                        <span className="text-lg font-normal text-muted-foreground/50 line-through">${LAUNCH_PROMO.prices.oneTime.original}</span>
-                      )}
                     </CardTitle>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm line-through text-muted-foreground/60">$39</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Save 26%</span>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       5 course generations. No subscription needed.
                     </p>
@@ -1216,7 +1049,7 @@ export default function Home() {
                       size="lg"
                       onClick={() => setShowPaywall(true)}
                     >
-                      Buy 5-Pack — ${LAUNCH_PROMO.active ? "29" : "39"}
+                      Buy 5-Pack — $29
                     </Button>
                   </CardFooter>
                 </Card>
@@ -1237,17 +1070,17 @@ export default function Home() {
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
                       <Crown className="size-3.5" />
                       Pro Max
-                      {LAUNCH_PROMO.active && <DiscountBadge original={LAUNCH_PROMO.prices.proMax.original} discounted={LAUNCH_PROMO.prices.proMax.discounted} />}
                     </CardDescription>
-                    <CardTitle className="text-3xl font-bold flex items-baseline gap-2">
-                      ${LAUNCH_PROMO.active ? LAUNCH_PROMO.prices.proMax.discounted : 79}
+                    <CardTitle className="text-3xl font-bold">
+                      $69
                       <span className="text-base font-normal text-muted-foreground">
                         /month
                       </span>
-                      {LAUNCH_PROMO.active && (
-                        <span className="text-lg font-normal text-muted-foreground/50 line-through">${LAUNCH_PROMO.prices.proMax.original}</span>
-                      )}
                     </CardTitle>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-sm line-through text-muted-foreground/60">$79/mo</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Save 13%</span>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       The ultimate toolkit to create &amp; sell courses.
                     </p>
@@ -1276,12 +1109,12 @@ export default function Home() {
                     <Button
                       className="w-full rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 hover:border-amber-400/70 transition-all"
                       size="lg"
-                      onClick={() => setShowNewsletterModal(true)}
+                      onClick={() => toast("You're on the list! We'll notify you when Pro Max launches.", "success")}
                     >
-                      <Mail className="size-4 mr-2" />
-                      Subscribe for Early Access
+                      <Sparkles className="size-4 mr-2" />
+                      Join Waitlist
                     </Button>
-                    <p className="text-[11px] text-muted-foreground/60 text-center">Get notified at launch — no spam.</p>
+                    <p className="text-[11px] text-muted-foreground/60 text-center">We&apos;ll email you at launch — no spam.</p>
                   </CardFooter>
                 </Card>
               </motion.div>
@@ -1324,8 +1157,12 @@ export default function Home() {
                       <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">Most Popular</Badge>
                     </div>
                     <CardHeader className="pt-7 pb-3">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500 flex items-center gap-2">Pro {LAUNCH_PROMO.active && <DiscountBadge original={LAUNCH_PROMO.prices.pro.original} discounted={LAUNCH_PROMO.prices.pro.discounted} />}</CardDescription>
-                      <CardTitle className="text-2xl font-bold flex items-baseline gap-1.5">${LAUNCH_PROMO.active ? LAUNCH_PROMO.prices.pro.discounted : 29}<span className="text-sm font-normal text-muted-foreground">/month</span>{LAUNCH_PROMO.active && <span className="text-base font-normal text-muted-foreground/50 line-through">${LAUNCH_PROMO.prices.pro.original}</span>}</CardTitle>
+                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Pro</CardDescription>
+                      <CardTitle className="text-2xl font-bold">$19<span className="text-sm font-normal text-muted-foreground">/month</span></CardTitle>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-xs line-through text-muted-foreground/60">$29/mo</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-34%</span>
+                      </div>
                       <p className="text-xs text-muted-foreground">For serious course creators.</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
@@ -1340,7 +1177,7 @@ export default function Home() {
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
                       <Button className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20" size="sm" onClick={() => setShowPaywall(true)}>
-                        Start Pro — ${LAUNCH_PROMO.active ? "19" : "29"}/mo
+                        Start Pro — $19/mo
                       </Button>
                     </CardFooter>
                   </Card>
@@ -1350,8 +1187,12 @@ export default function Home() {
                 <div className="w-[280px] shrink-0">
                   <Card className="relative flex flex-col h-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
                     <CardHeader className="pt-6 pb-3">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500 flex items-center gap-2">One-Time {LAUNCH_PROMO.active && <DiscountBadge original={LAUNCH_PROMO.prices.oneTime.original} discounted={LAUNCH_PROMO.prices.oneTime.discounted} />}</CardDescription>
-                      <CardTitle className="text-2xl font-bold flex items-baseline gap-1.5">${LAUNCH_PROMO.active ? LAUNCH_PROMO.prices.oneTime.discounted : 39}<span className="text-sm font-normal text-muted-foreground"> one-time</span>{LAUNCH_PROMO.active && <span className="text-base font-normal text-muted-foreground/50 line-through">${LAUNCH_PROMO.prices.oneTime.original}</span>}</CardTitle>
+                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">One-Time</CardDescription>
+                      <CardTitle className="text-2xl font-bold">$29<span className="text-sm font-normal text-muted-foreground"> one-time</span></CardTitle>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-xs line-through text-muted-foreground/60">$39</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-26%</span>
+                      </div>
                       <p className="text-xs text-muted-foreground">5 course generations. No subscription.</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
@@ -1366,7 +1207,7 @@ export default function Home() {
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
                       <Button className="w-full rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/20" size="sm" onClick={() => setShowPaywall(true)}>
-                        Buy 5-Pack — ${LAUNCH_PROMO.active ? "29" : "39"}
+                        Buy 5-Pack — $29
                       </Button>
                     </CardFooter>
                   </Card>
@@ -1384,9 +1225,12 @@ export default function Home() {
                     <CardHeader className="pt-7 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1">
                         <Crown className="size-3" />Pro Max
-                        {LAUNCH_PROMO.active && <DiscountBadge original={LAUNCH_PROMO.prices.proMax.original} discounted={LAUNCH_PROMO.prices.proMax.discounted} />}
                       </CardDescription>
-                      <CardTitle className="text-2xl font-bold flex items-baseline gap-1.5">${LAUNCH_PROMO.active ? LAUNCH_PROMO.prices.proMax.discounted : 79}<span className="text-sm font-normal text-muted-foreground">/month</span>{LAUNCH_PROMO.active && <span className="text-base font-normal text-muted-foreground/50 line-through">${LAUNCH_PROMO.prices.proMax.original}</span>}</CardTitle>
+                      <CardTitle className="text-2xl font-bold">$69<span className="text-sm font-normal text-muted-foreground">/month</span></CardTitle>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-xs line-through text-muted-foreground/60">$79/mo</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-13%</span>
+                      </div>
                       <p className="text-xs text-muted-foreground">The ultimate course creation toolkit.</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
@@ -1409,10 +1253,10 @@ export default function Home() {
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5 flex-col gap-1.5">
-                      <Button className="w-full rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" size="sm" onClick={() => setShowNewsletterModal(true)}>
-                        <Mail className="size-3.5 mr-1.5" />Subscribe for Early Access
+                      <Button className="w-full rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" size="sm" onClick={() => toast("You're on the list! We'll notify you when Pro Max launches.", "success")}>
+                        <Sparkles className="size-3.5 mr-1.5" />Join Waitlist
                       </Button>
-                      <p className="text-[10px] text-muted-foreground/60 text-center">Get notified at launch — no spam.</p>
+                      <p className="text-[10px] text-muted-foreground/60 text-center">No spam — email at launch only.</p>
                     </CardFooter>
                   </Card>
                 </div>
@@ -1652,11 +1496,6 @@ export default function Home() {
       <AuthModal
         open={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-      />
-      <NewsletterModal
-        open={showNewsletterModal}
-        onClose={() => setShowNewsletterModal(false)}
-        toast={toast}
       />
 
       {/* ═══════════════════════════════════════════════════
