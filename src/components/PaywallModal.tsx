@@ -10,6 +10,7 @@ import {
   Zap,
   Crown,
   ArrowRight,
+  Flame,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -18,14 +19,20 @@ interface PaywallModalProps {
   onClose: () => void;
 }
 
+/* Launch promo — mirrors the config in page.tsx */
+const PROMO_ACTIVE = true;
+const PROMO_EXPIRES = new Date("2026-05-11T23:59:59Z");
+
 const plans = [
   {
     id: "pro",
     name: "Syllabi Pro",
-    price: "$29",
+    price: PROMO_ACTIVE ? "$19" : "$29",
+    originalPrice: "$29",
     period: "/month",
     description: "Unlimited curriculum generations for serious course creators.",
-    badge: "Most Popular",
+    badge: PROMO_ACTIVE ? "Launch Special" : "Most Popular",
+    discountPct: PROMO_ACTIVE ? "34% OFF" : null,
     features: [
       "Unlimited generations",
       "Full modules, lessons & quizzes",
@@ -33,7 +40,7 @@ const plans = [
       "Custom pacing schedules",
       "Priority AI processing",
     ],
-    cta: "Start Pro — $29/mo",
+    cta: PROMO_ACTIVE ? "Start Pro — $19/mo" : "Start Pro — $29/mo",
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_pro_monthly",
     icon: Crown,
     gradient: "from-violet-600 to-indigo-600",
@@ -42,10 +49,12 @@ const plans = [
   {
     id: "5pack",
     name: "5-Pack",
-    price: "$39",
+    price: PROMO_ACTIVE ? "$29" : "$39",
+    originalPrice: "$39",
     period: "one-time",
     description: "5 additional curriculum generations. No subscription needed.",
     badge: null,
+    discountPct: PROMO_ACTIVE ? "26% OFF" : null,
     features: [
       "5 curriculum generations",
       "Full modules, lessons & quizzes",
@@ -53,7 +62,7 @@ const plans = [
       "Custom pacing schedules",
       "No recurring charges",
     ],
-    cta: "Buy 5-Pack — $39",
+    cta: PROMO_ACTIVE ? "Buy 5-Pack — $29" : "Buy 5-Pack — $39",
     priceId: process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "price_5pack",
     icon: Zap,
     gradient: "from-cyan-600 to-blue-600",
@@ -155,13 +164,22 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
                     <div className="flex items-center gap-2 mb-2 mt-1">
                       <plan.icon className={`size-5 ${plan.highlight ? "text-violet-500" : "text-cyan-500"}`} />
                       <span className="font-semibold text-sm">{plan.name}</span>
+                      {plan.discountPct && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-400 border border-rose-500/20">
+                          <Flame className="size-3" />
+                          {plan.discountPct}
+                        </span>
+                      )}
                     </div>
 
-                    <div className="mb-2">
+                    <div className="mb-2 flex items-baseline gap-1.5">
                       <span className="text-2xl font-bold">{plan.price}</span>
-                      <span className="text-xs text-muted-foreground ml-1">
+                      <span className="text-xs text-muted-foreground">
                         {plan.period}
                       </span>
+                      {PROMO_ACTIVE && (
+                        <span className="text-sm text-muted-foreground/50 line-through">{plan.originalPrice}</span>
+                      )}
                     </div>
 
                     <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
