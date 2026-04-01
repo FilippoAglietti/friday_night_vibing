@@ -24,7 +24,7 @@ import type { DifficultyLevel, Curriculum } from "@/types/curriculum";
 
 /* ─── Types ──────────────────────────────────────────────── */
 
-export type CourseLength = "mini" | "standard" | "bootcamp";
+export type CourseLength = "mini" | "beginner" | "intermediate" | "advanced";
 
 export interface CurriculumFormData {
   topic: string;
@@ -57,15 +57,16 @@ const DIFFICULTY_OPTIONS: { value: DifficultyLevel; label: string; desc: string 
 ];
 
 const COURSE_LENGTH_OPTIONS: { value: CourseLength; label: string; desc: string }[] = [
-  { value: "mini", label: "Mini-Course", desc: "~5 lessons · Quick win" },
-  { value: "standard", label: "Standard", desc: "10–15 lessons · Complete coverage" },
-  { value: "bootcamp", label: "Bootcamp", desc: "20+ lessons · Deep dive" },
+  { value: "mini", label: "Mini", desc: "~5 lessons · Quick overview" },
+  { value: "beginner", label: "Beginner", desc: "8–12 lessons · Solid foundation" },
+  { value: "intermediate", label: "Intermediate", desc: "12–18 lessons · In-depth coverage" },
+  { value: "advanced", label: "Advanced", desc: "20+ lessons · Comprehensive deep dive" },
 ];
 
 const INITIAL_FORM: CurriculumFormData = {
   topic: "",
   difficulty: "beginner",
-  courseLength: "standard",
+  courseLength: "beginner",
   niche: "",
   abstract: "",
   learnerProfile: "",

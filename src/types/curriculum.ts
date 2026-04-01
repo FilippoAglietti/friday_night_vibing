@@ -44,11 +44,12 @@ export type PacingStyle =
 
 /**
  * Desired course length sent from the generation form.
- *   mini      → ~5 lessons (1-2 modules)
- *   standard  → 10-15 lessons (3-5 modules)
- *   bootcamp  → 20+ lessons (6-10 modules)
+ *   mini         → ~5 lessons (1-2 modules)
+ *   beginner     → 8-12 lessons (3-4 modules)
+ *   intermediate → 12-18 lessons (4-6 modules)
+ *   advanced     → 20+ lessons (6-10 modules)
  */
-export type CourseLength = "mini" | "standard" | "bootcamp";
+export type CourseLength = "mini" | "beginner" | "intermediate" | "advanced";
 
 // ── Core Entities ─────────────────────────────────────────
 

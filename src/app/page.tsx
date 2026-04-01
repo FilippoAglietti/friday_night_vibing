@@ -915,6 +915,7 @@ export default function Home() {
                     onLoadingChange={handleLoadingChange}
                     onLimitReached={handleLimitReached}
                     onSubmitAttempt={handleFormSubmitAttempt}
+                    isFreeUser={!user}
                   />
                 </AnimateInView>
               </>

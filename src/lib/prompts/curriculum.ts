@@ -23,9 +23,10 @@ const AUDIENCE_DESCRIPTIONS: Record<AudienceLevel, string> = {
 };
 
 const LENGTH_DESCRIPTIONS: Record<CourseLength, string> = {
-  mini:     "1-2 modules with 4-6 lessons total. Tight, focused on one key outcome.",
-  standard: "3-5 modules with 10-15 lessons total. Balance breadth and depth.",
-  bootcamp: "6-10 modules with 20-30 lessons total. Comprehensive, foundation to mastery.",
+  mini:         "1-2 modules with 4-6 lessons total. Tight, focused on one key outcome.",
+  beginner:     "3-4 modules with 8-12 lessons total. Solid foundation with room to explore.",
+  intermediate: "4-6 modules with 12-18 lessons total. In-depth coverage balancing breadth and depth.",
+  advanced:     "6-10 modules with 20-30 lessons total. Comprehensive deep dive from foundation to mastery.",
 };
 
 // ─── System prompt ────────────────────────────────────────────

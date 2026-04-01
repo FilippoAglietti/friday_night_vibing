@@ -86,7 +86,7 @@ function checkRateLimit(ip: string): boolean {
 const VALID_AUDIENCES: AudienceLevel[] = ["beginner", "intermediate", "advanced"];
 
 /** Valid values for the length field */
-const VALID_LENGTHS: CourseLength[] = ["mini", "standard", "bootcamp"];
+const VALID_LENGTHS: CourseLength[] = ["mini", "beginner", "intermediate", "advanced"];
 
 /**
  * Validates and parses the incoming request body.
