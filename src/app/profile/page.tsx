@@ -592,23 +592,23 @@ export default function ProfilePage() {
             </div>
 
             {/* Description */}
-            <p className="text-xs text-muted-foreground/80 line-clamp-2 mb-3 leading-relaxed">{c.description}</p>
+            <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed">{c.description}</p>
 
             {/* Tags */}
             {c.tags && c.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-3">
                 {c.tags.slice(0, 3).map((tag, i) => (
-                  <span key={i} className="text-[9px] px-1.5 py-0.5 rounded-md bg-muted/40 text-muted-foreground/70">{tag}</span>
+                  <span key={i} className="text-[9px] px-1.5 py-0.5 rounded-md bg-muted/40 text-muted-foreground">{tag}</span>
                 ))}
                 {c.tags.length > 3 && (
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-muted/40 text-muted-foreground/50">+{c.tags.length - 3}</span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-muted/40 text-muted-foreground">+{c.tags.length - 3}</span>
                 )}
               </div>
             )}
 
             {/* Footer: date + actions */}
             <div className="flex items-center justify-between pt-2 border-t border-border/20">
-              <span className="text-[10px] text-muted-foreground/50">{timeAgo(gen.created_at)}</span>
+              <span className="text-[10px] text-muted-foreground">{timeAgo(gen.created_at)}</span>
               <div className="flex gap-0.5">
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c); }} title="Download PDF">
                   <Download className="size-3.5" />
@@ -674,7 +674,7 @@ export default function ProfilePage() {
                             <div className="flex-1 min-w-0">
                               <p className="text-xs text-foreground/90 truncate">{mod.title}</p>
                             </div>
-                            <span className="text-[9px] text-muted-foreground/50 shrink-0">{mod.lessons?.length || 0} lessons</span>
+                            <span className="text-[9px] text-muted-foreground shrink-0">{mod.lessons?.length || 0} lessons</span>
                           </div>
                         ))}
                       </div>
@@ -755,7 +755,7 @@ export default function ProfilePage() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-violet-400/80 font-medium">{getGreeting()},</p>
+                  <p className="text-sm text-violet-500 dark:text-violet-400 font-medium">{getGreeting()},</p>
                   <h1 className="text-xl sm:text-2xl font-bold truncate">{firstName}</h1>
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     <Badge variant="outline" className={`text-xs flex items-center gap-1 ${planBadgeClass}`}>
@@ -833,10 +833,10 @@ export default function ProfilePage() {
             {/* ── STAT CARDS ──────────────────────────────── */}
             <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: "Total Courses", value: loading ? "—" : generations.length, sub: `${thisMonthCount} this month`, icon: BookOpen, gradient: "from-violet-500/12 to-indigo-500/12", iconBg: "bg-violet-500/15", iconColor: "text-violet-400", border: "border-violet-500/15" },
-                { label: "Learning Hours", value: loading ? "—" : `${totalHours}h`, sub: `${totalLessonsAll} total lessons`, icon: Clock, gradient: "from-cyan-500/12 to-blue-500/12", iconBg: "bg-cyan-500/15", iconColor: "text-cyan-400", border: "border-cyan-500/15" },
-                { label: "Quiz Questions", value: loading ? "—" : totalQuizzes, sub: `across all courses`, icon: Award, gradient: "from-amber-500/12 to-orange-500/12", iconBg: "bg-amber-500/15", iconColor: "text-amber-400", border: "border-amber-500/15" },
-                { label: "Day Streak", value: loading ? "—" : streak, sub: streak > 0 ? "Keep it going!" : "Generate today!", icon: Flame, gradient: "from-rose-500/12 to-pink-500/12", iconBg: "bg-rose-500/15", iconColor: "text-rose-400", border: "border-rose-500/15" },
+                { label: "Total Courses", value: loading ? "—" : generations.length, sub: `${thisMonthCount} this month`, icon: BookOpen, gradient: "from-violet-500/15 to-indigo-500/15", iconBg: "bg-violet-500/15", iconColor: "text-violet-400", border: "border-violet-500/15" },
+                { label: "Learning Hours", value: loading ? "—" : `${totalHours}h`, sub: `${totalLessonsAll} total lessons`, icon: Clock, gradient: "from-cyan-500/15 to-blue-500/15", iconBg: "bg-cyan-500/15", iconColor: "text-cyan-400", border: "border-cyan-500/15" },
+                { label: "Quiz Questions", value: loading ? "—" : totalQuizzes, sub: `across all courses`, icon: Award, gradient: "from-amber-500/15 to-orange-500/15", iconBg: "bg-amber-500/15", iconColor: "text-amber-400", border: "border-amber-500/15" },
+                { label: "Day Streak", value: loading ? "—" : streak, sub: streak > 0 ? "Keep it going!" : "Generate today!", icon: Flame, gradient: "from-rose-500/15 to-pink-500/15", iconBg: "bg-rose-500/15", iconColor: "text-rose-400", border: "border-rose-500/15" },
               ].map(({ label, value, sub, icon: Icon, gradient, iconBg, iconColor, border }) => (
                 <Card key={label} className={`${border} bg-gradient-to-br ${gradient} backdrop-blur-sm hover:scale-[1.02] transition-all duration-200 overflow-hidden relative group`}>
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -847,11 +847,11 @@ export default function ProfilePage() {
                       <div className={`flex items-center justify-center size-9 rounded-xl ${iconBg}`}>
                         <Icon className={`size-[18px] ${iconColor}`} />
                       </div>
-                      <ArrowUpRight className="size-3.5 text-muted-foreground/20 group-hover:text-muted-foreground/40 transition-colors" />
+                      <ArrowUpRight className="size-3.5 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
                     </div>
                     <p className="text-2xl font-bold tracking-tight">{value}</p>
                     <p className="text-[11px] text-muted-foreground mt-0.5">{label}</p>
-                    <p className="text-[10px] text-muted-foreground/40 mt-0.5">{sub}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -945,8 +945,8 @@ export default function ProfilePage() {
                         ))}
                       </div>
                       <div className="flex items-center justify-between mt-3">
-                        <p className="text-[10px] text-muted-foreground/40">{generations.length} courses total</p>
-                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground/40">
+                        <p className="text-[10px] text-muted-foreground">{generations.length} course{generations.length !== 1 ? "s" : ""} total</p>
+                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                           <span>Less</span>
                           {[0, 1, 2, 3, 4].map((lvl) => (
                             <div key={lvl} className={`size-2.5 rounded-[2px] ${heatmapColors[lvl]}`} />
@@ -1069,9 +1069,9 @@ export default function ProfilePage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-medium text-foreground/90 group-hover:text-violet-400 transition-colors truncate">{s.title}</p>
-                            <p className="text-[10px] text-muted-foreground/50">{s.reason}</p>
+                            <p className="text-[10px] text-muted-foreground">{s.reason}</p>
                           </div>
-                          <ChevronRight className="size-3.5 text-muted-foreground/30 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all shrink-0" />
+                          <ChevronRight className="size-3.5 text-muted-foreground/60 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all shrink-0" />
                         </button>
                       ))}
                     </div>
@@ -1132,10 +1132,10 @@ export default function ProfilePage() {
                                           <Badge variant="outline" className={`text-[9px] h-4 ${difficultyColors[c.difficulty] || ""}`}>
                                             {c.difficulty}
                                           </Badge>
-                                          <span className="text-[10px] text-muted-foreground/50">{c.modules?.length || 0} mod · {lessonsCount} les · {c.pacing?.totalHours || 0}h</span>
+                                          <span className="text-[10px] text-muted-foreground">{c.modules?.length || 0} mod · {lessonsCount} les · {c.pacing?.totalHours || 0}h</span>
                                         </div>
                                       </div>
-                                      <span className="text-[9px] text-muted-foreground/40 shrink-0 mt-0.5">
+                                      <span className="text-[9px] text-muted-foreground shrink-0 mt-0.5">
                                         {new Date(gen.created_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                                       </span>
                                     </div>
@@ -1259,7 +1259,7 @@ export default function ProfilePage() {
                 <CardContent>
                   {searchQuery ? (
                     <>
-                      <Search className="size-10 text-muted-foreground/40 mx-auto mb-4" />
+                      <Search className="size-10 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-base font-semibold mb-2">No matches found</h3>
                       <p className="text-sm text-muted-foreground">Try a different search term.</p>
                     </>
@@ -1413,7 +1413,7 @@ export default function ProfilePage() {
                 >
                   <LogOut className="size-3.5" />Sign out
                 </Button>
-                <p className="text-[11px] text-muted-foreground/50">
+                <p className="text-[11px] text-muted-foreground">
                   To request account deletion, please contact{" "}
                   <a href="mailto:support@syllabi.ai" className="underline hover:text-muted-foreground transition-colors">support@syllabi.ai</a>.
                 </p>
