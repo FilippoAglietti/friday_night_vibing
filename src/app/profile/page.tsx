@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabaseBrowser } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import type { Curriculum } from "@/types/curriculum";
