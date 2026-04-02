@@ -47,7 +47,42 @@ import {
   Crown,
   Headphones,
   Menu,
+  Flame,
 } from "lucide-react";
+
+/* ─── Countdown Hook ─────────────────────────────────────── */
+
+const PROMO_EXPIRES = new Date("2026-05-11T23:59:59Z");
+
+function useCountdown(target: Date) {
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const diff = Math.max(0, target.getTime() - now.getTime());
+  const days  = Math.floor(diff / 86_400_000);
+  const hours = Math.floor((diff % 86_400_000) / 3_600_000);
+  const mins  = Math.floor((diff % 3_600_000) / 60_000);
+  const secs  = Math.floor((diff % 60_000) / 1000);
+  return { days, hours, mins, secs, expired: diff === 0 };
+}
+
+function CountdownInline() {
+  const { days, hours, mins, secs, expired } = useCountdown(PROMO_EXPIRES);
+  if (expired) return null;
+  return (
+    <span className="inline-flex items-center gap-1 text-xs font-mono tabular-nums">
+      <span className="font-bold text-rose-400">{days}d</span>
+      <span className="text-muted-foreground/40">:</span>
+      <span className="font-bold text-rose-400">{String(hours).padStart(2, "0")}h</span>
+      <span className="text-muted-foreground/40">:</span>
+      <span className="font-bold text-rose-400">{String(mins).padStart(2, "0")}m</span>
+      <span className="text-muted-foreground/40">:</span>
+      <span className="font-bold text-rose-400">{String(secs).padStart(2, "0")}s</span>
+    </span>
+  );
+}
 
 /* ─── Data ───────────────────────────────────────────────── */
 
@@ -924,12 +959,15 @@ export default function Home() {
               >
                 Start free. Upgrade when you&apos;re ready.
               </motion.h2>
-              <motion.div variants={fadeUp} className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5">
-                <span className="relative flex size-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
+              <motion.div variants={fadeUp} className="mt-4 inline-flex items-center gap-3 rounded-full border border-rose-500/25 bg-gradient-to-r from-rose-500/10 via-violet-500/5 to-amber-500/10 px-5 py-2.5 backdrop-blur-sm shadow-lg shadow-rose-500/5">
+                <Flame className="size-4 text-rose-400 animate-pulse shrink-0" />
+                <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-rose-400 via-violet-400 to-amber-400 bg-clip-text text-transparent">
+                  Launch Special
                 </span>
-                <span className="text-sm font-semibold text-emerald-500">Launch Special — limited time pricing</span>
+                <span className="hidden sm:inline text-muted-foreground/30">·</span>
+                <span className="hidden sm:inline text-xs text-muted-foreground">Ends in</span>
+                <CountdownInline />
+                <Flame className="size-4 text-rose-400 animate-pulse shrink-0" />
               </motion.div>
             </AnimateInView>
 
@@ -1006,7 +1044,7 @@ export default function Home() {
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-sm line-through text-muted-foreground/60">$29/mo</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Save 34%</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 34%</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       For serious course creators who ship regularly.
@@ -1054,7 +1092,7 @@ export default function Home() {
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-sm line-through text-muted-foreground/60">$39</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Save 26%</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 26%</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       5 course generations. No subscription needed.
@@ -1113,7 +1151,7 @@ export default function Home() {
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-sm line-through text-muted-foreground/60">$79/mo</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Save 13%</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 13%</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       The ultimate toolkit to create &amp; sell courses.
