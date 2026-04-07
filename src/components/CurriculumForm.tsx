@@ -776,15 +776,15 @@ export default function CurriculumForm({
             )}
           </AnimatePresence>
 
-          {/* ── About You — Learner Profile ────────────────── */}
+          {/* ── Target Audience — Who is this course for? ──── */}
           <div className="space-y-1.5">
             <Label htmlFor="course-learner-profile" className="text-sm font-medium">
-              About You{" "}
-              <span className="text-muted-foreground font-normal">(optional — helps personalize the course)</span>
+              Who is this course for?{" "}
+              <span className="text-muted-foreground font-normal">(optional — helps personalize the content)</span>
             </Label>
             <textarea
               id="course-learner-profile"
-              placeholder="e.g. I'm a marketing manager with 5 years of experience looking to transition into data science…"
+              placeholder="e.g. Medical residents in cardiology with basic ECG knowledge, or Marketing managers transitioning into data science…"
               value={form.learnerProfile}
               onChange={(e) => updateField("learnerProfile", e.target.value)}
               disabled={isSubmitting}
@@ -792,7 +792,7 @@ export default function CurriculumForm({
               maxLength={500}
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
             />
-            <SelectInfoPanel tooltip="The more context you share — your background, goals, and learning style — the more tailored and relevant your course will be. Even one sentence helps." />
+            <SelectInfoPanel tooltip="Describe who will take this course — their background, experience level, and goals. The more context you give, the more tailored and relevant the course content will be." />
           </div>
 
           {/* ── Abstract / PDF Upload ─────────────────────── */}

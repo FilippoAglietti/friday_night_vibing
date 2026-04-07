@@ -91,7 +91,7 @@ export function buildUserPrompt(params: GenerateRequest): string {
     : "";
 
   const learnerBlock = learnerProfile
-    ? `\nLEARNER PROFILE:\n"""\n${learnerProfile.slice(0, 500)}\n"""\nPersonalize the course for this learner. Adapt examples, exercises, and language to their background, goals, and experience level. Make the content feel tailored to who they are.\n`
+    ? `\nTARGET AUDIENCE PROFILE:\n"""\n${learnerProfile.slice(0, 500)}\n"""\nThis describes the target audience for the course. Adapt examples, exercises, depth, and language to their background, goals, and experience level. Make the content feel designed specifically for this audience.\n`
     : "";
 
   const languageBlock = language !== "en"
@@ -267,7 +267,7 @@ export function buildSkeletonPrompt(params: GenerateRequest): string {
     : "";
 
   const learnerBlock = learnerProfile
-    ? `\nLEARNER PROFILE:\n"""\n${learnerProfile.slice(0, 500)}\n"""\nPersonalize the course for this learner.\n`
+    ? `\nTARGET AUDIENCE PROFILE:\n"""\n${learnerProfile.slice(0, 500)}\n"""\nThis describes the target audience. Adapt structure and depth for their background and goals.\n`
     : "";
 
   const languageBlock = language !== "en"
