@@ -19,7 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Sparkles, Loader2, AlertCircle, FileText, Upload, X, Info, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, Loader2, AlertCircle, FileText, Upload, X, Info, ChevronDown, ChevronUp, Eye } from "lucide-react";
 import type {
   DifficultyLevel,
   Curriculum,
@@ -55,23 +55,25 @@ export interface CurriculumFormProps {
   onLimitReached?: () => void;
   /** Called before submit — return false to block (e.g. for auth gate) */
   onSubmitAttempt?: () => boolean;
+  /** Optional initial form values to pre-fill the form (for templates, duplicates, etc.) */
+  initialValues?: Partial<CurriculumFormData>;
   /** When true, restrict to mini course + beginner/intermediate only */
   isFreeUser?: boolean;
 }
 
 /* ─── Constants ──────────────────────────────────────────── */
 
-const DIFFICULTY_OPTIONS: { value: DifficultyLevel; label: string; desc: string }[] = [
-  { value: "beginner", label: "Beginner", desc: "No prior knowledge assumed" },
-  { value: "intermediate", label: "Intermediate", desc: "Some foundational skills expected" },
-  { value: "advanced", label: "Advanced", desc: "Deep expertise & complex topics" },
+const DIFFICULTY_OPTIONS: { value: DifficultyLevel; label: string; desc: string; tooltip: string }[] = [
+  { value: "beginner", label: "Beginner", desc: "No prior knowledge assumed", tooltip: "Best for intro courses, onboarding content, or audiences new to the subject. The AI will explain every concept from scratch with real-world examples." },
+  { value: "intermediate", label: "Intermediate", desc: "Some foundational skills expected", tooltip: "Ideal for students with some background knowledge. Covers advanced techniques and deeper applications without excessive repetition of basics." },
+  { value: "advanced", label: "Advanced", desc: "Deep expertise & complex topics", tooltip: "For expert-level learners tackling cutting-edge concepts and nuanced problems. Assumes strong foundational knowledge and high self-sufficiency." },
 ];
 
-const COURSE_LENGTH_OPTIONS: { value: CourseLength; label: string; desc: string; info: string }[] = [
-  { value: "crash", label: "Crash", desc: "~5 lessons · 1-2 modules", info: "Perfect for a quick overview or lead magnet. Covers one key outcome in a focused, bite-sized format." },
-  { value: "short", label: "Short", desc: "8–12 lessons · 3-4 modules", info: "A solid foundation course. Great for teaching a specific skill with room to explore subtopics." },
-  { value: "full", label: "Full", desc: "12–18 lessons · 4-6 modules", info: "In-depth coverage balancing breadth and depth. Ideal for flagship courses your students will pay for." },
-  { value: "masterclass", label: "Masterclass", desc: "20+ lessons · 6-10 modules", info: "Comprehensive deep dive from foundation to mastery. Best for premium, high-ticket courses." },
+const COURSE_LENGTH_OPTIONS: { value: CourseLength; label: string; desc: string; info: string; tooltip: string }[] = [
+  { value: "crash", label: "Crash", desc: "~5 lessons · 1-2 modules", info: "Perfect for a quick overview or lead magnet. Covers one key outcome in a focused, bite-sized format.", tooltip: "Quick introduction or promotional course. Best for lead magnets, webinars, or teasers to larger programs." },
+  { value: "short", label: "Short", desc: "8–12 lessons · 3-4 modules", info: "A solid foundation course. Great for teaching a specific skill with room to explore subtopics.", tooltip: "Comprehensive single-skill course. Ideal for bestseller-level content that teaches one topic in depth." },
+  { value: "full", label: "Full", desc: "12–18 lessons · 4-6 modules", info: "In-depth coverage balancing breadth and depth. Ideal for flagship courses your students will pay for.", tooltip: "Full curriculum course with multiple topics and applications. Perfect for flagship products with premium pricing." },
+  { value: "masterclass", label: "Masterclass", desc: "20+ lessons · 6-10 modules", info: "Comprehensive deep dive from foundation to mastery. Best for premium, high-ticket courses.", tooltip: "Premium, in-depth program from fundamentals to advanced mastery. Best for high-ticket courses and exclusive programs." },
 ];
 
 const LANGUAGE_OPTIONS: { value: CourseLanguage; label: string; flag: string }[] = [
@@ -93,17 +95,17 @@ const LANGUAGE_OPTIONS: { value: CourseLanguage; label: string; flag: string }[]
   { value: "sv", label: "Svenska", flag: "🇸🇪" },
 ];
 
-const TEACHING_STYLE_OPTIONS: { value: TeachingStyle; label: string; desc: string }[] = [
-  { value: "conversational", label: "Conversational", desc: "Friendly, approachable tone" },
-  { value: "academic", label: "Academic", desc: "Formal, research-backed style" },
-  { value: "hands-on", label: "Hands-on", desc: "Project-based, learn by doing" },
-  { value: "storytelling", label: "Storytelling", desc: "Narrative-driven, engaging examples" },
+const TEACHING_STYLE_OPTIONS: { value: TeachingStyle; label: string; desc: string; tooltip: string }[] = [
+  { value: "conversational", label: "Conversational", desc: "Friendly, approachable tone", tooltip: "Uses casual language and relatable examples. Great for making complex topics feel accessible and approachable." },
+  { value: "academic", label: "Academic", desc: "Formal, research-backed style", tooltip: "Rigorous, evidence-based approach with citations and formal structure. Best for credibility and professional audiences." },
+  { value: "hands-on", label: "Hands-on", desc: "Project-based, learn by doing", tooltip: "Focuses on practical exercises and real projects. Perfect for skill-building where students learn through direct application." },
+  { value: "storytelling", label: "Storytelling", desc: "Narrative-driven, engaging examples", tooltip: "Uses case studies, anecdotes, and narratives to illustrate concepts. Excellent for engagement and memorable learning." },
 ];
 
-const OUTPUT_STRUCTURE_OPTIONS: { value: OutputStructure; label: string; desc: string }[] = [
-  { value: "modules", label: "Modules & Lessons", desc: "Classic course layout" },
-  { value: "workshop", label: "Workshop", desc: "Session-based, interactive" },
-  { value: "bootcamp", label: "Bootcamp", desc: "Day-by-day, intensive" },
+const OUTPUT_STRUCTURE_OPTIONS: { value: OutputStructure; label: string; desc: string; tooltip: string }[] = [
+  { value: "modules", label: "Modules & Lessons", desc: "Classic course layout", tooltip: "Traditional course structure with modules containing multiple lessons. Flexible pacing, great for self-paced learning." },
+  { value: "workshop", label: "Workshop", desc: "Session-based, interactive", tooltip: "Organized as interactive sessions with live components. Best for instructor-led or cohort-based experiences." },
+  { value: "bootcamp", label: "Bootcamp", desc: "Day-by-day, intensive", tooltip: "Structured as daily intensive sessions. Perfect for accelerated learning programs and immersive experiences." },
 ];
 
 const INITIAL_FORM: CurriculumFormData = {
@@ -136,6 +138,51 @@ function validate(data: CurriculumFormData): FormErrors {
   return errors;
 }
 
+
+/* ─── HoverTooltip Component ──────────────────────────────── */
+
+interface HoverTooltipProps {
+  children: React.ReactNode;
+  tooltip: string;
+}
+
+function HoverTooltip({ children, tooltip }: HoverTooltipProps) {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = useCallback(() => {
+    timeoutRef.current = setTimeout(() => {
+      setShowTooltip(true);
+    }, 500);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setShowTooltip(false);
+  }, []);
+
+  return (
+    <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      {children}
+      <AnimatePresence>
+        {showTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: -4, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full left-0 z-50 mt-1 w-48 rounded-lg bg-violet-950 border border-violet-800 p-2.5 text-xs text-violet-100 shadow-lg pointer-events-none"
+          >
+            {tooltip}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 /* ─── Component ──────────────────────────────────────────── */
 
 export default function CurriculumForm({
@@ -143,10 +190,18 @@ export default function CurriculumForm({
   onLoadingChange,
   onLimitReached,
   onSubmitAttempt,
+  initialValues,
   isFreeUser = true,
 }: CurriculumFormProps) {
   const [form, setForm] = useState<CurriculumFormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
+
+  // Sync form with initialValues when they change
+  useEffect(() => {
+    if (initialValues) {
+      setForm((prev) => ({ ...prev, ...initialValues }));
+    }
+  }, [initialValues]);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -154,6 +209,7 @@ export default function CurriculumForm({
   const [pdfExtracting, setPdfExtracting] = useState(false);
   const [lengthInfoOpen, setLengthInfoOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   // Async generation state
   const [courseId, setCourseId] = useState<string | null>(null);
@@ -492,12 +548,14 @@ export default function CurriculumForm({
                     .filter((opt) => !isFreeUser || opt.value !== "advanced")
                     .map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      <span className="flex flex-col">
-                        <span className="font-medium">{opt.label}</span>
-                        <span className="text-[11px] text-muted-foreground">
-                          {opt.desc}
+                      <HoverTooltip tooltip={opt.tooltip}>
+                        <span className="flex flex-col">
+                          <span className="font-medium">{opt.label}</span>
+                          <span className="text-[11px] text-muted-foreground">
+                            {opt.desc}
+                          </span>
                         </span>
-                      </span>
+                      </HoverTooltip>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -561,12 +619,14 @@ export default function CurriculumForm({
                     .filter((opt) => !isFreeUser || opt.value === "crash")
                     .map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      <span className="flex flex-col">
-                        <span className="font-medium">{opt.label}</span>
-                        <span className="text-[11px] text-muted-foreground">
-                          {opt.desc}
+                      <HoverTooltip tooltip={opt.tooltip}>
+                        <span className="flex flex-col">
+                          <span className="font-medium">{opt.label}</span>
+                          <span className="text-[11px] text-muted-foreground">
+                            {opt.desc}
+                          </span>
                         </span>
-                      </span>
+                      </HoverTooltip>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -659,11 +719,15 @@ export default function CurriculumForm({
                       <SelectContent>
                         {TEACHING_STYLE_OPTIONS.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
-                            <span className="flex flex-col">
-                              <span className="font-medium">{opt.label}</span>
-                              <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
-                            </span>
-                          </SelectItem>
+                      <HoverTooltip tooltip={opt.tooltip}>
+                        <span className="flex flex-col">
+                          <span className="font-medium">{opt.label}</span>
+                          <span className="text-[11px] text-muted-foreground">
+                            {opt.desc}
+                          </span>
+                        </span>
+                      </HoverTooltip>
+                    </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -688,11 +752,15 @@ export default function CurriculumForm({
                       <SelectContent>
                         {OUTPUT_STRUCTURE_OPTIONS.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
-                            <span className="flex flex-col">
-                              <span className="font-medium">{opt.label}</span>
-                              <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
-                            </span>
-                          </SelectItem>
+                      <HoverTooltip tooltip={opt.tooltip}>
+                        <span className="flex flex-col">
+                          <span className="font-medium">{opt.label}</span>
+                          <span className="text-[11px] text-muted-foreground">
+                            {opt.desc}
+                          </span>
+                        </span>
+                      </HoverTooltip>
+                    </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -811,6 +879,101 @@ export default function CurriculumForm({
             </div>
           </div>
 
+          {/* ── Generation Preview ─────────────────────────── */}
+          <AnimatePresence>
+            {previewOpen && form.topic.trim().length >= 3 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="rounded-xl border border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-indigo-500/3 to-violet-500/5 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold flex items-center gap-1.5 text-violet-400">
+                      <Eye className="size-3.5" />
+                      Generation Preview
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewOpen(false)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    {/* Topic */}
+                    <div className="flex items-start gap-2">
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold min-w-[70px] mt-0.5">Topic</span>
+                      <span className="text-sm font-medium">{form.topic.trim()}</span>
+                    </div>
+
+                    {/* Config summary */}
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                        {DIFFICULTY_OPTIONS.find((o) => o.value === form.difficulty)?.label || form.difficulty}
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                        {COURSE_LENGTH_OPTIONS.find((o) => o.value === (isFreeUser ? "crash" : form.courseLength))?.label || form.courseLength}
+                        {" · "}
+                        {COURSE_LENGTH_OPTIONS.find((o) => o.value === (isFreeUser ? "crash" : form.courseLength))?.desc || ""}
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                        {TEACHING_STYLE_OPTIONS.find((o) => o.value === form.teachingStyle)?.label || form.teachingStyle}
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        {OUTPUT_STRUCTURE_OPTIONS.find((o) => o.value === form.outputStructure)?.label || form.outputStructure}
+                      </span>
+                      {form.includeQuizzes && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          Quizzes included
+                        </span>
+                      )}
+                      {form.language !== "en" && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                          {LANGUAGE_OPTIONS.find((o) => o.value === form.language)?.flag}{" "}
+                          {LANGUAGE_OPTIONS.find((o) => o.value === form.language)?.label}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Estimated output */}
+                    <div className="rounded-lg bg-muted/10 border border-border/20 p-3 space-y-1.5">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estimated output</p>
+                      {(() => {
+                        const len = isFreeUser ? "crash" : form.courseLength;
+                        const estimates: Record<string, { modules: string; lessons: string; hours: string }> = {
+                          crash: { modules: "1–2", lessons: "~5", hours: "1–2" },
+                          short: { modules: "3–4", lessons: "8–12", hours: "4–8" },
+                          full: { modules: "4–6", lessons: "12–18", hours: "10–20" },
+                          masterclass: { modules: "6–10", lessons: "20+", hours: "20–40" },
+                        };
+                        const est = estimates[len] || estimates.short;
+                        return (
+                          <div className="flex gap-4 text-xs text-muted-foreground">
+                            <span>{est.modules} modules</span>
+                            <span>{est.lessons} lessons</span>
+                            <span>{est.hours} hours</span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    {form.niche && (
+                      <div className="flex items-start gap-2">
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold min-w-[70px] mt-0.5">Niche</span>
+                        <span className="text-xs text-muted-foreground">{form.niche}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* ── API Error ─────────────────────────────────── */}
           <AnimatePresence>
             {(apiError || pollError) && (
@@ -827,27 +990,40 @@ export default function CurriculumForm({
             )}
           </AnimatePresence>
 
-          {/* ── Submit Button ─────────────────────────────── */}
-          <Button
-            id="curriculum-submit"
-            type="submit"
-            disabled={isSubmitting}
-            className="h-11 w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-base font-semibold text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:hover:scale-100"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 size-4 animate-spin" />
-                {generationStatus === "pending" && "Starting generation…"}
-                {generationStatus === "generating" && "Generating course…"}
-                {!generationStatus && "Submitting…"}
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 size-4" />
-                Generate Course
-              </>
+          {/* ── Action Buttons ─────────────────────────────── */}
+          <div className="flex gap-2">
+            {!isSubmitting && form.topic.trim().length >= 3 && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setPreviewOpen((prev) => !prev)}
+                className="h-11 rounded-full border-violet-500/30 text-violet-400 hover:bg-violet-500/10 hover:text-violet-300 transition-all"
+              >
+                <Eye className="mr-2 size-4" />
+                {previewOpen ? "Hide" : "Preview"}
+              </Button>
             )}
-          </Button>
+            <Button
+              id="curriculum-submit"
+              type="submit"
+              disabled={isSubmitting}
+              className="h-11 flex-1 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-base font-semibold text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:hover:scale-100"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  {generationStatus === "pending" && "Starting generation…"}
+                  {generationStatus === "generating" && "Generating course…"}
+                  {!generationStatus && "Submitting…"}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 size-4" />
+                  Generate Course
+                </>
+              )}
+            </Button>
+          </div>
 
           <p className="text-center text-xs text-muted-foreground">
             {isSubmitting ? "Don't worry, you can leave this page and come back." : "Takes about 15–30 seconds · Your first generation is free"}

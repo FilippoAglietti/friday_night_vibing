@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabaseBrowser } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
-import type { Curriculum } from "@/types/curriculum";
+import type { Curriculum, DifficultyLevel } from "@/types/curriculum";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { motion, AnimatePresence } from "framer-motion";
+import CurriculumForm, { CurriculumFormData, CourseLength } from "@/components/CurriculumForm";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -72,7 +73,7 @@ interface UserProfile {
   generations_limit: number;
 }
 
-type TabId = "overview" | "courses" | "settings";
+type TabId = "overview" | "courses" | "settings" | "generate";
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -91,6 +92,7 @@ const difficultyGradients: Record<string, string> = {
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: "overview", label: "Overview", icon: LayoutGrid },
   { id: "courses", label: "My Courses", icon: BookOpen },
+  { id: "generate", label: "New Course", icon: Sparkles },
   { id: "settings", label: "Account", icon: Settings },
 ];
 
@@ -302,6 +304,8 @@ function ProgressRing({
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [templateConfig, setTemplateConfig] = useState<Partial<CurriculumFormData> | null>(null);
+  const [duplicateConfig, setDuplicateConfig] = useState<Partial<CurriculumFormData> | null>(null);
   const [dark, setDark] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [generations, setGenerations] = useState<Generation[]>([]);
@@ -362,6 +366,68 @@ export default function ProfilePage() {
   // ── Derived stats ──────────────────────────────────────────
 
   // Only courses with status="ready" and valid curriculum are safe for stats/cards
+  // ── Course Templates ────────────────────────────────────
+  const COURSE_TEMPLATES: { title: string; icon: React.ElementType; description: string; config: Partial<CurriculumFormData> }[] = [
+    {
+      title: "Quick Workshop",
+      icon: Zap,
+      description: "5 lessons, 1-2 modules",
+      config: { courseLength: "crash", difficulty: "beginner" },
+    },
+    {
+      title: "Full Course",
+      icon: BookOpen,
+      description: "12-18 lessons, 4-6 modules",
+      config: { courseLength: "full", difficulty: "intermediate" },
+    },
+    {
+      title: "Bootcamp Intensive",
+      icon: Flame,
+      description: "20+ lessons, 6-10 modules",
+      config: { courseLength: "masterclass", difficulty: "intermediate" },
+    },
+    {
+      title: "Storytelling Deep Dive",
+      icon: Brain,
+      description: "Narrative-driven course",
+      config: { courseLength: "full", difficulty: "advanced", teachingStyle: "storytelling" },
+    },
+  ];
+
+  // ── Template & Duplicate Handlers ────────────────────────
+  const handleSelectTemplate = useCallback((config: Partial<CurriculumFormData>) => {
+    setTemplateConfig(config);
+    setDuplicateConfig(null);
+    setActiveTab("generate");
+  }, []);
+
+  const handleDuplicateCourse = useCallback((gen: Generation) => {
+    const c = gen.curriculum;
+    const config: Partial<CurriculumFormData> = {
+      topic: c?.title || gen.topic || "",
+      difficulty: (c?.difficulty || gen.audience || "beginner") as DifficultyLevel,
+      courseLength: (gen.length as CourseLength) || "full",
+      niche: gen.niche || "",
+      abstract: c?.description || "",
+      learnerProfile: c?.targetAudience || "",
+    };
+    setDuplicateConfig(config);
+    setTemplateConfig(null);
+    setActiveTab("generate");
+  }, []);
+
+  const handleFormGenerated = useCallback(async () => {
+    // Refresh the generations list from Supabase
+    const { data: courses } = await supabaseBrowser
+      .from("courses")
+      .select("id, topic, audience, length, niche, curriculum, status, created_at")
+      .order("created_at", { ascending: false });
+    if (courses) setGenerations(courses as unknown as Generation[]);
+    setTemplateConfig(null);
+    setDuplicateConfig(null);
+    setActiveTab("courses");
+  }, []);
+
   const readyGenerations = useMemo(
     () => generations.filter((g) => g.status === "ready" && g.curriculum != null),
     [generations]
@@ -525,7 +591,7 @@ export default function ProfilePage() {
               Sign in with Google to see your generated courses, track your usage, and manage your account.
             </p>
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={() => (window.location.href = "/")}>Back to Home</Button>
+              <Button variant="outline" onClick={() => setActiveTab("generate")}>Start Creating</Button>
               <Button
                 className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0"
                 onClick={async () => {
@@ -670,6 +736,18 @@ export default function ProfilePage() {
                   <Eye className="size-3.5" />
                 </Button>
               </div>
+                <Button
+                  variant="ghost" size="sm"
+                  className="h-7 w-7 p-0 hover:bg-pink-500/10 hover:text-pink-400"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDuplicateCourse(gen);
+                    setActiveTab("generate");
+                  }}
+                  title="Duplicate & Remix"
+                >
+                  <Copy className="size-3.5" />
+                </Button>
             </div>
 
             {/* Expanded content */}
@@ -765,7 +843,7 @@ export default function ProfilePage() {
             <Button
               size="sm"
               className="text-xs gap-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full px-4 hidden sm:flex hover:shadow-lg hover:shadow-violet-500/20 transition-shadow"
-              onClick={() => (window.location.href = "/")}
+              onClick={() => (setActiveTab("generate"))}
             >
               <Plus className="size-3.5" />
               New Course
@@ -812,7 +890,7 @@ export default function ProfilePage() {
                     </Badge>
                   </div>
                 </div>
-                <Button size="sm" className="sm:hidden bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shrink-0 rounded-full" onClick={() => (window.location.href = "/")}>
+                <Button size="sm" className="sm:hidden bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shrink-0 rounded-full" onClick={() => (setActiveTab("generate"))}>
                   <Plus className="size-4" />
                 </Button>
               </div>
@@ -907,7 +985,7 @@ export default function ProfilePage() {
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <button
-                      onClick={() => (window.location.href = "/")}
+                      onClick={() => (setActiveTab("generate"))}
                       className="group flex flex-col items-center gap-2 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3 sm:p-4 hover:bg-violet-500/10 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-200"
                     >
                       <div className="flex items-center justify-center size-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 group-hover:scale-110 transition-transform duration-200">
@@ -1028,7 +1106,7 @@ export default function ProfilePage() {
                       </div>
                       <p className="text-xs font-medium mt-2">{Math.round(usagePercent)}% used</p>
                       {userProfile?.plan === "free" && (
-                        <Button size="sm" className="mt-3 h-7 text-[10px] bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full" onClick={() => (window.location.href = "/")}>
+                        <Button size="sm" className="mt-3 h-7 text-[10px] bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full" onClick={() => (setActiveTab("generate"))}>
                           Upgrade<ChevronRight className="size-3 ml-0.5" />
                         </Button>
                       )}
@@ -1258,7 +1336,7 @@ export default function ProfilePage() {
                     <p className="text-sm text-muted-foreground mb-5 max-w-sm mx-auto">
                       Generate your first AI-powered course and it will appear here.
                     </p>
-                    <Button className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full px-6" onClick={() => (window.location.href = "/")}>
+                    <Button className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full px-6" onClick={() => (setActiveTab("generate"))}>
                       <Sparkles className="size-4 mr-2" />Generate Your First Course
                     </Button>
                   </CardContent>
@@ -1339,7 +1417,7 @@ export default function ProfilePage() {
                       <Sparkles className="size-10 text-violet-500/40 mx-auto mb-4" />
                       <h3 className="text-base font-semibold mb-2">No courses yet</h3>
                       <p className="text-sm text-muted-foreground mb-5 max-w-sm mx-auto">Generate your first AI-powered course and it will appear here.</p>
-                      <Button className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0" onClick={() => (window.location.href = "/")}>Generate Your First Course</Button>
+                      <Button className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0" onClick={() => (setActiveTab("generate"))}>Generate Your First Course</Button>
                     </>
                   )}
                 </CardContent>
@@ -1394,6 +1472,54 @@ export default function ProfilePage() {
             )}
           </div>
         )}
+
+        {/* ══════════════════════════════════════════════════
+            TAB: GENERATE COURSE
+        ══════════════════════════════════════════════════ */}
+        {activeTab === "generate" && (
+          <div className="space-y-6">
+            {/* Quick Start Templates */}
+            <div>
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Sparkles className="size-4 text-violet-500" />
+                Quick Start Templates
+              </h3>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {COURSE_TEMPLATES.map((template) => {
+                  const Icon = template.icon;
+                  return (
+                    <button
+                      key={template.title}
+                      onClick={() => handleSelectTemplate(template.config)}
+                      className="group relative overflow-hidden rounded-lg border border-border/40 bg-gradient-to-br from-card/50 to-card/30 p-4 hover:border-violet-500/40 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300"
+                    >
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                        <div className="absolute -top-8 -right-8 size-32 bg-violet-500/5 rounded-full blur-2xl" />
+                      </div>
+                      <div className="relative flex items-start justify-between gap-2 mb-2">
+                        <Icon className="size-5 text-violet-500 shrink-0 mt-0.5" />
+                        <span className="text-xs font-medium text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">Use template</span>
+                      </div>
+                      <h4 className="font-semibold text-sm text-left group-hover:text-violet-400 transition-colors">{template.title}</h4>
+                      <p className="text-xs text-muted-foreground mt-1 text-left">{template.description}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Curriculum Form */}
+            <div className="bg-card/40 border border-border/30 rounded-lg p-6">
+              <CurriculumForm
+                onGenerated={handleFormGenerated}
+                isFreeUser={userProfile?.plan === "free"}
+                initialValues={templateConfig || duplicateConfig || undefined}
+              />
+            </div>
+          </div>
+        )}
+
+
 
         {/* ══════════════════════════════════════════════════
             TAB: ACCOUNT SETTINGS
@@ -1475,7 +1601,7 @@ export default function ProfilePage() {
                           <li key={f} className="text-xs text-muted-foreground flex items-center gap-1.5"><div className="size-1 rounded-full bg-violet-500 shrink-0" />{f}</li>
                         ))}
                       </ul>
-                      <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 h-8 text-xs" onClick={() => (window.location.href = "/")}>
+                      <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 h-8 text-xs" onClick={() => (setActiveTab("generate"))}>
                         View Pricing Plans<ExternalLink className="size-3 ml-1.5" />
                       </Button>
                     </div>
