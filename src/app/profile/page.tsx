@@ -809,7 +809,7 @@ export default function ProfilePage() {
                       </Badge>
                     )}
                     <Badge variant="outline" className="text-xs border-border/40 text-muted-foreground">
-                      {generations.length} course{generations.length !== 1 ? "s" : ""}
+                      {readyGenerations.length} course{readyGenerations.length !== 1 ? "s" : ""}
                     </Badge>
                   </div>
                 </div>
@@ -872,7 +872,7 @@ export default function ProfilePage() {
             {/* ── STAT CARDS ──────────────────────────────── */}
             <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: "Total Courses", value: loading ? "—" : generations.length, sub: `${thisMonthCount} this month`, icon: BookOpen, gradient: "from-violet-500/15 to-indigo-500/15", iconBg: "bg-violet-500/15", iconColor: "text-violet-400", border: "border-violet-500/15" },
+                { label: "Total Courses", value: loading ? "—" : readyGenerations.length, sub: `${thisMonthCount} this month`, icon: BookOpen, gradient: "from-violet-500/15 to-indigo-500/15", iconBg: "bg-violet-500/15", iconColor: "text-violet-400", border: "border-violet-500/15" },
                 { label: "Learning Hours", value: loading ? "—" : `${totalHours}h`, sub: `${totalLessonsAll} total lessons`, icon: Clock, gradient: "from-cyan-500/15 to-blue-500/15", iconBg: "bg-cyan-500/15", iconColor: "text-cyan-400", border: "border-cyan-500/15" },
                 { label: "Quiz Questions", value: loading ? "—" : totalQuizzes, sub: `across all courses`, icon: Award, gradient: "from-amber-500/15 to-orange-500/15", iconBg: "bg-amber-500/15", iconColor: "text-amber-400", border: "border-amber-500/15" },
                 { label: "Day Streak", value: loading ? "—" : streak, sub: streak > 0 ? "Keep it going!" : "Generate today!", icon: Flame, gradient: "from-rose-500/15 to-pink-500/15", iconBg: "bg-rose-500/15", iconColor: "text-rose-400", border: "border-rose-500/15" },
@@ -927,7 +927,7 @@ export default function ProfilePage() {
                       <span className="text-xs font-medium text-cyan-400">My Courses</span>
                     </button>
 
-                    {generations.length > 0 && (
+                    {readyGenerations.length > 0 && (
                       <button
                         onClick={() => {
                           const latest = readyGenerations[0];
@@ -984,7 +984,7 @@ export default function ProfilePage() {
                         ))}
                       </div>
                       <div className="flex items-center justify-between mt-3">
-                        <p className="text-[10px] text-muted-foreground">{generations.length} course{generations.length !== 1 ? "s" : ""} total</p>
+                        <p className="text-[10px] text-muted-foreground">{readyGenerations.length} course{readyGenerations.length !== 1 ? "s" : ""} total</p>
                         <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                           <span>Less</span>
                           {[0, 1, 2, 3, 4].map((lvl) => (
@@ -1040,7 +1040,7 @@ export default function ProfilePage() {
             </motion.div>
 
             {/* ── DIFFICULTY BREAKDOWN ─────────────────────── */}
-            {!loading && generations.length > 0 && (
+            {!loading && readyGenerations.length > 0 && (
               <motion.div variants={fadeUp}>
                 <Card className="border-border/40 bg-card/50 backdrop-blur-sm">
                   <CardHeader className="pb-3">
@@ -1051,11 +1051,11 @@ export default function ProfilePage() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex h-3 rounded-full overflow-hidden bg-muted/20 mb-3">
-                      {generations.length > 0 && (
+                      {readyGenerations.length > 0 && (
                         <>
-                          {difficultyBreakdown.beginner > 0 && <div className="bg-emerald-500 transition-all duration-700" style={{ width: `${(difficultyBreakdown.beginner / generations.length) * 100}%` }} />}
-                          {difficultyBreakdown.intermediate > 0 && <div className="bg-amber-500 transition-all duration-700" style={{ width: `${(difficultyBreakdown.intermediate / generations.length) * 100}%` }} />}
-                          {difficultyBreakdown.advanced > 0 && <div className="bg-rose-500 transition-all duration-700" style={{ width: `${(difficultyBreakdown.advanced / generations.length) * 100}%` }} />}
+                          {difficultyBreakdown.beginner > 0 && <div className="bg-emerald-500 transition-all duration-700" style={{ width: `${(difficultyBreakdown.beginner / readyGenerations.length) * 100}%` }} />}
+                          {difficultyBreakdown.intermediate > 0 && <div className="bg-amber-500 transition-all duration-700" style={{ width: `${(difficultyBreakdown.intermediate / readyGenerations.length) * 100}%` }} />}
+                          {difficultyBreakdown.advanced > 0 && <div className="bg-rose-500 transition-all duration-700" style={{ width: `${(difficultyBreakdown.advanced / readyGenerations.length) * 100}%` }} />}
                         </>
                       )}
                     </div>
@@ -1120,7 +1120,7 @@ export default function ProfilePage() {
             )}
 
             {/* ── GENERATION TIMELINE ────────────────────── */}
-            {!loading && generations.length > 0 && (
+            {!loading && readyGenerations.length > 0 && (
               <motion.div variants={fadeUp}>
                 <Card className="border-border/40 bg-card/50 backdrop-blur-sm">
                   <CardHeader className="pb-3">
@@ -1232,9 +1232,9 @@ export default function ProfilePage() {
                   <Sparkles className="size-4 text-violet-500" />
                   Recent Courses
                 </h2>
-                {generations.length > 4 && (
+                {readyGenerations.length > 4 && (
                   <button onClick={() => setActiveTab("courses")} className="text-xs text-violet-500 hover:text-violet-400 transition-colors flex items-center gap-1">
-                    View all {generations.length}<ChevronRight className="size-3" />
+                    View all {readyGenerations.length}<ChevronRight className="size-3" />
                   </button>
                 )}
               </div>
@@ -1248,7 +1248,7 @@ export default function ProfilePage() {
                     </Card>
                   ))}
                 </div>
-              ) : generations.length === 0 ? (
+              ) : readyGenerations.length === 0 ? (
                 <Card className="text-center py-12 border-dashed border-border/40">
                   <CardContent>
                     <div className="relative mx-auto mb-5 w-fit">

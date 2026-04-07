@@ -24,6 +24,7 @@ import { NextRequest, NextResponse, after } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -406,10 +407,13 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
     }
 
     if (!parsed) {
-      console.error("[/api/generate] Raw Claude response (first 500 chars):", rawText.substring(0, 500));
-      console.error("[/api/generate] Raw Claude response (last 200 chars):", rawText.substring(rawText.length - 200));
+      const preview = rawText.substring(0, 300).replace(/\n/g, "\\n");
+      const tail = rawText.substring(Math.max(0, rawText.length - 150)).replace(/\n/g, "\\n");
+      console.error("[/api/generate] Raw Claude response (first 300 chars):", preview);
+      console.error("[/api/generate] Raw Claude response (last 150 chars):", tail);
+      console.error("[/api/generate] Response length:", rawText.length, "stop_reason:", response.stop_reason);
       throw new Error(
-        "Claude returned a response that could not be parsed as JSON."
+        `JSON parse failed (len=${rawText.length}, stop=${response.stop_reason}). Start: ${preview.substring(0, 120)}...`
       );
     }
   }
@@ -551,7 +555,10 @@ async function updateCourseRecord(
   curriculum?: Curriculum,
   error?: string
 ): Promise<void> {
-  const supabase = await createSupabaseServer();
+  // Use supabaseAdmin (service role) for background operations inside after().
+  // The cookies-based createSupabaseServer() is unreliable after the response
+  // has been sent — the cookie context may be gone.
+  const supabase = getSupabaseAdmin();
 
   if (curriculum) {
     // Update with successful curriculum
@@ -559,7 +566,7 @@ async function updateCourseRecord(
     const { error: updateError } = await supabase
       .from("courses")
       .update({
-        curriculum: curriculum as unknown as Record<string, unknown>,
+        curriculum: JSON.parse(JSON.stringify(curriculum)),
         status: "ready",
         title: curriculum.title ?? curriculum.id,
         description: curriculum.subtitle ?? null,
