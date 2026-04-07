@@ -389,6 +389,7 @@ export default function CurriculumForm({
             includeQuizzes: form.includeQuizzes,
             teachingStyle: form.teachingStyle,
             outputStructure: form.outputStructure,
+            hasAttachments: !!pdfFile,
           }),
         });
 

@@ -241,6 +241,8 @@ export interface GenerateRequest {
   teachingStyle?: TeachingStyle;
   /** How the course is structured (default "modules") */
   outputStructure?: OutputStructure;
+  /** Whether the user uploaded attachments (PDF/files) during generation */
+  hasAttachments?: boolean;
 }
 
 /** Success response from POST /api/generate (synchronous) */

@@ -175,6 +175,9 @@ function validateRequest(body: unknown): GenerateRequest {
     throw new Error(`'outputStructure' must be one of: ${VALID_OUTPUT_STRUCTURES.join(", ")}.`);
   }
 
+  // hasAttachments — optional boolean, defaults to false
+  const hasAttachments = b.hasAttachments !== undefined ? Boolean(b.hasAttachments) : false;
+
   // Sanitize: strip HTML tags and limit length
   const sanitizedTopic = b.topic
     .trim()
@@ -194,6 +197,7 @@ function validateRequest(body: unknown): GenerateRequest {
     includeQuizzes,
     teachingStyle,
     outputStructure,
+    hasAttachments,
   };
 }
 
@@ -507,7 +511,7 @@ async function createCourseRecord(
   console.log("[/api/generate] Creating course record with status=generating for user:", userId);
   const supabase = await createSupabaseServer();
 
-  // Create course record with status="generating"
+  // Create course record with status="generating" and ALL generation settings
   const { data: course, error } = await supabase.from("courses").insert({
     user_id: userId,
     title: request.topic,
@@ -515,13 +519,20 @@ async function createCourseRecord(
     audience: request.audience,
     length: request.length,
     niche: request.niche ?? null,
-    language: "en",
+    language: request.language ?? "en",
     level: request.audience as "beginner" | "intermediate" | "advanced",
     content_type: "text",
     curriculum: null,
     description: null,
     status: "generating", // Start with generating state
     error_message: null,
+    // Generation settings — saved so we can show/reproduce what the user chose
+    teaching_style: request.teachingStyle ?? "conversational",
+    output_structure: request.outputStructure ?? "modules",
+    include_quizzes: request.includeQuizzes ?? true,
+    learner_profile: request.learnerProfile ?? null,
+    course_abstract: request.abstract ?? null,
+    has_attachments: request.hasAttachments ?? false,
   }).select("id").single();
 
   if (error) {
