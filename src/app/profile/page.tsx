@@ -335,11 +335,41 @@ export default function ProfilePage() {
     load();
   }, []);
 
+  // Poll for generating courses — refresh every 5s while any course is generating
+  useEffect(() => {
+    const hasGenerating = generations.some((g) => g.status === "generating");
+    if (!hasGenerating || !user) return;
+
+    const interval = setInterval(async () => {
+      const { data: courses } = await supabaseBrowser
+        .from("courses")
+        .select("id, topic, audience, length, niche, curriculum, status, created_at")
+        .order("created_at", { ascending: false });
+      if (courses) setGenerations(courses as unknown as Generation[]);
+
+      // Also refresh profile (generations_used may have incremented)
+      const { data: profileData } = await supabaseBrowser
+        .from("profiles")
+        .select("plan, generations_used, generations_limit")
+        .eq("id", user.id)
+        .single();
+      if (profileData) setUserProfile(profileData as UserProfile);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [generations, user]);
+
   // ── Derived stats ──────────────────────────────────────────
 
   // Only courses with status="ready" and valid curriculum are safe for stats/cards
   const readyGenerations = useMemo(
     () => generations.filter((g) => g.status === "ready" && g.curriculum != null),
+    [generations]
+  );
+
+  // Courses still being generated — shown as loading cards in dashboard
+  const generatingCourses = useMemo(
+    () => generations.filter((g) => g.status === "generating"),
     [generations]
   );
 
@@ -1235,11 +1265,43 @@ export default function ProfilePage() {
                   </CardContent>
                 </Card>
               ) : (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {generations.slice(0, 4).map((gen, i) => (
-                    <CourseCard key={gen.id} gen={gen} index={i} />
-                  ))}
-                </div>
+                <>
+                  {/* Generating courses — pulsing cards */}
+                  {generatingCourses.length > 0 && (
+                    <div className="grid gap-4 sm:grid-cols-2 mb-4">
+                      {generatingCourses.map((gen) => (
+                        <Card key={gen.id} className="relative border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-indigo-500/3 to-violet-500/5 overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/5 to-violet-500/0 animate-pulse" />
+                          <div className="h-[2px] bg-gradient-to-r from-violet-500 via-indigo-500 to-violet-500 animate-pulse" />
+                          <CardHeader className="relative pb-2 pt-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-sm leading-snug text-violet-400">{gen.topic}</h3>
+                                <p className="text-[11px] text-muted-foreground mt-0.5">Generating your course...</p>
+                              </div>
+                              <Badge variant="outline" className="text-[10px] shrink-0 bg-violet-500/10 text-violet-400 border-violet-500/20 animate-pulse">
+                                <Sparkles className="size-2.5 mr-1" />Generating
+                              </Badge>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="relative pt-0">
+                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                              <div className="flex items-center gap-1.5">
+                                <div className="size-1.5 rounded-full bg-violet-500 animate-pulse" />
+                                <span>AI is crafting your curriculum</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {readyGenerations.slice(0, 4).map((gen, i) => (
+                      <CourseCard key={gen.id} gen={gen} index={i} />
+                    ))}
+                  </div>
+                </>
               )}
             </motion.div>
           </motion.div>
@@ -1289,6 +1351,41 @@ export default function ProfilePage() {
                   {filteredGenerations.length} course{filteredGenerations.length !== 1 ? "s" : ""}
                   {searchQuery && ` matching "${searchQuery}"`}
                 </p>
+                {/* Generating courses — shown with pulsing animation */}
+                {generatingCourses.length > 0 && (
+                  <div className="grid gap-4 sm:grid-cols-2 mb-4">
+                    {generatingCourses.map((gen) => (
+                      <Card key={gen.id} className="relative border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-indigo-500/3 to-violet-500/5 overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/5 to-violet-500/0 animate-pulse" />
+                        <div className="h-[2px] bg-gradient-to-r from-violet-500 via-indigo-500 to-violet-500 animate-pulse" />
+                        <CardHeader className="relative pb-2 pt-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm leading-snug text-violet-400">{gen.topic}</h3>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">Generating your course...</p>
+                            </div>
+                            <Badge variant="outline" className="text-[10px] shrink-0 bg-violet-500/10 text-violet-400 border-violet-500/20 animate-pulse">
+                              <Sparkles className="size-2.5 mr-1" />Generating
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="relative pt-0">
+                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                            <div className="flex items-center gap-1.5">
+                              <div className="size-1.5 rounded-full bg-violet-500 animate-pulse" />
+                              <span>AI is crafting your curriculum</span>
+                            </div>
+                          </div>
+                          <div className="mt-3 space-y-2">
+                            <div className="h-2 bg-muted/20 rounded-full w-full overflow-hidden">
+                              <div className="h-full bg-gradient-to-r from-violet-500/40 to-indigo-500/40 rounded-full animate-[pulse_2s_ease-in-out_infinite] w-2/3" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
                 <div className="grid gap-4 sm:grid-cols-2">
                   {filteredGenerations.map((gen, i) => (
                     <CourseCard key={gen.id} gen={gen} index={i} />

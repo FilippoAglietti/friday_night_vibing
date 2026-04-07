@@ -20,7 +20,7 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -30,12 +30,10 @@ export const dynamic = "force-dynamic";
 /**
  * maxDuration extends the Vercel serverless function timeout.
  * The after() callback runs the Claude API call AFTER the 202 response,
- * but still within the same function invocation. Without this, Vercel's
- * default timeout (10s Hobby / 15s Pro) kills the function before
- * Claude can finish generating the course (30-60+ seconds).
- * 60s is the max for Hobby plan; increase to 300 for Pro plan.
+ * but still within the same function invocation. 300s (5 min) is the
+ * max for Vercel Pro plan — enough for masterclass courses (32k tokens).
  */
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 import { buildCurriculumPrompt } from "@/lib/prompts/curriculum";
 import type {
@@ -721,48 +719,38 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
     );
   }
 
-  // ── Step 5: Generate curriculum synchronously ──────────────
-  // Run the Claude API call within the main handler rather than in after().
-  // after() on Vercel Hobby is killed by the runtime timeout before Claude
-  // can finish generating (30-60s). Running synchronously with maxDuration=60
-  // keeps the function alive for the full generation.
-  // The frontend polls /api/courses/[id]/status and picks up the result.
-  try {
-    console.log("[/api/generate] Starting generation for course:", courseId);
+  // ── Step 5: Return courseId immediately ─────────────────────
+  // The frontend receives this and starts polling /api/courses/[id]/status.
+  // Generation runs in the background via after() — survives even if
+  // the user closes the browser or shuts down the computer.
+  const res = NextResponse.json(
+    { success: true as const, courseId },
+    { status: 202 }
+  );
+  res.headers.set("X-Content-Type-Options", "nosniff");
+  res.headers.set("X-Frame-Options", "DENY");
 
-    // Generate curriculum via Claude
-    const curriculum = await generateCurriculum(generateRequest);
-
-    // Update course record with curriculum + increment counter
-    await updateCourseRecord(userId, courseId, curriculum, undefined);
-
-    console.log("[/api/generate] Generation completed for course:", courseId);
-
-    // Return courseId — frontend will pick up the ready status via polling
-    const res = NextResponse.json(
-      { success: true as const, courseId },
-      { status: 202 }
-    );
-    res.headers.set("X-Content-Type-Options", "nosniff");
-    res.headers.set("X-Frame-Options", "DENY");
-    return res;
-  } catch (err) {
-    // Update course record with error state so polling gets "failed"
-    const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
-    console.error("[/api/generate] Generation failed:", errorMessage);
+  // ── Step 6: Background generation with after() ──────────────
+  // Runs AFTER the 202 response is sent. With Vercel Pro + maxDuration=300,
+  // the function stays alive for up to 5 minutes — enough for masterclass
+  // courses (32k tokens). The course record is updated to "ready" or "failed"
+  // regardless of whether the client is still connected.
+  after(async () => {
     try {
-      await updateCourseRecord(userId, courseId, undefined, errorMessage);
-    } catch (updateErr) {
-      console.error("[/api/generate] Failed to update error state:", updateErr);
+      console.log("[/api/generate] Starting background generation for course:", courseId);
+      const curriculum = await generateCurriculum(generateRequest);
+      await updateCourseRecord(userId, courseId, curriculum, undefined);
+      console.log("[/api/generate] Background generation completed for course:", courseId);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
+      console.error("[/api/generate] Background generation failed:", errorMessage);
+      try {
+        await updateCourseRecord(userId, courseId, undefined, errorMessage);
+      } catch (updateErr) {
+        console.error("[/api/generate] Failed to update error state:", updateErr);
+      }
     }
+  });
 
-    // Still return courseId — frontend will pick up the failed status via polling
-    const res = NextResponse.json(
-      { success: true as const, courseId },
-      { status: 202 }
-    );
-    res.headers.set("X-Content-Type-Options", "nosniff");
-    res.headers.set("X-Frame-Options", "DENY");
-    return res;
-  }
+  return res;
 }
