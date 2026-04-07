@@ -3,9 +3,9 @@
  * ─────────────────────────────────────────────────────────────
  * Next.js App Router API route: POST /api/generate
  *
- * ASYNC course generation endpoint. Accepts a curriculum generation request,
- * validates it, checks auth + rate limits, creates a course record with
- * status="generating", then starts background generation via next/server#after().
+ * Async course generation endpoint. Returns courseId immediately (HTTP 202),
+ * then runs generation in the background via after(). Uses direct create()
+ * calls (no streaming) with capped max_tokens for fast responses.
  *
  * Request body:  { topic, difficulty, courseLength, niche?, abstract?, learnerProfile? }
  * Success:       { success: true, courseId: string } [HTTP 202 Accepted]
@@ -263,13 +263,18 @@ function repairTruncatedJson(json: string): string {
  * @param length - CourseLength: crash | short | full | masterclass
  * @returns max_tokens value to use in Claude API call
  */
-function getMaxTokensForLength(_length: CourseLength): number {
-  // Use the maximum output tokens for all course lengths.
-  // Claude Sonnet 4.6 supports up to 64k output tokens.
-  // You only pay for tokens actually generated, not the max limit,
-  // so there's no cost penalty — only reliability benefit.
-  // A crash course generates ~10k tokens, masterclass ~40-50k.
-  return 65536;
+function getMaxTokensForLength(length: CourseLength): number {
+  // Reasonable caps per course length. Lower values = faster responses
+  // and no need for streaming (SDK requires streaming for very high values).
+  // Actual usage: crash ~10k, short ~16k, full/masterclass use chunked
+  // generation with separate overrideMaxTokens per phase.
+  switch (length) {
+    case "crash": return 16384;
+    case "short": return 32768;
+    case "full": return 32768;
+    case "masterclass": return 32768;
+    default: return 16384;
+  }
 }
 
 /**
@@ -292,14 +297,15 @@ async function callClaudeWithRetry(
   system: string,
   messages: Anthropic.MessageParam[],
   length: CourseLength,
-  attempt: number = 1
+  attempt: number = 1,
+  overrideMaxTokens?: number
 ): Promise<Anthropic.Message> {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 60000);
+    const maxTokens = overrideMaxTokens ?? getMaxTokensForLength(length);
 
-    const maxTokens = getMaxTokensForLength(length);
-
+    // Direct (non-streaming) call. With capped max_tokens (8k-32k),
+    // the SDK no longer requires streaming. This is faster because
+    // there's no chunk-assembly overhead.
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: maxTokens,
@@ -307,7 +313,6 @@ async function callClaudeWithRetry(
       messages,
     });
 
-    clearTimeout(timeout);
     return response;
   } catch (err) {
     if (attempt < 2) {
@@ -316,7 +321,7 @@ async function callClaudeWithRetry(
         err
       );
       await new Promise((r) => setTimeout(r, 2000));
-      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1);
+      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1, overrideMaxTokens);
     }
     throw err;
   }
@@ -443,8 +448,9 @@ async function generateCurriculumChunked(
 
   const { system: skelSystem, messages: skelMessages } = buildSkeletonCurriculumPrompt(request);
 
-  // Skeleton is small — use 16k tokens max
-  const skelResponse = await callClaudeWithRetry(anthropic, skelSystem, skelMessages, "crash");
+  // Skeleton is structure-only — 8k tokens is plenty, completes in ~30s
+  // with direct create() (no streaming overhead).
+  const skelResponse = await callClaudeWithRetry(anthropic, skelSystem, skelMessages, request.length, 1, 8192);
 
   const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
   if (!skelTextBlock || skelTextBlock.type !== "text") {
@@ -489,8 +495,8 @@ async function generateCurriculumChunked(
           totalModules,
         );
 
-        // Each module needs ~8k tokens for content
-        const modResponse = await callClaudeWithRetry(anthropic, modSystem, modMessages, "short");
+        // Each module needs ~5-8k tokens. Direct create() completes in ~30-60s.
+        const modResponse = await callClaudeWithRetry(anthropic, modSystem, modMessages, request.length, 1, 16384);
 
         const modTextBlock = modResponse.content.find((block) => block.type === "text");
         if (!modTextBlock || modTextBlock.type !== "text") {
@@ -758,19 +764,17 @@ async function updateCourseRecord(
 /**
  * POST /api/generate
  *
- * Main request handler. Implements ASYNC course generation:
+ * Main request handler. Implements async course generation:
  *   1. Rate limit check by IP
  *   2. Input validation
  *   3. Auth check + generation limit enforcement
- *   4. Create course record with status="generating" (immediate)
- *   5. Return courseId immediately to the frontend
- *   6. Use next/server#after() to run generation in the background
- *   7. On completion, update course record with curriculum or error
+ *   4. Create course record with status="generating"
+ *   5. Return courseId immediately (HTTP 202)
+ *   6. Run generation in background via after()
+ *   7. Update course record with curriculum or error
  *
- * The frontend uses the courseId to poll GET /api/courses/[id]/status
- * until the course reaches status="ready" or status="failed".
- *
- * This allows users to navigate away without losing their generated course.
+ * Uses direct create() (no streaming) with capped max_tokens.
+ * Vercel Pro maxDuration=300 gives 5 minutes for after() to complete.
  */
 export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsyncResponse | GenerateErrorResponse>> {
   // ── Step 1: Rate limit ──────────────────────────────────────
@@ -872,9 +876,6 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
   }
 
   // ── Step 5: Return courseId immediately ─────────────────────
-  // The frontend receives this and starts polling /api/courses/[id]/status.
-  // Generation runs in the background via after() — survives even if
-  // the user closes the browser or shuts down the computer.
   const res = NextResponse.json(
     { success: true as const, courseId },
     { status: 202 }
@@ -884,20 +885,20 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
 
   // ── Step 6: Background generation with after() ──────────────
   // Runs AFTER the 202 response is sent. With Vercel Pro + maxDuration=300,
-  // the function stays alive for up to 5 minutes — enough for masterclass
-  // courses (32k tokens). The course record is updated to "ready" or "failed"
-  // regardless of whether the client is still connected.
+  // the function stays alive for up to 5 minutes.
+  // Using direct create() (no streaming) with capped max_tokens keeps
+  // each Claude call fast (~30-60s).
   after(async () => {
     try {
       console.log("[/api/generate] Starting background generation for course:", courseId);
       const curriculum = await generateCurriculum(generateRequest, courseId);
-      await updateCourseRecord(userId, courseId, curriculum, undefined);
+      await updateCourseRecord(userId!, courseId, curriculum, undefined);
       console.log("[/api/generate] Background generation completed for course:", courseId);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
       console.error("[/api/generate] Background generation failed:", errorMessage);
       try {
-        await updateCourseRecord(userId, courseId, undefined, errorMessage);
+        await updateCourseRecord(userId!, courseId, undefined, errorMessage);
       } catch (updateErr) {
         console.error("[/api/generate] Failed to update error state:", updateErr);
       }
