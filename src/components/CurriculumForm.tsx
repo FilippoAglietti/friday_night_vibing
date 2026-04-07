@@ -139,47 +139,25 @@ function validate(data: CurriculumFormData): FormErrors {
 }
 
 
-/* ─── HoverTooltip Component ──────────────────────────────── */
+/* ─── SelectInfoPanel — shows tooltip for the currently selected option ── */
 
-interface HoverTooltipProps {
-  children: React.ReactNode;
-  tooltip: string;
-}
-
-function HoverTooltip({ children, tooltip }: HoverTooltipProps) {
-  const [showTooltip, setShowTooltip] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleMouseEnter = useCallback(() => {
-    timeoutRef.current = setTimeout(() => {
-      setShowTooltip(true);
-    }, 500);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    setShowTooltip(false);
-  }, []);
-
+function SelectInfoPanel({ tooltip }: { tooltip: string | undefined }) {
   return (
-    <div className="relative" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      {children}
-      <AnimatePresence>
-        {showTooltip && (
-          <motion.div
-            initial={{ opacity: 0, y: -4, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 z-50 mt-1 w-48 rounded-lg bg-violet-950 border border-violet-800 p-2.5 text-xs text-violet-100 shadow-lg pointer-events-none"
-          >
-            {tooltip}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <AnimatePresence mode="wait">
+      {tooltip && (
+        <motion.p
+          key={tooltip}
+          initial={{ opacity: 0, y: -2 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -2 }}
+          transition={{ duration: 0.15 }}
+          className="flex items-start gap-1.5 mt-1.5 text-[11px] text-muted-foreground leading-relaxed"
+        >
+          <Info className="size-3 shrink-0 mt-0.5 text-violet-400/60" />
+          <span>{tooltip}</span>
+        </motion.p>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -548,18 +526,17 @@ export default function CurriculumForm({
                     .filter((opt) => !isFreeUser || opt.value !== "advanced")
                     .map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      <HoverTooltip tooltip={opt.tooltip}>
-                        <span className="flex flex-col">
-                          <span className="font-medium">{opt.label}</span>
-                          <span className="text-[11px] text-muted-foreground">
-                            {opt.desc}
-                          </span>
+                      <span className="flex flex-col">
+                        <span className="font-medium">{opt.label}</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {opt.desc}
                         </span>
-                      </HoverTooltip>
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <SelectInfoPanel tooltip={DIFFICULTY_OPTIONS.find((o) => o.value === form.difficulty)?.tooltip} />
             </div>
 
             {/* Course Length */}
@@ -619,18 +596,17 @@ export default function CurriculumForm({
                     .filter((opt) => !isFreeUser || opt.value === "crash")
                     .map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      <HoverTooltip tooltip={opt.tooltip}>
-                        <span className="flex flex-col">
-                          <span className="font-medium">{opt.label}</span>
-                          <span className="text-[11px] text-muted-foreground">
-                            {opt.desc}
-                          </span>
+                      <span className="flex flex-col">
+                        <span className="font-medium">{opt.label}</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {opt.desc}
                         </span>
-                      </HoverTooltip>
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <SelectInfoPanel tooltip={COURSE_LENGTH_OPTIONS.find((o) => o.value === (isFreeUser ? "crash" : form.courseLength))?.tooltip} />
             </div>
           </div>
 
@@ -719,18 +695,15 @@ export default function CurriculumForm({
                       <SelectContent>
                         {TEACHING_STYLE_OPTIONS.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
-                      <HoverTooltip tooltip={opt.tooltip}>
-                        <span className="flex flex-col">
-                          <span className="font-medium">{opt.label}</span>
-                          <span className="text-[11px] text-muted-foreground">
-                            {opt.desc}
-                          </span>
-                        </span>
-                      </HoverTooltip>
-                    </SelectItem>
+                            <span className="flex flex-col">
+                              <span className="font-medium">{opt.label}</span>
+                              <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
+                            </span>
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <SelectInfoPanel tooltip={TEACHING_STYLE_OPTIONS.find((o) => o.value === form.teachingStyle)?.tooltip} />
                   </div>
                 </div>
 
@@ -752,18 +725,15 @@ export default function CurriculumForm({
                       <SelectContent>
                         {OUTPUT_STRUCTURE_OPTIONS.map((opt) => (
                           <SelectItem key={opt.value} value={opt.value}>
-                      <HoverTooltip tooltip={opt.tooltip}>
-                        <span className="flex flex-col">
-                          <span className="font-medium">{opt.label}</span>
-                          <span className="text-[11px] text-muted-foreground">
-                            {opt.desc}
-                          </span>
-                        </span>
-                      </HoverTooltip>
-                    </SelectItem>
+                            <span className="flex flex-col">
+                              <span className="font-medium">{opt.label}</span>
+                              <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
+                            </span>
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <SelectInfoPanel tooltip={OUTPUT_STRUCTURE_OPTIONS.find((o) => o.value === form.outputStructure)?.tooltip} />
                   </div>
 
                   {/* Include Quizzes Toggle */}
