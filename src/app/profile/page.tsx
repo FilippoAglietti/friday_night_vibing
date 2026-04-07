@@ -53,6 +53,7 @@ import {
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength } from "@/components/CurriculumForm";
+import PaywallModal from "@/components/PaywallModal";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -319,6 +320,7 @@ export default function ProfilePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showAllTimeline, setShowAllTimeline] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -1110,7 +1112,7 @@ export default function ProfilePage() {
                       </div>
                       <p className="text-xs font-medium mt-2">{Math.round(usagePercent)}% used</p>
                       {userProfile?.plan === "free" && (
-                        <Button size="sm" className="mt-3 h-7 text-[10px] bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full" onClick={() => (setActiveTab("generate"))}>
+                        <Button size="sm" className="mt-3 h-7 text-[10px] bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full" onClick={() => setShowPaywall(true)}>
                           Upgrade<ChevronRight className="size-3 ml-0.5" />
                         </Button>
                       )}
@@ -1180,7 +1182,8 @@ export default function ProfilePage() {
                         <button
                           key={i}
                           onClick={() => {
-                            window.location.href = `/?topic=${encodeURIComponent(s.title)}`;
+                            setTemplateConfig({ topic: s.title });
+                            setActiveTab("generate");
                           }}
                           className="group flex items-center gap-3 rounded-xl border border-border/30 bg-muted/5 p-3 hover:bg-violet-500/5 hover:border-violet-500/20 hover:shadow-md hover:shadow-violet-500/5 transition-all duration-200 text-left"
                         >
@@ -1645,7 +1648,7 @@ export default function ProfilePage() {
                           <li key={f} className="text-xs text-muted-foreground flex items-center gap-1.5"><div className="size-1 rounded-full bg-violet-500 shrink-0" />{f}</li>
                         ))}
                       </ul>
-                      <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 h-8 text-xs" onClick={() => (setActiveTab("generate"))}>
+                      <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 h-8 text-xs" onClick={() => setShowPaywall(true)}>
                         View Pricing Plans<ExternalLink className="size-3 ml-1.5" />
                       </Button>
                     </div>
@@ -1698,6 +1701,9 @@ export default function ProfilePage() {
           </div>
         )}
       </main>
+
+      {/* Paywall Modal for Upgrade buttons */}
+      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />
     </div>
   );
 }
