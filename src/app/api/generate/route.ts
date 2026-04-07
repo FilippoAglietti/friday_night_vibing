@@ -27,6 +27,16 @@ import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * maxDuration extends the Vercel serverless function timeout.
+ * The after() callback runs the Claude API call AFTER the 202 response,
+ * but still within the same function invocation. Without this, Vercel's
+ * default timeout (10s Hobby / 15s Pro) kills the function before
+ * Claude can finish generating the course (30-60+ seconds).
+ * 60s is the max for Hobby plan; increase to 300 for Pro plan.
+ */
+export const maxDuration = 60;
+
 import { buildCurriculumPrompt } from "@/lib/prompts/curriculum";
 import type {
   GenerateRequest,

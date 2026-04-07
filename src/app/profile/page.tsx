@@ -61,7 +61,8 @@ interface Generation {
   audience: string;
   length: string;
   niche: string | null;
-  curriculum: Curriculum;
+  curriculum: Curriculum | null;
+  status: string;
   created_at: string;
 }
 
@@ -321,7 +322,7 @@ export default function ProfilePage() {
       setUser(user);
       if (user) {
         const [{ data: courses }, { data: profileData }] = await Promise.all([
-          supabaseBrowser.from("courses").select("id, topic, audience, length, niche, curriculum, created_at").order("created_at", { ascending: false }),
+          supabaseBrowser.from("courses").select("id, topic, audience, length, niche, curriculum, status, created_at").order("created_at", { ascending: false }),
           supabaseBrowser.from("profiles").select("plan, generations_used, generations_limit").eq("id", user.id).single(),
         ]);
         if (courses) setGenerations(courses as unknown as Generation[]);
@@ -336,51 +337,57 @@ export default function ProfilePage() {
 
   // ── Derived stats ──────────────────────────────────────────
 
+  // Only courses with status="ready" and valid curriculum are safe for stats/cards
+  const readyGenerations = useMemo(
+    () => generations.filter((g) => g.status === "ready" && g.curriculum != null),
+    [generations]
+  );
+
   const filteredGenerations = useMemo(() => {
-    if (!searchQuery.trim()) return generations;
+    if (!searchQuery.trim()) return readyGenerations;
     const q = searchQuery.toLowerCase();
-    return generations.filter((g) =>
+    return readyGenerations.filter((g) =>
       g.curriculum?.title?.toLowerCase().includes(q) ||
       g.topic?.toLowerCase().includes(q) ||
       g.curriculum?.difficulty?.toLowerCase().includes(q)
     );
-  }, [generations, searchQuery]);
+  }, [readyGenerations, searchQuery]);
 
   const totalHours = useMemo(
-    () => generations.reduce((sum, g) => sum + (g.curriculum?.pacing?.totalHours || 0), 0),
-    [generations]
+    () => readyGenerations.reduce((sum, g) => sum + (g.curriculum?.pacing?.totalHours || 0), 0),
+    [readyGenerations]
   );
 
   const thisMonthCount = useMemo(() => {
     const now = new Date();
-    return generations.filter((g) => {
+    return readyGenerations.filter((g) => {
       const d = new Date(g.created_at);
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     }).length;
-  }, [generations]);
+  }, [readyGenerations]);
 
   const totalLessonsAll = useMemo(
-    () => generations.reduce((sum, g) => sum + (g.curriculum?.modules?.reduce((a, m) => a + (m.lessons?.length || 0), 0) || 0), 0),
-    [generations]
+    () => readyGenerations.reduce((sum, g) => sum + (g.curriculum?.modules?.reduce((a, m) => a + (m.lessons?.length || 0), 0) || 0), 0),
+    [readyGenerations]
   );
 
   const totalQuizzes = useMemo(
-    () => generations.reduce((sum, g) => sum + (g.curriculum?.modules?.reduce((a, m) => a + (m.quiz?.length || 0), 0) || 0), 0),
-    [generations]
+    () => readyGenerations.reduce((sum, g) => sum + (g.curriculum?.modules?.reduce((a, m) => a + (m.quiz?.length || 0), 0) || 0), 0),
+    [readyGenerations]
   );
 
   const difficultyBreakdown = useMemo(() => {
     const counts = { beginner: 0, intermediate: 0, advanced: 0 };
-    generations.forEach((g) => {
+    readyGenerations.forEach((g) => {
       const d = g.curriculum?.difficulty?.toLowerCase() || "beginner";
       if (d in counts) counts[d as keyof typeof counts]++;
     });
     return counts;
-  }, [generations]);
+  }, [readyGenerations]);
 
-  const heatmapData = useMemo(() => buildHeatmap(generations), [generations]);
-  const streak = useMemo(() => getStreak(generations), [generations]);
-  const suggestions = useMemo(() => getSmartSuggestions(generations), [generations]);
+  const heatmapData = useMemo(() => buildHeatmap(readyGenerations), [readyGenerations]);
+  const streak = useMemo(() => getStreak(readyGenerations), [readyGenerations]);
+  const suggestions = useMemo(() => getSmartSuggestions(readyGenerations), [readyGenerations]);
 
   // Group generations by date for timeline
   const timelineGroups = useMemo(() => {
@@ -389,7 +396,7 @@ export default function ProfilePage() {
     const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
     const dateMap = new Map<string, Generation[]>();
-    generations.forEach((g) => {
+    readyGenerations.forEach((g) => {
       const d = new Date(g.created_at).toISOString().slice(0, 10);
       if (!dateMap.has(d)) dateMap.set(d, []);
       dateMap.get(d)!.push(g);
@@ -529,6 +536,8 @@ export default function ProfilePage() {
 
   function CourseCard({ gen, index }: { gen: Generation; index: number }) {
     const c = gen.curriculum;
+    // Guard: skip rendering if curriculum is null (generating/failed courses)
+    if (!c) return null;
     const totalLessons = c.modules?.reduce((a, m) => a + (m.lessons?.length || 0), 0) || 0;
     const totalQuiz = c.modules?.reduce((a, m) => a + (m.quiz?.length || 0), 0) || 0;
     const isExpanded = expandedId === gen.id;
@@ -891,8 +900,8 @@ export default function ProfilePage() {
                     {generations.length > 0 && (
                       <button
                         onClick={() => {
-                          const latest = generations[0];
-                          if (latest) handleDownloadPDF(latest.curriculum);
+                          const latest = readyGenerations[0];
+                          if (latest?.curriculum) handleDownloadPDF(latest.curriculum);
                         }}
                         className="group flex flex-col items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 sm:p-4 hover:bg-amber-500/10 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-200"
                       >
@@ -1110,6 +1119,7 @@ export default function ProfilePage() {
                             {/* Items */}
                             {group.items.map((gen, idx) => {
                               const c = gen.curriculum;
+                              if (!c) return null;
                               const lessonsCount = c.modules?.reduce((a, m) => a + (m.lessons?.length || 0), 0) || 0;
                               const gIdx = getCardGradientIdx(gen);
 
