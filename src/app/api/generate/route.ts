@@ -20,7 +20,7 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import { NextRequest, NextResponse, after } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -721,40 +721,48 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
     );
   }
 
-  // ── Step 5: Return courseId immediately ─────────────────────
-  // The generation happens in the background via after()
-  const res = NextResponse.json(
-    { success: true as const, courseId },
-    { status: 202 } // 202 Accepted — request accepted, processing async
-  );
-  res.headers.set("X-Content-Type-Options", "nosniff");
-  res.headers.set("X-Frame-Options", "DENY");
+  // ── Step 5: Generate curriculum synchronously ──────────────
+  // Run the Claude API call within the main handler rather than in after().
+  // after() on Vercel Hobby is killed by the runtime timeout before Claude
+  // can finish generating (30-60s). Running synchronously with maxDuration=60
+  // keeps the function alive for the full generation.
+  // The frontend polls /api/courses/[id]/status and picks up the result.
+  try {
+    console.log("[/api/generate] Starting generation for course:", courseId);
 
-  // ── Step 6: Background generation with after() ──────────────
-  // This runs AFTER the response is sent to the client.
-  // The function will complete even if the client disconnects.
-  after(async () => {
+    // Generate curriculum via Claude
+    const curriculum = await generateCurriculum(generateRequest);
+
+    // Update course record with curriculum + increment counter
+    await updateCourseRecord(userId, courseId, curriculum, undefined);
+
+    console.log("[/api/generate] Generation completed for course:", courseId);
+
+    // Return courseId — frontend will pick up the ready status via polling
+    const res = NextResponse.json(
+      { success: true as const, courseId },
+      { status: 202 }
+    );
+    res.headers.set("X-Content-Type-Options", "nosniff");
+    res.headers.set("X-Frame-Options", "DENY");
+    return res;
+  } catch (err) {
+    // Update course record with error state so polling gets "failed"
+    const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
+    console.error("[/api/generate] Generation failed:", errorMessage);
     try {
-      console.log("[/api/generate] Starting background generation for course:", courseId);
-
-      // Generate curriculum via Claude
-      const curriculum = await generateCurriculum(generateRequest);
-
-      // Update course record with curriculum
-      await updateCourseRecord(userId, courseId, curriculum, undefined);
-
-      console.log("[/api/generate] Background generation completed for course:", courseId);
-    } catch (err) {
-      // Catch any errors and update the course record with the error state
-      const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
-      console.error("[/api/generate] Background generation failed:", errorMessage);
-      try {
-        await updateCourseRecord(userId, courseId, undefined, errorMessage);
-      } catch (updateErr) {
-        console.error("[/api/generate] Failed to update error state:", updateErr);
-      }
+      await updateCourseRecord(userId, courseId, undefined, errorMessage);
+    } catch (updateErr) {
+      console.error("[/api/generate] Failed to update error state:", updateErr);
     }
-  });
 
-  return res;
+    // Still return courseId — frontend will pick up the failed status via polling
+    const res = NextResponse.json(
+      { success: true as const, courseId },
+      { status: 202 }
+    );
+    res.headers.set("X-Content-Type-Options", "nosniff");
+    res.headers.set("X-Frame-Options", "DENY");
+    return res;
+  }
 }
