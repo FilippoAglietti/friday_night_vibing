@@ -3,9 +3,9 @@
  * ─────────────────────────────────────────────────────────────
  * Next.js App Router API route: POST /api/generate
  *
- * ASYNC course generation endpoint. Accepts a curriculum generation request,
+ * Synchronous course generation endpoint. Accepts a curriculum generation request,
  * validates it, checks auth + rate limits, creates a course record with
- * status="generating", then starts background generation via next/server#after().
+ * status="generating", runs generation synchronously, then returns courseId.
  *
  * Request body:  { topic, difficulty, courseLength, niche?, abstract?, learnerProfile? }
  * Success:       { success: true, courseId: string } [HTTP 202 Accepted]
@@ -20,7 +20,7 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import { NextRequest, NextResponse, after } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -781,19 +781,22 @@ async function updateCourseRecord(
 /**
  * POST /api/generate
  *
- * Main request handler. Implements ASYNC course generation:
+ * Main request handler. Implements synchronous course generation:
  *   1. Rate limit check by IP
  *   2. Input validation
  *   3. Auth check + generation limit enforcement
- *   4. Create course record with status="generating" (immediate)
- *   5. Return courseId immediately to the frontend
- *   6. Use next/server#after() to run generation in the background
- *   7. On completion, update course record with curriculum or error
+ *   4. Create course record with status="generating"
+ *   5. Run generation synchronously (chunked for full/masterclass)
+ *   6. Update course record with curriculum or error
+ *   7. Return courseId
  *
- * The frontend uses the courseId to poll GET /api/courses/[id]/status
- * until the course reaches status="ready" or status="failed".
+ * The frontend polls GET /api/courses/[id]/status every 3-5s and shows
+ * real-time progress (module X of Y) during chunked generation.
  *
- * This allows users to navigate away without losing their generated course.
+ * We use synchronous generation because Vercel's after() callback gets
+ * killed before long-running Claude API calls complete, even with
+ * maxDuration=300. Running synchronously within the request works
+ * reliably with the 5-minute Pro timeout.
  */
 export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsyncResponse | GenerateErrorResponse>> {
   // ── Step 1: Rate limit ──────────────────────────────────────
@@ -894,44 +897,39 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
     );
   }
 
-  // ── Step 5: Return courseId immediately ─────────────────────
-  // The frontend receives this and starts polling /api/courses/[id]/status.
-  // Generation runs in the background via after() — survives even if
-  // the user closes the browser or shuts down the computer.
+  // ── Step 5: Synchronous generation ──────────────────────────
+  // Run generation synchronously within the same request. Vercel Pro
+  // allows maxDuration=300 (5 min), which is enough for masterclass
+  // courses with chunked generation (skeleton ~30-60s + modules in
+  // parallel batches ~60-90s each).
+  //
+  // We tried after() but Vercel kills the callback before long-running
+  // Claude API calls can complete — even with maxDuration=300.
+  //
+  // The frontend has already received a "generating" card from the
+  // course record and is polling /api/courses/[id]/status every 3-5s.
+  // When this function finishes, the next poll sees status="ready".
+  try {
+    console.log("[/api/generate] Starting synchronous generation for course:", courseId);
+    const curriculum = await generateCurriculum(generateRequest, courseId);
+    await updateCourseRecord(userId!, courseId, curriculum, undefined);
+    console.log("[/api/generate] Generation completed for course:", courseId);
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
+    console.error("[/api/generate] Generation failed:", errorMessage);
+    try {
+      await updateCourseRecord(userId!, courseId, undefined, errorMessage);
+    } catch (updateErr) {
+      console.error("[/api/generate] Failed to update error state:", updateErr);
+    }
+  }
+
+  // ── Step 6: Return courseId ─────────────────────────────────
   const res = NextResponse.json(
     { success: true as const, courseId },
     { status: 202 }
   );
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
-
-  // ── Step 6: Background generation with after() ──────────────
-  // Runs AFTER the 202 response is sent. With Vercel Pro + maxDuration=300,
-  // the function stays alive for up to 5 minutes — enough for masterclass
-  // courses (32k tokens). The course record is updated to "ready" or "failed"
-  // regardless of whether the client is still connected.
-  after(async () => {
-    // Diagnostic: confirm after() callback is executing
-    const adminDb = getSupabaseAdmin();
-    await adminDb.from("courses").update({
-      generation_progress: "after() started — preparing generation...",
-    }).eq("id", courseId);
-
-    try {
-      console.log("[/api/generate] Starting background generation for course:", courseId);
-      const curriculum = await generateCurriculum(generateRequest, courseId);
-      await updateCourseRecord(userId!, courseId, curriculum, undefined);
-      console.log("[/api/generate] Background generation completed for course:", courseId);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
-      console.error("[/api/generate] Background generation failed:", errorMessage);
-      try {
-        await updateCourseRecord(userId!, courseId, undefined, errorMessage);
-      } catch (updateErr) {
-        console.error("[/api/generate] Failed to update error state:", updateErr);
-      }
-    }
-  });
-
   return res;
 }
