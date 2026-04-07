@@ -1360,7 +1360,7 @@ export default function ProfilePage() {
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Crown className="size-4 text-amber-500" />
                       Pro Max Features
-                      <Badge className="ml-auto text-[9px] bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border-amber-500/30">Coming Soon</Badge>
+                      <Badge className="ml-auto text-[9px] bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border-amber-500/30">Upgrade</Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1414,10 +1414,12 @@ export default function ProfilePage() {
                     {userProfile.plan === "pro" && (
                       <div className="mt-3 flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 p-3">
                         <div>
-                          <p className="text-xs font-semibold text-amber-400">You&apos;re on Pro — Pro Max is coming soon</p>
-                          <p className="text-[10px] text-muted-foreground">These features will unlock automatically when Pro Max launches</p>
+                          <p className="text-xs font-semibold text-amber-400">Unlock the full toolkit</p>
+                          <p className="text-[10px] text-muted-foreground">Upgrade to Pro Max for AI audio, white-label exports & more</p>
                         </div>
-                        <Badge className="text-[9px] bg-amber-500/15 text-amber-400 border-amber-500/30 shrink-0">Waitlist</Badge>
+                        <Button size="sm" className="h-7 text-[10px] bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 rounded-full shrink-0" onClick={() => setShowPaywall(true)}>
+                          Go Pro Max<ChevronRight className="size-3 ml-0.5" />
+                        </Button>
                       </div>
                     )}
                   </CardContent>

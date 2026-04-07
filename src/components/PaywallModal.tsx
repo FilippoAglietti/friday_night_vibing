@@ -11,6 +11,10 @@ import {
   Crown,
   ArrowRight,
   Flame,
+  Headphones,
+  BookOpen,
+  Palette,
+  Cpu,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -26,24 +30,52 @@ const PROMO_EXPIRES = new Date("2026-05-11T23:59:59Z");
 const plans = [
   {
     id: "pro",
-    name: "Syllabi Pro",
+    name: "Pro",
     price: PROMO_ACTIVE ? "$19" : "$29",
     originalPrice: "$29/mo",
     period: "/month",
-    description: "Unlimited curriculum generations for serious course creators.",
+    description: "For creators who ship courses every week.",
     badge: PROMO_ACTIVE ? "Launch Special" : "Most Popular",
     discountPct: PROMO_ACTIVE ? "34% OFF" : null,
     features: [
-      "Unlimited generations",
+      "Unlimited course generations",
       "Full modules, lessons & quizzes",
-      "JSON, Markdown & PDF export",
-      "Custom pacing schedules",
+      "PDF, Markdown & Notion export",
+      "All course lengths & styles",
       "Priority AI processing",
     ],
     cta: PROMO_ACTIVE ? "Start Pro — $19/mo" : "Start Pro — $29/mo",
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_pro_monthly",
     icon: Crown,
     gradient: "from-violet-600 to-indigo-600",
+    badgeGradient: "from-violet-600 to-indigo-600",
+    checkColor: "text-violet-500",
+    highlight: false,
+  },
+  {
+    id: "promax",
+    name: "Pro Max",
+    price: PROMO_ACTIVE ? "$69" : "$79",
+    originalPrice: "$79/mo",
+    period: "/month",
+    description: "The ultimate toolkit to create & sell courses.",
+    badge: PROMO_ACTIVE ? "Save 13%" : "Best Value",
+    discountPct: PROMO_ACTIVE ? "13% OFF" : null,
+    features: [
+      "Everything in Pro",
+      "AI-generated audio lessons",
+      "Full chapter content generation",
+      "Premium Notion & PDF export",
+      "Sell-ready course packages",
+      "White-label branding",
+      "Dedicated AI processing",
+    ],
+    cta: PROMO_ACTIVE ? "Go Pro Max — $69/mo" : "Go Pro Max — $79/mo",
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "price_promax_monthly",
+    icon: Sparkles,
+    gradient: "from-amber-500 to-orange-600",
+    badgeGradient: "from-amber-500 to-orange-600",
+    checkColor: "text-amber-500",
     highlight: true,
   },
   {
@@ -52,20 +84,21 @@ const plans = [
     price: PROMO_ACTIVE ? "$29" : "$39",
     originalPrice: "$39",
     period: "one-time",
-    description: "5 additional curriculum generations. No subscription needed.",
+    description: "No subscription. Just 5 generations.",
     badge: null,
     discountPct: PROMO_ACTIVE ? "26% OFF" : null,
     features: [
-      "5 curriculum generations",
-      "Full modules, lessons & quizzes",
-      "JSON, Markdown & PDF export",
-      "Custom pacing schedules",
+      "5 course generations",
+      "Full modules & quizzes",
+      "PDF & Markdown export",
       "No recurring charges",
     ],
     cta: PROMO_ACTIVE ? "Buy 5-Pack — $29" : "Buy 5-Pack — $39",
     priceId: process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "price_5pack",
     icon: Zap,
     gradient: "from-cyan-600 to-blue-600",
+    badgeGradient: "from-cyan-600 to-blue-600",
+    checkColor: "text-cyan-500",
     highlight: false,
   },
 ];
@@ -115,10 +148,10 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
             className="fixed inset-0 z-[95] flex items-center justify-center p-4"
           >
-            <div className="relative w-full max-w-2xl rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl shadow-violet-500/10 overflow-hidden">
+            <div className="relative w-full max-w-3xl rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl shadow-violet-500/10 overflow-hidden max-h-[90vh] overflow-y-auto">
               {/* Close button */}
               <button
                 onClick={onClose}
@@ -136,33 +169,32 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
                   </span>
                 </div>
                 <h2 className="text-2xl font-bold tracking-tight">
-                  You&apos;ve used your free generation
+                  Unlock the full power of Syllabi
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-                  Upgrade to keep generating professional curricula with AI.
-                  Choose the plan that works for you.
+                  Choose your plan and start creating professional courses with AI.
                 </p>
               </div>
 
               {/* Plans grid */}
-              <div className="grid gap-4 sm:grid-cols-2 px-6 pb-8 pt-2">
+              <div className="grid gap-4 sm:grid-cols-3 px-6 pb-8 pt-2">
                 {plans.map((plan) => (
                   <div
                     key={plan.id}
                     className={`relative rounded-xl border p-5 transition-all ${
                       plan.highlight
-                        ? "border-violet-500/40 bg-violet-500/5 shadow-lg shadow-violet-500/5"
+                        ? "border-amber-500/40 bg-amber-500/5 shadow-lg shadow-amber-500/5 ring-1 ring-amber-500/20"
                         : "border-border/50 bg-card/50"
                     }`}
                   >
                     {plan.badge && (
-                      <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-0.5 text-[10px] font-semibold text-white border-0 shadow-md">
+                      <Badge className={`absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r ${plan.badgeGradient} px-3 py-0.5 text-[10px] font-semibold text-white border-0 shadow-md`}>
                         {plan.badge}
                       </Badge>
                     )}
 
                     <div className="flex items-center gap-2 mb-2 mt-1">
-                      <plan.icon className={`size-5 ${plan.highlight ? "text-violet-500" : "text-cyan-500"}`} />
+                      <plan.icon className={`size-5 ${plan.highlight ? "text-amber-500" : plan.id === "pro" ? "text-violet-500" : "text-cyan-500"}`} />
                       <span className="font-semibold text-sm">{plan.name}</span>
                       {plan.discountPct && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-400 border border-rose-500/20">
@@ -189,7 +221,7 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
                     <ul className="space-y-2 mb-5">
                       {plan.features.map((f) => (
                         <li key={f} className="flex items-center gap-2 text-xs">
-                          <Check className={`size-3.5 shrink-0 ${plan.highlight ? "text-violet-500" : "text-cyan-500"}`} />
+                          <Check className={`size-3.5 shrink-0 ${plan.checkColor}`} />
                           <span>{f}</span>
                         </li>
                       ))}
@@ -198,10 +230,12 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
                     <Button
                       onClick={() => handleCheckout(plan.priceId)}
                       disabled={loading !== null}
-                      className={`w-full rounded-full text-sm font-semibold border-0 transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                      className={`w-full rounded-full text-sm font-semibold border-0 transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r ${plan.gradient} text-white shadow-lg ${
                         plan.highlight
-                          ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40"
-                          : "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40"
+                          ? "shadow-amber-500/20 hover:shadow-amber-500/40"
+                          : plan.id === "pro"
+                          ? "shadow-violet-500/20 hover:shadow-violet-500/40"
+                          : "shadow-cyan-500/20 hover:shadow-cyan-500/40"
                       }`}
                     >
                       {loading === plan.priceId ? (

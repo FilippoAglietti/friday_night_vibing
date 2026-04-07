@@ -165,11 +165,10 @@ const freePlanFeatures = [
 ];
 
 const proPlanFeatures = [
-  { text: "Unlimited generations", included: true },
+  { text: "Unlimited course generations", included: true },
   { text: "Full modules, lessons & quizzes", included: true },
-  { text: "JSON, Markdown, PDF & Notion export", included: true },
-  { text: "Quizzes & assessments", included: true },
-  { text: "Custom pacing schedules", included: true },
+  { text: "PDF, Markdown & Notion export", included: true },
+  { text: "All course lengths & styles", included: true },
   { text: "Priority AI processing", included: true },
 ];
 
@@ -392,39 +391,7 @@ export default function Home() {
     toast("Course generated successfully!", "success");
   }, [toast]);
 
-  /* ── Join Pro Max waitlist ────────────────────────────────── */
-  const [waitlistLoading, setWaitlistLoading] = useState(false);
-  const handleJoinWaitlist = useCallback(async () => {
-    // Get the user's email from auth state
-    const email = (user as { email?: string } | null)?.email;
-    if (!email) {
-      // If not logged in, prompt sign in first
-      setShowAuthModal(true);
-      toast("Please sign in first so we can add you to the waitlist.", "info");
-      return;
-    }
-
-    setWaitlistLoading(true);
-    try {
-      const res = await fetch("/api/waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "promax_pricing" }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Could not join waitlist");
-      }
-
-      toast("You're on the list! We'll notify you when Pro Max launches.", "success");
-    } catch (err) {
-      console.error("[waitlist] Error:", err);
-      toast("Something went wrong. Please try again.", "error");
-    } finally {
-      setWaitlistLoading(false);
-    }
-  }, [user, toast]);
+  /* ── (waitlist removed — Pro Max is now live) ── */
 
   const handleLimitReached = useCallback(() => {
     setShowPaywall(true);
@@ -1124,15 +1091,15 @@ export default function Home() {
                 </Card>
               </motion.div>
 
-              {/* PRO MAX — COMING SOON */}
+              {/* PRO MAX */}
               <motion.div variants={scaleUp} className="flex min-w-0 overflow-visible">
                 <Card className="relative flex flex-col w-full border-amber-500/30 bg-gradient-to-b from-amber-500/5 via-card/50 to-card/50 backdrop-blur-sm shadow-xl shadow-amber-500/5 overflow-visible">
                   {/* Gold shimmer accent */}
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-3.5 py-1.5 text-xs font-semibold text-black border-0 shadow-lg shadow-amber-500/30 flex items-center gap-1.5">
-                      <Sparkles className="size-3" />
-                      Coming Soon
+                    <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-3.5 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-amber-500/30 flex items-center gap-1.5">
+                      <Crown className="size-3" />
+                      Best Value
                     </Badge>
                   </div>
                   <CardHeader className="pt-8">
@@ -1174,26 +1141,16 @@ export default function Home() {
                       ))}
                     </ul>
                   </CardContent>
-                  <CardFooter className="mt-auto pt-0 flex-col gap-2">
+                  <CardFooter className="mt-auto pt-0">
                     <Button
-                      className="w-full rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300 hover:border-amber-400/70 transition-all"
+                      id="pricing-promax-cta"
+                      className="w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:scale-[1.02]"
                       size="lg"
-                      disabled={waitlistLoading}
-                      onClick={handleJoinWaitlist}
+                      onClick={() => setShowPaywall(true)}
                     >
-                      {waitlistLoading ? (
-                        <span className="flex items-center gap-2">
-                          <div className="size-4 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
-                          Joining…
-                        </span>
-                      ) : (
-                        <>
-                          <Sparkles className="size-4 mr-2" />
-                          Join Waitlist
-                        </>
-                      )}
+                      Go Pro Max — $69/mo
+                      <ArrowRight className="ml-2 size-4" />
                     </Button>
-                    <p className="text-[11px] text-muted-foreground/60 text-center">We&apos;ll email you at launch — no spam.</p>
                   </CardFooter>
                 </Card>
               </motion.div>
@@ -1297,8 +1254,8 @@ export default function Home() {
                   <Card className="relative flex flex-col h-full border-amber-500/30 bg-gradient-to-b from-amber-500/5 via-card/50 to-card/50 backdrop-blur-sm shadow-xl shadow-amber-500/5 overflow-visible">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                      <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-3 py-1 text-xs font-semibold text-black border-0 shadow-lg shadow-amber-500/30 flex items-center gap-1">
-                        <Sparkles className="size-3" />Coming Soon
+                      <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-3 py-1 text-xs font-semibold text-white border-0 shadow-lg shadow-amber-500/30 flex items-center gap-1">
+                        <Crown className="size-3" />Best Value
                       </Badge>
                     </div>
                     <CardHeader className="pt-7 pb-3">
@@ -1331,20 +1288,10 @@ export default function Home() {
                         ))}
                       </ul>
                     </CardContent>
-                    <CardFooter className="mt-auto pt-0 pb-5 flex-col gap-1.5">
-                      <Button className="w-full rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20" size="sm" disabled={waitlistLoading} onClick={handleJoinWaitlist}>
-                        {waitlistLoading ? (
-                          <span className="flex items-center gap-2">
-                            <div className="size-3.5 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
-                            Joining…
-                          </span>
-                        ) : (
-                          <>
-                            <Sparkles className="size-3.5 mr-1.5" />Join Waitlist
-                          </>
-                        )}
+                    <CardFooter className="mt-auto pt-0 pb-5">
+                      <Button className="w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40" size="sm" onClick={() => setShowPaywall(true)}>
+                        Go Pro Max — $69/mo
                       </Button>
-                      <p className="text-[10px] text-muted-foreground/60 text-center">No spam — email at launch only.</p>
                     </CardFooter>
                   </Card>
                 </div>
