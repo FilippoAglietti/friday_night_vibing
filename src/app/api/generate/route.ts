@@ -4,8 +4,9 @@
  * Next.js App Router API route: POST /api/generate
  *
  * Async course generation endpoint. Returns courseId immediately (HTTP 202),
- * then runs generation in the background via after(). Uses direct create()
- * calls (no streaming) with capped max_tokens for fast responses.
+ * then runs generation in the background via after(). Uses stream() +
+ * finalMessage() (SDK requires streaming for claude-sonnet-4-6) with
+ * capped max_tokens for fast responses.
  *
  * Request body:  { topic, difficulty, courseLength, niche?, abstract?, learnerProfile? }
  * Success:       { success: true, courseId: string } [HTTP 202 Accepted]
@@ -303,16 +304,21 @@ async function callClaudeWithRetry(
   try {
     const maxTokens = overrideMaxTokens ?? getMaxTokensForLength(length);
 
-    // Direct (non-streaming) call. With capped max_tokens (8k-32k),
-    // the SDK no longer requires streaming. This is faster because
-    // there's no chunk-assembly overhead.
-    const response = await anthropic.messages.create({
+    // Use stream() + finalMessage() instead of direct create().
+    // The Anthropic SDK requires streaming for claude-sonnet-4-6 because
+    // it predicts the request "may take longer than 10 minutes".
+    // With capped max_tokens (8k-16k), streaming overhead is negligible
+    // and each call completes in ~30-60s.
+    const stream = anthropic.messages.stream({
       model: "claude-sonnet-4-6",
       max_tokens: maxTokens,
       system,
       messages,
     });
 
+    // finalMessage() waits for the full response — same result as create()
+    // but satisfies the SDK's streaming requirement.
+    const response = await stream.finalMessage();
     return response;
   } catch (err) {
     if (attempt < 2) {
@@ -773,7 +779,7 @@ async function updateCourseRecord(
  *   6. Run generation in background via after()
  *   7. Update course record with curriculum or error
  *
- * Uses direct create() (no streaming) with capped max_tokens.
+ * Uses stream() + finalMessage() (SDK requires streaming) with capped max_tokens.
  * Vercel Pro maxDuration=300 gives 5 minutes for after() to complete.
  */
 export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsyncResponse | GenerateErrorResponse>> {
@@ -886,7 +892,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
   // ── Step 6: Background generation with after() ──────────────
   // Runs AFTER the 202 response is sent. With Vercel Pro + maxDuration=300,
   // the function stays alive for up to 5 minutes.
-  // Using direct create() (no streaming) with capped max_tokens keeps
+  // Using stream() + finalMessage() with capped max_tokens keeps
   // each Claude call fast (~30-60s).
   after(async () => {
     try {
