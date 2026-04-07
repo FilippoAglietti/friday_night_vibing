@@ -269,4 +269,10 @@ export interface CourseStatusResponse {
   status: "pending" | "generating" | "ready" | "failed";
   curriculum?: Curriculum;
   error_message?: string;
+  /** Human-readable progress message during chunked generation */
+  generation_progress?: string;
+  /** Total modules to generate (set after skeleton phase) */
+  generation_total_modules?: number;
+  /** Modules fully generated so far */
+  generation_completed_modules?: number;
 }
