@@ -292,10 +292,11 @@ async function callClaudeWithRetry(
   system: string,
   messages: Anthropic.MessageParam[],
   length: CourseLength,
-  attempt: number = 1
+  attempt: number = 1,
+  overrideMaxTokens?: number
 ): Promise<Anthropic.Message> {
   try {
-    const maxTokens = getMaxTokensForLength(length);
+    const maxTokens = overrideMaxTokens ?? getMaxTokensForLength(length);
 
     // Use streaming to avoid the SDK's 10-minute timeout restriction.
     // The SDK requires streaming for high max_tokens values (65536)
@@ -445,8 +446,10 @@ async function generateCurriculumChunked(
 
   const { system: skelSystem, messages: skelMessages } = buildSkeletonCurriculumPrompt(request);
 
-  // Skeleton is small — use 16k tokens max
-  const skelResponse = await callClaudeWithRetry(anthropic, skelSystem, skelMessages, "crash");
+  // Skeleton is structure-only (titles, descriptions, order) — 8k tokens is plenty.
+  // Using 65536 here caused Vercel 300s timeouts because Claude would generate
+  // a massive response. Capping at 8192 keeps it under 60s.
+  const skelResponse = await callClaudeWithRetry(anthropic, skelSystem, skelMessages, request.length, 1, 8192);
 
   const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
   if (!skelTextBlock || skelTextBlock.type !== "text") {
@@ -491,8 +494,9 @@ async function generateCurriculumChunked(
           totalModules,
         );
 
-        // Each module needs ~8k tokens for content
-        const modResponse = await callClaudeWithRetry(anthropic, modSystem, modMessages, "short");
+        // Each module needs ~5-8k tokens for full lesson content + quiz.
+        // Cap at 16384 to keep each call fast (~60-90s) and avoid timeouts.
+        const modResponse = await callClaudeWithRetry(anthropic, modSystem, modMessages, request.length, 1, 16384);
 
         const modTextBlock = modResponse.content.find((block) => block.type === "text");
         if (!modTextBlock || modTextBlock.type !== "text") {
