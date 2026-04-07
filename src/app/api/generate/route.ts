@@ -491,11 +491,12 @@ async function generateCurriculumChunked(
 
   const { system: skelSystem, messages: skelMessages } = buildSkeletonCurriculumPrompt(request);
 
-  // Skeleton is structure-only — 8k tokens is plenty, completes in ~30s.
-  // 90s timeout gives ample headroom for API latency spikes.
+  // Skeleton is structure-only — 8k tokens is plenty.
+  // Italian/advanced/academic topics can take 90-120s; 150s timeout
+  // gives headroom. No retry on timeout (would eat too much budget).
   const skelResponse = await callClaudeWithRetry(
     anthropic, skelSystem, skelMessages, request.length, 1, 8192,
-    `${courseId}/skeleton`, 90_000,
+    `${courseId}/skeleton`, 150_000,
   );
 
   const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
@@ -516,68 +517,57 @@ async function generateCurriculumChunked(
     generation_completed_modules: 0,
   }).eq("id", courseId);
 
-  // ── Phase 2: Generate module details in parallel batches ────
-  // Run modules in parallel batches of 3 to avoid overwhelming the API
-  // while still being much faster than sequential generation.
-  const BATCH_SIZE = 3;
+  // ── Phase 2: Generate ALL module details in parallel ─────────
+  // Run ALL modules concurrently. With Vercel Pro's 300s timeout and
+  // skeleton taking ~120s, we have ~150s left. Running in parallel
+  // means total time = max(single module time) ≈ 90-120s, not sum.
+  // The Anthropic API handles 5-8 concurrent requests fine.
+  console.log(`[/api/generate] [${courseId}] Phase 2: Generating ALL ${totalModules} modules in parallel...`);
+
   const detailedModules: Module[] = new Array(totalModules);
   let completedModules = 0;
 
-  for (let batchStart = 0; batchStart < totalModules; batchStart += BATCH_SIZE) {
-    const batchEnd = Math.min(batchStart + BATCH_SIZE, totalModules);
-    const batchIndices = Array.from({ length: batchEnd - batchStart }, (_, i) => batchStart + i);
-
-    console.log(`[/api/generate] [${courseId}] Phase 2: Generating modules ${batchStart + 1}-${batchEnd} of ${totalModules}...`);
-
-    // Run this batch in parallel
-    const batchResults = await Promise.all(
-      batchIndices.map(async (moduleIndex) => {
-        const moduleData = skeleton.modules[moduleIndex];
-        const { system: modSystem, messages: modMessages } = buildModuleDetailCurriculumPrompt(
-          request,
-          skeleton.title,
-          skeleton.description,
-          moduleData,
-          moduleIndex,
-          totalModules,
-        );
-
-        // Each module needs ~5-8k tokens, completes in ~30-60s.
-        // 120s timeout per module — generous for retries and API spikes.
-        const modResponse = await callClaudeWithRetry(
-          anthropic, modSystem, modMessages, request.length, 1, 16384,
-          `${courseId}/module-${moduleData.id}`, 120_000,
-        );
-
-        const modTextBlock = modResponse.content.find((block) => block.type === "text");
-        if (!modTextBlock || modTextBlock.type !== "text") {
-          throw new Error(`Module ${moduleData.id}: Claude returned an empty response.`);
-        }
-
-        const moduleDetail = parseClaudeJson<{ lessons: Module["lessons"]; quiz: Module["quiz"] }>(
-          modTextBlock.text.trim(),
-          modResponse.stop_reason,
-          `module ${moduleData.id}`,
-        );
-
-        // Merge the detailed lessons/quiz into the skeleton module
-        return {
-          ...moduleData,
-          lessons: moduleDetail.lessons,
-          quiz: moduleDetail.quiz || [],
-        } as Module;
-      })
+  const modulePromises = skeleton.modules.map(async (moduleData, moduleIndex) => {
+    const { system: modSystem, messages: modMessages } = buildModuleDetailCurriculumPrompt(
+      request,
+      skeleton.title,
+      skeleton.description,
+      moduleData,
+      moduleIndex,
+      totalModules,
     );
 
-    // Store results and update progress
-    for (let i = 0; i < batchResults.length; i++) {
-      detailedModules[batchIndices[i]] = batchResults[i];
-      completedModules++;
+    // Each module needs ~5-8k tokens, completes in ~60-120s.
+    // 140s timeout per module — generous for API latency spikes.
+    const modResponse = await callClaudeWithRetry(
+      anthropic, modSystem, modMessages, request.length, 1, 16384,
+      `${courseId}/module-${moduleData.id}`, 140_000,
+    );
+
+    const modTextBlock = modResponse.content.find((block) => block.type === "text");
+    if (!modTextBlock || modTextBlock.type !== "text") {
+      throw new Error(`Module ${moduleData.id}: Claude returned an empty response.`);
     }
 
-    // Update progress in DB after each batch
+    const moduleDetail = parseClaudeJson<{ lessons: Module["lessons"]; quiz: Module["quiz"] }>(
+      modTextBlock.text.trim(),
+      modResponse.stop_reason,
+      `module ${moduleData.id}`,
+    );
+
+    // Merge the detailed lessons/quiz into the skeleton module
+    const result = {
+      ...moduleData,
+      lessons: moduleDetail.lessons,
+      quiz: moduleDetail.quiz || [],
+    } as Module;
+
+    // Update progress as each module completes (atomic increment)
+    detailedModules[moduleIndex] = result;
+    completedModules++;
+
     const progressMsg = completedModules < totalModules
-      ? `Generating module ${completedModules + 1} of ${totalModules}...`
+      ? `Generated ${completedModules} of ${totalModules} modules...`
       : "Finalizing course...";
 
     await supabase.from("courses").update({
@@ -585,9 +575,14 @@ async function generateCurriculumChunked(
       generation_completed_modules: completedModules,
     }).eq("id", courseId);
 
-    console.log(`[/api/generate] [${courseId}] Phase 2: ${completedModules}/${totalModules} modules complete`);
-    checkGlobalTimeout(`after batch ${batchStart + 1}-${batchEnd}`);
-  }
+    console.log(`[/api/generate] [${courseId}] Module ${moduleData.id} complete (${completedModules}/${totalModules})`);
+    return result;
+  });
+
+  // Wait for ALL modules to complete
+  await Promise.all(modulePromises);
+  console.log(`[/api/generate] [${courseId}] Phase 2 complete: all ${totalModules} modules generated`);
+  checkGlobalTimeout("after all modules");
 
   // ── Phase 3: Assemble final curriculum ─────────────────────
   const finalCurriculum: Curriculum = {
