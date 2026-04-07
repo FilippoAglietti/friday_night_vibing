@@ -1248,7 +1248,7 @@ export default function ProfilePage() {
                     </Card>
                   ))}
                 </div>
-              ) : readyGenerations.length === 0 ? (
+              ) : readyGenerations.length === 0 && generatingCourses.length === 0 ? (
                 <Card className="text-center py-12 border-dashed border-border/40">
                   <CardContent>
                     <div className="relative mx-auto mb-5 w-fit">
