@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import { Sparkles, Loader2, AlertCircle, FileText, Upload, X, Info, ChevronDown,
 import type {
   DifficultyLevel,
   Curriculum,
+  CourseStatusResponse,
   TeachingStyle,
   OutputStructure,
   CourseLanguage,
@@ -154,6 +155,12 @@ export default function CurriculumForm({
   const [lengthInfoOpen, setLengthInfoOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
+  // Async generation state
+  const [courseId, setCourseId] = useState<string | null>(null);
+  const [generationStatus, setGenerationStatus] = useState<"pending" | "generating" | "ready" | "failed" | null>(null);
+  const [pollError, setPollError] = useState<string | null>(null);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   /* ── Field handlers ────────────────────────────────────── */
 
   const updateField = useCallback(
@@ -241,8 +248,110 @@ export default function CurriculumForm({
     updateField("abstract", "");
   }, [updateField]);
 
+  /* ── Polling logic for async generation ───────────────────── */
+
+  /**
+   * Polls the course status endpoint to track generation progress.
+   * Called every 3 seconds until the course reaches a final state (ready/failed).
+   */
+  const pollGenerationStatus = useCallback(
+    async (id: string) => {
+      try {
+        const res = await fetch(`/api/courses/${id}/status`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          throw new Error(
+            errorData?.error || `Status check failed (${res.status})`
+          );
+        }
+
+        const data: CourseStatusResponse = await res.json();
+        setGenerationStatus(data.status);
+        setPollError(null);
+
+        // If the course is ready, call the callback with the curriculum
+        if (data.status === "ready" && data.curriculum) {
+          // Clear the polling interval
+          if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+            pollIntervalRef.current = null;
+          }
+          onGenerated?.(data.curriculum);
+          setIsSubmitting(false);
+          onLoadingChange?.(false);
+          // Reset form and state
+          setCourseId(null);
+          setGenerationStatus(null);
+        }
+
+        // If the course generation failed, show the error
+        if (data.status === "failed") {
+          // Clear the polling interval
+          if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+            pollIntervalRef.current = null;
+          }
+          setApiError(data.error_message || "Generation failed. Please try again.");
+          setIsSubmitting(false);
+          onLoadingChange?.(false);
+          setCourseId(null);
+          setGenerationStatus(null);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to check generation status";
+        setPollError(message);
+        console.error("[CurriculumForm] Polling error:", message);
+      }
+    },
+    [onGenerated, onLoadingChange]
+  );
+
+  /**
+   * Cleanup effect: Clear the polling interval when the component unmounts
+   * or when the form is reset.
+   */
+  useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    };
+  }, []);
+
+  /**
+   * Start polling when we have a courseId and haven't reached a final state yet.
+   */
+  useEffect(() => {
+    if (courseId && generationStatus && generationStatus !== "ready" && generationStatus !== "failed") {
+      // Initial poll immediately
+      pollGenerationStatus(courseId);
+
+      // Set up polling interval (every 3 seconds)
+      pollIntervalRef.current = setInterval(() => {
+        pollGenerationStatus(courseId);
+      }, 3000);
+
+      return () => {
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
+      };
+    }
+  }, [courseId, generationStatus, pollGenerationStatus]);
+
   /* ── Submit ────────────────────────────────────────────── */
 
+  /**
+   * Handles form submission for async course generation.
+   * Sends the request to POST /api/generate and gets back a courseId.
+   * Then starts polling GET /api/courses/[id]/status until generation completes.
+   */
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -251,6 +360,7 @@ export default function CurriculumForm({
       if (onSubmitAttempt && !onSubmitAttempt()) return;
 
       setApiError(null);
+      setPollError(null);
 
       // Mark all fields as touched
       setTouched({ topic: true, difficulty: true, courseLength: true, niche: true });
@@ -264,6 +374,7 @@ export default function CurriculumForm({
       onLoadingChange?.(true);
 
       try {
+        // Step 1: Send generation request and get courseId back
         const res = await fetch("/api/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -288,18 +399,20 @@ export default function CurriculumForm({
           );
         }
 
-        const { data } = await res.json();
-        onGenerated?.(data);
+        const { courseId: newCourseId } = await res.json();
+
+        // Step 2: Store courseId and start polling
+        setCourseId(newCourseId);
+        setGenerationStatus("pending");
       } catch (err) {
         setApiError(
           err instanceof Error ? err.message : "Something went wrong. Please try again."
         );
-      } finally {
         setIsSubmitting(false);
         onLoadingChange?.(false);
       }
     },
-    [form, onGenerated, onLoadingChange, onSubmitAttempt, isFreeUser]
+    [form, onLoadingChange, onSubmitAttempt, isFreeUser]
   );
 
   /* ── Render ────────────────────────────────────────────── */
@@ -699,7 +812,7 @@ export default function CurriculumForm({
 
           {/* ── API Error ─────────────────────────────────── */}
           <AnimatePresence>
-            {apiError && (
+            {(apiError || pollError) && (
               <motion.div
                 initial={{ opacity: 0, y: -4, height: 0 }}
                 animate={{ opacity: 1, y: 0, height: "auto" }}
@@ -708,7 +821,7 @@ export default function CurriculumForm({
                 className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive"
               >
                 <AlertCircle className="mt-0.5 size-4 shrink-0" />
-                <span>{apiError}</span>
+                <span>{apiError || pollError}</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -723,7 +836,9 @@ export default function CurriculumForm({
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
-                Generating course…
+                {generationStatus === "pending" && "Starting generation…"}
+                {generationStatus === "generating" && "Generating course…"}
+                {!generationStatus && "Submitting…"}
               </>
             ) : (
               <>
@@ -734,7 +849,7 @@ export default function CurriculumForm({
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Takes about 15–30 seconds · Your first generation is free
+            {isSubmitting ? "Don't worry, you can leave this page and come back." : "Takes about 15–30 seconds · Your first generation is free"}
           </p>
         </form>
       </CardContent>

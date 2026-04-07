@@ -243,10 +243,16 @@ export interface GenerateRequest {
   outputStructure?: OutputStructure;
 }
 
-/** Success response from POST /api/generate */
+/** Success response from POST /api/generate (synchronous) */
 export interface GenerateResponse {
   success: true;
   data: Curriculum;
+}
+
+/** Async success response from POST /api/generate with polling support */
+export interface GenerateAsyncResponse {
+  success: true;
+  courseId: string;
 }
 
 /** Error response from POST /api/generate */
@@ -254,4 +260,11 @@ export interface GenerateErrorResponse {
   success: false;
   error: string;
   details?: string;
+}
+
+/** Status response from GET /api/courses/[id]/status */
+export interface CourseStatusResponse {
+  status: "pending" | "generating" | "ready" | "failed";
+  curriculum?: Curriculum;
+  error_message?: string;
 }

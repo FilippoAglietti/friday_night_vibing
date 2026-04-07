@@ -3,20 +3,24 @@
  * ─────────────────────────────────────────────────────────────
  * Next.js App Router API route: POST /api/generate
  *
- * Accepts a curriculum generation request from the frontend form,
- * validates it, checks auth + rate limits, calls the Claude API,
- * saves the result to Supabase, and returns the curriculum JSON.
+ * ASYNC course generation endpoint. Accepts a curriculum generation request,
+ * validates it, checks auth + rate limits, creates a course record with
+ * status="generating", then starts background generation via next/server#after().
  *
- * Request body:  { topic, difficulty, courseLength, niche? }
- * Success:       { success: true, data: Curriculum }
+ * Request body:  { topic, difficulty, courseLength, niche?, abstract?, learnerProfile? }
+ * Success:       { success: true, courseId: string } [HTTP 202 Accepted]
  * Error:         { success: false, error: string, details?: string }
  *
+ * The frontend receives courseId immediately and polls GET /api/courses/[id]/status
+ * every 3 seconds until generation completes (status="ready" or "failed").
+ *
  * Rate limit:    5 requests per IP per hour (in-memory, resets on restart)
- * Auth:          Supabase session cookie (optional for free tier — 1 free generation)
+ * Auth:          Required — Supabase session cookie (user must be authenticated)
+ * Max tokens:    Scaled by course length (mini=8k, beginner=16k, intermediate=24k, advanced=32k)
  * ─────────────────────────────────────────────────────────────
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -26,7 +30,7 @@ export const dynamic = "force-dynamic";
 import { buildCurriculumPrompt } from "@/lib/prompts/curriculum";
 import type {
   GenerateRequest,
-  GenerateResponse,
+  GenerateAsyncResponse,
   GenerateErrorResponse,
   Curriculum,
   AudienceLevel,
@@ -235,14 +239,38 @@ function repairTruncatedJson(json: string): string {
 // ─── Claude API call with retry logic ─────────────────────────
 
 /**
+ * Determines the appropriate max_tokens limit based on the requested course length.
+ * Longer courses need more tokens to generate complete curricula.
+ *
+ * @param length - CourseLength: crash | short | full | masterclass
+ * @returns max_tokens value to use in Claude API call
+ */
+function getMaxTokensForLength(length: CourseLength): number {
+  switch (length) {
+    case "crash":
+      return 8192; // ~5 lessons
+    case "short":
+      return 16384; // 8-12 lessons
+    case "full":
+      return 24576; // 12-18 lessons
+    case "masterclass":
+      return 32768; // 20+ lessons
+    default:
+      return 16384;
+  }
+}
+
+/**
  * Calls the Claude API with retry logic and timeout.
  * - Retries once with exponential backoff (2s delay) on API failure
  * - Includes 60-second timeout per API call
  * - Logs all retry attempts to console
+ * - Scales max_tokens based on requested course length
  *
  * @param anthropic - Anthropic SDK instance
  * @param system - System prompt
  * @param messages - User messages
+ * @param length - CourseLength to determine token budget
  * @param attempt - Current attempt number (1 or 2)
  * @returns Claude API response
  * @throws Error if both attempts fail
@@ -251,15 +279,18 @@ async function callClaudeWithRetry(
   anthropic: Anthropic,
   system: string,
   messages: Anthropic.MessageParam[],
+  length: CourseLength,
   attempt: number = 1
 ): Promise<Anthropic.Message> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 60000);
 
+    const maxTokens = getMaxTokensForLength(length);
+
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 16384,
+      max_tokens: maxTokens,
       system,
       messages,
     });
@@ -273,7 +304,7 @@ async function callClaudeWithRetry(
         err
       );
       await new Promise((r) => setTimeout(r, 2000));
-      return callClaudeWithRetry(anthropic, system, messages, attempt + 1);
+      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1);
     }
     throw err;
   }
@@ -284,7 +315,7 @@ async function callClaudeWithRetry(
  * and parses the JSON response into a typed Curriculum object.
  *
  * Uses claude-sonnet-4-6 for the best balance of quality and speed.
- * max_tokens 16384 is needed for long bootcamp curricula.
+ * max_tokens is scaled based on course length (mini=8k, beginner=16k, intermediate=24k, advanced=32k).
  * Includes retry logic with exponential backoff and 60-second timeout.
  *
  * @param request - Validated generation request
@@ -301,8 +332,8 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
   const { system, messages } = buildCurriculumPrompt(request);
 
   // Call Claude with retry logic and timeout
-  // 16384 tokens ensures even large bootcamp curricula (6-10 modules) are not truncated
-  const response = await callClaudeWithRetry(anthropic, system, messages);
+  // max_tokens is scaled based on the requested course length
+  const response = await callClaudeWithRetry(anthropic, system, messages, request.length);
 
   // Extract the text content from the response
   const textBlock = response.content.find((block) => block.type === "text");
@@ -447,30 +478,29 @@ async function checkGenerationLimit(userId: string): Promise<boolean> {
 }
 
 /**
- * Saves the generated curriculum to Supabase and increments the user's
- * generation counter.
+ * Creates a new course record with status="generating" in Supabase.
+ * Returns the course ID which is used for polling the generation status.
  *
  * @param userId - The authenticated user's UUID (or null for anonymous)
  * @param request - The original generation request
- * @param curriculum - The generated curriculum to save
+ * @returns The newly created course ID
+ * @throws Error if the database insert fails
  */
-async function saveGeneration(
+async function createCourseRecord(
   userId: string | null,
-  request: GenerateRequest,
-  curriculum: Curriculum
-): Promise<void> {
+  request: GenerateRequest
+): Promise<string> {
   if (!userId) {
-    console.warn("[/api/generate] Skipping save — no userId (anonymous generation)");
-    return;
+    throw new Error("Cannot create course record without a user ID");
   }
 
-  console.log("[/api/generate] Saving course for user:", userId);
+  console.log("[/api/generate] Creating course record with status=generating for user:", userId);
   const supabase = await createSupabaseServer();
 
-  // Save to courses table (new schema v2)
+  // Create course record with status="generating"
   const { data: course, error } = await supabase.from("courses").insert({
     user_id: userId,
-    title: curriculum.title ?? request.topic,
+    title: request.topic,
     topic: request.topic,
     audience: request.audience,
     length: request.length,
@@ -478,29 +508,87 @@ async function saveGeneration(
     language: "en",
     level: request.audience as "beginner" | "intermediate" | "advanced",
     content_type: "text",
-    curriculum: curriculum as unknown as Record<string, unknown>,
-    description: curriculum.subtitle ?? null,
-    status: "ready",
+    curriculum: null,
+    description: null,
+    status: "generating", // Start with generating state
+    error_message: null,
   }).select("id").single();
 
   if (error) {
-    console.error("[/api/generate] Failed to save course:", error.message, error.details);
-    return;
+    console.error("[/api/generate] Failed to create course record:", error.message, error.details);
+    throw new Error("Failed to create course record");
   }
 
-  console.log("[/api/generate] Course saved successfully, id:", course?.id);
+  if (!course?.id) {
+    throw new Error("No course ID returned from insert");
+  }
 
-  // Increment generation counter and log usage event atomically
-  if (course?.id) {
+  console.log("[/api/generate] Course record created with ID:", course.id);
+  return course.id;
+}
+
+/**
+ * Updates an existing course record with the generated curriculum or error.
+ * Sets status to "ready" on success or "failed" on error.
+ * Also increments the user's generation counter.
+ *
+ * @param userId - The authenticated user's UUID
+ * @param courseId - The course ID to update
+ * @param curriculum - The generated curriculum (if successful)
+ * @param error - The error message (if generation failed)
+ */
+async function updateCourseRecord(
+  userId: string,
+  courseId: string,
+  curriculum?: Curriculum,
+  error?: string
+): Promise<void> {
+  const supabase = await createSupabaseServer();
+
+  if (curriculum) {
+    // Update with successful curriculum
+    console.log("[/api/generate] Updating course", courseId, "with generated curriculum");
+    const { error: updateError } = await supabase
+      .from("courses")
+      .update({
+        curriculum: curriculum as unknown as Record<string, unknown>,
+        status: "ready",
+        title: curriculum.title ?? curriculum.id,
+        description: curriculum.subtitle ?? null,
+      })
+      .eq("id", courseId);
+
+    if (updateError) {
+      console.error("[/api/generate] Failed to update course record:", updateError.message, updateError.details);
+      return;
+    }
+
+    console.log("[/api/generate] Course record updated successfully");
+
+    // Increment generation counter and log usage event atomically
     const { error: rpcError } = await supabase.rpc("increment_generation_usage", {
       p_user_id: userId,
-      p_course_id: course.id,
+      p_course_id: courseId,
       p_event_type: "course_generated",
     });
     if (rpcError) {
       console.error("[/api/generate] increment_generation_usage RPC failed:", rpcError.message);
     } else {
       console.log("[/api/generate] Generation counter incremented for user:", userId);
+    }
+  } else if (error) {
+    // Update with error state
+    console.log("[/api/generate] Updating course", courseId, "with error:", error);
+    const { error: updateError } = await supabase
+      .from("courses")
+      .update({
+        status: "failed",
+        error_message: error,
+      })
+      .eq("id", courseId);
+
+    if (updateError) {
+      console.error("[/api/generate] Failed to update course error state:", updateError.message, updateError.details);
     }
   }
 }
@@ -510,15 +598,21 @@ async function saveGeneration(
 /**
  * POST /api/generate
  *
- * Main request handler. Orchestrates:
+ * Main request handler. Implements ASYNC course generation:
  *   1. Rate limit check by IP
  *   2. Input validation
  *   3. Auth check + generation limit enforcement
- *   4. Claude API call
- *   5. Save to Supabase
- *   6. Return the curriculum
+ *   4. Create course record with status="generating" (immediate)
+ *   5. Return courseId immediately to the frontend
+ *   6. Use next/server#after() to run generation in the background
+ *   7. On completion, update course record with curriculum or error
+ *
+ * The frontend uses the courseId to poll GET /api/courses/[id]/status
+ * until the course reaches status="ready" or status="failed".
+ *
+ * This allows users to navigate away without losing their generated course.
  */
-export async function POST(req: NextRequest): Promise<NextResponse<GenerateResponse | GenerateErrorResponse>> {
+export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsyncResponse | GenerateErrorResponse>> {
   // ── Step 1: Rate limit ──────────────────────────────────────
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
@@ -577,48 +671,80 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateRespo
         );
       }
     } else {
-      console.warn("[/api/generate] No user session found — proceeding as anonymous");
+      console.warn("[/api/generate] No user session found — cannot generate without authentication");
+      // For async generation, we require authentication because we need to save to a user's course
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required.",
+          details: "You must be signed in to generate a course.",
+        },
+        { status: 401 }
+      );
     }
   } catch (err) {
     // Auth errors are non-fatal — proceed without user context
     console.error("[/api/generate] Auth check exception:", err);
-  }
-
-  // ── Step 4: Generate curriculum via Claude ──────────────────
-  let curriculum: Curriculum;
-  try {
-    curriculum = await generateCurriculum(generateRequest);
-  } catch (err) {
-    console.error("[/api/generate] Claude API error:", err);
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to generate course.",
-        details: err instanceof Error ? err.message : "Unexpected error from AI engine.",
+        error: "Authentication check failed.",
+        details: err instanceof Error ? err.message : "Unknown error",
       },
       { status: 500 }
     );
   }
 
-  // ── Step 5: Save to Supabase ────────────────────────────────
-  // IMPORTANT: We await saveGeneration instead of fire-and-forget.
-  // In Vercel serverless, the runtime can terminate after sending the
-  // response, which was cutting off the RPC call to increment the
-  // generation counter (the INSERT completed but the RPC did not).
+  // ── Step 4: Create course record with status="generating" ────
+  let courseId: string;
   try {
-    await saveGeneration(userId, generateRequest, curriculum);
+    courseId = await createCourseRecord(userId, generateRequest);
   } catch (err) {
-    // Save errors are non-fatal — the user still gets their curriculum
-    console.error("[/api/generate] Failed to save generation:", err);
+    console.error("[/api/generate] Failed to create course record:", err);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to create course record.",
+        details: err instanceof Error ? err.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 
-  // ── Step 6: Return the curriculum ──────────────────────────
-  // Return { success: true, data: curriculum } to match GenerateResponse type
+  // ── Step 5: Return courseId immediately ─────────────────────
+  // The generation happens in the background via after()
   const res = NextResponse.json(
-    { success: true as const, data: curriculum },
-    { status: 200 }
+    { success: true as const, courseId },
+    { status: 202 } // 202 Accepted — request accepted, processing async
   );
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
+
+  // ── Step 6: Background generation with after() ──────────────
+  // This runs AFTER the response is sent to the client.
+  // The function will complete even if the client disconnects.
+  after(async () => {
+    try {
+      console.log("[/api/generate] Starting background generation for course:", courseId);
+
+      // Generate curriculum via Claude
+      const curriculum = await generateCurriculum(generateRequest);
+
+      // Update course record with curriculum
+      await updateCourseRecord(userId, courseId, curriculum, undefined);
+
+      console.log("[/api/generate] Background generation completed for course:", courseId);
+    } catch (err) {
+      // Catch any errors and update the course record with the error state
+      const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
+      console.error("[/api/generate] Background generation failed:", errorMessage);
+      try {
+        await updateCourseRecord(userId, courseId, undefined, errorMessage);
+      } catch (updateErr) {
+        console.error("[/api/generate] Failed to update error state:", updateErr);
+      }
+    }
+  });
+
   return res;
 }
