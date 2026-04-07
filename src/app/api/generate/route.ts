@@ -263,13 +263,18 @@ function repairTruncatedJson(json: string): string {
  * @param length - CourseLength: crash | short | full | masterclass
  * @returns max_tokens value to use in Claude API call
  */
-function getMaxTokensForLength(_length: CourseLength): number {
-  // Use the maximum output tokens for all course lengths.
-  // Claude Sonnet 4.6 supports up to 64k output tokens.
-  // You only pay for tokens actually generated, not the max limit,
-  // so there's no cost penalty — only reliability benefit.
-  // A crash course generates ~10k tokens, masterclass ~40-50k.
-  return 65536;
+function getMaxTokensForLength(length: CourseLength): number {
+  // Reasonable caps per course length. Lower values = faster responses
+  // and no need for streaming (SDK requires streaming for very high values).
+  // Actual usage: crash ~10k, short ~16k, full/masterclass use chunked
+  // generation with separate overrideMaxTokens per phase.
+  switch (length) {
+    case "crash": return 16384;
+    case "short": return 32768;
+    case "full": return 32768;
+    case "masterclass": return 32768;
+    default: return 16384;
+  }
 }
 
 /**
@@ -298,19 +303,16 @@ async function callClaudeWithRetry(
   try {
     const maxTokens = overrideMaxTokens ?? getMaxTokensForLength(length);
 
-    // Use streaming to avoid the SDK's 10-minute timeout restriction.
-    // The SDK requires streaming for high max_tokens values (65536)
-    // because the non-streaming HTTP request could exceed its timeout.
-    // .stream() returns chunks in real-time, then .finalMessage()
-    // assembles them into the same Anthropic.Message shape.
-    const stream = anthropic.messages.stream({
+    // Direct (non-streaming) call. With capped max_tokens (8k-32k),
+    // the SDK no longer requires streaming. This is faster because
+    // there's no chunk-assembly overhead.
+    const response = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: maxTokens,
       system,
       messages,
     });
 
-    const response = await stream.finalMessage();
     return response;
   } catch (err) {
     if (attempt < 2) {
