@@ -139,12 +139,27 @@ function validate(data: CurriculumFormData): FormErrors {
 }
 
 
-/* ─── SelectInfoPanel — shows tooltip for the currently selected option ── */
+/* ─── InfoToggle — clickable ⓘ icon placed next to labels ────────────── */
 
-function SelectInfoPanel({ tooltip }: { tooltip: string | undefined }) {
+function InfoToggle({ open, onToggle }: { open: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className={`text-muted-foreground hover:text-violet-400 transition-colors ${open ? "text-violet-400" : ""}`}
+      aria-label="Toggle field info"
+    >
+      <Info className="size-3.5" />
+    </button>
+  );
+}
+
+/* ─── InfoPanel — animated reveal text, shown below field when toggled ── */
+
+function InfoPanel({ tooltip, open }: { tooltip: string | undefined; open: boolean }) {
   return (
     <AnimatePresence mode="wait">
-      {tooltip && (
+      {open && tooltip && (
         <motion.p
           key={tooltip}
           initial={{ opacity: 0, y: -2 }}
@@ -188,6 +203,12 @@ export default function CurriculumForm({
   const [lengthInfoOpen, setLengthInfoOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  // ⓘ info toggle state for each field
+  const [infoOpen, setInfoOpen] = useState<Record<string, boolean>>({});
+  const toggleInfo = useCallback((field: string) => {
+    setInfoOpen((prev) => ({ ...prev, [field]: !prev[field] }));
+  }, []);
 
   // Async generation state
   const [courseId, setCourseId] = useState<string | null>(null);
@@ -471,9 +492,12 @@ export default function CurriculumForm({
 
           {/* ── Course Topic ──────────────────────────────── */}
           <div className="space-y-1.5">
-            <Label htmlFor="curriculum-topic" className="text-sm font-medium">
-              Course Topic <span className="text-destructive">*</span>
-            </Label>
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="curriculum-topic" className="text-sm font-medium">
+                Course Topic <span className="text-destructive">*</span>
+              </Label>
+              <InfoToggle open={!!infoOpen.topic} onToggle={() => toggleInfo("topic")} />
+            </div>
             <Input
               id="curriculum-topic"
               type="text"
@@ -501,18 +525,19 @@ export default function CurriculumForm({
                 </motion.p>
               )}
             </AnimatePresence>
-            {!topicError && (
-              <SelectInfoPanel tooltip="Be specific — 'Photography for Instagram Reels' generates a better course than just 'Photography'. Include your angle or audience for best results." />
-            )}
+            <InfoPanel open={!!infoOpen.topic && !topicError} tooltip="Be specific — 'Photography for Instagram Reels' generates a better course than just 'Photography'. Include your angle or audience for best results." />
           </div>
 
           {/* ── Two-column row: Audience + Length ─────────── */}
           <div className="grid gap-4 sm:grid-cols-2">
             {/* Target Audience */}
             <div className="space-y-1.5">
-              <Label htmlFor="curriculum-difficulty" className="text-sm font-medium">
-                Target Audience
-              </Label>
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="curriculum-difficulty" className="text-sm font-medium">
+                  Target Audience
+                </Label>
+                <InfoToggle open={!!infoOpen.difficulty} onToggle={() => toggleInfo("difficulty")} />
+              </div>
               <Select
                 value={form.difficulty}
                 onValueChange={(val) => updateField("difficulty", val as DifficultyLevel)}
@@ -539,7 +564,7 @@ export default function CurriculumForm({
                   ))}
                 </SelectContent>
               </Select>
-              <SelectInfoPanel tooltip={DIFFICULTY_OPTIONS.find((o) => o.value === form.difficulty)?.tooltip} />
+              <InfoPanel open={!!infoOpen.difficulty} tooltip={DIFFICULTY_OPTIONS.find((o) => o.value === form.difficulty)?.tooltip} />
             </div>
 
             {/* Course Length */}
@@ -609,16 +634,19 @@ export default function CurriculumForm({
                   ))}
                 </SelectContent>
               </Select>
-              <SelectInfoPanel tooltip={COURSE_LENGTH_OPTIONS.find((o) => o.value === (isFreeUser ? "crash" : form.courseLength))?.tooltip} />
+              <InfoPanel open={lengthInfoOpen} tooltip={COURSE_LENGTH_OPTIONS.find((o) => o.value === (isFreeUser ? "crash" : form.courseLength))?.tooltip} />
             </div>
           </div>
 
           {/* ── Industry / Niche ──────────────────────────── */}
           <div className="space-y-1.5">
-            <Label htmlFor="curriculum-niche" className="text-sm font-medium">
-              Industry / Niche{" "}
-              <span className="text-muted-foreground font-normal">(optional)</span>
-            </Label>
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="curriculum-niche" className="text-sm font-medium">
+                Industry / Niche{" "}
+                <span className="text-muted-foreground font-normal">(optional)</span>
+              </Label>
+              <InfoToggle open={!!infoOpen.niche} onToggle={() => toggleInfo("niche")} />
+            </div>
             <Input
               id="curriculum-niche"
               type="text"
@@ -628,7 +656,7 @@ export default function CurriculumForm({
               disabled={isSubmitting}
               className="h-10"
             />
-            <SelectInfoPanel tooltip="Adding a niche helps the AI use industry-specific language, examples, and frameworks your audience already knows." />
+            <InfoPanel open={!!infoOpen.niche} tooltip="Adding a niche helps the AI use industry-specific language, examples, and frameworks your audience already knows." />
           </div>
 
           {/* ── Advanced Options Toggle ────────────────────── */}
@@ -659,9 +687,12 @@ export default function CurriculumForm({
                 <div className="grid gap-4 sm:grid-cols-2">
                   {/* Language */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="curriculum-language" className="text-sm font-medium">
-                      Language
-                    </Label>
+                    <div className="flex items-center gap-1.5">
+                      <Label htmlFor="curriculum-language" className="text-sm font-medium">
+                        Language
+                      </Label>
+                      <InfoToggle open={!!infoOpen.language} onToggle={() => toggleInfo("language")} />
+                    </div>
                     <Select
                       value={form.language}
                       onValueChange={(val) => updateField("language", val as CourseLanguage)}
@@ -681,14 +712,17 @@ export default function CurriculumForm({
                         ))}
                       </SelectContent>
                     </Select>
-                    <SelectInfoPanel tooltip="Your entire course — titles, lessons, quizzes, and resources — will be generated natively in this language, not translated." />
+                    <InfoPanel open={!!infoOpen.language} tooltip="Your entire course — titles, lessons, quizzes, and resources — will be generated natively in this language, not translated." />
                   </div>
 
                   {/* Teaching Style */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="curriculum-style" className="text-sm font-medium">
-                      Teaching Style
-                    </Label>
+                    <div className="flex items-center gap-1.5">
+                      <Label htmlFor="curriculum-style" className="text-sm font-medium">
+                        Teaching Style
+                      </Label>
+                      <InfoToggle open={!!infoOpen.style} onToggle={() => toggleInfo("style")} />
+                    </div>
                     <Select
                       value={form.teachingStyle}
                       onValueChange={(val) => updateField("teachingStyle", val as TeachingStyle)}
@@ -708,7 +742,7 @@ export default function CurriculumForm({
                         ))}
                       </SelectContent>
                     </Select>
-                    <SelectInfoPanel tooltip={TEACHING_STYLE_OPTIONS.find((o) => o.value === form.teachingStyle)?.tooltip} />
+                    <InfoPanel open={!!infoOpen.style} tooltip={TEACHING_STYLE_OPTIONS.find((o) => o.value === form.teachingStyle)?.tooltip} />
                   </div>
                 </div>
 
@@ -716,9 +750,12 @@ export default function CurriculumForm({
                 <div className="grid gap-4 sm:grid-cols-2">
                   {/* Output Structure */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="curriculum-structure" className="text-sm font-medium">
-                      Output Structure
-                    </Label>
+                    <div className="flex items-center gap-1.5">
+                      <Label htmlFor="curriculum-structure" className="text-sm font-medium">
+                        Output Structure
+                      </Label>
+                      <InfoToggle open={!!infoOpen.structure} onToggle={() => toggleInfo("structure")} />
+                    </div>
                     <Select
                       value={form.outputStructure}
                       onValueChange={(val) => updateField("outputStructure", val as OutputStructure)}
@@ -738,12 +775,15 @@ export default function CurriculumForm({
                         ))}
                       </SelectContent>
                     </Select>
-                    <SelectInfoPanel tooltip={OUTPUT_STRUCTURE_OPTIONS.find((o) => o.value === form.outputStructure)?.tooltip} />
+                    <InfoPanel open={!!infoOpen.structure} tooltip={OUTPUT_STRUCTURE_OPTIONS.find((o) => o.value === form.outputStructure)?.tooltip} />
                   </div>
 
                   {/* Include Quizzes Toggle */}
                   <div className="space-y-1.5">
-                    <Label className="text-sm font-medium">Include Quizzes</Label>
+                    <div className="flex items-center gap-1.5">
+                      <Label className="text-sm font-medium">Include Quizzes</Label>
+                      <InfoToggle open={!!infoOpen.quizzes} onToggle={() => toggleInfo("quizzes")} />
+                    </div>
                     <button
                       type="button"
                       onClick={() => updateField("includeQuizzes", !form.includeQuizzes)}
@@ -769,7 +809,7 @@ export default function CurriculumForm({
                         {form.includeQuizzes ? "Quizzes included" : "No quizzes"}
                       </span>
                     </button>
-                    <SelectInfoPanel tooltip={form.includeQuizzes ? "Each module will include multiple-choice and short-answer questions to reinforce learning and boost completion rates." : "No quizzes will be generated. You can always add them later from the course editor."} />
+                    <InfoPanel open={!!infoOpen.quizzes} tooltip={form.includeQuizzes ? "Each module will include multiple-choice and short-answer questions to reinforce learning and boost completion rates." : "No quizzes will be generated. You can always add them later from the course editor."} />
                   </div>
                 </div>
               </motion.div>
@@ -778,10 +818,13 @@ export default function CurriculumForm({
 
           {/* ── About You — Learner Profile ────────────────── */}
           <div className="space-y-1.5">
-            <Label htmlFor="course-learner-profile" className="text-sm font-medium">
-              About You{" "}
-              <span className="text-muted-foreground font-normal">(optional — helps personalize the course)</span>
-            </Label>
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="course-learner-profile" className="text-sm font-medium">
+                About You{" "}
+                <span className="text-muted-foreground font-normal">(optional)</span>
+              </Label>
+              <InfoToggle open={!!infoOpen.learner} onToggle={() => toggleInfo("learner")} />
+            </div>
             <textarea
               id="course-learner-profile"
               placeholder="e.g. I'm a marketing manager with 5 years of experience looking to transition into data science…"
@@ -792,15 +835,18 @@ export default function CurriculumForm({
               maxLength={500}
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
             />
-            <SelectInfoPanel tooltip="The more context you share — your background, goals, and learning style — the more tailored and relevant your course will be. Even one sentence helps." />
+            <InfoPanel open={!!infoOpen.learner} tooltip="The more context you share — your background, goals, and learning style — the more tailored and relevant your course will be. Even one sentence helps." />
           </div>
 
           {/* ── Abstract / PDF Upload ─────────────────────── */}
           <div className="space-y-1.5">
-            <Label htmlFor="curriculum-abstract" className="text-sm font-medium">
-              Course Abstract{" "}
-              <span className="text-muted-foreground font-normal">(optional — paste text or upload PDF)</span>
-            </Label>
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="curriculum-abstract" className="text-sm font-medium">
+                Course Abstract{" "}
+                <span className="text-muted-foreground font-normal">(optional)</span>
+              </Label>
+              <InfoToggle open={!!infoOpen.abstract} onToggle={() => toggleInfo("abstract")} />
+            </div>
             <textarea
               id="curriculum-abstract"
               placeholder="Paste a course description, abstract, or outline to guide the course generation…"
@@ -851,7 +897,7 @@ export default function CurriculumForm({
                 {form.abstract.length > 0 && `${form.abstract.length}/4000 chars`}
               </span>
             </div>
-            <SelectInfoPanel tooltip="Paste a syllabus, outline, or course description and the AI will use it as a blueprint. Upload a PDF to auto-extract the text." />
+            <InfoPanel open={!!infoOpen.abstract} tooltip="Paste a syllabus, outline, or course description and the AI will use it as a blueprint. Upload a PDF to auto-extract the text." />
           </div>
 
           {/* ── Generation Preview ─────────────────────────── */}
