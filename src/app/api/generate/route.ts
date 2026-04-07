@@ -299,10 +299,22 @@ async function callClaudeWithRetry(
   messages: Anthropic.MessageParam[],
   length: CourseLength,
   attempt: number = 1,
-  overrideMaxTokens?: number
+  overrideMaxTokens?: number,
+  label: string = "unknown",
+  timeoutMs: number = 120_000, // default 2-min timeout per call
 ): Promise<Anthropic.Message> {
   try {
     const maxTokens = overrideMaxTokens ?? getMaxTokensForLength(length);
+
+    // AbortController prevents silent hangs — if the stream stalls,
+    // we abort after timeoutMs instead of waiting for Vercel to kill us.
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      console.error(`[/api/generate] [${label}] Aborting — timeout after ${timeoutMs}ms`);
+      controller.abort();
+    }, timeoutMs);
+
+    console.log(`[/api/generate] [${label}] Calling Claude (attempt ${attempt}, max_tokens=${maxTokens}, timeout=${timeoutMs}ms)...`);
 
     // Use stream() + finalMessage() instead of direct create().
     // The Anthropic SDK requires streaming for claude-sonnet-4-6 because
@@ -314,22 +326,34 @@ async function callClaudeWithRetry(
       max_tokens: maxTokens,
       system,
       messages,
+    }, {
+      signal: controller.signal,
     });
 
     // finalMessage() waits for the full response — same result as create()
     // but satisfies the SDK's streaming requirement.
     const response = await stream.finalMessage();
+
+    clearTimeout(timer);
+    console.log(`[/api/generate] [${label}] Claude responded (attempt ${attempt}, stop=${response.stop_reason}, usage=${JSON.stringify(response.usage)})`);
     return response;
   } catch (err) {
+    // Distinguish abort (timeout) from other errors for better diagnostics
+    const isAbort = err instanceof Error && err.name === "AbortError";
+    const errMsg = err instanceof Error ? err.message : String(err);
+
     if (attempt < 2) {
       console.warn(
-        `[/api/generate] Attempt ${attempt} failed, retrying in 2s...`,
-        err
+        `[/api/generate] [${label}] Attempt ${attempt} failed (${isAbort ? "TIMEOUT" : errMsg}), retrying in 2s...`
       );
       await new Promise((r) => setTimeout(r, 2000));
-      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1, overrideMaxTokens);
+      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1, overrideMaxTokens, label, timeoutMs);
     }
-    throw err;
+
+    // Both attempts failed — throw a descriptive error
+    throw new Error(
+      `[${label}] Claude call failed after ${attempt} attempts: ${isAbort ? `Timed out after ${timeoutMs}ms` : errMsg}`
+    );
   }
 }
 
@@ -443,6 +467,19 @@ async function generateCurriculumChunked(
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const supabase = getSupabaseAdmin();
 
+  // Global safety: track total elapsed time. Vercel Pro kills at 300s.
+  // We abort at 270s to leave 30s for DB cleanup.
+  const globalStart = Date.now();
+  const GLOBAL_TIMEOUT_MS = 270_000; // 270s — 30s safety margin
+
+  function checkGlobalTimeout(phase: string): void {
+    const elapsed = Date.now() - globalStart;
+    if (elapsed > GLOBAL_TIMEOUT_MS) {
+      throw new Error(`Global timeout: ${phase} at ${(elapsed / 1000).toFixed(0)}s (limit ${GLOBAL_TIMEOUT_MS / 1000}s). Vercel would kill us at 300s.`);
+    }
+    console.log(`[/api/generate] [${courseId}] [${phase}] Elapsed: ${(elapsed / 1000).toFixed(1)}s of ${GLOBAL_TIMEOUT_MS / 1000}s`);
+  }
+
   // ── Phase 1: Generate skeleton ─────────────────────────────
   console.log(`[/api/generate] [${courseId}] Phase 1: Generating course skeleton...`);
 
@@ -454,9 +491,12 @@ async function generateCurriculumChunked(
 
   const { system: skelSystem, messages: skelMessages } = buildSkeletonCurriculumPrompt(request);
 
-  // Skeleton is structure-only — 8k tokens is plenty, completes in ~30s
-  // with direct create() (no streaming overhead).
-  const skelResponse = await callClaudeWithRetry(anthropic, skelSystem, skelMessages, request.length, 1, 8192);
+  // Skeleton is structure-only — 8k tokens is plenty, completes in ~30s.
+  // 90s timeout gives ample headroom for API latency spikes.
+  const skelResponse = await callClaudeWithRetry(
+    anthropic, skelSystem, skelMessages, request.length, 1, 8192,
+    `${courseId}/skeleton`, 90_000,
+  );
 
   const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
   if (!skelTextBlock || skelTextBlock.type !== "text") {
@@ -467,6 +507,7 @@ async function generateCurriculumChunked(
 
   const totalModules = skeleton.modules.length;
   console.log(`[/api/generate] [${courseId}] Phase 1 complete: ${totalModules} modules, ${skeleton.modules.reduce((sum, m) => sum + m.lessons.length, 0)} lessons`);
+  checkGlobalTimeout("after skeleton");
 
   // Update progress with module count
   await supabase.from("courses").update({
@@ -501,8 +542,12 @@ async function generateCurriculumChunked(
           totalModules,
         );
 
-        // Each module needs ~5-8k tokens. Direct create() completes in ~30-60s.
-        const modResponse = await callClaudeWithRetry(anthropic, modSystem, modMessages, request.length, 1, 16384);
+        // Each module needs ~5-8k tokens, completes in ~30-60s.
+        // 120s timeout per module — generous for retries and API spikes.
+        const modResponse = await callClaudeWithRetry(
+          anthropic, modSystem, modMessages, request.length, 1, 16384,
+          `${courseId}/module-${moduleData.id}`, 120_000,
+        );
 
         const modTextBlock = modResponse.content.find((block) => block.type === "text");
         if (!modTextBlock || modTextBlock.type !== "text") {
@@ -541,6 +586,7 @@ async function generateCurriculumChunked(
     }).eq("id", courseId);
 
     console.log(`[/api/generate] [${courseId}] Phase 2: ${completedModules}/${totalModules} modules complete`);
+    checkGlobalTimeout(`after batch ${batchStart + 1}-${batchEnd}`);
   }
 
   // ── Phase 3: Assemble final curriculum ─────────────────────
@@ -895,18 +941,27 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
   // Using stream() + finalMessage() with capped max_tokens keeps
   // each Claude call fast (~30-60s).
   after(async () => {
+    const startTime = Date.now();
     try {
-      console.log("[/api/generate] Starting background generation for course:", courseId);
+      console.log(`[/api/generate] [${courseId}] after() started at ${new Date().toISOString()}`);
       const curriculum = await generateCurriculum(generateRequest, courseId);
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      console.log(`[/api/generate] [${courseId}] Generation complete in ${elapsed}s — saving to DB...`);
       await updateCourseRecord(userId!, courseId, curriculum, undefined);
-      console.log("[/api/generate] Background generation completed for course:", courseId);
+      console.log(`[/api/generate] [${courseId}] Course saved successfully. Total: ${elapsed}s`);
     } catch (err) {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
-      console.error("[/api/generate] Background generation failed:", errorMessage);
+      console.error(`[/api/generate] [${courseId}] FAILED after ${elapsed}s:`, errorMessage);
+      // Stack trace helps identify exactly where the failure occurred
+      if (err instanceof Error && err.stack) {
+        console.error(`[/api/generate] [${courseId}] Stack:`, err.stack);
+      }
       try {
         await updateCourseRecord(userId!, courseId, undefined, errorMessage);
+        console.log(`[/api/generate] [${courseId}] Error state saved to DB`);
       } catch (updateErr) {
-        console.error("[/api/generate] Failed to update error state:", updateErr);
+        console.error(`[/api/generate] [${courseId}] CRITICAL: Failed to update error state:`, updateErr);
       }
     }
   });
