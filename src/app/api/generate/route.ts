@@ -319,7 +319,7 @@ async function callClaudeWithRetry(
         err
       );
       await new Promise((r) => setTimeout(r, 2000));
-      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1);
+      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1, overrideMaxTokens);
     }
     throw err;
   }
@@ -446,10 +446,21 @@ async function generateCurriculumChunked(
 
   const { system: skelSystem, messages: skelMessages } = buildSkeletonCurriculumPrompt(request);
 
+  // Diagnostic: mark that we're about to call Claude
+  await supabase.from("courses").update({
+    generation_progress: "Calling Claude for skeleton...",
+  }).eq("id", courseId);
+
   // Skeleton is structure-only (titles, descriptions, order) — 8k tokens is plenty.
   // Using 65536 here caused Vercel 300s timeouts because Claude would generate
   // a massive response. Capping at 8192 keeps it under 60s.
-  const skelResponse = await callClaudeWithRetry(anthropic, skelSystem, skelMessages, request.length, 1, 8192);
+  // Wrap in a 120s timeout to prevent silent hangs inside after().
+  const skelResponse = await Promise.race([
+    callClaudeWithRetry(anthropic, skelSystem, skelMessages, request.length, 1, 8192),
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Skeleton Claude call timed out after 120s")), 120_000)
+    ),
+  ]);
 
   const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
   if (!skelTextBlock || skelTextBlock.type !== "text") {
@@ -496,7 +507,13 @@ async function generateCurriculumChunked(
 
         // Each module needs ~5-8k tokens for full lesson content + quiz.
         // Cap at 16384 to keep each call fast (~60-90s) and avoid timeouts.
-        const modResponse = await callClaudeWithRetry(anthropic, modSystem, modMessages, request.length, 1, 16384);
+        // 180s timeout to prevent silent hangs.
+        const modResponse = await Promise.race([
+          callClaudeWithRetry(anthropic, modSystem, modMessages, request.length, 1, 16384),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Module ${moduleData.id} Claude call timed out after 180s`)), 180_000)
+          ),
+        ]);
 
         const modTextBlock = modResponse.content.find((block) => block.type === "text");
         if (!modTextBlock || modTextBlock.type !== "text") {
@@ -894,16 +911,22 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
   // courses (32k tokens). The course record is updated to "ready" or "failed"
   // regardless of whether the client is still connected.
   after(async () => {
+    // Diagnostic: confirm after() callback is executing
+    const adminDb = getSupabaseAdmin();
+    await adminDb.from("courses").update({
+      generation_progress: "after() started — preparing generation...",
+    }).eq("id", courseId);
+
     try {
       console.log("[/api/generate] Starting background generation for course:", courseId);
       const curriculum = await generateCurriculum(generateRequest, courseId);
-      await updateCourseRecord(userId, courseId, curriculum, undefined);
+      await updateCourseRecord(userId!, courseId, curriculum, undefined);
       console.log("[/api/generate] Background generation completed for course:", courseId);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
       console.error("[/api/generate] Background generation failed:", errorMessage);
       try {
-        await updateCourseRecord(userId, courseId, undefined, errorMessage);
+        await updateCourseRecord(userId!, courseId, undefined, errorMessage);
       } catch (updateErr) {
         console.error("[/api/generate] Failed to update error state:", updateErr);
       }
