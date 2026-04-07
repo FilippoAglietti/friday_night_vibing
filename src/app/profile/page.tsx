@@ -1135,7 +1135,7 @@ export default function ProfilePage() {
                 <CardContent>
                   {loading ? (
                     <div className="h-[120px] bg-muted/20 rounded-lg animate-pulse" />
-                  ) : userProfile?.plan === "pro_max" ? (
+                  ) : userProfile?.plan === "pro_max" && (userProfile.generations_limit < 0 || userProfile.generations_limit >= 1000) ? (
                     <div className="flex flex-col items-center justify-center py-4">
                       <div className="relative">
                         <ProgressRing percent={100} color="text-amber-400" />
@@ -1143,6 +1143,24 @@ export default function ProfilePage() {
                       </div>
                       <p className="text-xs font-semibold mt-3">Unlimited</p>
                       <p className="text-[10px] text-muted-foreground">Pro Max Plan</p>
+                    </div>
+                  ) : userProfile?.plan === "pro_max" ? (
+                    <div className="flex flex-col items-center justify-center py-2">
+                      <div className="relative">
+                        <ProgressRing percent={usagePercent} color={usagePercent >= 90 ? "text-rose-500" : usagePercent >= 80 ? "text-amber-500" : "text-amber-400"} />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-lg font-bold">{Math.max(0, (userProfile?.generations_limit || 0) - (userProfile?.generations_used || 0))}</span>
+                          <span className="text-[9px] text-muted-foreground">remaining</span>
+                        </div>
+                      </div>
+                      <p className="text-xs font-medium mt-2">Pro Max 5-Pack</p>
+                      {usagePercent >= 100 ? (
+                        <Button size="sm" className="mt-3 h-7 text-[10px] bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 rounded-full" onClick={() => setShowPaywall(true)}>
+                          Go Unlimited<ChevronRight className="size-3 ml-0.5" />
+                        </Button>
+                      ) : usagePercent >= 80 ? (
+                        <p className="text-[10px] text-amber-400 mt-1">Running low — upgrade anytime</p>
+                      ) : null}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-2">
@@ -1735,13 +1753,13 @@ export default function ProfilePage() {
                   <div>
                     <p className="font-semibold text-sm">{planLabel} Plan</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {userProfile?.plan === "free" ? "1 generation included" : userProfile?.plan === "pro" ? "50 generations / month" : "Unlimited generations"}
+                      {userProfile?.plan === "free" ? "1 generation included" : userProfile?.plan === "pro" ? "50 generations / month" : userProfile && userProfile.generations_limit > 0 && userProfile.generations_limit < 1000 ? `${userProfile.generations_limit} Pro Max generations` : "Unlimited generations"}
                     </p>
                   </div>
                   <Badge variant="outline" className={`text-xs ${planBadgeClass}`}>{planLabel}</Badge>
                 </div>
 
-                {userProfile && userProfile.plan !== "pro_max" && (
+                {userProfile && (userProfile.plan !== "pro_max" || (userProfile.generations_limit > 0 && userProfile.generations_limit < 1000)) && (
                   <>
                     <Separator className="border-border/30" />
                     <div>

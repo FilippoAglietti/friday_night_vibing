@@ -80,25 +80,27 @@ const plans = [
   },
   {
     id: "5pack",
-    name: "5-Pack",
+    name: "Pro Max · 5-Pack",
     price: PROMO_ACTIVE ? "$29" : "$39",
     originalPrice: "$39",
     period: "one-time",
-    description: "No subscription. Just 5 generations.",
+    description: "Try Pro Max with 5 premium generations.",
     badge: null,
     discountPct: PROMO_ACTIVE ? "26% OFF" : null,
     features: [
-      "5 course generations",
-      "Full modules & quizzes",
-      "PDF & Markdown export",
+      "5 Pro Max generations",
+      "AI-generated audio lessons",
+      "Full chapter content generation",
+      "Premium Notion & PDF export",
+      "White-label branding",
       "No recurring charges",
     ],
-    cta: PROMO_ACTIVE ? "Buy 5-Pack — $29" : "Buy 5-Pack — $39",
+    cta: PROMO_ACTIVE ? "Try Pro Max — $29" : "Try Pro Max — $39",
     priceId: process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "price_5pack",
-    icon: Zap,
-    gradient: "from-cyan-600 to-blue-600",
-    badgeGradient: "from-cyan-600 to-blue-600",
-    checkColor: "text-cyan-500",
+    icon: Crown,
+    gradient: "from-amber-600 to-orange-600",
+    badgeGradient: "from-amber-600 to-orange-600",
+    checkColor: "text-amber-400",
     highlight: false,
   },
 ];
@@ -194,7 +196,7 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
                     )}
 
                     <div className="flex items-center gap-2 mb-2 mt-1">
-                      <plan.icon className={`size-5 ${plan.highlight ? "text-amber-500" : plan.id === "pro" ? "text-violet-500" : "text-cyan-500"}`} />
+                      <plan.icon className={`size-5 ${plan.highlight || plan.id === "5pack" ? "text-amber-500" : plan.id === "pro" ? "text-violet-500" : "text-cyan-500"}`} />
                       <span className="font-semibold text-sm">{plan.name}</span>
                       {plan.discountPct && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-400 border border-rose-500/20">
@@ -231,11 +233,11 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
                       onClick={() => handleCheckout(plan.priceId)}
                       disabled={loading !== null}
                       className={`w-full rounded-full text-sm font-semibold border-0 transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r ${plan.gradient} text-white shadow-lg ${
-                        plan.highlight
+                        plan.highlight || plan.id === "5pack"
                           ? "shadow-amber-500/20 hover:shadow-amber-500/40"
                           : plan.id === "pro"
                           ? "shadow-violet-500/20 hover:shadow-violet-500/40"
-                          : "shadow-cyan-500/20 hover:shadow-cyan-500/40"
+                          : "shadow-amber-500/20 hover:shadow-amber-500/40"
                       }`}
                     >
                       {loading === plan.priceId ? (

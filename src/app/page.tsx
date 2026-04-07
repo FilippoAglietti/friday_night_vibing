@@ -1037,16 +1037,17 @@ export default function Home() {
                 </Card>
               </motion.div>
 
-              {/* 5-PACK ONE-TIME */}
+              {/* PRO MAX 5-PACK */}
               <motion.div variants={scaleUp} className="flex min-w-0 overflow-visible">
-                <Card className="relative flex flex-col w-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
+                <Card className="relative flex flex-col w-full overflow-visible border-amber-500/20 bg-gradient-to-b from-amber-500/[0.03] via-card/50 to-card/50 backdrop-blur-sm">
                   {/* Invisible spacer to align with badged cards */}
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 opacity-0 pointer-events-none">
                     <Badge className="rounded-full px-4 py-1.5 text-xs">‌</Badge>
                   </div>
                   <CardHeader className="pt-8">
-                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">
-                      One-Time
+                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                      <Crown className="size-3.5" />
+                      Pro Max · 5-Pack
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
                       $29
@@ -1059,20 +1060,21 @@ export default function Home() {
                       <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 26%</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      5 course generations. No subscription needed.
+                      5 premium generations. No subscription.
                     </p>
                   </CardHeader>
                   <CardContent className="flex-1">
                     <ul className="space-y-3">
                       {[
-                        "5 course generations",
-                        "Full modules, lessons & quizzes",
-                        "JSON, Markdown, PDF & Notion export",
-                        "Custom pacing schedules",
+                        "5 Pro Max generations",
+                        "AI-generated audio lessons",
+                        "Full chapter content generation",
+                        "Premium Notion & PDF export",
+                        "White-label branding",
                         "No recurring charges",
                       ].map((text, i) => (
                         <li key={i} className="flex items-center gap-2.5 text-sm">
-                          <Check className="size-4 text-cyan-500 shrink-0" />
+                          <Check className="size-4 text-amber-400 shrink-0" />
                           <span>{text}</span>
                         </li>
                       ))}
@@ -1081,11 +1083,11 @@ export default function Home() {
                   <CardFooter className="mt-auto pt-0">
                     <Button
                       id="pricing-5pack-cta"
-                      className="w-full rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all hover:scale-[1.02]"
+                      className="w-full rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:scale-[1.02]"
                       size="lg"
                       onClick={() => setShowPaywall(true)}
                     >
-                      Buy 5-Pack — $29
+                      Try Pro Max — $29
                     </Button>
                   </CardFooter>
                 </Card>
@@ -1219,31 +1221,33 @@ export default function Home() {
                   </Card>
                 </div>
 
-                {/* 5-PACK */}
+                {/* PRO MAX 5-PACK */}
                 <div className="w-[280px] shrink-0">
-                  <Card className="relative flex flex-col h-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
+                  <Card className="relative flex flex-col h-full overflow-visible border-amber-500/20 bg-gradient-to-b from-amber-500/[0.03] via-card/50 to-card/50 backdrop-blur-sm">
                     <CardHeader className="pt-6 pb-3">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-cyan-500">One-Time</CardDescription>
+                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+                        <Crown className="size-3" />Pro Max · 5-Pack
+                      </CardDescription>
                       <CardTitle className="text-2xl font-bold">$29<span className="text-sm font-normal text-muted-foreground"> one-time</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">$39</span>
                         <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-26%</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">5 course generations. No subscription.</p>
+                      <p className="text-xs text-muted-foreground">5 premium generations. No subscription.</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
                       <ul className="space-y-2">
-                        {["5 course generations", "Full modules, lessons & quizzes", "JSON, Markdown, PDF & Notion export", "Custom pacing schedules", "No recurring charges"].map((text, i) => (
+                        {["5 Pro Max generations", "AI-generated audio lessons", "Full chapter content generation", "Premium Notion & PDF export", "White-label branding", "No recurring charges"].map((text, i) => (
                           <li key={i} className="flex items-center gap-2 text-xs">
-                            <Check className="size-3.5 text-cyan-500 shrink-0" />
+                            <Check className="size-3.5 text-amber-400 shrink-0" />
                             <span>{text}</span>
                           </li>
                         ))}
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
-                      <Button className="w-full rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/20" size="sm" onClick={() => setShowPaywall(true)}>
-                        Buy 5-Pack — $29
+                      <Button className="w-full rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20" size="sm" onClick={() => setShowPaywall(true)}>
+                        Try Pro Max — $29
                       </Button>
                     </CardFooter>
                   </Card>
