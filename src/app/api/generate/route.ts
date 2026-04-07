@@ -254,19 +254,13 @@ function repairTruncatedJson(json: string): string {
  * @param length - CourseLength: crash | short | full | masterclass
  * @returns max_tokens value to use in Claude API call
  */
-function getMaxTokensForLength(length: CourseLength): number {
-  switch (length) {
-    case "crash":
-      return 16384; // 1-2 modules, 4-6 lessons — needs ~10-12k tokens for rich content
-    case "short":
-      return 32768; // 3-4 modules, 8-12 lessons
-    case "full":
-      return 65536; // 4-6 modules, 12-18 lessons
-    case "masterclass":
-      return 65536; // 6-10 modules, 20-30 lessons (Sonnet max = 64k output)
-    default:
-      return 16384;
-  }
+function getMaxTokensForLength(_length: CourseLength): number {
+  // Use the maximum output tokens for all course lengths.
+  // Claude Sonnet 4.6 supports up to 64k output tokens.
+  // You only pay for tokens actually generated, not the max limit,
+  // so there's no cost penalty — only reliability benefit.
+  // A crash course generates ~10k tokens, masterclass ~40-50k.
+  return 65536;
 }
 
 /**
