@@ -1040,9 +1040,10 @@ export default function Home() {
               {/* PRO MAX 5-PACK */}
               <motion.div variants={scaleUp} className="flex min-w-0 overflow-visible">
                 <Card className="relative flex flex-col w-full overflow-visible border-amber-500/20 bg-gradient-to-b from-amber-500/[0.03] via-card/50 to-card/50 backdrop-blur-sm">
-                  {/* Invisible spacer to align with badged cards */}
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10 opacity-0 pointer-events-none">
-                    <Badge className="rounded-full px-4 py-1.5 text-xs">‌</Badge>
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                    <Badge className="rounded-full bg-gradient-to-r from-amber-600 to-orange-600 px-3.5 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-amber-500/30">
+                      One-Time
+                    </Badge>
                   </div>
                   <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
