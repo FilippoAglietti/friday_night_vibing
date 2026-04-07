@@ -257,13 +257,13 @@ function repairTruncatedJson(json: string): string {
 function getMaxTokensForLength(length: CourseLength): number {
   switch (length) {
     case "crash":
-      return 8192; // ~5 lessons
+      return 16384; // 1-2 modules, 4-6 lessons — needs ~10-12k tokens for rich content
     case "short":
-      return 16384; // 8-12 lessons
+      return 32768; // 3-4 modules, 8-12 lessons
     case "full":
-      return 24576; // 12-18 lessons
+      return 65536; // 4-6 modules, 12-18 lessons
     case "masterclass":
-      return 32768; // 20+ lessons
+      return 65536; // 6-10 modules, 20-30 lessons (Sonnet max = 64k output)
     default:
       return 16384;
   }
@@ -358,45 +358,49 @@ async function generateCurriculum(request: GenerateRequest): Promise<Curriculum>
     console.warn("[/api/generate] Response was truncated (hit max_tokens). Attempting JSON repair...");
   }
 
+  // Pre-process: strip markdown code fences if present (even without closing ```)
+  // Claude sometimes wraps JSON in ```json ... ``` despite being told not to.
+  // On truncated responses the closing ``` won't exist, so we strip the opening.
+  let cleanText = rawText;
+  const fenceStart = cleanText.match(/^```(?:json)?\s*\n?/);
+  if (fenceStart) {
+    cleanText = cleanText.slice(fenceStart[0].length);
+    // Remove closing fence if present
+    const fenceEnd = cleanText.lastIndexOf("```");
+    if (fenceEnd !== -1) {
+      cleanText = cleanText.slice(0, fenceEnd).trim();
+    }
+  }
+
   // Parse the JSON — Claude should return pure JSON per our prompt instructions.
-  // Sometimes Claude wraps JSON in markdown fences or adds preamble text,
-  // so we try multiple extraction strategies.
+  // Sometimes Claude adds preamble text, so we try multiple extraction strategies.
   let curriculum: Curriculum | undefined;
   try {
-    // Strategy 1: Direct parse (ideal case — pure JSON)
-    curriculum = JSON.parse(rawText) as Curriculum;
+    // Strategy 1: Direct parse (ideal case — pure JSON or after fence stripping)
+    curriculum = JSON.parse(cleanText) as Curriculum;
   } catch {
     let parsed = false;
 
-    // Strategy 2: Extract from markdown code fences ```json ... ```
-    const jsonMatch = rawText.match(/```(?:json)?\s*([\s\S]*?)```/);
-    if (jsonMatch) {
-      try {
-        curriculum = JSON.parse(jsonMatch[1]) as Curriculum;
-        parsed = true;
-      } catch { /* fall through to strategy 3 */ }
-    }
-
-    // Strategy 3: Find the first '{' and last '}' to extract the JSON object
+    // Strategy 2: Find the first '{' and last '}' to extract the JSON object
     if (!parsed) {
-      const firstBrace = rawText.indexOf("{");
-      const lastBrace = rawText.lastIndexOf("}");
+      const firstBrace = cleanText.indexOf("{");
+      const lastBrace = cleanText.lastIndexOf("}");
       if (firstBrace !== -1 && lastBrace > firstBrace) {
         try {
           curriculum = JSON.parse(
-            rawText.slice(firstBrace, lastBrace + 1)
+            cleanText.slice(firstBrace, lastBrace + 1)
           ) as Curriculum;
           parsed = true;
-        } catch { /* fall through to strategy 4 */ }
+        } catch { /* fall through to strategy 3 */ }
       }
     }
 
-    // Strategy 4: Repair truncated JSON (when response hit max_tokens)
+    // Strategy 3: Repair truncated JSON (when response hit max_tokens)
     // Extract from first '{' and attempt to close unclosed brackets/braces
     if (!parsed) {
-      const firstBrace = rawText.indexOf("{");
+      const firstBrace = cleanText.indexOf("{");
       if (firstBrace !== -1) {
-        const truncatedJson = rawText.slice(firstBrace);
+        const truncatedJson = cleanText.slice(firstBrace);
         const repairedJson = repairTruncatedJson(truncatedJson);
         try {
           curriculum = JSON.parse(repairedJson) as Curriculum;
