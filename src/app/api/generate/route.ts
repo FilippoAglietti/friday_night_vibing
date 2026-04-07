@@ -3,9 +3,9 @@
  * ─────────────────────────────────────────────────────────────
  * Next.js App Router API route: POST /api/generate
  *
- * Synchronous course generation endpoint. Accepts a curriculum generation request,
- * validates it, checks auth + rate limits, creates a course record with
- * status="generating", runs generation synchronously, then returns courseId.
+ * Async course generation endpoint. Returns courseId immediately (HTTP 202),
+ * then runs generation in the background via after(). Uses direct create()
+ * calls (no streaming) with capped max_tokens for fast responses.
  *
  * Request body:  { topic, difficulty, courseLength, niche?, abstract?, learnerProfile? }
  * Success:       { success: true, courseId: string } [HTTP 202 Accepted]
@@ -20,7 +20,7 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -448,21 +448,9 @@ async function generateCurriculumChunked(
 
   const { system: skelSystem, messages: skelMessages } = buildSkeletonCurriculumPrompt(request);
 
-  // Diagnostic: mark that we're about to call Claude
-  await supabase.from("courses").update({
-    generation_progress: "Calling Claude for skeleton...",
-  }).eq("id", courseId);
-
-  // Skeleton is structure-only (titles, descriptions, order) — 8k tokens is plenty.
-  // Using 65536 here caused Vercel 300s timeouts because Claude would generate
-  // a massive response. Capping at 8192 keeps it under 60s.
-  // Wrap in a 120s timeout to prevent silent hangs inside after().
-  const skelResponse = await Promise.race([
-    callClaudeWithRetry(anthropic, skelSystem, skelMessages, request.length, 1, 8192),
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("Skeleton Claude call timed out after 120s")), 120_000)
-    ),
-  ]);
+  // Skeleton is structure-only — 8k tokens is plenty, completes in ~30s
+  // with direct create() (no streaming overhead).
+  const skelResponse = await callClaudeWithRetry(anthropic, skelSystem, skelMessages, request.length, 1, 8192);
 
   const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
   if (!skelTextBlock || skelTextBlock.type !== "text") {
@@ -507,15 +495,8 @@ async function generateCurriculumChunked(
           totalModules,
         );
 
-        // Each module needs ~5-8k tokens for full lesson content + quiz.
-        // Cap at 16384 to keep each call fast (~60-90s) and avoid timeouts.
-        // 180s timeout to prevent silent hangs.
-        const modResponse = await Promise.race([
-          callClaudeWithRetry(anthropic, modSystem, modMessages, request.length, 1, 16384),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error(`Module ${moduleData.id} Claude call timed out after 180s`)), 180_000)
-          ),
-        ]);
+        // Each module needs ~5-8k tokens. Direct create() completes in ~30-60s.
+        const modResponse = await callClaudeWithRetry(anthropic, modSystem, modMessages, request.length, 1, 16384);
 
         const modTextBlock = modResponse.content.find((block) => block.type === "text");
         if (!modTextBlock || modTextBlock.type !== "text") {
@@ -783,22 +764,17 @@ async function updateCourseRecord(
 /**
  * POST /api/generate
  *
- * Main request handler. Implements synchronous course generation:
+ * Main request handler. Implements async course generation:
  *   1. Rate limit check by IP
  *   2. Input validation
  *   3. Auth check + generation limit enforcement
  *   4. Create course record with status="generating"
- *   5. Run generation synchronously (chunked for full/masterclass)
- *   6. Update course record with curriculum or error
- *   7. Return courseId
+ *   5. Return courseId immediately (HTTP 202)
+ *   6. Run generation in background via after()
+ *   7. Update course record with curriculum or error
  *
- * The frontend polls GET /api/courses/[id]/status every 3-5s and shows
- * real-time progress (module X of Y) during chunked generation.
- *
- * We use synchronous generation because Vercel's after() callback gets
- * killed before long-running Claude API calls complete, even with
- * maxDuration=300. Running synchronously within the request works
- * reliably with the 5-minute Pro timeout.
+ * Uses direct create() (no streaming) with capped max_tokens.
+ * Vercel Pro maxDuration=300 gives 5 minutes for after() to complete.
  */
 export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsyncResponse | GenerateErrorResponse>> {
   // ── Step 1: Rate limit ──────────────────────────────────────
@@ -899,39 +875,35 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
     );
   }
 
-  // ── Step 5: Synchronous generation ──────────────────────────
-  // Run generation synchronously within the same request. Vercel Pro
-  // allows maxDuration=300 (5 min), which is enough for masterclass
-  // courses with chunked generation (skeleton ~30-60s + modules in
-  // parallel batches ~60-90s each).
-  //
-  // We tried after() but Vercel kills the callback before long-running
-  // Claude API calls can complete — even with maxDuration=300.
-  //
-  // The frontend has already received a "generating" card from the
-  // course record and is polling /api/courses/[id]/status every 3-5s.
-  // When this function finishes, the next poll sees status="ready".
-  try {
-    console.log("[/api/generate] Starting synchronous generation for course:", courseId);
-    const curriculum = await generateCurriculum(generateRequest, courseId);
-    await updateCourseRecord(userId!, courseId, curriculum, undefined);
-    console.log("[/api/generate] Generation completed for course:", courseId);
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
-    console.error("[/api/generate] Generation failed:", errorMessage);
-    try {
-      await updateCourseRecord(userId!, courseId, undefined, errorMessage);
-    } catch (updateErr) {
-      console.error("[/api/generate] Failed to update error state:", updateErr);
-    }
-  }
-
-  // ── Step 6: Return courseId ─────────────────────────────────
+  // ── Step 5: Return courseId immediately ─────────────────────
   const res = NextResponse.json(
     { success: true as const, courseId },
     { status: 202 }
   );
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
+
+  // ── Step 6: Background generation with after() ──────────────
+  // Runs AFTER the 202 response is sent. With Vercel Pro + maxDuration=300,
+  // the function stays alive for up to 5 minutes.
+  // Using direct create() (no streaming) with capped max_tokens keeps
+  // each Claude call fast (~30-60s).
+  after(async () => {
+    try {
+      console.log("[/api/generate] Starting background generation for course:", courseId);
+      const curriculum = await generateCurriculum(generateRequest, courseId);
+      await updateCourseRecord(userId!, courseId, curriculum, undefined);
+      console.log("[/api/generate] Background generation completed for course:", courseId);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
+      console.error("[/api/generate] Background generation failed:", errorMessage);
+      try {
+        await updateCourseRecord(userId!, courseId, undefined, errorMessage);
+      } catch (updateErr) {
+        console.error("[/api/generate] Failed to update error state:", updateErr);
+      }
+    }
+  });
+
   return res;
 }
