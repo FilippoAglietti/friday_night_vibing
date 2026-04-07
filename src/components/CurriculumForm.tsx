@@ -501,6 +501,9 @@ export default function CurriculumForm({
                 </motion.p>
               )}
             </AnimatePresence>
+            {!topicError && (
+              <SelectInfoPanel tooltip="Be specific — 'Photography for Instagram Reels' generates a better course than just 'Photography'. Include your angle or audience for best results." />
+            )}
           </div>
 
           {/* ── Two-column row: Audience + Length ─────────── */}
@@ -625,6 +628,7 @@ export default function CurriculumForm({
               disabled={isSubmitting}
               className="h-10"
             />
+            <SelectInfoPanel tooltip="Adding a niche helps the AI use industry-specific language, examples, and frameworks your audience already knows." />
           </div>
 
           {/* ── Advanced Options Toggle ────────────────────── */}
@@ -677,6 +681,7 @@ export default function CurriculumForm({
                         ))}
                       </SelectContent>
                     </Select>
+                    <SelectInfoPanel tooltip="Your entire course — titles, lessons, quizzes, and resources — will be generated natively in this language, not translated." />
                   </div>
 
                   {/* Teaching Style */}
@@ -764,6 +769,7 @@ export default function CurriculumForm({
                         {form.includeQuizzes ? "Quizzes included" : "No quizzes"}
                       </span>
                     </button>
+                    <SelectInfoPanel tooltip={form.includeQuizzes ? "Each module will include multiple-choice and short-answer questions to reinforce learning and boost completion rates." : "No quizzes will be generated. You can always add them later from the course editor."} />
                   </div>
                 </div>
               </motion.div>
@@ -786,9 +792,7 @@ export default function CurriculumForm({
               maxLength={500}
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
             />
-            <p className="text-[11px] text-muted-foreground">
-              Describe your background, goals, or learning style so we can tailor the course to you.
-            </p>
+            <SelectInfoPanel tooltip="The more context you share — your background, goals, and learning style — the more tailored and relevant your course will be. Even one sentence helps." />
           </div>
 
           {/* ── Abstract / PDF Upload ─────────────────────── */}
@@ -847,6 +851,7 @@ export default function CurriculumForm({
                 {form.abstract.length > 0 && `${form.abstract.length}/4000 chars`}
               </span>
             </div>
+            <SelectInfoPanel tooltip="Paste a syllabus, outline, or course description and the AI will use it as a blueprint. Upload a PDF to auto-extract the text." />
           </div>
 
           {/* ── Generation Preview ─────────────────────────── */}
