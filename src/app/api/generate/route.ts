@@ -295,19 +295,21 @@ async function callClaudeWithRetry(
   attempt: number = 1
 ): Promise<Anthropic.Message> {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 60000);
-
     const maxTokens = getMaxTokensForLength(length);
 
-    const response = await anthropic.messages.create({
+    // Use streaming to avoid the SDK's 10-minute timeout restriction.
+    // The SDK requires streaming for high max_tokens values (65536)
+    // because the non-streaming HTTP request could exceed its timeout.
+    // .stream() returns chunks in real-time, then .finalMessage()
+    // assembles them into the same Anthropic.Message shape.
+    const stream = anthropic.messages.stream({
       model: "claude-sonnet-4-6",
       max_tokens: maxTokens,
       system,
       messages,
     });
 
-    clearTimeout(timeout);
+    const response = await stream.finalMessage();
     return response;
   } catch (err) {
     if (attempt < 2) {
