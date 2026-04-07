@@ -6,7 +6,7 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import type { GenerateRequest, AudienceLevel, CourseLength } from "@/types/curriculum";
+import type { GenerateRequest, AudienceLevel, CourseLength, TeachingStyle, OutputStructure } from "@/types/curriculum";
 
 // Re-export for convenience
 export type { GenerateRequest };
@@ -23,10 +23,37 @@ const AUDIENCE_DESCRIPTIONS: Record<AudienceLevel, string> = {
 };
 
 const LENGTH_DESCRIPTIONS: Record<CourseLength, string> = {
-  mini:         "1-2 modules with 4-6 lessons total. Tight, focused on one key outcome.",
-  beginner:     "3-4 modules with 8-12 lessons total. Solid foundation with room to explore.",
-  intermediate: "4-6 modules with 12-18 lessons total. In-depth coverage balancing breadth and depth.",
-  advanced:     "6-10 modules with 20-30 lessons total. Comprehensive deep dive from foundation to mastery.",
+  crash:       "1-2 modules with 4-6 lessons total. Tight, focused on one key outcome.",
+  short:       "3-4 modules with 8-12 lessons total. Solid foundation with room to explore.",
+  full:        "4-6 modules with 12-18 lessons total. In-depth coverage balancing breadth and depth.",
+  masterclass: "6-10 modules with 20-30 lessons total. Comprehensive deep dive from foundation to mastery.",
+};
+
+const TEACHING_STYLE_DESCRIPTIONS: Record<TeachingStyle, string> = {
+  academic:
+    "Use a formal, research-backed tone. Cite studies and frameworks. Structure content like a university lecture with clear definitions and rigorous explanations.",
+  conversational:
+    "Write as if explaining to a friend over coffee. Use contractions, rhetorical questions, and relatable analogies. Keep it warm and approachable.",
+  "hands-on":
+    "Focus on practical exercises and projects. Every concept should be introduced through a 'build something' approach. Minimize theory — maximize doing.",
+  storytelling:
+    "Teach through narratives, case studies, and real-world stories. Open each lesson with a compelling scenario. Make the learner the protagonist of their learning journey.",
+};
+
+const OUTPUT_STRUCTURE_DESCRIPTIONS: Record<OutputStructure, string> = {
+  modules:
+    "Organize as traditional course modules, each containing sequential lessons. Best for self-paced learning.",
+  workshop:
+    "Organize as interactive workshop sessions. Each module is a standalone session with warm-up, core activity, breakout exercises, and wrap-up. Name modules as 'Session 1', 'Session 2', etc.",
+  bootcamp:
+    "Organize as an intensive day-by-day bootcamp schedule. Each module represents one day. Include morning theory, afternoon practice, and daily challenges. Name modules as 'Day 1', 'Day 2', etc.",
+};
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: "English", es: "Spanish", pt: "Portuguese", fr: "French",
+  de: "German", it: "Italian", nl: "Dutch", pl: "Polish",
+  ja: "Japanese", ko: "Korean", zh: "Chinese", ar: "Arabic",
+  hi: "Hindi", ru: "Russian", tr: "Turkish", sv: "Swedish",
 };
 
 // ─── System prompt ────────────────────────────────────────────
@@ -52,7 +79,11 @@ OUTPUT RULES (CRITICAL):
 // ─── User prompt factory ──────────────────────────────────────
 
 export function buildUserPrompt(params: GenerateRequest): string {
-  const { topic, audience, length, niche, abstract, learnerProfile } = params;
+  const {
+    topic, audience, length, niche, abstract, learnerProfile,
+    language = "en", includeQuizzes = true,
+    teachingStyle = "conversational", outputStructure = "modules",
+  } = params;
   const now = new Date().toISOString();
 
   const abstractBlock = abstract
@@ -63,13 +94,23 @@ export function buildUserPrompt(params: GenerateRequest): string {
     ? `\nLEARNER PROFILE:\n"""\n${learnerProfile.slice(0, 500)}\n"""\nPersonalize the course for this learner. Adapt examples, exercises, and language to their background, goals, and experience level. Make the content feel tailored to who they are.\n`
     : "";
 
+  const languageBlock = language !== "en"
+    ? `\nLANGUAGE: Generate ALL course content (title, subtitle, description, objectives, lessons, quizzes, resources) in ${LANGUAGE_NAMES[language] || language}. Only the JSON keys should remain in English.\n`
+    : "";
+
+  const quizBlock = !includeQuizzes
+    ? `\nQUIZZES: Do NOT include any quiz questions. Set "quiz" to an empty array [] for every module.\n`
+    : "";
+
   return `
 Generate a complete course for:
 
 TOPIC: "${topic}"
 AUDIENCE: ${audience} — ${AUDIENCE_DESCRIPTIONS[audience]}
 LENGTH: ${LENGTH_DESCRIPTIONS[length]}
-NICHE: ${niche ? `"${niche}"` : "general / not specified"}${learnerBlock}${abstractBlock}
+NICHE: ${niche ? `"${niche}"` : "general / not specified"}
+TEACHING STYLE: ${teachingStyle} — ${TEACHING_STYLE_DESCRIPTIONS[teachingStyle]}
+STRUCTURE: ${outputStructure} — ${OUTPUT_STRUCTURE_DESCRIPTIONS[outputStructure]}${languageBlock}${quizBlock}${learnerBlock}${abstractBlock}
 
 Return ONLY this exact JSON structure:
 
@@ -159,7 +200,7 @@ Return ONLY this exact JSON structure:
 }
 
 Requirements:
-- Each module must have 2-5 lessons and 2-3 quiz questions
+- Each module must have 2-5 lessons${includeQuizzes ? " and 2-3 quiz questions" : " (NO quiz questions — set quiz to empty array)"}
 - Each lesson MUST have "content" (string, 2-4 paragraphs of rich markdown with real explanations, examples, exercises — NOT placeholder text)
 - Each lesson MUST have "keyPoints" (array of 3-5 strings) covering core concepts, practical tips, and actionable takeaways
 - Each lesson MUST have "suggestedResources" (array of 1-3 objects with title, url, type) with REAL, working URLs to well-known authoritative sites (e.g. MDN, official docs, Wikipedia, real blog posts, YouTube channels)

@@ -430,16 +430,13 @@ export default function Home() {
     setShowPaywall(true);
   }, []);
 
-  const isDevMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("dev") === "true";
-
   const handleFormSubmitAttempt = useCallback(() => {
-    if (isDevMode) return true;
     if (!user) {
       setShowAuthModal(true);
       return false;
     }
     return true;
-  }, [user, isDevMode]);
+  }, [user]);
 
   // Snap scroll container — drives both snap behaviour and parallax
   const containerRef = useRef<HTMLDivElement>(null);

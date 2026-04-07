@@ -19,12 +19,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Sparkles, Loader2, AlertCircle, FileText, Upload, X } from "lucide-react";
-import type { DifficultyLevel, Curriculum } from "@/types/curriculum";
+import { Sparkles, Loader2, AlertCircle, FileText, Upload, X, Info, ChevronDown, ChevronUp } from "lucide-react";
+import type {
+  DifficultyLevel,
+  Curriculum,
+  TeachingStyle,
+  OutputStructure,
+  CourseLanguage,
+} from "@/types/curriculum";
 
 /* ─── Types ──────────────────────────────────────────────── */
 
-export type CourseLength = "mini" | "beginner" | "intermediate" | "advanced";
+export type CourseLength = "crash" | "short" | "full" | "masterclass";
 
 export interface CurriculumFormData {
   topic: string;
@@ -33,6 +39,10 @@ export interface CurriculumFormData {
   niche: string;
   abstract: string;
   learnerProfile: string;
+  language: CourseLanguage;
+  includeQuizzes: boolean;
+  teachingStyle: TeachingStyle;
+  outputStructure: OutputStructure;
 }
 
 export interface CurriculumFormProps {
@@ -56,20 +66,56 @@ const DIFFICULTY_OPTIONS: { value: DifficultyLevel; label: string; desc: string 
   { value: "advanced", label: "Advanced", desc: "Deep expertise & complex topics" },
 ];
 
-const COURSE_LENGTH_OPTIONS: { value: CourseLength; label: string; desc: string }[] = [
-  { value: "mini", label: "Mini", desc: "~5 lessons · Quick overview" },
-  { value: "beginner", label: "Beginner", desc: "8–12 lessons · Solid foundation" },
-  { value: "intermediate", label: "Intermediate", desc: "12–18 lessons · In-depth coverage" },
-  { value: "advanced", label: "Advanced", desc: "20+ lessons · Comprehensive deep dive" },
+const COURSE_LENGTH_OPTIONS: { value: CourseLength; label: string; desc: string; info: string }[] = [
+  { value: "crash", label: "Crash", desc: "~5 lessons · 1-2 modules", info: "Perfect for a quick overview or lead magnet. Covers one key outcome in a focused, bite-sized format." },
+  { value: "short", label: "Short", desc: "8–12 lessons · 3-4 modules", info: "A solid foundation course. Great for teaching a specific skill with room to explore subtopics." },
+  { value: "full", label: "Full", desc: "12–18 lessons · 4-6 modules", info: "In-depth coverage balancing breadth and depth. Ideal for flagship courses your students will pay for." },
+  { value: "masterclass", label: "Masterclass", desc: "20+ lessons · 6-10 modules", info: "Comprehensive deep dive from foundation to mastery. Best for premium, high-ticket courses." },
+];
+
+const LANGUAGE_OPTIONS: { value: CourseLanguage; label: string; flag: string }[] = [
+  { value: "en", label: "English", flag: "🇬🇧" },
+  { value: "es", label: "Español", flag: "🇪🇸" },
+  { value: "pt", label: "Português", flag: "🇧🇷" },
+  { value: "fr", label: "Français", flag: "🇫🇷" },
+  { value: "de", label: "Deutsch", flag: "🇩🇪" },
+  { value: "it", label: "Italiano", flag: "🇮🇹" },
+  { value: "nl", label: "Nederlands", flag: "🇳🇱" },
+  { value: "pl", label: "Polski", flag: "🇵🇱" },
+  { value: "ja", label: "日本語", flag: "🇯🇵" },
+  { value: "ko", label: "한국어", flag: "🇰🇷" },
+  { value: "zh", label: "中文", flag: "🇨🇳" },
+  { value: "ar", label: "العربية", flag: "🇸🇦" },
+  { value: "hi", label: "हिन्दी", flag: "🇮🇳" },
+  { value: "ru", label: "Русский", flag: "🇷🇺" },
+  { value: "tr", label: "Türkçe", flag: "🇹🇷" },
+  { value: "sv", label: "Svenska", flag: "🇸🇪" },
+];
+
+const TEACHING_STYLE_OPTIONS: { value: TeachingStyle; label: string; desc: string }[] = [
+  { value: "conversational", label: "Conversational", desc: "Friendly, approachable tone" },
+  { value: "academic", label: "Academic", desc: "Formal, research-backed style" },
+  { value: "hands-on", label: "Hands-on", desc: "Project-based, learn by doing" },
+  { value: "storytelling", label: "Storytelling", desc: "Narrative-driven, engaging examples" },
+];
+
+const OUTPUT_STRUCTURE_OPTIONS: { value: OutputStructure; label: string; desc: string }[] = [
+  { value: "modules", label: "Modules & Lessons", desc: "Classic course layout" },
+  { value: "workshop", label: "Workshop", desc: "Session-based, interactive" },
+  { value: "bootcamp", label: "Bootcamp", desc: "Day-by-day, intensive" },
 ];
 
 const INITIAL_FORM: CurriculumFormData = {
   topic: "",
   difficulty: "beginner",
-  courseLength: "beginner",
+  courseLength: "short",
   niche: "",
   abstract: "",
   learnerProfile: "",
+  language: "en",
+  includeQuizzes: true,
+  teachingStyle: "conversational",
+  outputStructure: "modules",
 };
 
 /* ─── Validation ─────────────────────────────────────────── */
@@ -105,6 +151,8 @@ export default function CurriculumForm({
   const [apiError, setApiError] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfExtracting, setPdfExtracting] = useState(false);
+  const [lengthInfoOpen, setLengthInfoOpen] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   /* ── Field handlers ────────────────────────────────────── */
 
@@ -222,10 +270,14 @@ export default function CurriculumForm({
           body: JSON.stringify({
             topic: form.topic.trim(),
             difficulty: isFreeUser && form.difficulty === "advanced" ? "intermediate" : form.difficulty,
-            courseLength: isFreeUser ? "mini" : form.courseLength,
+            courseLength: isFreeUser ? "crash" : form.courseLength,
             niche: form.niche.trim() || undefined,
             abstract: form.abstract.trim() || undefined,
             learnerProfile: form.learnerProfile.trim() || undefined,
+            language: form.language,
+            includeQuizzes: form.includeQuizzes,
+            teachingStyle: form.teachingStyle,
+            outputStructure: form.outputStructure,
           }),
         });
 
@@ -340,14 +392,47 @@ export default function CurriculumForm({
 
             {/* Course Length */}
             <div className="space-y-1.5">
-              <Label htmlFor="curriculum-length" className="text-sm font-medium">
-                Course Length
-                {isFreeUser && (
-                  <span className="ml-1.5 text-[10px] font-normal text-violet-400">(Mini only on free plan)</span>
+              <div className="flex items-center gap-1.5">
+                <Label htmlFor="curriculum-length" className="text-sm font-medium">
+                  Course Length
+                  {isFreeUser && (
+                    <span className="ml-1.5 text-[10px] font-normal text-violet-400">(Crash only on free plan)</span>
+                  )}
+                </Label>
+                <button
+                  type="button"
+                  onClick={() => setLengthInfoOpen((prev) => !prev)}
+                  className="text-muted-foreground hover:text-violet-400 transition-colors"
+                  aria-label="Course length info"
+                >
+                  <Info className="size-3.5" />
+                </button>
+              </div>
+
+              {/* Info panel */}
+              <AnimatePresence>
+                {lengthInfoOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="rounded-lg border border-violet-500/20 bg-violet-500/5 p-3 space-y-2 mb-1.5">
+                      {COURSE_LENGTH_OPTIONS.map((opt) => (
+                        <div key={opt.value} className="flex gap-2">
+                          <span className="text-xs font-semibold text-violet-400 min-w-[80px] shrink-0">{opt.label}</span>
+                          <span className="text-xs text-muted-foreground">{opt.info}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
-              </Label>
+              </AnimatePresence>
+
               <Select
-                value={isFreeUser ? "mini" : form.courseLength}
+                value={isFreeUser ? "crash" : form.courseLength}
                 onValueChange={(val) => updateField("courseLength", val as CourseLength)}
                 disabled={isSubmitting || isFreeUser}
               >
@@ -359,7 +444,7 @@ export default function CurriculumForm({
                 </SelectTrigger>
                 <SelectContent>
                   {COURSE_LENGTH_OPTIONS
-                    .filter((opt) => !isFreeUser || opt.value === "mini")
+                    .filter((opt) => !isFreeUser || opt.value === "crash")
                     .map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       <span className="flex flex-col">
@@ -391,6 +476,147 @@ export default function CurriculumForm({
               className="h-10"
             />
           </div>
+
+          {/* ── Advanced Options Toggle ────────────────────── */}
+          <button
+            type="button"
+            onClick={() => setAdvancedOpen((prev) => !prev)}
+            className="flex items-center gap-2 w-full text-sm font-medium text-violet-400 hover:text-violet-300 transition-colors py-1"
+          >
+            {advancedOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+            Advanced Options
+            {!advancedOpen && (
+              <span className="text-[10px] text-muted-foreground font-normal ml-1">
+                Language, style, quizzes & more
+              </span>
+            )}
+          </button>
+
+          <AnimatePresence>
+            {advancedOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden space-y-3 md:space-y-4"
+              >
+                {/* ── Language + Teaching Style row ──────────── */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Language */}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="curriculum-language" className="text-sm font-medium">
+                      Language
+                    </Label>
+                    <Select
+                      value={form.language}
+                      onValueChange={(val) => updateField("language", val as CourseLanguage)}
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger id="curriculum-language" className="h-10 w-full">
+                        <SelectValue placeholder="Select language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LANGUAGE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            <span className="flex items-center gap-2">
+                              <span>{opt.flag}</span>
+                              <span className="font-medium">{opt.label}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Teaching Style */}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="curriculum-style" className="text-sm font-medium">
+                      Teaching Style
+                    </Label>
+                    <Select
+                      value={form.teachingStyle}
+                      onValueChange={(val) => updateField("teachingStyle", val as TeachingStyle)}
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger id="curriculum-style" className="h-10 w-full">
+                        <SelectValue placeholder="Select style" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TEACHING_STYLE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            <span className="flex flex-col">
+                              <span className="font-medium">{opt.label}</span>
+                              <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* ── Output Structure + Quizzes row ────────── */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Output Structure */}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="curriculum-structure" className="text-sm font-medium">
+                      Output Structure
+                    </Label>
+                    <Select
+                      value={form.outputStructure}
+                      onValueChange={(val) => updateField("outputStructure", val as OutputStructure)}
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger id="curriculum-structure" className="h-10 w-full">
+                        <SelectValue placeholder="Select structure" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {OUTPUT_STRUCTURE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            <span className="flex flex-col">
+                              <span className="font-medium">{opt.label}</span>
+                              <span className="text-[11px] text-muted-foreground">{opt.desc}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Include Quizzes Toggle */}
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium">Include Quizzes</Label>
+                    <button
+                      type="button"
+                      onClick={() => updateField("includeQuizzes", !form.includeQuizzes)}
+                      disabled={isSubmitting}
+                      className={`flex items-center gap-3 h-10 w-full rounded-md border px-3 transition-colors ${
+                        form.includeQuizzes
+                          ? "border-violet-500/50 bg-violet-500/10 text-foreground"
+                          : "border-input bg-background text-muted-foreground"
+                      }`}
+                    >
+                      <div
+                        className={`relative w-9 h-5 rounded-full transition-colors ${
+                          form.includeQuizzes ? "bg-violet-500" : "bg-muted"
+                        }`}
+                      >
+                        <div
+                          className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                            form.includeQuizzes ? "translate-x-4" : "translate-x-0.5"
+                          }`}
+                        />
+                      </div>
+                      <span className="text-sm">
+                        {form.includeQuizzes ? "Quizzes included" : "No quizzes"}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ── About You — Learner Profile ────────────────── */}
           <div className="space-y-1.5">

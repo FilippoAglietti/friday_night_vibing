@@ -44,12 +44,24 @@ export type PacingStyle =
 
 /**
  * Desired course length sent from the generation form.
- *   mini         → ~5 lessons (1-2 modules)
- *   beginner     → 8-12 lessons (3-4 modules)
- *   intermediate → 12-18 lessons (4-6 modules)
- *   advanced     → 20+ lessons (6-10 modules)
+ *   crash      → ~5 lessons (1-2 modules)
+ *   short      → 8-12 lessons (3-4 modules)
+ *   full       → 12-18 lessons (4-6 modules)
+ *   masterclass → 20+ lessons (6-10 modules)
  */
-export type CourseLength = "mini" | "beginner" | "intermediate" | "advanced";
+export type CourseLength = "crash" | "short" | "full" | "masterclass";
+
+/** Teaching style / tone for the generated course */
+export type TeachingStyle = "academic" | "conversational" | "hands-on" | "storytelling";
+
+/** Output structure — how the course is organized */
+export type OutputStructure = "modules" | "workshop" | "bootcamp";
+
+/** Supported languages for course generation */
+export type CourseLanguage =
+  | "en" | "es" | "pt" | "fr" | "de" | "it"
+  | "nl" | "pl" | "ja" | "ko" | "zh" | "ar"
+  | "hi" | "ru" | "tr" | "sv";
 
 // ── Core Entities ─────────────────────────────────────────
 
@@ -221,6 +233,14 @@ export interface GenerateRequest {
   abstract?: string;
   /** Optional learner profile — who they are and what they want to achieve */
   learnerProfile?: string;
+  /** Language for the generated course (ISO 639-1 code, default "en") */
+  language?: CourseLanguage;
+  /** Whether to include quiz questions in each module (default true) */
+  includeQuizzes?: boolean;
+  /** Teaching style / tone (default "conversational") */
+  teachingStyle?: TeachingStyle;
+  /** How the course is structured (default "modules") */
+  outputStructure?: OutputStructure;
 }
 
 /** Success response from POST /api/generate */

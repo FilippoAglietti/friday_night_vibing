@@ -31,6 +31,9 @@ import type {
   Curriculum,
   AudienceLevel,
   CourseLength,
+  TeachingStyle,
+  OutputStructure,
+  CourseLanguage,
 } from "@/types/curriculum";
 
 // ─── Rate limiter (in-memory) ─────────────────────────────────
@@ -86,7 +89,10 @@ function checkRateLimit(ip: string): boolean {
 const VALID_AUDIENCES: AudienceLevel[] = ["beginner", "intermediate", "advanced"];
 
 /** Valid values for the length field */
-const VALID_LENGTHS: CourseLength[] = ["mini", "beginner", "intermediate", "advanced"];
+const VALID_LENGTHS: CourseLength[] = ["crash", "short", "full", "masterclass"];
+const VALID_TEACHING_STYLES: TeachingStyle[] = ["academic", "conversational", "hands-on", "storytelling"];
+const VALID_OUTPUT_STRUCTURES: OutputStructure[] = ["modules", "workshop", "bootcamp"];
+const VALID_LANGUAGES: CourseLanguage[] = ["en", "es", "pt", "fr", "de", "it", "nl", "pl", "ja", "ko", "zh", "ar", "hi", "ru", "tr", "sv"];
 
 /**
  * Validates and parses the incoming request body.
@@ -135,6 +141,27 @@ function validateRequest(body: unknown): GenerateRequest {
     throw new Error("'learnerProfile' must be a string if provided.");
   }
 
+  // language — optional, defaults to "en"
+  const language = (b.language as CourseLanguage | undefined) ?? "en";
+  if (!VALID_LANGUAGES.includes(language)) {
+    throw new Error(`'language' must be one of: ${VALID_LANGUAGES.join(", ")}.`);
+  }
+
+  // includeQuizzes — optional boolean, defaults to true
+  const includeQuizzes = b.includeQuizzes !== undefined ? Boolean(b.includeQuizzes) : true;
+
+  // teachingStyle — optional, defaults to "conversational"
+  const teachingStyle = (b.teachingStyle as TeachingStyle | undefined) ?? "conversational";
+  if (!VALID_TEACHING_STYLES.includes(teachingStyle)) {
+    throw new Error(`'teachingStyle' must be one of: ${VALID_TEACHING_STYLES.join(", ")}.`);
+  }
+
+  // outputStructure — optional, defaults to "modules"
+  const outputStructure = (b.outputStructure as OutputStructure | undefined) ?? "modules";
+  if (!VALID_OUTPUT_STRUCTURES.includes(outputStructure)) {
+    throw new Error(`'outputStructure' must be one of: ${VALID_OUTPUT_STRUCTURES.join(", ")}.`);
+  }
+
   // Sanitize: strip HTML tags and limit length
   const sanitizedTopic = b.topic
     .trim()
@@ -150,6 +177,10 @@ function validateRequest(body: unknown): GenerateRequest {
       : undefined,
     abstract: b.abstract ? (b.abstract as string).trim().slice(0, 4000) : undefined,
     learnerProfile: b.learnerProfile ? (b.learnerProfile as string).trim().slice(0, 500) : undefined,
+    language,
+    includeQuizzes,
+    teachingStyle,
+    outputStructure,
   };
 }
 
