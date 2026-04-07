@@ -17,7 +17,7 @@ import { cookies } from "next/headers";
 export async function GET(req: NextRequest) {
   const { searchParams, origin } = new URL(req.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const next = searchParams.get("next") ?? "/profile";
 
   if (code) {
     const cookieStore = await cookies();
@@ -43,6 +43,8 @@ export async function GET(req: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      let isNewUser = false;
+
       // Check if this is a new user and send welcome email
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -54,6 +56,7 @@ export async function GET(req: NextRequest) {
 
           // If user was created within the last 5 minutes, they're new
           if (minutesSinceCreation < 5) {
+            isNewUser = true;
             const userName =
               user.user_metadata?.full_name ||
               user.user_metadata?.name ||
@@ -81,7 +84,10 @@ export async function GET(req: NextRequest) {
         console.error("[auth/callback] Welcome email check failed:", emailErr);
       }
 
-      return NextResponse.redirect(`${origin}${next}`);
+      // Redirect to dashboard with welcome animation + onboarding flags
+      const separator = next.includes("?") ? "&" : "?";
+      const flags = isNewUser ? `${separator}welcome=true&onboarding=true` : `${separator}welcome=true`;
+      return NextResponse.redirect(`${origin}${next}${flags}`);
     }
 
     console.error("[auth/callback] Code exchange error:", error);

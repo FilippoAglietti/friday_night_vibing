@@ -54,6 +54,8 @@ import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength } from "@/components/CurriculumForm";
 import PaywallModal from "@/components/PaywallModal";
+import OnboardingQuiz, { type OnboardingAnswers } from "@/components/OnboardingQuiz";
+import WelcomeAnimation from "@/components/WelcomeAnimation";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -321,6 +323,25 @@ export default function ProfilePage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showAllTimeline, setShowAllTimeline] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Read URL params for welcome animation and onboarding quiz
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("welcome") === "true") {
+      setShowWelcome(true);
+      // Clean URL without reload
+      const url = new URL(window.location.href);
+      url.searchParams.delete("welcome");
+      url.searchParams.delete("onboarding");
+      window.history.replaceState({}, "", url.pathname);
+    }
+    if (params.get("onboarding") === "true") {
+      // Will show after welcome animation completes
+      setShowOnboarding(true);
+    }
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -577,6 +598,28 @@ export default function ProfilePage() {
     navigator.clipboard.writeText(url);
     setCopiedId(gen.id);
     setTimeout(() => setCopiedId(null), 2000);
+  }, []);
+
+  // ── Onboarding complete handler ────────────────────────────
+  const handleOnboardingComplete = useCallback(async (answers: OnboardingAnswers) => {
+    setShowOnboarding(false);
+    // Save answers to localStorage for now (Filippo needs to add DB columns)
+    // Once onboarding_role, onboarding_industry, onboarding_audience columns
+    // exist in profiles table, this should write to Supabase instead.
+    if (user) {
+      try {
+        localStorage.setItem(`syllabi_onboarding_${user.id}`, JSON.stringify(answers));
+      } catch (err) {
+        console.error("[ProfilePage] Failed to save onboarding answers:", err);
+      }
+    }
+  }, [user]);
+
+  // ── Welcome animation complete → show quiz if needed ──────
+  const handleWelcomeComplete = useCallback(() => {
+    setShowWelcome(false);
+    // If onboarding flag was set, show quiz after welcome animation
+    // (showOnboarding was already set from URL params)
   }, []);
 
   // ── Sign-in gate ───────────────────────────────────────────
@@ -1309,6 +1352,79 @@ export default function ProfilePage() {
               </motion.div>
             )}
 
+            {/* ── PRO MAX LOCKED FEATURES ──────────────────── */}
+            {userProfile && userProfile.plan !== "pro_max" && (
+              <motion.div variants={fadeUp}>
+                <Card className="border-border/40 bg-card/50 backdrop-blur-sm overflow-hidden">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Crown className="size-4 text-amber-500" />
+                      Pro Max Features
+                      <Badge className="ml-auto text-[9px] bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border-amber-500/30">Coming Soon</Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {[
+                        { icon: Brain, label: "AI Course Branding", desc: "Custom branded templates with your logo & colors", locked: userProfile.plan !== "pro_max" },
+                        { icon: Presentation, label: "Video Script Generator", desc: "Turn lessons into camera-ready video scripts", locked: userProfile.plan !== "pro_max" },
+                        { icon: BarChart3, label: "Student Analytics", desc: "Track engagement, completion, and quiz scores", locked: userProfile.plan !== "pro_max" },
+                        { icon: Layers, label: "Team Collaboration", desc: "Invite co-creators and share course drafts", locked: userProfile.plan !== "pro_max" },
+                        { icon: Zap, label: "API Access", desc: "Generate courses programmatically via REST API", locked: userProfile.plan !== "pro_max" },
+                        { icon: Shield, label: "White-Label Export", desc: "Remove Syllabi branding from all exports", locked: userProfile.plan !== "pro_max" },
+                      ].map((feat) => (
+                        <div
+                          key={feat.label}
+                          className={`relative flex items-start gap-3 rounded-xl border p-3 transition-all ${
+                            feat.locked
+                              ? "border-border/20 bg-muted/5 opacity-60"
+                              : "border-amber-500/30 bg-amber-500/5"
+                          }`}
+                        >
+                          {feat.locked && (
+                            <div className="absolute top-2 right-2">
+                              <Shield className="size-3 text-muted-foreground/40" />
+                            </div>
+                          )}
+                          <div className={`flex items-center justify-center size-8 rounded-lg shrink-0 ${
+                            feat.locked
+                              ? "bg-muted/20"
+                              : "bg-gradient-to-br from-amber-500/20 to-orange-500/20"
+                          }`}>
+                            <feat.icon className={`size-4 ${feat.locked ? "text-muted-foreground/50" : "text-amber-400"}`} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className={`text-xs font-medium ${feat.locked ? "text-muted-foreground" : "text-foreground"}`}>{feat.label}</p>
+                            <p className="text-[10px] text-muted-foreground/70 line-clamp-1">{feat.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {userProfile.plan === "free" && (
+                      <div className="mt-3 flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 p-3">
+                        <div>
+                          <p className="text-xs font-semibold text-amber-400">Unlock all features</p>
+                          <p className="text-[10px] text-muted-foreground">Upgrade to Pro first, then unlock Pro Max</p>
+                        </div>
+                        <Button size="sm" className="h-7 text-[10px] bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full" onClick={() => setShowPaywall(true)}>
+                          Upgrade<ChevronRight className="size-3 ml-0.5" />
+                        </Button>
+                      </div>
+                    )}
+                    {userProfile.plan === "pro" && (
+                      <div className="mt-3 flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 p-3">
+                        <div>
+                          <p className="text-xs font-semibold text-amber-400">You&apos;re on Pro — Pro Max is coming soon</p>
+                          <p className="text-[10px] text-muted-foreground">These features will unlock automatically when Pro Max launches</p>
+                        </div>
+                        <Badge className="text-[9px] bg-amber-500/15 text-amber-400 border-amber-500/30 shrink-0">Waitlist</Badge>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
             {/* ── RECENT COURSES ──────────────────────────── */}
             <motion.div variants={fadeUp}>
               <div className="flex items-center justify-between mb-4">
@@ -1704,6 +1820,19 @@ export default function ProfilePage() {
 
       {/* Paywall Modal for Upgrade buttons */}
       <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />
+
+      {/* Welcome Animation — plays on login */}
+      <WelcomeAnimation
+        show={showWelcome}
+        userName={user?.user_metadata?.full_name || user?.email?.split("@")[0] || ""}
+        onComplete={handleWelcomeComplete}
+      />
+
+      {/* Onboarding Quiz — shown for new users after welcome animation */}
+      <OnboardingQuiz
+        open={showOnboarding && !showWelcome}
+        onComplete={handleOnboardingComplete}
+      />
     </div>
   );
 }

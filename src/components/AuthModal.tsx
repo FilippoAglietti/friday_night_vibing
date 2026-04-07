@@ -57,7 +57,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           email: email.trim(),
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=/profile`,
           },
         });
 
@@ -76,7 +76,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         if (signInError) throw signInError;
 
         onClose();
-        window.location.reload();
+        window.location.href = "/profile?welcome=true";
       }
     } catch (err: unknown) {
       const msg =
@@ -107,7 +107,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
       await supabaseBrowser.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/profile`,
         },
       });
     } catch {
