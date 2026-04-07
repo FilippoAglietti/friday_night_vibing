@@ -1,7 +1,7 @@
 // ============================================================
 // SUPABASE DATABASE TYPES - AUTO-GENERATED
 // Progetto: syllabi-ai (gmxseuttpurnxbluvcwx)
-// Generato il: 2026-03-31
+// Generato il: 2026-04-07
 // NON modificare manualmente — rigenera con: supabase gen types
 // ============================================================
 
@@ -14,6 +14,8 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
@@ -23,18 +25,28 @@ export type Database = {
         Row: {
           audience: string
           content_type: Database["public"]["Enums"]["content_type"]
+          course_abstract: string | null
           created_at: string
           curriculum: Json | null
           description: string | null
+          embedding: string | null
           error_message: string | null
+          generation_completed_modules: number | null
+          generation_progress: string | null
+          generation_total_modules: number | null
+          has_attachments: boolean | null
           id: string
+          include_quizzes: boolean | null
           is_public: boolean | null
           is_published: boolean | null
           language: string | null
+          learner_profile: string | null
           length: string
           level: Database["public"]["Enums"]["course_level"] | null
           niche: string | null
+          output_structure: string | null
           status: Database["public"]["Enums"]["generation_status"]
+          teaching_style: string | null
           thumbnail_url: string | null
           title: string | null
           topic: string
@@ -44,18 +56,28 @@ export type Database = {
         Insert: {
           audience: string
           content_type?: Database["public"]["Enums"]["content_type"]
+          course_abstract?: string | null
           created_at?: string
           curriculum?: Json | null
           description?: string | null
+          embedding?: string | null
           error_message?: string | null
+          generation_completed_modules?: number | null
+          generation_progress?: string | null
+          generation_total_modules?: number | null
+          has_attachments?: boolean | null
           id?: string
+          include_quizzes?: boolean | null
           is_public?: boolean | null
           is_published?: boolean | null
           language?: string | null
+          learner_profile?: string | null
           length: string
           level?: Database["public"]["Enums"]["course_level"] | null
           niche?: string | null
+          output_structure?: string | null
           status?: Database["public"]["Enums"]["generation_status"]
+          teaching_style?: string | null
           thumbnail_url?: string | null
           title?: string | null
           topic: string
@@ -65,18 +87,28 @@ export type Database = {
         Update: {
           audience?: string
           content_type?: Database["public"]["Enums"]["content_type"]
+          course_abstract?: string | null
           created_at?: string
           curriculum?: Json | null
           description?: string | null
+          embedding?: string | null
           error_message?: string | null
+          generation_completed_modules?: number | null
+          generation_progress?: string | null
+          generation_total_modules?: number | null
+          has_attachments?: boolean | null
           id?: string
+          include_quizzes?: boolean | null
           is_public?: boolean | null
           is_published?: boolean | null
           language?: string | null
+          learner_profile?: string | null
           length?: string
           level?: Database["public"]["Enums"]["course_level"] | null
           niche?: string | null
+          output_structure?: string | null
           status?: Database["public"]["Enums"]["generation_status"]
+          teaching_style?: string | null
           thumbnail_url?: string | null
           title?: string | null
           topic?: string
@@ -159,11 +191,13 @@ export type Database = {
           generations_limit: number
           generations_used: number
           id: string
+          is_admin: boolean
           onboarding_completed: boolean | null
           plan: Database["public"]["Enums"]["plan_type"]
           preferred_language: string | null
           stripe_customer_id: string | null
           updated_at: string
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -173,11 +207,13 @@ export type Database = {
           generations_limit?: number
           generations_used?: number
           id: string
+          is_admin?: boolean
           onboarding_completed?: boolean | null
           plan?: Database["public"]["Enums"]["plan_type"]
           preferred_language?: string | null
           stripe_customer_id?: string | null
           updated_at?: string
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -187,11 +223,13 @@ export type Database = {
           generations_limit?: number
           generations_used?: number
           id?: string
+          is_admin?: boolean
           onboarding_completed?: boolean | null
           plan?: Database["public"]["Enums"]["plan_type"]
           preferred_language?: string | null
           stripe_customer_id?: string | null
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -316,12 +354,92 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      hypopg_hidden_indexes: {
+        Row: {
+          am_name: unknown
+          index_name: unknown
+          indexrelid: unknown
+          is_hypo: boolean | null
+          schema_name: unknown
+          table_name: unknown
+        }
+        Relationships: []
+      }
+      hypopg_list_indexes: {
+        Row: {
+          am_name: unknown
+          index_name: string | null
+          indexrelid: unknown
+          schema_name: unknown
+          table_name: unknown
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      check_username_available: {
+        Args: { p_username: string }
+        Returns: boolean
+      }
+      hypopg: { Args: never; Returns: Record<string, unknown>[] }
+      hypopg_create_index: {
+        Args: { sql_order: string }
+        Returns: Record<string, unknown>[]
+      }
+      hypopg_drop_index: { Args: { indexid: unknown }; Returns: boolean }
+      hypopg_get_indexdef: { Args: { indexid: unknown }; Returns: string }
+      hypopg_hidden_indexes: {
+        Args: never
+        Returns: {
+          indexid: unknown
+        }[]
+      }
+      hypopg_hide_index: { Args: { indexid: unknown }; Returns: boolean }
+      hypopg_relation_size: { Args: { indexid: unknown }; Returns: number }
+      hypopg_reset: { Args: never; Returns: undefined }
+      hypopg_reset_index: { Args: never; Returns: undefined }
+      hypopg_unhide_all_indexes: { Args: never; Returns: undefined }
+      hypopg_unhide_index: { Args: { indexid: unknown }; Returns: boolean }
       increment_generation_usage: {
         Args: { p_course_id: string; p_event_type: string; p_user_id: string }
         Returns: undefined
+      }
+      increment_generations_used: {
+        Args: { user_id: string }
+        Returns: undefined
+      }
+      index_advisor: {
+        Args: { query: string }
+        Returns: {
+          errors: string[]
+          index_statements: string[]
+          startup_cost_after: Json
+          startup_cost_before: Json
+          total_cost_after: Json
+          total_cost_before: Json
+        }[]
+      }
+      search_similar_courses: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          id: string
+          similarity: number
+          title: string
+          topic: string
+          user_id: string
+        }[]
+      }
+      set_username: {
+        Args: { p_user_id: string; p_username: string }
+        Returns: undefined
+      }
+      validate_curriculum_schema: {
+        Args: { curriculum: Json }
+        Returns: boolean
       }
     }
     Enums: {
@@ -342,44 +460,137 @@ export type Database = {
   }
 }
 
-// ── Utility types ────────────────────────────────────────────
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
 type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
-export type Tables<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T]["Row"]
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
-export type TablesInsert<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T]["Insert"]
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
-export type TablesUpdate<T extends keyof DefaultSchema["Tables"]> =
-  DefaultSchema["Tables"][T]["Update"]
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
-export type Enums<T extends keyof DefaultSchema["Enums"]> =
-  DefaultSchema["Enums"][T]
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
-// ── Shorthand types (usali nel codice) ───────────────────────
-export type Profile     = Tables<"profiles">
-export type Course      = Tables<"courses">
-export type MediaAsset  = Tables<"media_assets">
-export type Subscription = Tables<"subscriptions">
-export type UsageEvent  = Tables<"usage_events">
-export type Waitlist    = Tables<"waitlist">
-
-export type PlanType          = Enums<"plan_type">
-export type GenerationStatus  = Enums<"generation_status">
-export type ContentType       = Enums<"content_type">
-export type CourseLevel       = Enums<"course_level">
-export type SubscriptionStatus = Enums<"subscription_status">
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {
     Enums: {
-      content_type: ["text", "audio", "video", "mixed"] as const,
-      course_level: ["beginner", "intermediate", "advanced"] as const,
-      generation_status: ["pending", "generating", "ready", "failed"] as const,
-      plan_type: ["free", "pro", "team"] as const,
-      subscription_status: ["active", "canceled", "past_due", "trialing", "incomplete"] as const,
+      content_type: ["text", "audio", "video", "mixed"],
+      course_level: ["beginner", "intermediate", "advanced"],
+      generation_status: ["pending", "generating", "ready", "failed"],
+      plan_type: ["free", "pro", "team"],
+      subscription_status: [
+        "active",
+        "canceled",
+        "past_due",
+        "trialing",
+        "incomplete",
+      ],
     },
   },
 } as const

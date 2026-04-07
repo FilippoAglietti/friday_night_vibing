@@ -99,7 +99,7 @@ export async function GET(
     // ── Fetch course and verify ownership ───────────────────────
     const { data: course, error: fetchError } = await supabase
       .from("courses")
-      .select("id, status, curriculum, error_message, user_id")
+      .select("id, status, curriculum, error_message, user_id, generation_progress, generation_total_modules, generation_completed_modules")
       .eq("id", courseId)
       .eq("user_id", user.id)
       .single();
@@ -143,6 +143,19 @@ export async function GET(
     } else if (course.status === "failed" && course.error_message) {
       // Include error details for failed courses
       baseResponse.error_message = course.error_message;
+    }
+
+    // Include generation progress for courses that are still generating
+    if (course.status === "generating") {
+      if (course.generation_progress) {
+        baseResponse.generation_progress = course.generation_progress;
+      }
+      if (course.generation_total_modules) {
+        baseResponse.generation_total_modules = course.generation_total_modules;
+      }
+      if (course.generation_completed_modules != null) {
+        baseResponse.generation_completed_modules = course.generation_completed_modules;
+      }
     }
 
     const res = NextResponse.json(baseResponse, { status: 200 });

@@ -36,12 +36,17 @@ export const dynamic = "force-dynamic";
  */
 export const maxDuration = 300;
 
-import { buildCurriculumPrompt } from "@/lib/prompts/curriculum";
+import {
+  buildCurriculumPrompt,
+  buildSkeletonCurriculumPrompt,
+  buildModuleDetailCurriculumPrompt,
+} from "@/lib/prompts/curriculum";
 import type {
   GenerateRequest,
   GenerateAsyncResponse,
   GenerateErrorResponse,
   Curriculum,
+  Module,
   AudienceLevel,
   CourseLength,
   TeachingStyle,
@@ -317,113 +322,244 @@ async function callClaudeWithRetry(
   }
 }
 
+// ─── JSON parsing helper ─────────────────────────────────────
+
 /**
- * Calls the Anthropic Claude API with the curriculum generation prompt
- * and parses the JSON response into a typed Curriculum object.
+ * Parses a raw Claude response string into a JSON object.
+ * Handles code fences, preamble text, and truncated JSON.
  *
- * Uses claude-sonnet-4-6 for the best balance of quality and speed.
- * max_tokens is scaled based on course length (mini=8k, beginner=16k, intermediate=24k, advanced=32k).
- * Includes retry logic with exponential backoff and 60-second timeout.
- *
- * @param request - Validated generation request
- * @returns Parsed Curriculum object
- * @throws Error if the API call fails or returns invalid JSON
+ * @param rawText - Raw text from Claude's response
+ * @param stopReason - Claude's stop_reason for logging
+ * @param label - Label for log messages (e.g. "skeleton", "module mod-1")
+ * @returns Parsed JSON object
+ * @throws Error if parsing fails after all strategies
  */
-async function generateCurriculum(request: GenerateRequest): Promise<Curriculum> {
-  // Initialise the Anthropic SDK with the API key from environment variables
-  const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
-  });
-
-  // Build the system + user messages from the prompt factory
-  const { system, messages } = buildCurriculumPrompt(request);
-
-  // Call Claude with retry logic and timeout
-  // max_tokens is scaled based on the requested course length
-  const response = await callClaudeWithRetry(anthropic, system, messages, request.length);
-
-  // Extract the text content from the response
-  const textBlock = response.content.find((block) => block.type === "text");
-  if (!textBlock || textBlock.type !== "text") {
-    throw new Error("Claude returned an empty or non-text response.");
+function parseClaudeJson<T>(rawText: string, stopReason: string | null, label: string): T {
+  if (stopReason === "max_tokens") {
+    console.warn(`[/api/generate] [${label}] Response truncated (hit max_tokens). Attempting repair...`);
   }
 
-  const rawText = textBlock.text.trim();
-
-  // Check if the response was truncated (stop_reason === "max_tokens")
-  // A truncated JSON will never parse correctly, so warn early
-  if (response.stop_reason === "max_tokens") {
-    console.warn("[/api/generate] Response was truncated (hit max_tokens). Attempting JSON repair...");
-  }
-
-  // Pre-process: strip markdown code fences if present (even without closing ```)
-  // Claude sometimes wraps JSON in ```json ... ``` despite being told not to.
-  // On truncated responses the closing ``` won't exist, so we strip the opening.
+  // Pre-process: strip markdown code fences
   let cleanText = rawText;
   const fenceStart = cleanText.match(/^```(?:json)?\s*\n?/);
   if (fenceStart) {
     cleanText = cleanText.slice(fenceStart[0].length);
-    // Remove closing fence if present
     const fenceEnd = cleanText.lastIndexOf("```");
     if (fenceEnd !== -1) {
       cleanText = cleanText.slice(0, fenceEnd).trim();
     }
   }
 
-  // Parse the JSON — Claude should return pure JSON per our prompt instructions.
-  // Sometimes Claude adds preamble text, so we try multiple extraction strategies.
-  let curriculum: Curriculum | undefined;
+  // Strategy 1: Direct parse
   try {
-    // Strategy 1: Direct parse (ideal case — pure JSON or after fence stripping)
-    curriculum = JSON.parse(cleanText) as Curriculum;
-  } catch {
-    let parsed = false;
+    return JSON.parse(cleanText) as T;
+  } catch { /* continue */ }
 
-    // Strategy 2: Find the first '{' and last '}' to extract the JSON object
-    if (!parsed) {
-      const firstBrace = cleanText.indexOf("{");
-      const lastBrace = cleanText.lastIndexOf("}");
-      if (firstBrace !== -1 && lastBrace > firstBrace) {
-        try {
-          curriculum = JSON.parse(
-            cleanText.slice(firstBrace, lastBrace + 1)
-          ) as Curriculum;
-          parsed = true;
-        } catch { /* fall through to strategy 3 */ }
-      }
-    }
-
-    // Strategy 3: Repair truncated JSON (when response hit max_tokens)
-    // Extract from first '{' and attempt to close unclosed brackets/braces
-    if (!parsed) {
-      const firstBrace = cleanText.indexOf("{");
-      if (firstBrace !== -1) {
-        const truncatedJson = cleanText.slice(firstBrace);
-        const repairedJson = repairTruncatedJson(truncatedJson);
-        try {
-          curriculum = JSON.parse(repairedJson) as Curriculum;
-          parsed = true;
-          console.warn("[/api/generate] JSON was repaired after truncation — some content may be incomplete.");
-        } catch { /* fall through to error */ }
-      }
-    }
-
-    if (!parsed) {
-      const preview = rawText.substring(0, 300).replace(/\n/g, "\\n");
-      const tail = rawText.substring(Math.max(0, rawText.length - 150)).replace(/\n/g, "\\n");
-      console.error("[/api/generate] Raw Claude response (first 300 chars):", preview);
-      console.error("[/api/generate] Raw Claude response (last 150 chars):", tail);
-      console.error("[/api/generate] Response length:", rawText.length, "stop_reason:", response.stop_reason);
-      throw new Error(
-        `JSON parse failed (len=${rawText.length}, stop=${response.stop_reason}). Start: ${preview.substring(0, 120)}...`
-      );
-    }
+  // Strategy 2: Extract JSON object between first { and last }
+  const firstBrace = cleanText.indexOf("{");
+  const lastBrace = cleanText.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    try {
+      return JSON.parse(cleanText.slice(firstBrace, lastBrace + 1)) as T;
+    } catch { /* continue */ }
   }
 
-  if (!curriculum) {
-    throw new Error("Failed to parse curriculum JSON");
+  // Strategy 3: Repair truncated JSON
+  if (firstBrace !== -1) {
+    const repairedJson = repairTruncatedJson(cleanText.slice(firstBrace));
+    try {
+      const result = JSON.parse(repairedJson) as T;
+      console.warn(`[/api/generate] [${label}] JSON repaired after truncation — content may be incomplete.`);
+      return result;
+    } catch { /* continue */ }
   }
-  return curriculum;
+
+  // All strategies failed
+  const preview = rawText.substring(0, 300).replace(/\n/g, "\\n");
+  const tail = rawText.substring(Math.max(0, rawText.length - 150)).replace(/\n/g, "\\n");
+  console.error(`[/api/generate] [${label}] Raw response (first 300):`, preview);
+  console.error(`[/api/generate] [${label}] Raw response (last 150):`, tail);
+  console.error(`[/api/generate] [${label}] Length: ${rawText.length}, stop: ${stopReason}`);
+  throw new Error(
+    `[${label}] JSON parse failed (len=${rawText.length}, stop=${stopReason}). Start: ${preview.substring(0, 120)}...`
+  );
+}
+
+// ─── Single-shot generation (for crash/short courses) ────────
+
+/**
+ * Generates a complete curriculum in a single Claude call.
+ * Best for crash and short courses (~5-12 lessons) that fit within
+ * the 5-minute Vercel Pro timeout.
+ *
+ * @param request - Validated generation request
+ * @returns Parsed Curriculum object
+ */
+async function generateCurriculumSingleShot(request: GenerateRequest): Promise<Curriculum> {
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const { system, messages } = buildCurriculumPrompt(request);
+  const response = await callClaudeWithRetry(anthropic, system, messages, request.length);
+
+  const textBlock = response.content.find((block) => block.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new Error("Claude returned an empty or non-text response.");
+  }
+
+  return parseClaudeJson<Curriculum>(textBlock.text.trim(), response.stop_reason, "single-shot");
+}
+
+// ─── Chunked generation (for full/masterclass courses) ───────
+
+/**
+ * Generates a curriculum in two phases:
+ *   Phase 1: Generate skeleton (outline with module/lesson stubs) — ~2-4k tokens, ~30-60s
+ *   Phase 2: Generate full content for each module in parallel — ~5-8k tokens each, ~1-2 min
+ *
+ * This keeps every individual Claude call under 2 minutes, well within
+ * Vercel Pro's 300s timeout even for masterclass courses with 10 modules.
+ *
+ * Progress is written to the course record after each module completes,
+ * so the frontend can show "Generating module 3 of 6..." in real-time.
+ *
+ * @param request - Validated generation request
+ * @param courseId - The course ID for progress updates
+ * @returns Assembled Curriculum object
+ */
+async function generateCurriculumChunked(
+  request: GenerateRequest,
+  courseId: string,
+): Promise<Curriculum> {
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const supabase = getSupabaseAdmin();
+
+  // ── Phase 1: Generate skeleton ─────────────────────────────
+  console.log(`[/api/generate] [${courseId}] Phase 1: Generating course skeleton...`);
+
+  await supabase.from("courses").update({
+    generation_progress: "Designing course structure...",
+    generation_total_modules: 0,
+    generation_completed_modules: 0,
+  }).eq("id", courseId);
+
+  const { system: skelSystem, messages: skelMessages } = buildSkeletonCurriculumPrompt(request);
+
+  // Skeleton is small — use 16k tokens max
+  const skelResponse = await callClaudeWithRetry(anthropic, skelSystem, skelMessages, "crash");
+
+  const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
+  if (!skelTextBlock || skelTextBlock.type !== "text") {
+    throw new Error("Skeleton: Claude returned an empty or non-text response.");
+  }
+
+  const skeleton = parseClaudeJson<Curriculum>(skelTextBlock.text.trim(), skelResponse.stop_reason, "skeleton");
+
+  const totalModules = skeleton.modules.length;
+  console.log(`[/api/generate] [${courseId}] Phase 1 complete: ${totalModules} modules, ${skeleton.modules.reduce((sum, m) => sum + m.lessons.length, 0)} lessons`);
+
+  // Update progress with module count
+  await supabase.from("courses").update({
+    generation_progress: `Generating module 1 of ${totalModules}...`,
+    generation_total_modules: totalModules,
+    generation_completed_modules: 0,
+  }).eq("id", courseId);
+
+  // ── Phase 2: Generate module details in parallel batches ────
+  // Run modules in parallel batches of 3 to avoid overwhelming the API
+  // while still being much faster than sequential generation.
+  const BATCH_SIZE = 3;
+  const detailedModules: Module[] = new Array(totalModules);
+  let completedModules = 0;
+
+  for (let batchStart = 0; batchStart < totalModules; batchStart += BATCH_SIZE) {
+    const batchEnd = Math.min(batchStart + BATCH_SIZE, totalModules);
+    const batchIndices = Array.from({ length: batchEnd - batchStart }, (_, i) => batchStart + i);
+
+    console.log(`[/api/generate] [${courseId}] Phase 2: Generating modules ${batchStart + 1}-${batchEnd} of ${totalModules}...`);
+
+    // Run this batch in parallel
+    const batchResults = await Promise.all(
+      batchIndices.map(async (moduleIndex) => {
+        const moduleData = skeleton.modules[moduleIndex];
+        const { system: modSystem, messages: modMessages } = buildModuleDetailCurriculumPrompt(
+          request,
+          skeleton.title,
+          skeleton.description,
+          moduleData,
+          moduleIndex,
+          totalModules,
+        );
+
+        // Each module needs ~8k tokens for content
+        const modResponse = await callClaudeWithRetry(anthropic, modSystem, modMessages, "short");
+
+        const modTextBlock = modResponse.content.find((block) => block.type === "text");
+        if (!modTextBlock || modTextBlock.type !== "text") {
+          throw new Error(`Module ${moduleData.id}: Claude returned an empty response.`);
+        }
+
+        const moduleDetail = parseClaudeJson<{ lessons: Module["lessons"]; quiz: Module["quiz"] }>(
+          modTextBlock.text.trim(),
+          modResponse.stop_reason,
+          `module ${moduleData.id}`,
+        );
+
+        // Merge the detailed lessons/quiz into the skeleton module
+        return {
+          ...moduleData,
+          lessons: moduleDetail.lessons,
+          quiz: moduleDetail.quiz || [],
+        } as Module;
+      })
+    );
+
+    // Store results and update progress
+    for (let i = 0; i < batchResults.length; i++) {
+      detailedModules[batchIndices[i]] = batchResults[i];
+      completedModules++;
+    }
+
+    // Update progress in DB after each batch
+    const progressMsg = completedModules < totalModules
+      ? `Generating module ${completedModules + 1} of ${totalModules}...`
+      : "Finalizing course...";
+
+    await supabase.from("courses").update({
+      generation_progress: progressMsg,
+      generation_completed_modules: completedModules,
+    }).eq("id", courseId);
+
+    console.log(`[/api/generate] [${courseId}] Phase 2: ${completedModules}/${totalModules} modules complete`);
+  }
+
+  // ── Phase 3: Assemble final curriculum ─────────────────────
+  const finalCurriculum: Curriculum = {
+    ...skeleton,
+    modules: detailedModules,
+  };
+
+  console.log(`[/api/generate] [${courseId}] Chunked generation complete: ${totalModules} modules assembled`);
+  return finalCurriculum;
+}
+
+/**
+ * Main entry point for curriculum generation.
+ * Routes to single-shot or chunked generation based on course length.
+ *
+ * - crash / short → single-shot (fast, fits in one call)
+ * - full / masterclass → chunked (skeleton + per-module, parallel)
+ *
+ * @param request - Validated generation request
+ * @param courseId - The course ID for progress updates (used by chunked)
+ * @returns Parsed Curriculum object
+ */
+async function generateCurriculum(request: GenerateRequest, courseId: string): Promise<Curriculum> {
+  if (request.length === "crash" || request.length === "short") {
+    console.log(`[/api/generate] [${courseId}] Using single-shot generation for ${request.length} course`);
+    return generateCurriculumSingleShot(request);
+  } else {
+    console.log(`[/api/generate] [${courseId}] Using chunked generation for ${request.length} course`);
+    return generateCurriculumChunked(request, courseId);
+  }
 }
 
 // ─── Supabase helpers ─────────────────────────────────────────
@@ -754,7 +890,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
   after(async () => {
     try {
       console.log("[/api/generate] Starting background generation for course:", courseId);
-      const curriculum = await generateCurriculum(generateRequest);
+      const curriculum = await generateCurriculum(generateRequest, courseId);
       await updateCourseRecord(userId, courseId, curriculum, undefined);
       console.log("[/api/generate] Background generation completed for course:", courseId);
     } catch (err) {

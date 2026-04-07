@@ -64,6 +64,10 @@ interface Generation {
   curriculum: Curriculum | null;
   status: string;
   created_at: string;
+  /** Progress fields for chunked generation */
+  generation_progress?: string | null;
+  generation_total_modules?: number | null;
+  generation_completed_modules?: number | null;
 }
 
 interface UserProfile {
@@ -322,7 +326,7 @@ export default function ProfilePage() {
       setUser(user);
       if (user) {
         const [{ data: courses }, { data: profileData }] = await Promise.all([
-          supabaseBrowser.from("courses").select("id, topic, audience, length, niche, curriculum, status, created_at").order("created_at", { ascending: false }),
+          supabaseBrowser.from("courses").select("id, topic, audience, length, niche, curriculum, status, created_at, generation_progress, generation_total_modules, generation_completed_modules").order("created_at", { ascending: false }),
           supabaseBrowser.from("profiles").select("plan, generations_used, generations_limit").eq("id", user.id).single(),
         ]);
         if (courses) setGenerations(courses as unknown as Generation[]);
@@ -343,7 +347,7 @@ export default function ProfilePage() {
     const interval = setInterval(async () => {
       const { data: courses } = await supabaseBrowser
         .from("courses")
-        .select("id, topic, audience, length, niche, curriculum, status, created_at")
+        .select("id, topic, audience, length, niche, curriculum, status, created_at, generation_progress, generation_total_modules, generation_completed_modules")
         .order("created_at", { ascending: false });
       if (courses) setGenerations(courses as unknown as Generation[]);
 
@@ -1265,34 +1269,55 @@ export default function ProfilePage() {
                 </Card>
               ) : (
                 <>
-                  {/* Generating courses — pulsing cards */}
+                  {/* Generating courses — progress cards */}
                   {generatingCourses.length > 0 && (
                     <div className="grid gap-4 sm:grid-cols-2 mb-4">
-                      {generatingCourses.map((gen) => (
-                        <Card key={gen.id} className="relative border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-indigo-500/3 to-violet-500/5 overflow-hidden">
-                          <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/5 to-violet-500/0 animate-pulse" />
-                          <div className="h-[2px] bg-gradient-to-r from-violet-500 via-indigo-500 to-violet-500 animate-pulse" />
-                          <CardHeader className="relative pb-2 pt-4">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-sm leading-snug text-violet-400">{gen.topic}</h3>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">Generating your course...</p>
+                      {generatingCourses.map((gen) => {
+                        const totalMods = gen.generation_total_modules || 0;
+                        const completedMods = gen.generation_completed_modules || 0;
+                        const hasProgress = totalMods > 0;
+                        const progressPercent = hasProgress
+                          ? Math.round(10 + (completedMods / totalMods) * 90)
+                          : 5;
+                        const progressMessage = gen.generation_progress || "AI is crafting your curriculum";
+
+                        return (
+                          <Card key={gen.id} className="relative border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-indigo-500/3 to-violet-500/5 overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/5 to-violet-500/0 animate-pulse" />
+                            <div className="h-[2px] bg-gradient-to-r from-violet-500 via-indigo-500 to-violet-500 animate-pulse" />
+                            <CardHeader className="relative pb-2 pt-4">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-semibold text-sm leading-snug text-violet-400">{gen.topic}</h3>
+                                  <p className="text-[11px] text-muted-foreground mt-0.5">{progressMessage}</p>
+                                </div>
+                                <Badge variant="outline" className="text-[10px] shrink-0 bg-violet-500/10 text-violet-400 border-violet-500/20 animate-pulse">
+                                  <Sparkles className="size-2.5 mr-1" />
+                                  {hasProgress ? `${completedMods}/${totalMods}` : "Generating"}
+                                </Badge>
                               </div>
-                              <Badge variant="outline" className="text-[10px] shrink-0 bg-violet-500/10 text-violet-400 border-violet-500/20 animate-pulse">
-                                <Sparkles className="size-2.5 mr-1" />Generating
-                              </Badge>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="relative pt-0">
-                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                              <div className="flex items-center gap-1.5">
-                                <div className="size-1.5 rounded-full bg-violet-500 animate-pulse" />
-                                <span>AI is crafting your curriculum</span>
+                            </CardHeader>
+                            <CardContent className="relative pt-0">
+                              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                                <div className="flex items-center gap-1.5">
+                                  <div className="size-1.5 rounded-full bg-violet-500 animate-pulse" />
+                                  <span>{hasProgress ? `Module ${Math.min(completedMods + 1, totalMods)} of ${totalMods}` : "Designing course structure"}</span>
+                                </div>
                               </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                              {hasProgress && (
+                                <div className="mt-3">
+                                  <div className="h-2 bg-muted/20 rounded-full w-full overflow-hidden">
+                                    <div
+                                      className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full transition-all duration-1000 ease-out"
+                                      style={{ width: `${progressPercent}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                     </div>
                   )}
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -1350,39 +1375,58 @@ export default function ProfilePage() {
                   {filteredGenerations.length} course{filteredGenerations.length !== 1 ? "s" : ""}
                   {searchQuery && ` matching "${searchQuery}"`}
                 </p>
-                {/* Generating courses — shown with pulsing animation */}
+                {/* Generating courses — shown with progress tracking */}
                 {generatingCourses.length > 0 && (
                   <div className="grid gap-4 sm:grid-cols-2 mb-4">
-                    {generatingCourses.map((gen) => (
-                      <Card key={gen.id} className="relative border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-indigo-500/3 to-violet-500/5 overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/5 to-violet-500/0 animate-pulse" />
-                        <div className="h-[2px] bg-gradient-to-r from-violet-500 via-indigo-500 to-violet-500 animate-pulse" />
-                        <CardHeader className="relative pb-2 pt-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-sm leading-snug text-violet-400">{gen.topic}</h3>
-                              <p className="text-[11px] text-muted-foreground mt-0.5">Generating your course...</p>
+                    {generatingCourses.map((gen) => {
+                      // Calculate progress percentage from chunked generation data
+                      const totalMods = gen.generation_total_modules || 0;
+                      const completedMods = gen.generation_completed_modules || 0;
+                      const hasProgress = totalMods > 0;
+                      // Skeleton phase = 10%, then modules fill the remaining 90%
+                      const progressPercent = hasProgress
+                        ? Math.round(10 + (completedMods / totalMods) * 90)
+                        : 5; // indeterminate — just show a sliver
+                      const progressMessage = gen.generation_progress || "AI is crafting your curriculum";
+
+                      return (
+                        <Card key={gen.id} className="relative border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-indigo-500/3 to-violet-500/5 overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/5 to-violet-500/0 animate-pulse" />
+                          <div className="h-[2px] bg-gradient-to-r from-violet-500 via-indigo-500 to-violet-500 animate-pulse" />
+                          <CardHeader className="relative pb-2 pt-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-sm leading-snug text-violet-400">{gen.topic}</h3>
+                                <p className="text-[11px] text-muted-foreground mt-0.5">{progressMessage}</p>
+                              </div>
+                              <Badge variant="outline" className="text-[10px] shrink-0 bg-violet-500/10 text-violet-400 border-violet-500/20 animate-pulse">
+                                <Sparkles className="size-2.5 mr-1" />
+                                {hasProgress ? `${completedMods}/${totalMods}` : "Generating"}
+                              </Badge>
                             </div>
-                            <Badge variant="outline" className="text-[10px] shrink-0 bg-violet-500/10 text-violet-400 border-violet-500/20 animate-pulse">
-                              <Sparkles className="size-2.5 mr-1" />Generating
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="relative pt-0">
-                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                            <div className="flex items-center gap-1.5">
-                              <div className="size-1.5 rounded-full bg-violet-500 animate-pulse" />
-                              <span>AI is crafting your curriculum</span>
+                          </CardHeader>
+                          <CardContent className="relative pt-0">
+                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                              <div className="flex items-center gap-1.5">
+                                <div className="size-1.5 rounded-full bg-violet-500 animate-pulse" />
+                                <span>{hasProgress ? `Module ${completedMods + 1 > totalMods ? totalMods : completedMods + 1} of ${totalMods}` : "Designing course structure"}</span>
+                              </div>
                             </div>
-                          </div>
-                          <div className="mt-3 space-y-2">
-                            <div className="h-2 bg-muted/20 rounded-full w-full overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-violet-500/40 to-indigo-500/40 rounded-full animate-[pulse_2s_ease-in-out_infinite] w-2/3" />
+                            <div className="mt-3 space-y-2">
+                              <div className="h-2 bg-muted/20 rounded-full w-full overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full transition-all duration-1000 ease-out"
+                                  style={{ width: `${progressPercent}%` }}
+                                />
+                              </div>
+                              {hasProgress && (
+                                <p className="text-[10px] text-muted-foreground/60 text-right">{progressPercent}%</p>
+                              )}
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
                 <div className="grid gap-4 sm:grid-cols-2">
