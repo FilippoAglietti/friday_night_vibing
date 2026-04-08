@@ -55,22 +55,25 @@ import {
 const PROMO_EXPIRES = new Date("2026-05-11T23:59:59Z");
 
 function useCountdown(target: Date) {
-  const [now, setNow] = useState(new Date());
+  // Start with null to avoid hydration mismatch (server date ≠ client date)
+  const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
+    setNow(new Date());
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+  if (!now) return { days: 0, hours: 0, mins: 0, secs: 0, expired: false, ready: false };
   const diff = Math.max(0, target.getTime() - now.getTime());
   const days  = Math.floor(diff / 86_400_000);
   const hours = Math.floor((diff % 86_400_000) / 3_600_000);
   const mins  = Math.floor((diff % 3_600_000) / 60_000);
   const secs  = Math.floor((diff % 60_000) / 1000);
-  return { days, hours, mins, secs, expired: diff === 0 };
+  return { days, hours, mins, secs, expired: diff === 0, ready: true };
 }
 
 function CountdownInline() {
-  const { days, hours, mins, secs, expired } = useCountdown(PROMO_EXPIRES);
-  if (expired) return null;
+  const { days, hours, mins, secs, expired, ready } = useCountdown(PROMO_EXPIRES);
+  if (!ready || expired) return null;
   return (
     <span className="inline-flex items-center gap-1 text-xs font-mono tabular-nums">
       <span className="font-bold text-rose-400">{days}d</span>
