@@ -54,6 +54,7 @@ import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
+import { generateCurriculumXlsx } from "@/lib/exports/generateXlsx";
 import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength } from "@/components/CurriculumForm";
@@ -598,6 +599,22 @@ export default function ProfilePage() {
     }
   }, []);
 
+  const handleExportXlsx = useCallback(async (curriculum: Curriculum) => {
+    try {
+      const blob = await generateCurriculumXlsx(curriculum);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Failed to export XLSX:", e);
+    }
+  }, []);
+
   const handleShareCourse = useCallback((gen: Generation) => {
     const encoded = btoa(encodeURIComponent(JSON.stringify(gen.curriculum)));
     const url = `${window.location.origin}/share?data=${encoded}`;
@@ -880,6 +897,13 @@ export default function ProfilePage() {
                         onClick={(e) => { e.stopPropagation(); handleExportPptx(c); }}
                       >
                         <Presentation className="size-3" /> Slides
+                      </Button>
+                      <Button
+                        variant="outline" size="sm"
+                        className="h-7 text-[10px] gap-1 border-emerald-500/20 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/30 col-span-2"
+                        onClick={(e) => { e.stopPropagation(); handleExportXlsx(c); }}
+                      >
+                        <FileDown className="size-3" /> Excel
                       </Button>
                     </div>
                   </div>

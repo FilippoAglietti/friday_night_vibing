@@ -18,7 +18,6 @@ import {
   Download,
   ExternalLink,
   FileText,
-  GraduationCap,
   HelpCircle,
   LayoutGrid,
   Lightbulb,
@@ -38,7 +37,7 @@ import AudioPlayer, { type AudioTrack } from "@/components/AudioPlayer";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
-import { generateScormPackage } from "@/lib/exports/generateScorm";
+import { generateCurriculumXlsx } from "@/lib/exports/generateXlsx";
 import { generateShareableUrl, type LeadMagnetSettings } from "@/lib/exports/generateShareUrl";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource } from "@/types/curriculum";
@@ -391,22 +390,22 @@ export default function CurriculumOutput({
     }
   };
 
-  const handleExportScorm = async () => {
+  const handleExportXlsx = async () => {
     try {
-      setLoadingExports((prev) => ({ ...prev, scorm: true }));
-      const blob = await generateScormPackage(curriculum);
+      setLoadingExports((prev) => ({ ...prev, xlsx: true }));
+      const blob = await generateCurriculumXlsx(curriculum);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${sanitizeFilename(curriculum.title)}_scorm.zip`;
+      a.download = `${sanitizeFilename(curriculum.title)}.xlsx`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error("Failed to generate SCORM package:", e);
+      console.error("Failed to generate Excel workbook:", e);
     } finally {
-      setLoadingExports((prev) => ({ ...prev, scorm: false }));
+      setLoadingExports((prev) => ({ ...prev, xlsx: false }));
     }
   };
 
@@ -811,13 +810,13 @@ export default function CurriculumOutput({
             {loadingExports.pptx ? "Generating..." : "Slides"}
           </Button>
           <Button
-            onClick={handleExportScorm}
-            disabled={loadingExports.scorm}
+            onClick={handleExportXlsx}
+            disabled={loadingExports.xlsx}
             className="flex-1 gap-2 min-w-[140px] bg-emerald-600 hover:bg-emerald-700 text-white border-0"
             size="lg"
           >
-            <GraduationCap className="h-4 w-4" />
-            {loadingExports.scorm ? "Generating..." : "SCORM"}
+            <LayoutGrid className="h-4 w-4" />
+            {loadingExports.xlsx ? "Generating..." : "Excel"}
           </Button>
           <Button
             onClick={handleShareLink}
