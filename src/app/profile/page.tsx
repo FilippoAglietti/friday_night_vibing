@@ -54,7 +54,6 @@ import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
-import { generateCurriculumXlsx } from "@/lib/exports/generateXlsx";
 import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength } from "@/components/CurriculumForm";
@@ -599,25 +598,9 @@ export default function ProfilePage() {
     }
   }, []);
 
-  const handleExportXlsx = useCallback(async (curriculum: Curriculum) => {
-    try {
-      const blob = await generateCurriculumXlsx(curriculum);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("Failed to export XLSX:", e);
-    }
-  }, []);
-
   const handleShareCourse = useCallback((gen: Generation) => {
-    const encoded = btoa(encodeURIComponent(JSON.stringify(gen.curriculum)));
-    const url = `${window.location.origin}/share?data=${encoded}`;
+    if (!gen.curriculum) return;
+    const url = generateShareableUrl(gen.curriculum);
     navigator.clipboard.writeText(url);
     setCopiedId(gen.id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -897,13 +880,6 @@ export default function ProfilePage() {
                         onClick={(e) => { e.stopPropagation(); handleExportPptx(c); }}
                       >
                         <Presentation className="size-3" /> Slides
-                      </Button>
-                      <Button
-                        variant="outline" size="sm"
-                        className="h-7 text-[10px] gap-1 border-emerald-500/20 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/30 col-span-2"
-                        onClick={(e) => { e.stopPropagation(); handleExportXlsx(c); }}
-                      >
-                        <FileDown className="size-3" /> Excel
                       </Button>
                     </div>
                   </div>
@@ -1381,8 +1357,8 @@ export default function ProfilePage() {
                                       <Button variant="ghost" size="sm" className="h-6 px-2 text-[9px] gap-1 hover:bg-amber-500/10 hover:text-amber-400"
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          const encoded = btoa(encodeURIComponent(JSON.stringify(c)));
-                                          window.open(`/share?data=${encoded}`, "_blank");
+                                          sessionStorage.setItem("syllabi_preview", JSON.stringify(c));
+                                          window.open("/share", "_blank");
                                         }}
                                       >
                                         <Eye className="size-2.5" />View

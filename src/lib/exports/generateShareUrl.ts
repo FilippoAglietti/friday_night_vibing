@@ -35,7 +35,9 @@ export function generateShareableUrl(
       payload.leadMagnet = leadMagnet;
     }
     const jsonString = JSON.stringify(payload);
-    const encoded = Buffer.from(jsonString).toString("base64");
+    const encoded = typeof window !== "undefined"
+      ? btoa(unescape(encodeURIComponent(jsonString)))
+      : Buffer.from(jsonString).toString("base64");
 
     // Build the shareable URL
     if (typeof window !== "undefined") {
@@ -56,15 +58,29 @@ export function generateShareableUrl(
  */
 export function decodeSharePayload(encodedData: string): SharePayload | null {
   try {
-    const jsonString = Buffer.from(encodedData, "base64").toString("utf-8");
-    const parsed = JSON.parse(jsonString);
+    // Browser-safe base64 decode (handles UTF-8 properly)
+    let jsonString: string;
+    if (typeof window !== "undefined") {
+      jsonString = decodeURIComponent(escape(atob(encodedData)));
+    } else {
+      jsonString = Buffer.from(encodedData, "base64").toString("utf-8");
+    }
+
+    // Backwards compat: old URLs used btoa(encodeURIComponent(json))
+    // which produces URI-encoded JSON after atob — try decoding that too
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = JSON.parse(jsonString);
+    } catch {
+      parsed = JSON.parse(decodeURIComponent(jsonString));
+    }
 
     // Backwards compat: old URLs encoded a raw Curriculum (has .modules)
     if (parsed.modules && !parsed.curriculum) {
-      return { curriculum: parsed as Curriculum };
+      return { curriculum: parsed as unknown as Curriculum };
     }
 
-    return parsed as SharePayload;
+    return parsed as unknown as SharePayload;
   } catch (error) {
     console.error("Failed to decode share payload:", error);
     return null;

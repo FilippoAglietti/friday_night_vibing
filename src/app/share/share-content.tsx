@@ -17,9 +17,24 @@ export default function SharePageContent() {
   const [emailError, setEmailError] = useState("");
 
   const payload = useMemo<SharePayload | null>(() => {
+    // 1. Try URL param (public share links)
     const data = searchParams.get("data");
-    if (!data) return null;
-    return decodeSharePayload(data);
+    if (data) return decodeSharePayload(data);
+
+    // 2. Try sessionStorage (local preview — handles large curricula that exceed URL limits)
+    try {
+      const stored = sessionStorage.getItem("syllabi_preview");
+      if (stored) {
+        sessionStorage.removeItem("syllabi_preview");
+        const parsed = JSON.parse(stored);
+        if (parsed.modules && !parsed.curriculum) {
+          return { curriculum: parsed } as SharePayload;
+        }
+        return parsed as SharePayload;
+      }
+    } catch { /* ignore */ }
+
+    return null;
   }, [searchParams]);
 
   const curriculum = payload?.curriculum ?? null;
