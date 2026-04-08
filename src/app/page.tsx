@@ -416,7 +416,7 @@ export default function Home() {
 
   return (
     <div
-      className="relative overflow-x-hidden bg-background text-foreground transition-colors duration-300"
+      className="relative overflow-hidden bg-background text-foreground transition-colors duration-300 md:h-screen"
     >
       {/* ── Scroll Progress Bar ─────────────────────────── */}
       <ScrollProgress container={containerRef} />
@@ -1352,12 +1352,11 @@ export default function Home() {
           </div>
         </section>
       </main>
-      </div> {/* end snap-scroll-container */}
 
       {/* ═══════════════════════════════════════════════════
-          FOOTER
+          FOOTER (inside snap container so no content leaks)
       ═══════════════════════════════════════════════════ */}
-      <footer className="relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-xl">
+      <footer className="snap-section-footer relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:py-12 sm:px-6">
           <div className="grid gap-8 grid-cols-2 lg:grid-cols-4">
             {/* Brand */}
@@ -1530,6 +1529,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      </div> {/* end snap-scroll-container */}
 
       {/* ── Modals ─────────────────────────────────────── */}
       <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />

@@ -214,17 +214,20 @@
 /* ─── Scroll Snap ─────────────────────────────────────── */
 .snap-scroll-container {
   height: 100svh;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
-  scroll-snap-type: y proximity;
+  scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
   scroll-padding-top: 3.5rem; /* 56px nav height */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Disable snap scroll on mobile — content overflows single screens */
+/* Disable snap on mobile — content overflows single screens */
 @media (max-width: 767px) {
   .snap-scroll-container {
     scroll-snap-type: none;
+    height: auto;
+    overflow: visible;
   }
 }
 
@@ -239,11 +242,19 @@
   min-height: 100vh;
 }
 
-/* On mobile, let sections be natural height instead of forcing viewport */
+/* Footer snaps to end — doesn't need full height */
+.snap-section-footer {
+  scroll-snap-align: end;
+}
+
+/* On mobile, natural height — no snapping */
 @media (max-width: 767px) {
   .snap-section {
     scroll-snap-align: none;
     min-height: auto;
+  }
+  .snap-section-footer {
+    scroll-snap-align: none;
   }
 }
 
