@@ -28,7 +28,8 @@ import {
   Target,
   Trophy,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import AudioPlayer, { type AudioTrack } from "@/components/AudioPlayer";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
@@ -594,6 +595,24 @@ export default function CurriculumOutput({
 }: CurriculumOutputProps) {
   const [copied, setCopied] = useState(false);
   const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
+  const [showAudioPlayer, setShowAudioPlayer] = useState(true);
+
+  // Build audio tracks from curriculum modules/lessons
+  const audioTracks = useMemo<AudioTrack[]>(() => {
+    const tracks: AudioTrack[] = [];
+    curriculum.modules.forEach((mod, mi) => {
+      mod.lessons.forEach((lesson, li) => {
+        tracks.push({
+          id: `${mi}-${li}`,
+          title: lesson.title,
+          subtitle: `Module ${mi + 1} · Lesson ${li + 1}`,
+          duration: lesson.durationMinutes * 60,
+          url: (lesson as unknown as Record<string, unknown>).audioUrl as string | undefined, // will be undefined until backend generates audio
+        });
+      });
+    });
+    return tracks;
+  }, [curriculum]);
 
   const totalLessons = curriculum.modules.reduce(
     (acc, m) => acc + (m.lessons?.length || 0),
@@ -739,6 +758,15 @@ export default function CurriculumOutput({
           </div>
         </CardHeader>
       </Card>
+
+      {/* ── Audio Player ── */}
+      {showAudioPlayer && audioTracks.length > 0 && (
+        <AudioPlayer
+          tracks={audioTracks}
+          courseTitle={curriculum.title}
+          onClose={() => setShowAudioPlayer(false)}
+        />
+      )}
 
       {/* ── Learning Outcomes ── */}
       {curriculum.objectives && curriculum.objectives.length > 0 && (
