@@ -300,7 +300,7 @@ Return ONLY this JSON structure (lessons are stubs with NO content/keyPoints/sug
     {
       "id": "mod-1",
       "title": "Module title",
-      "description": "One paragraph describing what this module covers and why",
+      "description": "1-2 sentence summary of the module",
       "objectives": ["2-3 module-level learning objectives"],
       "order": 0,
       "durationMinutes": 90,
@@ -308,10 +308,10 @@ Return ONLY this JSON structure (lessons are stubs with NO content/keyPoints/sug
         {
           "id": "lesson-1-1",
           "title": "Lesson title",
-          "description": "2-3 sentence description",
+          "description": "Single short sentence",
           "format": "video",
           "durationMinutes": 20,
-          "objectives": ["Single lesson learning objective using a Bloom's verb"],
+          "objectives": ["Single Bloom's-verb objective"],
           "order": 0
         }
       ],
@@ -345,6 +345,8 @@ Return ONLY this JSON structure (lessons are stubs with NO content/keyPoints/sug
 
 Requirements:
 - Each module must have 2-5 lesson STUBS (title + description + format + duration + objectives + order ONLY)
+- Keep lesson descriptions SHORT (one sentence max) — content is generated separately later
+- Keep module descriptions SHORT (1-2 sentences max)
 - Do NOT include keyPoints, content, suggestedResources, or quiz in lessons — leave them out
 - Set quiz to empty array [] for every module (quizzes are generated later)
 - ${includeQuizzes ? "Quizzes WILL be added later — just plan the right number of lessons per module" : "No quizzes will be added"}

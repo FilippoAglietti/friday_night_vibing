@@ -491,12 +491,14 @@ async function generateCurriculumChunked(
 
   const { system: skelSystem, messages: skelMessages } = buildSkeletonCurriculumPrompt(request);
 
-  // Skeleton is structure-only — 8k tokens is plenty.
-  // Italian/advanced/academic topics can take 90-120s; 150s timeout
-  // gives headroom. No retry on timeout (would eat too much budget).
+  // Skeleton is structure-only, but masterclass (6-10 modules × 2-5 lessons)
+  // in non-English (Italian tokenizes ~30% heavier) was hitting the old 8k cap
+  // and truncating mid-JSON. 16k tokens is the new safe ceiling — comfortably
+  // fits even a full 10-module Italian academic skeleton without bloating the
+  // phase-2 budget. Timeout raised to 200s accordingly (streaming ~2x longer).
   const skelResponse = await callClaudeWithRetry(
-    anthropic, skelSystem, skelMessages, request.length, 1, 8192,
-    `${courseId}/skeleton`, 150_000,
+    anthropic, skelSystem, skelMessages, request.length, 1, 16384,
+    `${courseId}/skeleton`, 200_000,
   );
 
   const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
