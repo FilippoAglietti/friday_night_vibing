@@ -159,11 +159,11 @@ const exampleCurricula = [
 ];
 
 const freePlanFeatures = [
-  { text: "1 free mini-course generation", included: true },
-  { text: "Basic modules & lessons", included: true },
-  { text: "JSON export", included: true },
-  { text: "Notion export", included: false },
-  { text: "Quizzes & assessments", included: false },
+  { text: "3 free mini-course generations", included: true },
+  { text: "Modules, lessons & quizzes", included: true },
+  { text: "PDF & Notion export", included: true },
+  { text: "Shareable course links", included: true },
+  { text: "Audio narration", included: false },
   { text: "Unlimited generations", included: false },
 ];
 
@@ -1192,7 +1192,7 @@ export default function Home() {
                       </span>
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      Perfect for trying Syllabi out. No strings attached.
+                      Create 3 mini-courses free. No credit card required.
                     </p>
                   </CardHeader>
                   <CardContent className="flex-1">
@@ -1405,7 +1405,7 @@ export default function Home() {
                     <CardHeader className="pt-6 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Free</CardDescription>
                       <CardTitle className="text-2xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/forever</span></CardTitle>
-                      <p className="text-xs text-muted-foreground">Try Syllabi with one free generation.</p>
+                      <p className="text-xs text-muted-foreground">Create 3 mini-courses free. No card required.</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
                       <ul className="space-y-2">

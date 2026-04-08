@@ -358,7 +358,7 @@ export default function ProfilePage() {
         ]);
         if (courses) setGenerations(courses as unknown as Generation[]);
         setUserProfile(
-          (profileData as UserProfile | null) ?? { plan: "free", generations_used: 0, generations_limit: 1 }
+          (profileData as UserProfile | null) ?? { plan: "free", generations_used: 0, generations_limit: 3 }
         );
       }
       setLoading(false);
@@ -1753,7 +1753,7 @@ export default function ProfilePage() {
                   <div>
                     <p className="font-semibold text-sm">{planLabel} Plan</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {userProfile?.plan === "free" ? "1 generation included" : userProfile?.plan === "pro" ? "50 generations / month" : userProfile && userProfile.generations_limit > 0 && userProfile.generations_limit < 1000 ? `${userProfile.generations_limit} Pro Max generations` : "Unlimited generations"}
+                      {userProfile?.plan === "free" ? "3 mini-course generations included" : userProfile?.plan === "pro" ? "Unlimited generations" : userProfile && userProfile.generations_limit > 0 && userProfile.generations_limit < 1000 ? `${userProfile.generations_limit} Pro Max generations` : "Unlimited generations"}
                     </p>
                   </div>
                   <Badge variant="outline" className={`text-xs ${planBadgeClass}`}>{planLabel}</Badge>

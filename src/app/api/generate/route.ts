@@ -880,7 +880,7 @@ async function createSupabaseServer() {
 
 /**
  * Checks whether the authenticated user is allowed to generate a curriculum.
- * Free plan: 1 generation total.
+ * Free plan: 3 mini-course generations.
  * Pro plan: unlimited.
  *
  * @param userId - The authenticated user's UUID

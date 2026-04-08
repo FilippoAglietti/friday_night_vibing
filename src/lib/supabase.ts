@@ -185,7 +185,7 @@ create table public.profiles (
   email             text not null,
   plan              text not null default 'free' check (plan in ('free', 'pro')),
   generations_used  integer not null default 0,
-  generations_limit integer not null default 1, -- free = 1, pro = 999999
+  generations_limit integer not null default 3, -- free = 3, pro = 999999
   created_at        timestamp with time zone default now() not null,
   updated_at        timestamp with time zone default now() not null
 );
