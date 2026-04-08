@@ -41,6 +41,7 @@ import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
 import { generateShareableUrl, type LeadMagnetSettings } from "@/lib/exports/generateShareUrl";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
+import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
 import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource } from "@/types/curriculum";
 
 interface CurriculumOutputProps {
@@ -287,6 +288,7 @@ export default function CurriculumOutput({
   onGenerateAnother,
 }: CurriculumOutputProps) {
   const [copied, setCopied] = useState(false);
+  const [notionCopied, setNotionCopied] = useState(false);
   const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
   const [showAudioPlayer, setShowAudioPlayer] = useState(true);
   const [leadMagnet, setLeadMagnet] = useState<LeadMagnetSettings>({
@@ -340,17 +342,12 @@ export default function CurriculumOutput({
     }
   };
 
-  const handleExportNotion = () => {
-    const md = generateNotionMarkdown(curriculum);
-    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${sanitizeFilename(curriculum.title)}_notion.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleExportNotion = async () => {
+    const ok = await copyNotionHtmlToClipboard(curriculum);
+    if (ok) {
+      setNotionCopied(true);
+      setTimeout(() => setNotionCopied(false), 3000);
+    }
   };
 
   const handleExportDocx = async () => {
@@ -770,7 +767,7 @@ export default function CurriculumOutput({
             size="lg"
           >
             <FileText className="h-4 w-4" />
-            Export for Notion
+            {notionCopied ? "Copied! Paste in Notion →" : "Copy for Notion"}
           </Button>
           <Button
             onClick={handleCopy}

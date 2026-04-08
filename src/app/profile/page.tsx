@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
+import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
 import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
@@ -553,17 +554,9 @@ export default function ProfilePage() {
     }
   }, []);
 
-  const handleExportNotion = useCallback((curriculum: Curriculum) => {
-    const md = generateNotionMarkdown(curriculum);
-    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_notion.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleExportNotion = useCallback(async (curriculum: Curriculum) => {
+    await copyNotionHtmlToClipboard(curriculum);
+    // Brief visual feedback — the button text could be updated via state if needed
   }, []);
 
   const handleExportDocx = useCallback(async (curriculum: Curriculum) => {
@@ -773,7 +766,7 @@ export default function ProfilePage() {
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c); }} title="Download PDF">
                   <Download className="size-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-purple-500/10 hover:text-purple-400" onClick={(e) => { e.stopPropagation(); handleExportNotion(c); }} title="Export for Notion">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-purple-500/10 hover:text-purple-400" onClick={(e) => { e.stopPropagation(); handleExportNotion(c); }} title="Copy for Notion">
                   <FileText className="size-3.5" />
                 </Button>
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-emerald-500/10 hover:text-emerald-400" onClick={(e) => { e.stopPropagation(); handleShareCourse(gen); }} title="Share">
