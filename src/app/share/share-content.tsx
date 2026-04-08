@@ -391,21 +391,37 @@ export default function SharePageContent() {
 
         <div className="relative max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4 text-white">
-            Create Your Own Course
+            Want to create courses like this?
           </h2>
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Build beautiful, shareable courses with our easy-to-use platform.
+            Syllabi generates complete courses with audio narration, stunning design, and shareable links — in seconds.
           </p>
           <a
             href="https://syllabi.online"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 text-white font-bold rounded-lg transition shadow-lg hover:shadow-violet-500/50"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 text-white font-bold rounded-xl transition shadow-lg hover:shadow-violet-500/50 text-lg"
           >
-            Visit syllabi.online →
+            Create your first course free
           </a>
         </div>
       </section>
+
+      {/* Made with Syllabi */}
+      <div className="border-t border-white/5 py-6 text-center">
+        <a
+          href="https://syllabi.online"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-violet-400 transition-colors"
+        >
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+            <path d="M6 12v5c3 3 9 3 12 0v-5" />
+          </svg>
+          Made with Syllabi.ai
+        </a>
+      </div>
     </div>
   );
 }
