@@ -522,8 +522,16 @@ async function generateCurriculumChunked(
   // skeleton taking ~120s, we have ~150s left. Running in parallel
   // means total time = max(single module time) ≈ 90-120s, not sum.
   // The Anthropic API handles 5-8 concurrent requests fine.
+  //
+  // Fault-tolerance: we use allSettled + a skeleton-stub fallback so
+  // that one slow/failing module does not blow up the entire course.
+  // As long as we reach the MIN_SUCCESS_RATIO we accept the result and
+  // keep the skeleton stub for any module that failed — the user still
+  // gets a usable course and can hit "regenerate module" on the failed
+  // ones from the dashboard.
   console.log(`[/api/generate] [${courseId}] Phase 2: Generating ALL ${totalModules} modules in parallel...`);
 
+  const MIN_SUCCESS_RATIO = 0.6; // keep going even if 40% of modules fail
   const detailedModules: Module[] = new Array(totalModules);
   let completedModules = 0;
 
@@ -579,9 +587,44 @@ async function generateCurriculumChunked(
     return result;
   });
 
-  // Wait for ALL modules to complete
-  await Promise.all(modulePromises);
-  console.log(`[/api/generate] [${courseId}] Phase 2 complete: all ${totalModules} modules generated`);
+  // Wait for ALL modules to settle (allSettled — don't blow up on single failures)
+  const settled = await Promise.allSettled(modulePromises);
+
+  // Backfill any failed modules with their skeleton stub so the user
+  // still receives a complete, navigable course.
+  let failureCount = 0;
+  settled.forEach((outcome, i) => {
+    if (outcome.status === "rejected") {
+      failureCount++;
+      const err = outcome.reason instanceof Error ? outcome.reason.message : String(outcome.reason);
+      console.warn(
+        `[/api/generate] [${courseId}] Module ${skeleton.modules[i].id} FAILED — using skeleton stub. Reason: ${err}`
+      );
+      if (!detailedModules[i]) {
+        // Promote the skeleton module as-is; the viewer handles missing
+        // lesson.content by showing a "regenerate" prompt.
+        detailedModules[i] = {
+          ...skeleton.modules[i],
+          lessons: skeleton.modules[i].lessons.map((l) => ({ ...l })),
+          quiz: [],
+        } as Module;
+      }
+    }
+  });
+
+  const successRatio = 1 - failureCount / totalModules;
+  if (successRatio < MIN_SUCCESS_RATIO) {
+    throw new Error(
+      `Too many modules failed (${failureCount}/${totalModules} — ${(successRatio * 100).toFixed(0)}% success).`
+    );
+  }
+  if (failureCount > 0) {
+    console.warn(
+      `[/api/generate] [${courseId}] Phase 2 partially complete: ${failureCount}/${totalModules} module(s) fell back to skeleton stub.`
+    );
+  } else {
+    console.log(`[/api/generate] [${courseId}] Phase 2 complete: all ${totalModules} modules generated`);
+  }
   checkGlobalTimeout("after all modules");
 
   // ── Phase 3: Assemble final curriculum ─────────────────────
@@ -676,7 +719,12 @@ async function checkGenerationLimit(userId: string): Promise<boolean> {
   // Pro users have unlimited generations
   if (profile.plan === "pro") return true;
 
-  // Free users are limited by generations_limit (default: 1)
+  // Pro Max monthly subscribers: generations_limit = -1 means unlimited.
+  // Pro Max 5-Pack (one-time): generations_limit is a positive integer that
+  // gets decremented via generations_used just like free plans.
+  if (profile.plan === "pro_max" && profile.generations_limit < 0) return true;
+
+  // Free / Pro Max 5-Pack / any other bounded plan: limit by counter
   return profile.generations_used < profile.generations_limit;
 }
 

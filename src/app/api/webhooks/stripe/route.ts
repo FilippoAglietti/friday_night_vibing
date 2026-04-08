@@ -16,7 +16,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 // ─── Route config ─────────────────────────────────────────────
 
@@ -29,9 +29,8 @@ export const dynamic = "force-dynamic";
  * Looks up a user profile by Stripe customer ID.
  * Returns the profile id or null if not found.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function findUserByCustomerId(
-  supabaseAdmin: any,
+  supabaseAdmin: SupabaseClient,
   customerId: string
 ): Promise<string | null> {
   const { data: profiles } = await supabaseAdmin
@@ -129,38 +128,60 @@ export async function POST(req: NextRequest) {
       console.log(`[stripe-webhook] Checkout completed for user ${userId}, price: ${priceId}, plan: ${plan}`);
 
       if (plan === "5pack") {
-        // ── 5-Pack: Add 5 generations to the user's limit ──
+        // ── 5-Pack (Pro Max one-time): adds 5 premium generations and
+        //    promotes the profile to the "pro_max" tier so quality flags
+        //    downstream can unlock masterclass features. Stacks on any
+        //    existing positive balance (free users start at 3, pro_max
+        //    buyers at 0 or whatever they had left). If the user already
+        //    has unlimited pro_max (limit < 0), we leave the limit alone.
         const { data: profile } = await supabaseAdmin
           .from("profiles")
-          .select("generations_limit")
+          .select("generations_limit, plan")
           .eq("id", userId)
           .single();
 
-        const currentLimit = profile?.generations_limit ?? 1;
+        const currentLimit = profile?.generations_limit ?? 0;
+        const nextLimit = currentLimit < 0 ? currentLimit : currentLimit + 5;
 
         await supabaseAdmin
           .from("profiles")
           .update({
-            generations_limit: currentLimit + 5,
+            plan: "pro_max",
+            generations_limit: nextLimit,
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
 
-        console.log(`[stripe-webhook] Added 5 generations for user ${userId} (new limit: ${currentLimit + 5})`);
-      } else if (plan === "pro" || plan === "promax") {
-        // ── Pro / Pro Max subscription: Set plan with unlimited generations ──
+        console.log(
+          `[stripe-webhook] 5-Pack purchased by ${userId}: plan=pro_max, limit ${currentLimit} → ${nextLimit}`
+        );
+      } else if (plan === "promax") {
+        // ── Pro Max monthly subscription: unlimited (-1) ──
         await supabaseAdmin
           .from("profiles")
           .update({
-            plan: plan === "promax" ? "pro" : "pro", // both map to "pro" in DB for now
+            plan: "pro_max",
+            generations_limit: -1,
+            stripe_customer_id: session.customer as string,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+
+        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro Max monthly (unlimited)`);
+      } else if (plan === "pro") {
+        // ── Pro monthly subscription: unlimited (legacy, 999999) ──
+        await supabaseAdmin
+          .from("profiles")
+          .update({
+            plan: "pro",
             generations_limit: 999999,
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
 
-        console.log(`[stripe-webhook] Upgraded user ${userId} to ${plan}`);
+        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro monthly`);
       } else {
         console.warn(`[stripe-webhook] Unknown plan for price ${priceId}, treating as Pro`);
         await supabaseAdmin
@@ -196,17 +217,34 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // Confirm subscription is active — re-enable if it was flagged
-      await supabaseAdmin
-        .from("profiles")
-        .update({
-          plan: "pro",
-          generations_limit: 999999,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", userId);
+      // Figure out which plan the renewal corresponds to so we can
+      // re-confirm the correct tier (pro vs pro_max monthly).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const renewalPriceId = (invoice.lines?.data?.[0] as any)?.price?.id || "";
+      const renewalPlan = getPlanFromPriceId(renewalPriceId);
 
-      console.log(`[stripe-webhook] Invoice paid — confirmed pro for user ${userId}`);
+      if (renewalPlan === "promax") {
+        await supabaseAdmin
+          .from("profiles")
+          .update({
+            plan: "pro_max",
+            generations_limit: -1,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+        console.log(`[stripe-webhook] Invoice paid — confirmed pro_max for user ${userId}`);
+      } else {
+        // Default: legacy Pro monthly renewal
+        await supabaseAdmin
+          .from("profiles")
+          .update({
+            plan: "pro",
+            generations_limit: 999999,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+        console.log(`[stripe-webhook] Invoice paid — confirmed pro for user ${userId}`);
+      }
       break;
     }
 
@@ -268,7 +306,7 @@ export async function POST(req: NextRequest) {
       const currentPriceId = subscription.items.data[0]?.price?.id || "";
       const plan = getPlanFromPriceId(currentPriceId);
 
-      if (plan === "pro" || plan === "promax") {
+      if (plan === "pro") {
         await supabaseAdmin
           .from("profiles")
           .update({
@@ -277,8 +315,17 @@ export async function POST(req: NextRequest) {
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
-
-        console.log(`[stripe-webhook] Subscription updated — user ${userId} on ${plan}`);
+        console.log(`[stripe-webhook] Subscription updated — user ${userId} on pro`);
+      } else if (plan === "promax") {
+        await supabaseAdmin
+          .from("profiles")
+          .update({
+            plan: "pro_max",
+            generations_limit: -1,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+        console.log(`[stripe-webhook] Subscription updated — user ${userId} on pro_max`);
       }
 
       break;
@@ -301,7 +348,7 @@ export async function POST(req: NextRequest) {
         .from("profiles")
         .update({
           plan: "free",
-          generations_limit: 1,
+          generations_limit: 3, // Updated default per latest product spec
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);

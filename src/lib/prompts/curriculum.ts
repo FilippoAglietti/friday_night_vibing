@@ -26,7 +26,7 @@ const LENGTH_DESCRIPTIONS: Record<CourseLength, string> = {
   crash:       "1-2 modules with 4-6 lessons total. Tight, focused on one key outcome.",
   short:       "3-4 modules with 8-12 lessons total. Solid foundation with room to explore.",
   full:        "4-6 modules with 12-18 lessons total. In-depth coverage balancing breadth and depth.",
-  masterclass: "5-7 modules with 15-25 lessons total. Comprehensive deep dive from foundation to mastery.",
+  masterclass: "6-10 modules with 20-30 lessons total. Comprehensive deep dive from foundation to mastery.",
 };
 
 const TEACHING_STYLE_DESCRIPTIONS: Record<TeachingStyle, string> = {
