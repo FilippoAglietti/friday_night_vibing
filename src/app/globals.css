@@ -218,6 +218,7 @@
   overflow-x: hidden;
   scroll-behavior: smooth;
   scroll-padding-top: 3.5rem; /* 56px nav height */
+  scroll-snap-type: y proximity;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -226,21 +227,28 @@
   .snap-scroll-container {
     height: auto;
     overflow: visible;
+    scroll-snap-type: none;
   }
 }
 
 .snap-section {
   min-height: 100vh;
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
 }
 
 .snap-section-footer {
-  /* no special sizing needed */
+  scroll-snap-align: end;
 }
 
 /* On mobile, let sections be natural height */
 @media (max-width: 767px) {
   .snap-section {
     min-height: auto;
+    scroll-snap-align: none;
+  }
+  .snap-section-footer {
+    scroll-snap-align: none;
   }
 }
 
