@@ -92,21 +92,21 @@ function CountdownInline() {
 const painPoints = [
   {
     icon: Clock,
-    problem: "Hours wasted on blank outlines",
+    problem: "Your courses look like everyone else's",
     solution:
-      "Get a complete, structured course in under 60 seconds — modules, lessons, quizzes, and pacing all done.",
+      "Syllabi generates courses with stunning design and real audio narration — so polished your students won't believe it's AI.",
   },
   {
     icon: Brain,
-    problem: "No idea how to structure content",
+    problem: "Nobody finishes your courses",
     solution:
-      "AI understands pedagogical best practices — it sequences topics logically so your students actually learn.",
+      "Audio lessons, structured pacing, and beautiful visuals keep learners engaged from start to finish — not just skimming.",
   },
   {
     icon: Target,
-    problem: "Courses feel random & disorganized",
+    problem: "Creating & sharing is a 10-tool nightmare",
     solution:
-      "Every generated course has clear objectives, progressive difficulty, and measurable learning outcomes.",
+      "One click gives you a complete course with a shareable link, audio, quizzes, and export-ready files. No LMS required.",
   },
 ];
 
@@ -114,20 +114,20 @@ const steps = [
   {
     num: "01",
     icon: BookOpen,
-    title: "Enter your topic",
-    desc: "Describe what you want to teach — from \"Python for data science\" to \"Sourdough baking 101\".",
+    title: "Describe what you teach",
+    desc: "Enter your topic, pick a style and depth — from \"Python for data science\" to \"Sourdough baking 101\".",
   },
   {
     num: "02",
     icon: Sparkles,
-    title: "AI generates your course",
-    desc: "In seconds you get modules, lessons, quizzes, resources, and a pacing schedule — all editable.",
+    title: "AI builds your course",
+    desc: "In seconds you get modules, lessons, quizzes, audio narration, and a shareable link — all editable.",
   },
   {
     num: "03",
-    icon: Download,
-    title: "Download & teach",
-    desc: "Export to JSON, Markdown, or PDF. Drop it into your LMS, Notion, or start teaching today.",
+    icon: Globe,
+    title: "Share, teach, or sell",
+    desc: "Send a link, export to Notion or PDF, or turn it into a lead magnet. Your course, your way.",
   },
 ];
 
@@ -567,8 +567,8 @@ export default function Home() {
                   variant="outline"
                   className="mb-6 rounded-full border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400"
                 >
-                  <Sparkles className="mr-1.5 size-3" />
-                  AI-Powered Course Design
+                  <Headphones className="mr-1.5 size-3" />
+                  Audio Courses · Shareable Links · Stunning Design
                 </Badge>
               </motion.div>
 
@@ -576,22 +576,20 @@ export default function Home() {
                 variants={fadeUp}
                 className="text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
               >
-                Turn Any Topic Into a
+                The Course Generator That
                 <br />
                 <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
-                  Complete Course
+                  Sounds as Good as It Looks
                 </span>
-                <br />
-                in Seconds
               </motion.h1>
 
               <motion.p
                 variants={fadeUp}
                 className="mx-auto mt-4 sm:mt-6 max-w-2xl xl:max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-xl xl:text-2xl"
               >
-                AI-powered course design for course creators, educators, and
-                coaches. Stop staring at blank outlines — get a production-ready
-                course with modules, lessons, quizzes, and pacing.
+                AI creates complete courses with audio narration, beautiful
+                design, and shareable links — ready to teach, sell, or share
+                in seconds.
               </motion.p>
 
               <motion.div
@@ -614,7 +612,7 @@ export default function Home() {
                   className="h-12 w-full sm:w-auto rounded-full px-8 text-base"
                   onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  See Example Courses
+                  Hear a Sample Course
                 </Button>
               </motion.div>
 
@@ -622,7 +620,7 @@ export default function Home() {
                 variants={fadeUp}
                 className="mt-4 text-xs text-muted-foreground"
               >
-                No credit card required · Free forever on the starter plan
+                No credit card required · Your first course is free
               </motion.p>
             </motion.div>
           </div>
@@ -653,15 +651,15 @@ export default function Home() {
                 variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
-                Building a course shouldn&apos;t feel like pulling teeth
+                Sound familiar?
               </motion.h2>
               <motion.p
                 variants={fadeUp}
                 className="mx-auto mt-4 max-w-2xl text-muted-foreground"
               >
-                Course creators waste 40+ hours just on the outline. You know
-                your material — you just need it structured into something
-                students can follow.
+                Other AI tools give you a text dump and call it a course.
+                Your students deserve audio they can listen to, design they
+                want to look at, and a link they can actually open.
               </motion.p>
             </AnimateInView>
 
@@ -824,15 +822,15 @@ export default function Home() {
                 variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
-                See what Syllabi can create
+                Hear it. See it. Share it.
               </motion.h2>
               <motion.p
                 variants={fadeUp}
                 className="mx-auto mt-4 max-w-2xl text-muted-foreground"
               >
-                These courses were generated in seconds. Each one includes
-                modules, lessons, quizzes, bonus resources, and a full pacing
-                schedule.
+                Every course below was generated in seconds — complete with
+                audio narration, structured lessons, quizzes, and a shareable
+                link.
               </motion.p>
             </AnimateInView>
 
@@ -1328,17 +1326,16 @@ export default function Home() {
                 variants={fadeUp}
                 className="text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl 2xl:text-6xl"
               >
-                Ready to build your
+                Ready to hear the
                 <br />
-                first course?
+                difference?
               </motion.h2>
               <motion.p
                 variants={fadeUp}
                 className="mx-auto mt-4 max-w-lg xl:max-w-2xl xl:text-lg text-muted-foreground"
               >
-                Join hundreds of course creators who save 40+ hours per course
-                with Syllabi. Your first generation is free — no credit card, no
-                catch.
+                Create a course with audio, design, and a shareable link —
+                all in under 60 seconds. Your first generation is free.
               </motion.p>
               <motion.div variants={fadeUp}>
                 <Button
