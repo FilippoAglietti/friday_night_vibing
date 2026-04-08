@@ -564,10 +564,21 @@ async function generateCurriculumChunked(
       totalModules,
     );
 
-    // Each module needs ~5-8k tokens, completes in ~60-120s.
-    // 140s timeout per module — generous for API latency spikes.
+    // Module budget: 8k tokens / 140s timeout.
+    //
+    // Previous 16k budget was the silent killer: Sonnet streams at ~50-80
+    // tok/s, so a 16k-token module could legitimately take 200-300s to
+    // finish — well past the 140s per-call timeout. AbortController would
+    // fire, retry once, then fail after ~280s. With 10 modules in parallel
+    // ALL hitting this same wall, Phase 2 delivered 0/10 successes in
+    // Tentativo 8 even with a healthy 180s runway.
+    //
+    // 8k is plenty for a module: ~1.6k tokens per lesson × 5 lessons ≈
+    // 1200-1500 words of dense academic prose per lesson, which is
+    // exactly the target for Masterclass-grade content. Streaming 8k
+    // tokens fits in 100-130s comfortably inside the 140s timeout.
     const modResponse = await callClaudeWithRetry(
-      anthropic, modSystem, modMessages, request.length, 1, 16384,
+      anthropic, modSystem, modMessages, request.length, 1, 8192,
       `${courseId}/module-${moduleData.id}`, 140_000,
     );
 
