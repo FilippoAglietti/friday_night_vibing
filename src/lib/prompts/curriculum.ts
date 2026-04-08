@@ -366,12 +366,20 @@ You are an expert instructional designer. You are generating the DETAILED CONTEN
 Follow these principles:
 • 70/30 theory-to-practice — every lesson must include a practical exercise or real-world task
 • Quiz questions test UNDERSTANDING, not memorisation
-• Every lesson MUST include detailed "keyPoints", "suggestedResources" with REAL URLs, and "content" with rich markdown
+• Every lesson MUST include "keyPoints", "suggestedResources" with REAL URLs, and "content" in markdown
+
+LENGTH BUDGET (CRITICAL — enforced):
+- Each lesson "content" field must be BETWEEN 280 AND 400 WORDS. Not more. Not less.
+  This is a strict upper bound — exceeding it causes the response to be cut off mid-JSON and discarded.
+- Each lesson needs EXACTLY 4 keyPoints (one sentence each, ≤ 20 words per point)
+- Each lesson needs EXACTLY 2 suggestedResources
+- Write dense, compressed, high-signal prose — no filler, no restating the objectives, no "welcome to this lesson" intros
 
 OUTPUT RULES (CRITICAL):
 - Respond with ONLY valid JSON — no markdown, no preamble, no explanation.
 - Return a JSON object with "lessons" array and "quiz" array.
 - durationMinutes must be a number (integer), not a string.
+- You MUST finish writing the closing "}" of the JSON object. If you are running out of space, cut content length to ensure the JSON is COMPLETE and VALID.
 `.trim();
 
 /**
@@ -423,11 +431,13 @@ Here are the lesson stubs you must flesh out with full content:
 
 ${lessonsJson}
 
-For EACH lesson above, generate:
-- "keyPoints": array of 3-5 strings — core concepts, practical tips, actionable takeaways
-- "content": string — 2-4 paragraphs of rich markdown with real explanations, examples, exercises. Use ## headers, **bold**, > blockquotes, code blocks where relevant.
-- "suggestedResources": array of 1-3 objects { "title": string, "url": string, "type": string } — REAL, working URLs to well-known authoritative sites (MDN, official docs, Wikipedia, real blogs, YouTube). type must be one of: article, video, podcast, book, tool, documentation.
+For EACH lesson above, generate EXACTLY:
+- "keyPoints": array of EXACTLY 4 strings — each ≤ 20 words, high signal, no filler
+- "content": string — BETWEEN 280 AND 400 WORDS of dense markdown. Structure: one ## header, 2 short paragraphs explaining the core concept, a ### Try It Yourself hands-on exercise, and a > Pro Tip blockquote. NO restating objectives, NO welcome intros, NO padding. This is a strict word cap — going over causes truncation.
+- "suggestedResources": array of EXACTLY 2 objects { "title": string, "url": string, "type": string } — REAL working URLs to authoritative sites (MDN, official docs, Wikipedia, real blogs, YouTube). type must be one of: article, video, podcast, book, tool, documentation.
 ${quizBlock}
+
+SIZE DISCIPLINE: Your entire response must fit comfortably in a 12,000 token budget. If you catch yourself writing long-winded content, compress it. A truncated JSON response is worthless — a concise complete one is the goal.
 
 Return ONLY this JSON structure:
 

@@ -621,34 +621,35 @@ async function generateCurriculumChunked(
       totalModules,
     );
 
-    // Module budget: 8k tokens / 180s timeout / NO retry / HAIKU 4.5.
+    // Module budget: 16k tokens / 180s timeout / NO retry / HAIKU 4.5.
     //
-    // Post-Tentativo 10 pivot:
-    //   • Tentativi 7-10 definitively proved Sonnet 4.6 cannot stream
-    //     even 5k tokens per module under 10-way parallel load inside a
-    //     280s global budget. Every single attempt delivered 0/10
-    //     modules: 16k/140s, 8k/140s, 5k/180s — all failed identically.
-    //   • Hypothesis: Anthropic's per-key OTPM bucket splits ~evenly
-    //     across in-flight streams. At concurrency 10 the effective
-    //     per-stream throughput on Sonnet drops to ~20-30 tok/s — far
-    //     below the ~28 tok/s a 5k-token call needs to clear 180s.
-    //   • Haiku 4.5 has independent rate tiers AND streams ~3× faster
-    //     (~150-200 tok/s single-call, ~80-120 tok/s under parallel
-    //     load), so 8192 tokens clears in 70-100s with massive headroom.
+    // Post-Tentativo 11 pivot (the diagnostic breakthrough):
+    //   Tentativo 11 surfaced the TRUE failure via per-module error
+    //   reasons in courses.error_message:
+    //     "[module mod-1] JSON parse failed (len=29283, stop=max_tokens)"
+    //   That is NOT a timeout. Haiku successfully streamed ~7300 tokens
+    //   (~29k chars) in well under the 180s window and then hit the 8192
+    //   max_tokens ceiling with the JSON still mid-object. Every prior
+    //   Tentativo that blamed timeouts was actually hitting token-budget
+    //   truncation — the prompt asked for "2-4 paragraphs of rich
+    //   markdown" per lesson with no upper bound, which a capable model
+    //   happily expands into 8k+ tokens of prose per module.
     //
-    // Quality trade-off: Haiku 4.5 is meaningfully strong for structured
-    // educational content (lesson explanation + examples + quiz), the
-    // primary use case here. The alternative — shipping a failed course
-    // every time — is infinitely worse. Can be revisited if per-module
-    // quality measurably underperforms.
+    // Two stacked fixes:
+    //   1. Bump to 16384 tokens — Haiku 4.5 supports up to 64k output
+    //      tokens, so 16k is safe, and at 100-150 tok/s it still fits
+    //      the 180s timeout comfortably (107-164s stream time).
+    //   2. Tightened prompt in MODULE_DETAIL_SYSTEM_PROMPT / builder to
+    //      enforce strict per-lesson word budgets (280-400 words, 4
+    //      keyPoints, 2 resources). This keeps actual generated output
+    //      in the 5-8k token range with 8k+ tokens of ceiling margin.
     //
-    // Retry stays DISABLED: a retry on a 180s call would total 362s+,
-    // exceeding Vercel's 300s cap. Failures are already recoverable via
-    // the skeleton-stub backfill below.
+    // Retry stays DISABLED: same reasoning as before (retry doubles
+    // budget, blows Vercel cap, and backfill already recovers).
     const modResponse = await callClaudeWithRetry(
       anthropic, modSystem, modMessages, request.length,
       /* attempt */ 1,
-      /* overrideMaxTokens */ 8192,
+      /* overrideMaxTokens */ 16384,
       /* label */ `${courseId}/module-${moduleData.id}`,
       /* timeoutMs */ 180_000,
       /* model */ "claude-haiku-4-5-20251001",
