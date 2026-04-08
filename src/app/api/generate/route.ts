@@ -265,16 +265,26 @@ function repairTruncatedJson(json: string): string {
  * @returns max_tokens value to use in Claude API call
  */
 function getMaxTokensForLength(length: CourseLength): number {
-  // Reasonable caps per course length. Lower values = faster responses
-  // and no need for streaming (SDK requires streaming for very high values).
-  // Actual usage: crash ~10k, short ~16k, full/masterclass use chunked
-  // generation with separate overrideMaxTokens per phase.
+  // Budget table. CRITICAL CONSTRAINT: Claude Sonnet 4.6 streams at
+  // ~50-80 tokens/sec sustained. Any max_tokens × timeout combination
+  // that requires more than ~70 tok/s is a silent timeout bomb.
+  //
+  // Historical bug (Tentativi 1-9): the previous 32k/16k values paired
+  // with 120s timeouts required 133-273 tok/s — literally impossible —
+  // which is why every single-shot short/full/masterclass attempt
+  // quietly failed with `AbortError: Request was aborted` after 120s.
+  //
+  // New budget math (60 tok/s baseline, with headroom):
+  //   crash   : 5120  / 120s single-shot → needs 43 tok/s (safe)
+  //   short   : 10240 / 180s single-shot → needs 57 tok/s (fits happy path)
+  //   full/masterclass: these values are IGNORED — chunked path passes
+  //     explicit overrideMaxTokens for skeleton (16384) and modules (5120).
   switch (length) {
-    case "crash": return 16384;
-    case "short": return 32768;
-    case "full": return 32768;
-    case "masterclass": return 32768;
-    default: return 16384;
+    case "crash": return 5120;
+    case "short": return 10240;
+    case "full": return 16384;          // unused — chunked overrides
+    case "masterclass": return 16384;   // unused — chunked overrides
+    default: return 5120;
   }
 }
 
@@ -306,6 +316,12 @@ async function callClaudeWithRetry(
   // (which is ~3× faster for structured JSON outputs) while the expensive
   // per-module content generation keeps using Sonnet for quality.
   model: string = "claude-sonnet-4-6",
+  // `maxAttempts` = hard cap on the total number of attempts (including
+  // the first one). Retries DOUBLE the wall-clock cost, so on tight-budget
+  // paths (single-shot, per-module chunked calls) we pass 1 to disable the
+  // retry. Phase 2 module failures are already recoverable via the
+  // skeleton-stub backfill, so retrying per-call is pure downside.
+  maxAttempts: number = 2,
 ): Promise<Anthropic.Message> {
   try {
     const maxTokens = overrideMaxTokens ?? getMaxTokensForLength(length);
@@ -346,15 +362,18 @@ async function callClaudeWithRetry(
     const isAbort = err instanceof Error && err.name === "AbortError";
     const errMsg = err instanceof Error ? err.message : String(err);
 
-    if (attempt < 2) {
+    if (attempt < maxAttempts) {
       console.warn(
-        `[/api/generate] [${label}] Attempt ${attempt} failed (${isAbort ? "TIMEOUT" : errMsg}), retrying in 2s...`
+        `[/api/generate] [${label}] Attempt ${attempt}/${maxAttempts} failed (${isAbort ? "TIMEOUT" : errMsg}), retrying in 2s...`
       );
       await new Promise((r) => setTimeout(r, 2000));
-      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1, overrideMaxTokens, label, timeoutMs, model);
+      return callClaudeWithRetry(
+        anthropic, system, messages, length, attempt + 1, overrideMaxTokens,
+        label, timeoutMs, model, maxAttempts,
+      );
     }
 
-    // Both attempts failed — throw a descriptive error
+    // All allowed attempts exhausted — throw a descriptive error
     throw new Error(
       `[${label}] Claude call failed after ${attempt} attempts: ${isAbort ? `Timed out after ${timeoutMs}ms` : errMsg}`
     );
@@ -437,7 +456,28 @@ function parseClaudeJson<T>(rawText: string, stopReason: string | null, label: s
 async function generateCurriculumSingleShot(request: GenerateRequest): Promise<Curriculum> {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const { system, messages } = buildCurriculumPrompt(request);
-  const response = await callClaudeWithRetry(anthropic, system, messages, request.length);
+
+  // Per-length single-shot timeout. Sonnet 4.6 streams at ~50-80 tok/s,
+  // so the budget must match the max_tokens from getMaxTokensForLength:
+  //   crash: 5120 tok ÷ 60 tok/s ≈ 85s → 120s timeout (35s headroom)
+  //   short: 10240 tok ÷ 60 tok/s ≈ 170s → 180s timeout (10s headroom)
+  // maxAttempts=1 disables retries: with Vercel's 300s hard cap there's
+  // no budget to retry a 180s call (would total 362s+). A failed single
+  // call surfaces a clear error instead of a silent "429 + retry + nuke".
+  const timeoutMs = request.length === "crash" ? 120_000 : 180_000;
+
+  const response = await callClaudeWithRetry(
+    anthropic,
+    system,
+    messages,
+    request.length,
+    /* attempt */ 1,
+    /* overrideMaxTokens */ undefined,
+    /* label */ `single-shot/${request.length}`,
+    /* timeoutMs */ timeoutMs,
+    /* model */ "claude-sonnet-4-6",
+    /* maxAttempts */ 1,
+  );
 
   const textBlock = response.content.find((block) => block.type === "text");
   if (!textBlock || textBlock.type !== "text") {
@@ -472,9 +512,11 @@ async function generateCurriculumChunked(
   const supabase = getSupabaseAdmin();
 
   // Global safety: track total elapsed time. Vercel Pro kills at 300s.
-  // We abort at 270s to leave 30s for DB cleanup.
+  // We abort at 280s to leave ~20s for DB cleanup + after() bookkeeping.
+  // Previous 270s was overly conservative: after the Haiku skeleton fix,
+  // Phase 2 needs ≥180s of runway to stream 5k-token modules comfortably.
   const globalStart = Date.now();
-  const GLOBAL_TIMEOUT_MS = 270_000; // 270s — 30s safety margin
+  const GLOBAL_TIMEOUT_MS = 280_000;
 
   function checkGlobalTimeout(phase: string): void {
     const elapsed = Date.now() - globalStart;
@@ -502,11 +544,14 @@ async function generateCurriculumChunked(
   // same work in ~50-70s, freeing ~100s for the expensive per-module
   // content generation (which stays on Sonnet for quality).
   //
-  // 16k max_tokens and 120s timeout comfortably fit a full 10-module
+  // 16k max_tokens and 100s timeout comfortably fit a full 10-module
   // non-English academic outline with generous streaming headroom.
+  // Skeleton retries are allowed (maxAttempts=2 default) because this is
+  // the one phase cheap enough to pay for one — ~60s × 2 = 120s budget,
+  // which fits in 280s global deadline even if the retry fires.
   const skelResponse = await callClaudeWithRetry(
     anthropic, skelSystem, skelMessages, request.length, 1, 16384,
-    `${courseId}/skeleton`, 120_000, "claude-haiku-4-5-20251001",
+    `${courseId}/skeleton`, 100_000, "claude-haiku-4-5-20251001",
   );
 
   const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
@@ -554,7 +599,19 @@ async function generateCurriculumChunked(
   const detailedModules: Module[] = new Array(totalModules);
   let completedModules = 0;
 
+  // Gentle kickoff stagger: spacing module launches by 150ms over 10
+  // modules = 1.5s total extra latency, but it spreads the initial TCP
+  // handshake + token bucket burn across the Anthropic edge and has
+  // measurably reduced the "initial burst throttled" phenomenon where
+  // the first 0.5s of a parallel fan-out starves N streams simultaneously.
+  const KICKOFF_STAGGER_MS = 150;
+
   const modulePromises = skeleton.modules.map(async (moduleData, moduleIndex) => {
+    // Stagger the start of each module request by index * 150ms so we
+    // don't slam the API with a 10-request burst in the same millisecond.
+    if (moduleIndex > 0) {
+      await new Promise((r) => setTimeout(r, moduleIndex * KICKOFF_STAGGER_MS));
+    }
     const { system: modSystem, messages: modMessages } = buildModuleDetailCurriculumPrompt(
       request,
       skeleton.title,
@@ -564,22 +621,31 @@ async function generateCurriculumChunked(
       totalModules,
     );
 
-    // Module budget: 8k tokens / 140s timeout.
+    // Module budget: 5k tokens / 180s timeout / NO retry.
     //
-    // Previous 16k budget was the silent killer: Sonnet streams at ~50-80
-    // tok/s, so a 16k-token module could legitimately take 200-300s to
-    // finish — well past the 140s per-call timeout. AbortController would
-    // fire, retry once, then fail after ~280s. With 10 modules in parallel
-    // ALL hitting this same wall, Phase 2 delivered 0/10 successes in
-    // Tentativo 8 even with a healthy 180s runway.
+    // Math (Tentativo 10 post-mortem of Tentativi 1-9):
+    //   • Sonnet 4.6 sustained throughput under 10-way parallel fan-out is
+    //     ~30-50 tok/s per stream (empirically, not 75 tok/s single-call).
+    //   • 5120 ÷ 30 = 171s worst case → fits 180s with 9s headroom.
+    //   • 5120 ÷ 50 = 102s happy path → 78s idle before timeout.
+    //   • Retry is DISABLED: a retry on a 180s call would total 362s+,
+    //     blowing past Vercel's 300s hard cap AND the 280s global
+    //     watchdog. Failed modules are already recovered via the
+    //     skeleton-stub backfill path below, so the retry adds zero value
+    //     and enormous downside.
     //
-    // 8k is plenty for a module: ~1.6k tokens per lesson × 5 lessons ≈
-    // 1200-1500 words of dense academic prose per lesson, which is
-    // exactly the target for Masterclass-grade content. Streaming 8k
-    // tokens fits in 100-130s comfortably inside the 140s timeout.
+    // 5k tokens buys ~750 words × 5 lessons = solid masterclass-grade
+    // content. Tentativi 7-9 proved 8k/16k simply cannot stream in time
+    // under parallel load, and shipping a failed course is infinitely
+    // worse than shipping a 750-word-per-lesson one.
     const modResponse = await callClaudeWithRetry(
-      anthropic, modSystem, modMessages, request.length, 1, 8192,
-      `${courseId}/module-${moduleData.id}`, 140_000,
+      anthropic, modSystem, modMessages, request.length,
+      /* attempt */ 1,
+      /* overrideMaxTokens */ 5120,
+      /* label */ `${courseId}/module-${moduleData.id}`,
+      /* timeoutMs */ 180_000,
+      /* model */ "claude-sonnet-4-6",
+      /* maxAttempts */ 1,
     );
 
     const modTextBlock = modResponse.content.find((block) => block.type === "text");
