@@ -302,6 +302,10 @@ async function callClaudeWithRetry(
   overrideMaxTokens?: number,
   label: string = "unknown",
   timeoutMs: number = 120_000, // default 2-min timeout per call
+  // `model` is explicitly overridable so the skeleton phase can use Haiku
+  // (which is ~3× faster for structured JSON outputs) while the expensive
+  // per-module content generation keeps using Sonnet for quality.
+  model: string = "claude-sonnet-4-6",
 ): Promise<Anthropic.Message> {
   try {
     const maxTokens = overrideMaxTokens ?? getMaxTokensForLength(length);
@@ -314,15 +318,15 @@ async function callClaudeWithRetry(
       controller.abort();
     }, timeoutMs);
 
-    console.log(`[/api/generate] [${label}] Calling Claude (attempt ${attempt}, max_tokens=${maxTokens}, timeout=${timeoutMs}ms)...`);
+    console.log(`[/api/generate] [${label}] Calling Claude (model=${model}, attempt ${attempt}, max_tokens=${maxTokens}, timeout=${timeoutMs}ms)...`);
 
     // Use stream() + finalMessage() instead of direct create().
     // The Anthropic SDK requires streaming for claude-sonnet-4-6 because
     // it predicts the request "may take longer than 10 minutes".
     // With capped max_tokens (8k-16k), streaming overhead is negligible
-    // and each call completes in ~30-60s.
+    // and each call completes in ~30-60s. Haiku is streaming-safe too.
     const stream = anthropic.messages.stream({
-      model: "claude-sonnet-4-6",
+      model,
       max_tokens: maxTokens,
       system,
       messages,
@@ -347,7 +351,7 @@ async function callClaudeWithRetry(
         `[/api/generate] [${label}] Attempt ${attempt} failed (${isAbort ? "TIMEOUT" : errMsg}), retrying in 2s...`
       );
       await new Promise((r) => setTimeout(r, 2000));
-      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1, overrideMaxTokens, label, timeoutMs);
+      return callClaudeWithRetry(anthropic, system, messages, length, attempt + 1, overrideMaxTokens, label, timeoutMs, model);
     }
 
     // Both attempts failed — throw a descriptive error
@@ -491,14 +495,18 @@ async function generateCurriculumChunked(
 
   const { system: skelSystem, messages: skelMessages } = buildSkeletonCurriculumPrompt(request);
 
-  // Skeleton is structure-only, but masterclass (6-10 modules × 2-5 lessons)
-  // in non-English (Italian tokenizes ~30% heavier) was hitting the old 8k cap
-  // and truncating mid-JSON. 16k tokens is the new safe ceiling — comfortably
-  // fits even a full 10-module Italian academic skeleton without bloating the
-  // phase-2 budget. Timeout raised to 200s accordingly (streaming ~2x longer).
+  // Skeleton is pure structure (module/lesson stubs) — a task at which
+  // Haiku 4.5 excels and runs ~3× faster than Sonnet 4.6. Empirically a
+  // 10-module masterclass skeleton on Sonnet took ~170s, which left no
+  // runway for Phase 2 within Vercel's 300s hard cap. Haiku does the
+  // same work in ~50-70s, freeing ~100s for the expensive per-module
+  // content generation (which stays on Sonnet for quality).
+  //
+  // 16k max_tokens and 120s timeout comfortably fit a full 10-module
+  // non-English academic outline with generous streaming headroom.
   const skelResponse = await callClaudeWithRetry(
     anthropic, skelSystem, skelMessages, request.length, 1, 16384,
-    `${courseId}/skeleton`, 200_000,
+    `${courseId}/skeleton`, 120_000, "claude-haiku-4-5-20251001",
   );
 
   const skelTextBlock = skelResponse.content.find((block) => block.type === "text");
@@ -520,17 +528,26 @@ async function generateCurriculumChunked(
   }).eq("id", courseId);
 
   // ── Phase 2: Generate ALL module details in parallel ─────────
-  // Run ALL modules concurrently. With Vercel Pro's 300s timeout and
-  // skeleton taking ~120s, we have ~150s left. Running in parallel
-  // means total time = max(single module time) ≈ 90-120s, not sum.
-  // The Anthropic API handles 5-8 concurrent requests fine.
+  // Run ALL modules concurrently. With Vercel Pro's 300s hard cap and
+  // a Haiku skeleton averaging ~50-70s, Phase 2 has ~200-220s of runway.
+  // Running modules in parallel means total time = max(single module) ≈
+  // 90-120s, not the sum of all. The Anthropic API comfortably handles
+  // 10 concurrent requests.
   //
-  // Fault-tolerance: we use allSettled + a skeleton-stub fallback so
-  // that one slow/failing module does not blow up the entire course.
-  // As long as we reach the MIN_SUCCESS_RATIO we accept the result and
-  // keep the skeleton stub for any module that failed — the user still
-  // gets a usable course and can hit "regenerate module" on the failed
-  // ones from the dashboard.
+  // Fault-tolerance (unchanged from before):
+  //   • allSettled + skeleton-stub fallback for individual module failures.
+  //   • MIN_SUCCESS_RATIO gate so a broadly broken batch still surfaces as
+  //     an error instead of shipping 90% empty modules.
+  //
+  // NEW: hard deadline preemption. Before this, a single stalled module
+  // would keep Phase 2 waiting until Vercel nuke-killed the whole function
+  // at 300s — leaving the course in a permanent "generating" zombie state
+  // with 0 completed modules persisted. Now we race Phase 2 against a
+  // computed deadline (= remaining budget until the 270s global watchdog).
+  // When the deadline wins, we harvest whatever modules already landed in
+  // `detailedModules` (populated incrementally inside each promise) and
+  // fall through to the normal backfill-with-skeleton-stubs path, so the
+  // user ALWAYS gets a navigable course rather than a zombie.
   console.log(`[/api/generate] [${courseId}] Phase 2: Generating ALL ${totalModules} modules in parallel...`);
 
   const MIN_SUCCESS_RATIO = 0.6; // keep going even if 40% of modules fail
@@ -589,11 +606,66 @@ async function generateCurriculumChunked(
     return result;
   });
 
-  // Wait for ALL modules to settle (allSettled — don't blow up on single failures)
-  const settled = await Promise.allSettled(modulePromises);
+  // Hard deadline = remaining budget until the 270s global watchdog,
+  // minus 10s of safety runway for final DB writes. Never less than 30s
+  // (if we're this late already we need the Promise.race to fire ASAP).
+  const phase2RemainingMs = Math.max(
+    30_000,
+    GLOBAL_TIMEOUT_MS - (Date.now() - globalStart) - 10_000,
+  );
+  console.log(
+    `[/api/generate] [${courseId}] Phase 2 hard deadline: ${(phase2RemainingMs / 1000).toFixed(0)}s`,
+  );
 
-  // Backfill any failed modules with their skeleton stub so the user
-  // still receives a complete, navigable course.
+  // Marker promise that rejects when Phase 2 has run out of time.
+  // We race it against allSettled so we can preempt a stalled batch
+  // instead of waiting for Vercel's nuclear kill at 300s.
+  let phase2Timer: ReturnType<typeof setTimeout> | undefined;
+  const phase2Deadline = new Promise<never>((_, reject) => {
+    phase2Timer = setTimeout(
+      () => reject(new Error("PHASE2_DEADLINE")),
+      phase2RemainingMs,
+    );
+  });
+
+  // Wait for ALL modules to settle OR the deadline to fire, whichever
+  // comes first. allSettled never rejects by itself, so any rejection
+  // from this race must be the deadline.
+  let settled: PromiseSettledResult<Module>[];
+  let phase2TimedOut = false;
+  try {
+    settled = (await Promise.race([
+      Promise.allSettled(modulePromises),
+      phase2Deadline,
+    ])) as PromiseSettledResult<Module>[];
+  } catch (raceErr) {
+    if (raceErr instanceof Error && raceErr.message === "PHASE2_DEADLINE") {
+      phase2TimedOut = true;
+      console.warn(
+        `[/api/generate] [${courseId}] Phase 2 hit hard deadline (${(phase2RemainingMs / 1000).toFixed(0)}s) — harvesting ${completedModules}/${totalModules} completed modules and backfilling the rest.`,
+      );
+      // Synthesize a settled array from whatever's done. Anything still
+      // in-flight becomes a synthetic rejection so the backfill loop
+      // picks up the skeleton stub for it.
+      settled = skeleton.modules.map((_, i) =>
+        detailedModules[i]
+          ? ({ status: "fulfilled", value: detailedModules[i] } as PromiseFulfilledResult<Module>)
+          : ({
+              status: "rejected",
+              reason: new Error(`Phase 2 deadline reached before module ${i + 1} completed`),
+            } as PromiseRejectedResult),
+      );
+    } else {
+      // Anything else is a real bug — rethrow so after() catches it
+      clearTimeout(phase2Timer);
+      throw raceErr;
+    }
+  } finally {
+    clearTimeout(phase2Timer);
+  }
+
+  // Backfill any failed modules (or deadline-cancelled ones) with their
+  // skeleton stub so the user still receives a complete, navigable course.
   let failureCount = 0;
   settled.forEach((outcome, i) => {
     if (outcome.status === "rejected") {
@@ -613,6 +685,16 @@ async function generateCurriculumChunked(
       }
     }
   });
+
+  // If Phase 2 deadlined AND we have some completed modules, accept the
+  // partial result — the course is still usable and the user can trigger
+  // per-module regeneration from the dashboard. The normal MIN_SUCCESS_RATIO
+  // guard below will still reject a mostly-empty result.
+  if (phase2TimedOut) {
+    console.warn(
+      `[/api/generate] [${courseId}] Phase 2 deadline: delivered ${totalModules - failureCount}/${totalModules} detailed modules, ${failureCount} fell back to skeleton stubs.`,
+    );
+  }
 
   const successRatio = 1 - failureCount / totalModules;
   if (successRatio < MIN_SUCCESS_RATIO) {
