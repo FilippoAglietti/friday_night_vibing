@@ -621,30 +621,37 @@ async function generateCurriculumChunked(
       totalModules,
     );
 
-    // Module budget: 5k tokens / 180s timeout / NO retry.
+    // Module budget: 8k tokens / 180s timeout / NO retry / HAIKU 4.5.
     //
-    // Math (Tentativo 10 post-mortem of Tentativi 1-9):
-    //   • Sonnet 4.6 sustained throughput under 10-way parallel fan-out is
-    //     ~30-50 tok/s per stream (empirically, not 75 tok/s single-call).
-    //   • 5120 ÷ 30 = 171s worst case → fits 180s with 9s headroom.
-    //   • 5120 ÷ 50 = 102s happy path → 78s idle before timeout.
-    //   • Retry is DISABLED: a retry on a 180s call would total 362s+,
-    //     blowing past Vercel's 300s hard cap AND the 280s global
-    //     watchdog. Failed modules are already recovered via the
-    //     skeleton-stub backfill path below, so the retry adds zero value
-    //     and enormous downside.
+    // Post-Tentativo 10 pivot:
+    //   • Tentativi 7-10 definitively proved Sonnet 4.6 cannot stream
+    //     even 5k tokens per module under 10-way parallel load inside a
+    //     280s global budget. Every single attempt delivered 0/10
+    //     modules: 16k/140s, 8k/140s, 5k/180s — all failed identically.
+    //   • Hypothesis: Anthropic's per-key OTPM bucket splits ~evenly
+    //     across in-flight streams. At concurrency 10 the effective
+    //     per-stream throughput on Sonnet drops to ~20-30 tok/s — far
+    //     below the ~28 tok/s a 5k-token call needs to clear 180s.
+    //   • Haiku 4.5 has independent rate tiers AND streams ~3× faster
+    //     (~150-200 tok/s single-call, ~80-120 tok/s under parallel
+    //     load), so 8192 tokens clears in 70-100s with massive headroom.
     //
-    // 5k tokens buys ~750 words × 5 lessons = solid masterclass-grade
-    // content. Tentativi 7-9 proved 8k/16k simply cannot stream in time
-    // under parallel load, and shipping a failed course is infinitely
-    // worse than shipping a 750-word-per-lesson one.
+    // Quality trade-off: Haiku 4.5 is meaningfully strong for structured
+    // educational content (lesson explanation + examples + quiz), the
+    // primary use case here. The alternative — shipping a failed course
+    // every time — is infinitely worse. Can be revisited if per-module
+    // quality measurably underperforms.
+    //
+    // Retry stays DISABLED: a retry on a 180s call would total 362s+,
+    // exceeding Vercel's 300s cap. Failures are already recoverable via
+    // the skeleton-stub backfill below.
     const modResponse = await callClaudeWithRetry(
       anthropic, modSystem, modMessages, request.length,
       /* attempt */ 1,
-      /* overrideMaxTokens */ 5120,
+      /* overrideMaxTokens */ 8192,
       /* label */ `${courseId}/module-${moduleData.id}`,
       /* timeoutMs */ 180_000,
-      /* model */ "claude-sonnet-4-6",
+      /* model */ "claude-haiku-4-5-20251001",
       /* maxAttempts */ 1,
     );
 
@@ -743,7 +750,11 @@ async function generateCurriculumChunked(
 
   // Backfill any failed modules (or deadline-cancelled ones) with their
   // skeleton stub so the user still receives a complete, navigable course.
+  // We also collect the first few rejection reasons so the DB error_message
+  // column carries actionable diagnostic data when Vercel runtime logs are
+  // unavailable (as has been the case throughout this debugging cycle).
   let failureCount = 0;
+  const failureReasons: string[] = [];
   settled.forEach((outcome, i) => {
     if (outcome.status === "rejected") {
       failureCount++;
@@ -751,6 +762,10 @@ async function generateCurriculumChunked(
       console.warn(
         `[/api/generate] [${courseId}] Module ${skeleton.modules[i].id} FAILED — using skeleton stub. Reason: ${err}`
       );
+      // Keep only the first 3 distinct reasons to keep error_message bounded.
+      if (failureReasons.length < 3 && !failureReasons.includes(err)) {
+        failureReasons.push(err);
+      }
       if (!detailedModules[i]) {
         // Promote the skeleton module as-is; the viewer handles missing
         // lesson.content by showing a "regenerate" prompt.
@@ -775,8 +790,15 @@ async function generateCurriculumChunked(
 
   const successRatio = 1 - failureCount / totalModules;
   if (successRatio < MIN_SUCCESS_RATIO) {
+    // Include the first distinct rejection reasons in the thrown message
+    // so they end up in courses.error_message. The Vercel runtime logs MCP
+    // has been silently broken through Tentativi 7-10, so the DB is the
+    // only place we can post-mortem why modules actually failed.
+    const reasonSummary = failureReasons.length > 0
+      ? ` Reasons: ${failureReasons.map((r) => r.replace(/\s+/g, " ").slice(0, 220)).join(" | ")}`
+      : "";
     throw new Error(
-      `Too many modules failed (${failureCount}/${totalModules} — ${(successRatio * 100).toFixed(0)}% success).`
+      `Too many modules failed (${failureCount}/${totalModules} — ${(successRatio * 100).toFixed(0)}% success).${reasonSummary}`
     );
   }
   if (failureCount > 0) {
