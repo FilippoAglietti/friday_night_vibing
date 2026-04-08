@@ -22,11 +22,14 @@ import {
   HelpCircle,
   LayoutGrid,
   Lightbulb,
+  Pencil,
   RefreshCw,
+  RotateCcw,
   Share2,
   Sparkles,
   Target,
   Trophy,
+  Wand2,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import AudioPlayer, { type AudioTrack } from "@/components/AudioPlayer";
@@ -902,6 +905,67 @@ export default function CurriculumOutput({
           </CardContent>
         </Card>
       )}
+
+      {/* ── Edit & Refine ── */}
+      <Card className="border-dashed border-violet-500/20 bg-violet-500/[0.02]">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Wand2 className="h-5 w-5 text-violet-500" />
+            <h2 className="font-semibold text-base">Edit & Refine</h2>
+            <Badge variant="outline" className="text-[10px] ml-1 border-violet-500/30 text-violet-400">
+              Beta
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            Fine-tune your course — edit the title, regenerate lessons, or adjust the structure.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button
+              className="flex flex-col items-center gap-1.5 rounded-xl border border-border/40 bg-card/50 p-3 text-center transition-all hover:border-violet-500/30 hover:bg-violet-500/5"
+              onClick={() => {
+                const newTitle = prompt("Edit course title:", curriculum.title);
+                if (newTitle && newTitle !== curriculum.title) {
+                  // TODO: Filippo — API endpoint to update course title
+                  alert("Title editing will be available soon — saved locally for now.");
+                }
+              }}
+            >
+              <Pencil className="size-4 text-muted-foreground" />
+              <span className="text-xs font-medium">Edit Title</span>
+            </button>
+            <button
+              className="flex flex-col items-center gap-1.5 rounded-xl border border-border/40 bg-card/50 p-3 text-center transition-all hover:border-violet-500/30 hover:bg-violet-500/5"
+              onClick={() => {
+                // TODO: Filippo — API endpoint to regenerate specific module
+                alert("Module regeneration coming soon — Filippo is building the API.");
+              }}
+            >
+              <RotateCcw className="size-4 text-muted-foreground" />
+              <span className="text-xs font-medium">Regen Module</span>
+            </button>
+            <button
+              className="flex flex-col items-center gap-1.5 rounded-xl border border-border/40 bg-card/50 p-3 text-center transition-all hover:border-violet-500/30 hover:bg-violet-500/5"
+              onClick={() => {
+                // TODO: Filippo — API endpoint to add a module
+                alert("Adding modules coming soon — Filippo is building the API.");
+              }}
+            >
+              <Sparkles className="size-4 text-muted-foreground" />
+              <span className="text-xs font-medium">Add Module</span>
+            </button>
+            <button
+              className="flex flex-col items-center gap-1.5 rounded-xl border border-border/40 bg-card/50 p-3 text-center transition-all hover:border-violet-500/30 hover:bg-violet-500/5"
+              onClick={() => {
+                // TODO: Filippo — API endpoint to adjust difficulty/depth
+                alert("Depth adjustment coming soon — Filippo is building the API.");
+              }}
+            >
+              <Target className="size-4 text-muted-foreground" />
+              <span className="text-xs font-medium">Adjust Depth</span>
+            </button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* ── Action Buttons ── */}
       <div className="space-y-3 pb-8">
