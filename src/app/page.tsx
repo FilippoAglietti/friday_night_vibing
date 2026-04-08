@@ -1,6 +1,6 @@
 "use client";
 
-import CurriculumForm from "@/components/CurriculumForm";
+import CurriculumForm, { type CurriculumFormData } from "@/components/CurriculumForm";
 import CurriculumOutput from "@/components/CurriculumOutput";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import PaywallModal from "@/components/PaywallModal";
@@ -10,7 +10,7 @@ import { useToast } from "@/components/ToastProvider";
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Curriculum } from "@/types/curriculum";
 import { exampleCurricula as fullExampleCurricula } from "@/data/exampleCurricula";
-import { motion, useScroll, useTransform, useAnimation, type Variants } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useAnimation, type Variants } from "framer-motion";
 import ScrollProgress from "@/components/ScrollProgress";
 import { Button } from "@/components/ui/button";
 import { supabaseBrowser } from "@/lib/supabase";
@@ -230,6 +230,66 @@ const testimonials = [
   },
 ];
 
+/* ─── Course Templates ─────────────────────────────────── */
+
+const courseTemplates: {
+  id: string;
+  icon: typeof BookOpen;
+  label: string;
+  desc: string;
+  gradient: string;
+  preset: Partial<CurriculumFormData>;
+}[] = [
+  {
+    id: "onboarding",
+    icon: Layers,
+    label: "Employee Onboarding",
+    desc: "New hire training with company culture, processes & tools",
+    gradient: "from-violet-500 to-indigo-500",
+    preset: { topic: "Employee Onboarding Program", difficulty: "beginner", courseLength: "short", teachingStyle: "conversational", outputStructure: "modules", niche: "HR & People Ops" },
+  },
+  {
+    id: "lead-magnet",
+    icon: Flame,
+    label: "Lead Magnet Mini-Course",
+    desc: "Quick-win course to capture emails and build your list",
+    gradient: "from-amber-500 to-orange-500",
+    preset: { topic: "", difficulty: "beginner", courseLength: "crash", teachingStyle: "conversational", outputStructure: "modules", abstract: "Deliver one actionable insight that leaves the audience wanting more" },
+  },
+  {
+    id: "coaching",
+    icon: MessageCircle,
+    label: "Coaching Program",
+    desc: "Structured transformation journey for clients",
+    gradient: "from-emerald-500 to-teal-500",
+    preset: { topic: "", difficulty: "intermediate", courseLength: "full", teachingStyle: "storytelling", outputStructure: "workshop", niche: "Coaching & Personal Development" },
+  },
+  {
+    id: "sales-training",
+    icon: Target,
+    label: "Sales Training",
+    desc: "Pitch frameworks, objection handling & closing techniques",
+    gradient: "from-rose-500 to-pink-500",
+    preset: { topic: "Sales Training Program", difficulty: "intermediate", courseLength: "short", teachingStyle: "hands-on", outputStructure: "bootcamp", niche: "Sales & Revenue" },
+  },
+  {
+    id: "technical",
+    icon: FileText,
+    label: "Technical Skills",
+    desc: "Programming, tools, or technical workflows — hands-on",
+    gradient: "from-cyan-500 to-blue-500",
+    preset: { topic: "", difficulty: "intermediate", courseLength: "full", teachingStyle: "hands-on", outputStructure: "modules", niche: "Software & Technology" },
+  },
+  {
+    id: "blank",
+    icon: Sparkles,
+    label: "Start from Scratch",
+    desc: "Full control — you define every detail",
+    gradient: "from-zinc-500 to-zinc-600",
+    preset: {},
+  },
+];
+
 const difficultyColor: Record<string, string> = {
   Beginner:
     "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -393,6 +453,8 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<unknown>(null);
   const [previewCurriculum, setPreviewCurriculum] = useState<Curriculum | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [templateFormValues, setTemplateFormValues] = useState<Partial<CurriculumFormData> | undefined>(undefined);
   const { toast } = useToast();
   const closePreview = useCallback(() => setPreviewCurriculum(null), []);
 
@@ -829,18 +891,82 @@ export default function Home() {
                     variants={fadeUp}
                     className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
                   >
-                    Generate your course
+                    {selectedTemplate ? "Customize & generate" : "Pick a starting point"}
                   </motion.h2>
+                  {!selectedTemplate && (
+                    <motion.p
+                      variants={fadeUp}
+                      className="mx-auto mt-3 max-w-lg text-muted-foreground"
+                    >
+                      Choose a template to get started fast, or build from scratch.
+                    </motion.p>
+                  )}
                 </AnimateInView>
-                <AnimateInView containerRef={containerRef} amount={0.3} variants={fadeUp} className="mx-auto w-full max-w-xl sm:max-w-2xl">
-                  <CurriculumForm
-                    onGenerated={handleGenerated}
-                    onLoadingChange={handleLoadingChange}
-                    onLimitReached={handleLimitReached}
-                    onSubmitAttempt={handleFormSubmitAttempt}
-                    isFreeUser={!user}
-                  />
-                </AnimateInView>
+
+                <AnimatePresence mode="wait">
+                  {!selectedTemplate ? (
+                    /* ── Template Grid ─────────────────────── */
+                    <motion.div
+                      key="template-grid"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -16 }}
+                      transition={{ duration: 0.25 }}
+                      className="mx-auto w-full max-w-3xl"
+                    >
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                        {courseTemplates.map((tmpl) => {
+                          const Icon = tmpl.icon;
+                          return (
+                            <button
+                              key={tmpl.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedTemplate(tmpl.id);
+                                setTemplateFormValues(tmpl.preset);
+                              }}
+                              className="group relative flex flex-col items-center gap-2 rounded-2xl border border-border/40 bg-card/30 p-5 sm:p-6 text-center backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60 hover:shadow-xl hover:shadow-violet-500/5 hover:scale-[1.02] active:scale-[0.98]"
+                            >
+                              <div className={`flex size-10 sm:size-12 items-center justify-center rounded-xl bg-gradient-to-br ${tmpl.gradient} text-white shadow-lg`}>
+                                <Icon className="size-5 sm:size-6" />
+                              </div>
+                              <p className="text-sm font-semibold sm:text-base">{tmpl.label}</p>
+                              <p className="text-[11px] leading-snug text-muted-foreground sm:text-xs">{tmpl.desc}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    /* ── Form (with template pre-fill) ────── */
+                    <motion.div
+                      key="form-view"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -16 }}
+                      transition={{ duration: 0.25 }}
+                      className="mx-auto w-full max-w-xl sm:max-w-2xl"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedTemplate(null); setTemplateFormValues(undefined); }}
+                        className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <ArrowRight className="size-3.5 rotate-180" />
+                        Back to templates
+                      </button>
+                      <CurriculumForm
+                        key={selectedTemplate}
+                        onGenerated={handleGenerated}
+                        onLoadingChange={handleLoadingChange}
+                        onLimitReached={handleLimitReached}
+                        onSubmitAttempt={handleFormSubmitAttempt}
+                        initialValues={templateFormValues}
+                        isFreeUser={!user}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </>
             )}
           </div>
