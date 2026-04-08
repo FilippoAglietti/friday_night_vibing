@@ -22,6 +22,8 @@ import {
   HelpCircle,
   LayoutGrid,
   Lightbulb,
+  Lock,
+  Mail,
   Pencil,
   RefreshCw,
   RotateCcw,
@@ -37,7 +39,7 @@ import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
-import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
+import { generateShareableUrl, type LeadMagnetSettings } from "@/lib/exports/generateShareUrl";
 import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource } from "@/types/curriculum";
 
 interface CurriculumOutputProps {
@@ -599,6 +601,12 @@ export default function CurriculumOutput({
   const [copied, setCopied] = useState(false);
   const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
   const [showAudioPlayer, setShowAudioPlayer] = useState(true);
+  const [leadMagnet, setLeadMagnet] = useState<LeadMagnetSettings>({
+    enabled: false,
+    headline: "Get free access to this course",
+    ctaText: "Unlock Course",
+  });
+  const [showLeadMagnetPanel, setShowLeadMagnetPanel] = useState(false);
 
   // Build audio tracks from curriculum modules/lessons
   const audioTracks = useMemo<AudioTrack[]>(() => {
@@ -716,7 +724,10 @@ export default function CurriculumOutput({
 
   const handleShareLink = async () => {
     try {
-      const shareUrl = generateShareableUrl(curriculum);
+      const shareUrl = generateShareableUrl(
+        curriculum,
+        leadMagnet.enabled ? leadMagnet : undefined,
+      );
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -964,6 +975,93 @@ export default function CurriculumOutput({
               <span className="text-xs font-medium">Adjust Depth</span>
             </button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* ── Lead Magnet Mode ── */}
+      <Card className="border-violet-500/20 bg-gradient-to-br from-violet-500/[0.03] to-cyan-500/[0.03]">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-violet-500" />
+              <h2 className="font-semibold text-base">Lead Magnet Mode</h2>
+              <Badge variant="outline" className="text-[10px] ml-1 border-cyan-500/30 text-cyan-400">
+                Growth
+              </Badge>
+            </div>
+            <button
+              onClick={() => {
+                const next = !leadMagnet.enabled;
+                setLeadMagnet((prev) => ({ ...prev, enabled: next }));
+                if (next) setShowLeadMagnetPanel(true);
+              }}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                leadMagnet.enabled ? "bg-violet-600" : "bg-muted"
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform ${
+                  leadMagnet.enabled ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">
+            Gate your course behind an email capture — turn every share link into a lead generation machine.
+          </p>
+
+          {leadMagnet.enabled && (
+            <div className="space-y-3 pt-2 border-t border-border/30">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                  Gate Headline
+                </label>
+                <input
+                  type="text"
+                  value={leadMagnet.headline || ""}
+                  onChange={(e) =>
+                    setLeadMagnet((prev) => ({ ...prev, headline: e.target.value }))
+                  }
+                  placeholder="Get free access to this course"
+                  className="w-full rounded-lg border border-border/40 bg-card/50 px-3 py-2 text-sm focus:border-violet-500/50 focus:outline-none focus:ring-1 focus:ring-violet-500/20"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                  Description (optional)
+                </label>
+                <input
+                  type="text"
+                  value={leadMagnet.description || ""}
+                  onChange={(e) =>
+                    setLeadMagnet((prev) => ({ ...prev, description: e.target.value }))
+                  }
+                  placeholder="Enter your email to unlock all modules, quizzes, and audio lessons"
+                  className="w-full rounded-lg border border-border/40 bg-card/50 px-3 py-2 text-sm focus:border-violet-500/50 focus:outline-none focus:ring-1 focus:ring-violet-500/20"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                  Button Text
+                </label>
+                <input
+                  type="text"
+                  value={leadMagnet.ctaText || ""}
+                  onChange={(e) =>
+                    setLeadMagnet((prev) => ({ ...prev, ctaText: e.target.value }))
+                  }
+                  placeholder="Unlock Course"
+                  className="w-full rounded-lg border border-border/40 bg-card/50 px-3 py-2 text-sm focus:border-violet-500/50 focus:outline-none focus:ring-1 focus:ring-violet-500/20"
+                />
+              </div>
+              <div className="flex items-center gap-2 pt-1 text-xs text-muted-foreground">
+                <Lock className="size-3" />
+                <span>
+                  Visitors will see the course preview (title, stats, first module) but must enter their email to unlock the full content.
+                </span>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
