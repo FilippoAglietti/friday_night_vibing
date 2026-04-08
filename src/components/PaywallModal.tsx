@@ -21,6 +21,7 @@ import { useState } from "react";
 interface PaywallModalProps {
   open: boolean;
   onClose: () => void;
+  currentPlan?: "free" | "pro" | "pro_max";
 }
 
 /* Launch promo — mirrors the config in page.tsx */
@@ -105,8 +106,15 @@ const plans = [
   },
 ];
 
-export default function PaywallModal({ open, onClose }: PaywallModalProps) {
+export default function PaywallModal({ open, onClose, currentPlan = "free" }: PaywallModalProps) {
   const [loading, setLoading] = useState<string | null>(null);
+
+  // Filter plans based on current plan — don't show what they already have
+  const visiblePlans = currentPlan === "pro"
+    ? plans.filter((p) => p.id !== "pro")       // Pro users: show Pro Max + 5-Pack only
+    : currentPlan === "pro_max"
+    ? []                                          // Pro Max users: nothing to upgrade to
+    : plans;                                      // Free users: show all
 
   const handleCheckout = async (priceId: string) => {
     setLoading(priceId);
@@ -179,8 +187,8 @@ export default function PaywallModal({ open, onClose }: PaywallModalProps) {
               </div>
 
               {/* Plans grid */}
-              <div className="grid gap-4 sm:grid-cols-3 px-6 pb-8 pt-2">
-                {plans.map((plan) => (
+              <div className={`grid gap-4 px-6 pb-8 pt-2 ${visiblePlans.length === 2 ? "sm:grid-cols-2 max-w-2xl mx-auto" : "sm:grid-cols-3"}`}>
+                {visiblePlans.map((plan) => (
                   <div
                     key={plan.id}
                     className={`relative rounded-xl border p-5 transition-all ${

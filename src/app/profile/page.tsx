@@ -1839,7 +1839,7 @@ export default function ProfilePage() {
       </main>
 
       {/* Paywall Modal for Upgrade buttons */}
-      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />
+      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} currentPlan={(userProfile?.plan as "free" | "pro" | "pro_max") || "free"} />
 
       {/* Welcome Animation — plays on login */}
       <WelcomeAnimation
