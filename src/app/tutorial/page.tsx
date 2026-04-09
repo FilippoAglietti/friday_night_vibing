@@ -21,6 +21,7 @@ import {
   Wand2,
   Zap,
 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -112,6 +113,8 @@ const colorMap: Record<string, { gradient: string; bg: string; text: string; bor
 };
 
 export default function TutorialPage() {
+  const { t } = useTranslation();
+
   // Ensure dark theme matches the main website
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -129,23 +132,20 @@ export default function TutorialPage() {
         {/* Back link */}
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
           <ArrowLeft className="size-4" />
-          Back to home
+          {t("tutorial.backToHome")}
         </Link>
 
         {/* Header */}
         <motion.div {...fadeUp} className="text-center mb-16">
           <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/5 px-4 py-1.5 mb-6">
             <BookOpen className="size-3.5 text-violet-400" />
-            <span className="text-xs font-medium text-violet-400">Step-by-Step Guide</span>
+            <span className="text-xs font-medium text-violet-400">{t("tutorial.badge")}</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            How to Use{" "}
-            <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
-              Syllabi.ai
-            </span>
+            {t("tutorial.heading")}
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            From topic to a fully-structured, audio-narrated course in minutes. Here&apos;s how it works.
+            {t("tutorial.subheading")}
           </p>
         </motion.div>
 
@@ -206,15 +206,15 @@ export default function TutorialPage() {
           <Card className="border-violet-500/20 bg-gradient-to-br from-violet-500/5 via-indigo-500/5 to-card/50 backdrop-blur-sm">
             <CardContent className="py-12">
               <Wand2 className="size-10 text-violet-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-3">Ready to create your first course?</h2>
+              <h2 className="text-2xl font-bold mb-3">{t("tutorial.cta")}</h2>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                It takes less than 30 seconds. Pick a topic, and let AI do the heavy lifting.
+                {t("tutorial.subheading")}
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link href="/profile">
                   <Button className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 px-8 gap-2" size="lg">
                     <Play className="size-4" />
-                    Start Creating
+                    {t("tutorial.ctaBtn")}
                   </Button>
                 </Link>
                 <Link href="/#pricing">

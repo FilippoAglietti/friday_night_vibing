@@ -6,6 +6,8 @@ import LoadingSkeleton from "@/components/LoadingSkeleton";
 import PaywallModal from "@/components/PaywallModal";
 import AuthModal from "@/components/AuthModal";
 import AuthButton from "@/components/AuthButton";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ToastProvider";
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Curriculum } from "@/types/curriculum";
@@ -290,6 +292,15 @@ const courseTemplates: {
   },
 ];
 
+const TEMPLATE_KEY_MAP: Record<string, string> = {
+  "onboarding": "onboarding",
+  "lead-magnet": "leadMagnet",
+  "coaching": "coaching",
+  "sales-training": "sales",
+  "technical": "technical",
+  "blank": "scratch",
+};
+
 const difficultyColor: Record<string, string> = {
   Beginner:
     "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -385,20 +396,22 @@ function AnimateInView({
 
 /* ─── Section Meta ────────────────────────────────────── */
 
-const sectionMeta = [
-  { id: "hero",             label: "Hero"          },
-  { id: "problem-solution", label: "The Problem"   },
-  { id: "how-it-works",     label: "How It Works"  },
-  { id: "generate",         label: "Try It Now"    },
-  { id: "examples",         label: "Examples"      },
-  { id: "testimonials",     label: "Testimonials"  },
-  { id: "pricing",          label: "Pricing"       },
-  { id: "final-cta",        label: "Get Started"   },
-];
+const SECTION_IDS = ["hero", "problem-solution", "how-it-works", "generate", "examples", "testimonials", "pricing", "final-cta"];
 
 /* ─── Section Dots ────────────────────────────────────── */
 
 function SectionDots({ activeSection }: { activeSection: string }) {
+  const { t } = useTranslation();
+  const sectionMeta = [
+    { id: "hero",             label: t("sections.hero")          },
+    { id: "problem-solution", label: t("sections.theProblem")    },
+    { id: "how-it-works",     label: t("sections.howItWorks")    },
+    { id: "generate",         label: t("sections.tryItNow")      },
+    { id: "examples",         label: t("sections.examples")      },
+    { id: "testimonials",     label: t("sections.testimonials")  },
+    { id: "pricing",          label: t("sections.pricing")       },
+    { id: "final-cta",        label: t("sections.getStarted")    },
+  ];
   return (
     <div
       className="fixed right-5 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-3.5 lg:flex"
@@ -439,7 +452,7 @@ export default function Home() {
       },
       { root: container, threshold: [0.3, 0.5] }
     );
-    sectionMeta.forEach(({ id }) => {
+    SECTION_IDS.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
@@ -456,6 +469,7 @@ export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [templateFormValues, setTemplateFormValues] = useState<Partial<CurriculumFormData> | undefined>(undefined);
   const { toast } = useToast();
+  const { t } = useTranslation();
   const closePreview = useCallback(() => setPreviewCurriculum(null), []);
 
   useEffect(() => {
@@ -482,13 +496,13 @@ export default function Home() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("checkout") === "success") {
-      toast("Payment successful! You now have Pro access.", "success");
+      toast(t("toast.paymentSuccess"), "success");
       window.history.replaceState({}, "", "/");
     } else if (params.get("checkout") === "cancelled") {
-      toast("Checkout cancelled. You can try again anytime.", "info");
+      toast(t("toast.checkoutCancelled"), "info");
       window.history.replaceState({}, "", "/");
     } else if (params.get("auth_error") === "true") {
-      toast("Sign in failed. Please try again.", "error");
+      toast(t("toast.signInFailed"), "error");
       window.history.replaceState({}, "", "/");
     }
   }, [toast]);
@@ -499,7 +513,7 @@ export default function Home() {
 
   const handleGenerated = useCallback((c: Curriculum) => {
     setCurriculum(c);
-    toast("Course generated successfully!", "success");
+    toast(t("toast.courseGenerated"), "success");
   }, [toast]);
 
   /* ── (waitlist removed — Pro Max is now live) ── */
@@ -563,34 +577,35 @@ export default function Home() {
               href="#how-it-works"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              How it works
+              {t("nav.howItWorks")}
             </a>
             <a
               href="#examples"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Examples
+              {t("nav.examples")}
             </a>
             <a
               href="#pricing"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Pricing
+              {t("nav.pricing")}
             </a>
             <a
               href="/tutorial"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Tutorial
+              {t("nav.tutorial")}
             </a>
             <a
               href="/contact"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Contact Us
+              {t("nav.contactUs")}
             </a>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <Button
               id="theme-toggle"
               variant="ghost"
@@ -608,7 +623,7 @@ export default function Home() {
               size="lg"
               onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Get Started Free
+              {t("nav.getStartedFree")}
             </Button>
             <Button
               variant="ghost"
@@ -624,50 +639,20 @@ export default function Home() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl">
             <div className="mx-auto max-w-6xl px-4 py-3 space-y-1">
-              <a
-                href="#how-it-works"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-              >
-                How it works
-              </a>
-              <a
-                href="#examples"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-              >
-                Examples
-              </a>
-              <a
-                href="#pricing"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-              >
-                Pricing
-              </a>
-              <a
-                href="/tutorial"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-              >
-                Tutorial
-              </a>
-              <a
-                href="/contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-              >
-                Contact Us
-              </a>
+              <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.howItWorks")}</a>
+              <a href="#examples" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.examples")}</a>
+              <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.pricing")}</a>
+              <a href="/tutorial" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.tutorial")}</a>
+              <a href="/contact" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.contactUs")}</a>
               <div className="pt-2 pb-1">
+                <div className="px-4 pb-2">
+                  <LanguageSwitcher />
+                </div>
                 <Button
                   className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    document.getElementById("generate")?.scrollIntoView({ behavior: "smooth" });
-                  }}
+                  onClick={() => { setMobileMenuOpen(false); document.getElementById("generate")?.scrollIntoView({ behavior: "smooth" }); }}
                 >
-                  Get Started Free
+                  {t("nav.getStartedFree")}
                 </Button>
               </div>
             </div>
@@ -702,7 +687,7 @@ export default function Home() {
                   className="mb-6 rounded-full border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400"
                 >
                   <Headphones className="mr-1.5 size-3" />
-                  Audio Courses · Shareable Links · Stunning Design
+                  {t("hero.badge")}
                 </Badge>
               </motion.div>
 
@@ -710,12 +695,12 @@ export default function Home() {
                 variants={fadeUp}
                 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
               >
-                <span className="block">The Course Generator</span>
+                <span className="block">{t("hero.title1")}</span>
                 <span className="block text-[0.65em] font-semibold tracking-wide text-muted-foreground/70 mt-1">
-                  that
+                  {t("hero.titleConnector")}
                 </span>
                 <span className="block bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent tracking-[-0.02em] w-full text-center">
-                  Sounds as Good as It Looks
+                  {t("hero.title2")}
                 </span>
               </motion.h1>
 
@@ -723,9 +708,7 @@ export default function Home() {
                 variants={fadeUp}
                 className="mx-auto mt-4 sm:mt-6 max-w-2xl xl:max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-xl xl:text-2xl"
               >
-                AI creates complete courses with audio narration, beautiful
-                design, and shareable links — ready to teach, sell, or share
-                in seconds.
+                {t("hero.subtitle")}
               </motion.p>
 
               <motion.div
@@ -738,7 +721,7 @@ export default function Home() {
                   className="h-12 xl:h-14 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 xl:px-10 text-base xl:text-lg font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
                   onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  Generate Your First Course Free
+                  {t("hero.cta")}
                   <ArrowRight className="ml-2 size-4" />
                 </Button>
                 <Button
@@ -748,7 +731,7 @@ export default function Home() {
                   className="h-12 w-full sm:w-auto rounded-full px-8 text-base"
                   onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  Hear a Sample Course
+                  {t("hero.secondaryCta")}
                 </Button>
               </motion.div>
 
@@ -756,7 +739,7 @@ export default function Home() {
                 variants={fadeUp}
                 className="mt-4 text-xs text-muted-foreground"
               >
-                No credit card required · Your first course is free
+                {t("hero.tagline")}
               </motion.p>
             </motion.div>
           </div>
@@ -781,21 +764,19 @@ export default function Home() {
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
               >
-                The Problem
+                {t("problem.eyebrow")}
               </motion.p>
               <motion.h2
                 variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
-                Sound familiar?
+                {t("problem.heading")}
               </motion.h2>
               <motion.p
                 variants={fadeUp}
                 className="mx-auto mt-4 max-w-2xl text-muted-foreground"
               >
-                Other AI tools give you a text dump and call it a course.
-                Your students deserve audio they can listen to, design they
-                want to look at, and a link they can actually open.
+                {t("problem.subheading")}
               </motion.p>
             </AnimateInView>
 
@@ -808,10 +789,10 @@ export default function Home() {
                       <p.icon className="size-5 md:size-6 xl:size-7 2xl:size-9 text-violet-500" />
                     </div>
                     {/* Title */}
-                    <h3 className="text-lg xl:text-xl 2xl:text-2xl font-semibold">{p.problem}</h3>
+                    <h3 className="text-lg xl:text-xl 2xl:text-2xl font-semibold">{t(`problem.pain${i + 1}Problem`)}</h3>
                     {/* Description */}
                     <p className="mt-2 text-sm xl:text-base leading-relaxed text-muted-foreground">
-                      {p.solution}
+                      {t(`problem.pain${i + 1}Solution`)}
                     </p>
                   </div>
                 </motion.div>
@@ -836,13 +817,13 @@ export default function Home() {
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
               >
-                How It Works
+                {t("howItWorks.eyebrow")}
               </motion.p>
               <motion.h2
                 variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
-                Three steps. Zero headaches.
+                {t("howItWorks.heading")}
               </motion.h2>
             </AnimateInView>
 
@@ -867,9 +848,9 @@ export default function Home() {
                     <div className="mt-4 mb-3 md:mb-5 flex size-12 md:size-14 xl:size-16 2xl:size-20 items-center justify-center rounded-2xl bg-violet-500/10">
                       <s.icon className="size-5 md:size-6 xl:size-7 2xl:size-9 text-violet-500" />
                     </div>
-                    <h3 className="text-lg xl:text-xl 2xl:text-2xl font-semibold">{s.title}</h3>
+                    <h3 className="text-lg xl:text-xl 2xl:text-2xl font-semibold">{t(`howItWorks.step${i + 1}Title`)}</h3>
                     <p className="mt-2 text-sm xl:text-base leading-relaxed text-muted-foreground">
-                      {s.desc}
+                      {t(`howItWorks.step${i + 1}Desc`)}
                     </p>
                   </div>
                 </motion.div>
@@ -913,20 +894,20 @@ export default function Home() {
                     variants={fadeUp}
                     className="text-sm font-semibold uppercase tracking-widest text-violet-500"
                   >
-                    Try It Now
+                    {t("generate.eyebrow")}
                   </motion.p>
                   <motion.h2
                     variants={fadeUp}
                     className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
                   >
-                    {selectedTemplate ? "Customize & generate" : "Pick a starting point"}
+                    {selectedTemplate ? t("generate.headingCustomize") : t("generate.headingPick")}
                   </motion.h2>
                   {!selectedTemplate && (
                     <motion.p
                       variants={fadeUp}
                       className="mx-auto mt-3 max-w-lg text-muted-foreground"
                     >
-                      Choose a template to get started fast, or build from scratch.
+                      {t("generate.subheading")}
                     </motion.p>
                   )}
                 </AnimateInView>
@@ -958,8 +939,8 @@ export default function Home() {
                               <div className={`flex size-10 sm:size-12 items-center justify-center rounded-xl bg-gradient-to-br ${tmpl.gradient} text-white shadow-lg`}>
                                 <Icon className="size-5 sm:size-6" />
                               </div>
-                              <p className="text-sm font-semibold sm:text-base">{tmpl.label}</p>
-                              <p className="text-[11px] leading-snug text-muted-foreground sm:text-xs">{tmpl.desc}</p>
+                              <p className="text-sm font-semibold sm:text-base">{t(`templates.${TEMPLATE_KEY_MAP[tmpl.id]}Label`)}</p>
+                              <p className="text-[11px] leading-snug text-muted-foreground sm:text-xs">{t(`templates.${TEMPLATE_KEY_MAP[tmpl.id]}Desc`)}</p>
                             </button>
                           );
                         })}
@@ -981,7 +962,7 @@ export default function Home() {
                         className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <ArrowRight className="size-3.5 rotate-180" />
-                        Back to templates
+                        {t("generate.backToTemplates")}
                       </button>
                       <CurriculumForm
                         key={selectedTemplate}
@@ -1016,21 +997,19 @@ export default function Home() {
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
               >
-                Real Examples
+                {t("examples.eyebrow")}
               </motion.p>
               <motion.h2
                 variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
-                Hear it. See it. Share it.
+                {t("examples.heading")}
               </motion.h2>
               <motion.p
                 variants={fadeUp}
                 className="mx-auto mt-4 max-w-2xl text-muted-foreground"
               >
-                Every course below was generated in seconds — complete with
-                audio narration, structured lessons, quizzes, and a shareable
-                link.
+                {t("examples.subheading")}
               </motion.p>
             </AnimateInView>
 
@@ -1052,7 +1031,7 @@ export default function Home() {
                     {/* Preview hint on hover */}
                     <div className="absolute top-4 right-4 flex items-center gap-1.5 text-xs text-violet-400 opacity-0 transition-all duration-300 group-hover:opacity-100">
                       <Eye className="size-4" />
-                      <span className="font-medium">Preview</span>
+                      <span className="font-medium">{t("examples.preview")}</span>
                     </div>
 
                     {/* Title — fixed height so stats grid aligns across cards */}
@@ -1067,17 +1046,17 @@ export default function Home() {
                       <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3.5 xl:p-4">
                         <Layers className="mb-2 size-5 xl:size-6 text-violet-500" />
                         <span className="text-lg xl:text-xl font-bold">{c.modules}</span>
-                        <span className="text-[11px] xl:text-xs text-muted-foreground font-medium">Modules</span>
+                        <span className="text-[11px] xl:text-xs text-muted-foreground font-medium">{t("examples.modules")}</span>
                       </div>
                       <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3.5 xl:p-4">
                         <FileText className="mb-2 size-5 xl:size-6 text-violet-500" />
                         <span className="text-lg xl:text-xl font-bold">{c.lessons}</span>
-                        <span className="text-[11px] xl:text-xs text-muted-foreground font-medium">Lessons</span>
+                        <span className="text-[11px] xl:text-xs text-muted-foreground font-medium">{t("examples.lessons")}</span>
                       </div>
                       <div className="flex flex-col items-center rounded-xl bg-violet-500/5 border border-violet-500/10 p-3.5 xl:p-4">
                         <Clock className="mb-2 size-5 xl:size-6 text-violet-500" />
                         <span className="text-lg xl:text-xl font-bold">{c.hours}h</span>
-                        <span className="text-[11px] xl:text-xs text-muted-foreground font-medium">Total</span>
+                        <span className="text-[11px] xl:text-xs text-muted-foreground font-medium">{t("examples.total")}</span>
                       </div>
                     </div>
 
@@ -1116,25 +1095,24 @@ export default function Home() {
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
               >
-                What Creators Say
+                {t("testimonials.eyebrow")}
               </motion.p>
               <motion.h2
                 variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
-                They tried the rest. Then they heard Syllabi.ai
+                {t("testimonials.heading")}
               </motion.h2>
               <motion.p
                 variants={fadeUp}
                 className="mx-auto mt-4 max-w-2xl text-muted-foreground"
               >
-                Course creators, coaches, and trainers who switched to audio-first
-                courses and never looked back.
+                {t("testimonials.subheading")}
               </motion.p>
             </AnimateInView>
 
             <AnimateInView containerRef={containerRef} amount={0.1} variants={stagger} className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:gap-8">
-              {testimonials.map((t, i) => (
+              {testimonials.map((testimonial, i) => (
                 <motion.div key={i} variants={scaleUp}>
                   <div className="relative flex flex-col h-full p-6 xl:p-8 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/20 hover:bg-card/50">
                     {/* Quote icon */}
@@ -1144,17 +1122,17 @@ export default function Home() {
 
                     {/* Quote text */}
                     <p className="flex-1 text-sm leading-relaxed text-foreground/80 xl:text-base">
-                      &ldquo;{t.quote}&rdquo;
+                      &ldquo;{testimonial.quote}&rdquo;
                     </p>
 
                     {/* Author */}
                     <div className="mt-6 flex items-center gap-3">
-                      <div className={`flex size-10 items-center justify-center rounded-full bg-gradient-to-br ${t.gradient} text-xs font-bold text-white`}>
-                        {t.avatar}
+                      <div className={`flex size-10 items-center justify-center rounded-full bg-gradient-to-br ${testimonial.gradient} text-xs font-bold text-white`}>
+                        {testimonial.avatar}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold">{t.name}</p>
-                        <p className="text-xs text-muted-foreground">{t.role}</p>
+                        <p className="text-sm font-semibold">{testimonial.name}</p>
+                        <p className="text-xs text-muted-foreground">{testimonial.role}</p>
                       </div>
                     </div>
                   </div>
@@ -1180,21 +1158,21 @@ export default function Home() {
                 variants={fadeUp}
                 className="text-sm font-semibold uppercase tracking-widest text-violet-500"
               >
-                Pricing
+                {t("pricing.eyebrow")}
               </motion.p>
               <motion.h2
                 variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
-                Start free. Upgrade when you&apos;re ready.
+                {t("pricing.heading")}
               </motion.h2>
               <motion.div variants={fadeUp} className="mt-4 inline-flex items-center gap-3 rounded-full border border-rose-500/25 bg-gradient-to-r from-rose-500/10 via-violet-500/5 to-amber-500/10 px-5 py-2.5 backdrop-blur-sm shadow-lg shadow-rose-500/5">
                 <Flame className="size-4 text-rose-400 animate-pulse shrink-0" />
                 <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-rose-400 via-violet-400 to-amber-400 bg-clip-text text-transparent">
-                  Launch Special
+                  {t("pricing.launchSpecial")}
                 </span>
                 <span className="hidden sm:inline text-muted-foreground/30">·</span>
-                <span className="hidden sm:inline text-xs text-muted-foreground">Ends in</span>
+                <span className="hidden sm:inline text-xs text-muted-foreground">{t("pricing.endsIn")}</span>
                 <CountdownInline />
                 <Flame className="size-4 text-rose-400 animate-pulse shrink-0" />
               </motion.div>
@@ -1216,11 +1194,11 @@ export default function Home() {
                     <CardTitle className="text-3xl font-bold">
                       €0
                       <span className="text-base font-normal text-muted-foreground">
-                        /forever
+                        {t("pricing.forever")}
                       </span>
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      Create 3 mini-courses free. No credit card required.
+                      {t("pricing.freeDesc")}
                     </p>
                   </CardHeader>
                   <CardContent className="flex-1">
@@ -1233,7 +1211,7 @@ export default function Home() {
                             <X className="size-4 text-muted-foreground/40 shrink-0" />
                           )}
                           <span className={f.included ? "" : "text-muted-foreground/50"}>
-                            {f.text}
+                            {t(`pricing.free${i + 1}`)}
                           </span>
                         </li>
                       ))}
@@ -1247,7 +1225,7 @@ export default function Home() {
                       size="lg"
                       onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
                     >
-                      Get Started Free
+                      {t("pricing.getStartedFree")}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -1258,7 +1236,7 @@ export default function Home() {
                 <Card className="relative flex flex-col w-full overflow-visible border-violet-500/30 bg-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/5">
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                     <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">
-                      Most Popular
+                      {t("pricing.mostPopular")}
                     </Badge>
                   </div>
                   <CardHeader className="pt-8">
@@ -1268,15 +1246,15 @@ export default function Home() {
                     <CardTitle className="text-3xl font-bold">
                       €28
                       <span className="text-base font-normal text-muted-foreground">
-                        /month
+                        {t("pricing.month")}
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-sm line-through text-muted-foreground/60">€35/mo</span>
-                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 20%</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />{t("pricing.save20")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      For serious course creators who ship regularly.
+                      {t("pricing.proDesc")}
                     </p>
                   </CardHeader>
                   <CardContent className="flex-1">
@@ -1284,7 +1262,7 @@ export default function Home() {
                       {proPlanFeatures.map((f, i) => (
                         <li key={i} className="flex items-center gap-2.5 text-sm">
                           <Check className="size-4 text-violet-500 shrink-0" />
-                          <span>{f.text}</span>
+                          <span>{t(`pricing.pro${i + 1}`)}</span>
                         </li>
                       ))}
                     </ul>
@@ -1296,7 +1274,7 @@ export default function Home() {
                       size="lg"
                       onClick={() => setShowPaywall(true)}
                     >
-                      Start Pro — €28/mo
+                      {t("pricing.startProBtn")}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -1307,7 +1285,7 @@ export default function Home() {
                 <Card className="relative flex flex-col w-full overflow-visible border-amber-500/20 bg-gradient-to-b from-amber-500/[0.03] via-card/50 to-card/50 backdrop-blur-sm">
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                     <Badge className="rounded-full bg-gradient-to-r from-amber-600 to-orange-600 px-3.5 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-amber-500/30">
-                      One-Time
+                      {t("pricing.oneTime")}
                     </Badge>
                   </div>
                   <CardHeader className="pt-8">
@@ -1318,30 +1296,23 @@ export default function Home() {
                     <CardTitle className="text-3xl font-bold">
                       €33
                       <span className="text-base font-normal text-muted-foreground">
-                        {" "}one-time
+                        {" "}{t("pricing.oneTimeLabel")}
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-sm line-through text-muted-foreground/60">€42</span>
-                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 21%</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />{t("pricing.save21")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      5 premium generations. No subscription.
+                      {t("pricing.fivePackDesc")}
                     </p>
                   </CardHeader>
                   <CardContent className="flex-1">
                     <ul className="space-y-3">
-                      {[
-                        "5 Pro Max generations",
-                        "AI-generated audio lessons",
-                        "Full chapter content generation",
-                        "Premium Notion & PDF export",
-                        "White-label branding",
-                        "No recurring charges",
-                      ].map((text, i) => (
+                      {[1,2,3,4,5,6].map((n, i) => (
                         <li key={i} className="flex items-center gap-2.5 text-sm">
                           <Check className="size-4 text-amber-400 shrink-0" />
-                          <span>{text}</span>
+                          <span>{t(`pricing.pack${n}`)}</span>
                         </li>
                       ))}
                     </ul>
@@ -1353,7 +1324,7 @@ export default function Home() {
                       size="lg"
                       onClick={() => setShowPaywall(true)}
                     >
-                      Try Pro Max — €33
+                      {t("pricing.tryProMaxBtn")}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -1367,7 +1338,7 @@ export default function Home() {
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                     <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-3.5 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-amber-500/30 flex items-center gap-1.5">
                       <Crown className="size-3" />
-                      Best Value
+                      {t("pricing.bestValue")}
                     </Badge>
                   </div>
                   <CardHeader className="pt-8">
@@ -1378,15 +1349,15 @@ export default function Home() {
                     <CardTitle className="text-3xl font-bold">
                       €69
                       <span className="text-base font-normal text-muted-foreground">
-                        /month
+                        {t("pricing.month")}
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-sm line-through text-muted-foreground/60">€79/mo</span>
-                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 13%</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />{t("pricing.save13")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      The ultimate toolkit to create &amp; sell courses.
+                      {t("pricing.proMaxDesc")}
                     </p>
                   </CardHeader>
                   <CardContent className="flex-1">
@@ -1396,15 +1367,15 @@ export default function Home() {
                         <Headphones className="size-5 text-amber-500" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-amber-500">AI Audio Lessons</p>
-                        <p className="text-[11px] text-muted-foreground">Generate narrated audio for every lesson</p>
+                        <p className="text-xs font-semibold text-amber-500">{t("pricing.aiAudioTitle")}</p>
+                        <p className="text-[11px] text-muted-foreground">{t("pricing.aiAudioDesc")}</p>
                       </div>
                     </div>
                     <ul className="space-y-3">
                       {proMaxFeatures.map((f, i) => (
                         <li key={i} className="flex items-center gap-2.5 text-sm">
                           <Check className="size-4 text-amber-500 shrink-0" />
-                          <span>{f.text}</span>
+                          <span>{t(`pricing.pm${i + 1}`)}</span>
                         </li>
                       ))}
                     </ul>
@@ -1416,7 +1387,7 @@ export default function Home() {
                       size="lg"
                       onClick={() => setShowPaywall(true)}
                     >
-                      Go Pro Max — €69/mo
+                      {t("pricing.goProMaxBtn")}
                       <ArrowRight className="ml-2 size-4" />
                     </Button>
                   </CardFooter>
@@ -1440,14 +1411,14 @@ export default function Home() {
                         {freePlanFeatures.map((f, i) => (
                           <li key={i} className="flex items-center gap-2 text-xs">
                             {f.included ? <Check className="size-3.5 text-emerald-500 shrink-0" /> : <X className="size-3.5 text-muted-foreground/40 shrink-0" />}
-                            <span className={f.included ? "" : "text-muted-foreground/50"}>{f.text}</span>
+                            <span className={f.included ? "" : "text-muted-foreground/50"}>{t(`pricing.free${i + 1}`)}</span>
                           </li>
                         ))}
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
                       <Button className="w-full rounded-full" variant="outline" size="sm" onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}>
-                        Start Free
+                        {t("pricing.startFree")}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -1458,30 +1429,30 @@ export default function Home() {
                   <Card className="relative flex flex-col h-full overflow-visible border-violet-500/40 bg-gradient-to-b from-violet-500/10 via-card/50 to-card/50 backdrop-blur-sm shadow-xl shadow-violet-500/10">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500/60 to-transparent" />
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                      <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">Most Popular</Badge>
+                      <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">{t("pricing.mostPopular")}</Badge>
                     </div>
                     <CardHeader className="pt-7 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Pro</CardDescription>
-                      <CardTitle className="text-2xl font-bold">€28<span className="text-sm font-normal text-muted-foreground">/month</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€28<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">€35/mo</span>
                         <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-20%</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">For serious course creators.</p>
+                      <p className="text-xs text-muted-foreground">{t("pricing.proDesc")}</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
                       <ul className="space-y-2">
                         {proPlanFeatures.map((f, i) => (
                           <li key={i} className="flex items-center gap-2 text-xs">
                             <Check className="size-3.5 text-violet-500 shrink-0" />
-                            <span>{f.text}</span>
+                            <span>{t(`pricing.pro${i + 1}`)}</span>
                           </li>
                         ))}
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
                       <Button className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20" size="sm" onClick={() => setShowPaywall(true)}>
-                        Start Pro — €28/mo
+                        {t("pricing.startProBtn")}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -1494,26 +1465,26 @@ export default function Home() {
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
                         <Crown className="size-3" />Pro Max · 5-Pack
                       </CardDescription>
-                      <CardTitle className="text-2xl font-bold">€33<span className="text-sm font-normal text-muted-foreground"> one-time</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€33<span className="text-sm font-normal text-muted-foreground"> {t("pricing.oneTimeLabel")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">€42</span>
                         <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-21%</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">5 premium generations. No subscription.</p>
+                      <p className="text-xs text-muted-foreground">{t("pricing.fivePackDesc")}</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
                       <ul className="space-y-2">
-                        {["5 Pro Max generations", "AI-generated audio lessons", "Full chapter content generation", "Premium Notion & PDF export", "White-label branding", "No recurring charges"].map((text, i) => (
+                        {[1,2,3,4,5,6].map((n, i) => (
                           <li key={i} className="flex items-center gap-2 text-xs">
                             <Check className="size-3.5 text-amber-400 shrink-0" />
-                            <span>{text}</span>
+                            <span>{t(`pricing.pack${n}`)}</span>
                           </li>
                         ))}
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
                       <Button className="w-full rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20" size="sm" onClick={() => setShowPaywall(true)}>
-                        Try Pro Max — €33
+                        {t("pricing.tryProMaxBtn")}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -1525,19 +1496,19 @@ export default function Home() {
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
                       <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-3 py-1 text-xs font-semibold text-white border-0 shadow-lg shadow-amber-500/30 flex items-center gap-1">
-                        <Crown className="size-3" />Best Value
+                        <Crown className="size-3" />{t("pricing.bestValue")}
                       </Badge>
                     </div>
                     <CardHeader className="pt-7 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1">
                         <Crown className="size-3" />Pro Max
                       </CardDescription>
-                      <CardTitle className="text-2xl font-bold">€69<span className="text-sm font-normal text-muted-foreground">/month</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€69<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">€79/mo</span>
                         <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-13%</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">The ultimate course creation toolkit.</p>
+                      <p className="text-xs text-muted-foreground">{t("pricing.proMaxDesc")}</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
                       <div className="mb-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2.5 flex items-center gap-2.5">
@@ -1545,28 +1516,28 @@ export default function Home() {
                           <Headphones className="size-4 text-amber-500" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[10px] font-semibold text-amber-500">AI Audio Lessons</p>
-                          <p className="text-[10px] text-muted-foreground">Narrated audio for every lesson</p>
+                          <p className="text-[10px] font-semibold text-amber-500">{t("pricing.aiAudioTitle")}</p>
+                          <p className="text-[10px] text-muted-foreground">{t("pricing.aiAudioDesc")}</p>
                         </div>
                       </div>
                       <ul className="space-y-2">
                         {proMaxFeatures.slice(0, 5).map((f, i) => (
                           <li key={i} className="flex items-center gap-2 text-xs">
                             <Check className="size-3.5 text-amber-500 shrink-0" />
-                            <span>{f.text}</span>
+                            <span>{t(`pricing.pm${i + 1}`)}</span>
                           </li>
                         ))}
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
                       <Button className="w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40" size="sm" onClick={() => setShowPaywall(true)}>
-                        Go Pro Max — €69/mo
+                        {t("pricing.goProMaxBtn")}
                       </Button>
                     </CardFooter>
                   </Card>
                 </div>
               </div>
-              <p className="text-center text-[11px] text-muted-foreground/50 mt-1">Swipe to see all plans →</p>
+              <p className="text-center text-[11px] text-muted-foreground/50 mt-1">{t("pricing.swipePlans")}</p>
             </div>
           </div>
         </section>
@@ -1590,16 +1561,13 @@ export default function Home() {
                 variants={fadeUp}
                 className="text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl 2xl:text-6xl"
               >
-                Ready to hear the
-                <br />
-                difference?
+                {t("finalCta.heading")}
               </motion.h2>
               <motion.p
                 variants={fadeUp}
                 className="mx-auto mt-4 max-w-lg xl:max-w-2xl xl:text-lg text-muted-foreground"
               >
-                Create a course with audio, design, and a shareable link —
-                all in under 60 seconds. Your first generation is free.
+                {t("finalCta.subheading")}
               </motion.p>
               <motion.div variants={fadeUp}>
                 <Button
@@ -1608,7 +1576,7 @@ export default function Home() {
                   className="mt-8 xl:mt-10 h-12 xl:h-14 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 xl:px-12 text-base xl:text-lg font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
                   onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  Generate Your First Course Free
+                  {t("finalCta.cta")}
                   <ArrowRight className="ml-2 size-4" />
                 </Button>
               </motion.div>
@@ -1635,8 +1603,7 @@ export default function Home() {
                 </span>
               </a>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                AI-powered course generation for course creators, educators,
-                and coaches.
+                {t("footer.tagline")}
               </p>
               <div className="mt-4 flex gap-3">
                 <a
@@ -1665,103 +1632,28 @@ export default function Home() {
 
             {/* Product */}
             <div>
-              <h4 className="text-sm font-semibold">Product</h4>
+              <h4 className="text-sm font-semibold">{t("footer.product")}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a
-                    href="#how-it-works"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    How it works
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#examples"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Examples
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#pricing"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Pricing
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/tutorial"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Tutorial
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/docs#faq"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    API
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/contact"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Contact Us
-                  </a>
-                </li>
+                <li><a href="#how-it-works" className="hover:text-foreground transition-colors">{t("footer.howItWorks")}</a></li>
+                <li><a href="#examples" className="hover:text-foreground transition-colors">{t("footer.examples")}</a></li>
+                <li><a href="#pricing" className="hover:text-foreground transition-colors">{t("footer.pricing")}</a></li>
+                <li><a href="/tutorial" className="hover:text-foreground transition-colors">{t("footer.tutorial")}</a></li>
+                <li><a href="/docs#faq" className="hover:text-foreground transition-colors">{t("footer.api")}</a></li>
+                <li><a href="/contact" className="hover:text-foreground transition-colors">{t("footer.contactUs")}</a></li>
               </ul>
             </div>
 
             {/* Resources */}
             <div>
-              <h4 className="text-sm font-semibold">Resources</h4>
+              <h4 className="text-sm font-semibold">{t("footer.resources")}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <li><a href="/docs" className="hover:text-foreground transition-colors">{t("footer.documentation")}</a></li>
+                <li><a href="/blog" className="hover:text-foreground transition-colors">{t("footer.blog")}</a></li>
+                <li><a href="/changelog" className="hover:text-foreground transition-colors">{t("footer.changelog")}</a></li>
+                <li><a href="/support" className="hover:text-foreground transition-colors">{t("footer.support")}</a></li>
                 <li>
-                  <a
-                    href="/docs"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/blog"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/changelog"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Changelog
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/support"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Support
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLScHZQ9cSmQwUnDnHiSPSFaRyeS1Ijh4jbnueFAJ4fdedQZdfA/viewform"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-foreground transition-colors text-violet-400 font-medium"
-                  >
-                    Feedback
+                  <a href="https://docs.google.com/forms/d/e/1FAIpQLScHZQ9cSmQwUnDnHiSPSFaRyeS1Ijh4jbnueFAJ4fdedQZdfA/viewform" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors text-violet-400 font-medium">
+                    {t("footer.feedback")}
                   </a>
                 </li>
               </ul>
@@ -1769,42 +1661,21 @@ export default function Home() {
 
             {/* Legal */}
             <div>
-              <h4 className="text-sm font-semibold">Legal</h4>
+              <h4 className="text-sm font-semibold">{t("footer.legal")}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a
-                    href="/privacy"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/terms"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/cookies"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Cookie Policy
-                  </a>
-                </li>
+                <li><a href="/privacy" className="hover:text-foreground transition-colors">{t("footer.privacyPolicy")}</a></li>
+                <li><a href="/terms" className="hover:text-foreground transition-colors">{t("footer.termsOfService")}</a></li>
+                <li><a href="/cookies" className="hover:text-foreground transition-colors">{t("footer.cookiePolicy")}</a></li>
               </ul>
             </div>
           </div>
 
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/40 pt-8 sm:flex-row">
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Syllabi. All rights reserved.
+              {t("footer.copyright").replace("{year}", String(new Date().getFullYear()))}
             </p>
             <p className="text-xs text-muted-foreground">
-              Built with ❤️ for course creators
+              {t("footer.builtWith")}
             </p>
           </div>
         </div>
@@ -1835,7 +1706,7 @@ export default function Home() {
               className="sticky top-0 z-10 ml-auto flex items-center gap-1.5 mb-4 rounded-full bg-background/90 border border-border/60 px-4 py-2 text-sm font-medium text-foreground shadow-lg hover:bg-background transition-colors backdrop-blur-sm"
             >
               <XIcon className="size-4" />
-              Close preview
+              {t("modal.closePreview")}
             </button>
             <CurriculumOutput
               curriculum={previewCurriculum}

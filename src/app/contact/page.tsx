@@ -14,6 +14,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -21,6 +22,7 @@ const fadeUp = {
 };
 
 export default function ContactPage() {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -66,21 +68,21 @@ export default function ContactPage() {
         {/* Back link */}
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
           <ArrowLeft className="size-4" />
-          Back to home
+          {t("contact.backToHome")}
         </Link>
 
         {/* Header */}
         <motion.div {...fadeUp} className="text-center mb-12">
           <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/5 px-4 py-1.5 mb-6">
             <MessageCircle className="size-3.5 text-violet-400" />
-            <span className="text-xs font-medium text-violet-400">We&apos;d love to hear from you</span>
+            <span className="text-xs font-medium text-violet-400">{t("contact.badge")}</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Get In Touch
+            {t("contact.heading")}
             <span className="bg-gradient-to-r from-violet-500 to-indigo-500 bg-clip-text text-transparent">!</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Questions, ideas, or just want to say hi? We&apos;re building the future of course creation together.
+            {t("contact.subheading")}
           </p>
         </motion.div>
 
@@ -92,9 +94,9 @@ export default function ContactPage() {
           className="grid md:grid-cols-3 gap-4 mb-12"
         >
           {[
-            { icon: Mail, title: "Email Us", desc: "hello@syllabi.online", color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/20" },
-            { icon: Zap, title: "Quick Response", desc: "Usually within 24 hours", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
-            { icon: Users, title: "Join the Community", desc: "Connect with other creators", color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20" },
+            { icon: Mail, title: t("contact.emailTitle"), desc: t("contact.emailDesc"), color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/20" },
+            { icon: Zap, title: t("contact.responseTitle"), desc: t("contact.responseDesc"), color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
+            { icon: Users, title: t("contact.communityTitle"), desc: t("contact.communityDesc"), color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20" },
           ].map((item) => (
             <Card key={item.title} className={`border ${item.bg} bg-card/30 backdrop-blur-sm`}>
               <CardContent className="flex items-center gap-3 py-4 px-5">
@@ -124,54 +126,54 @@ export default function ContactPage() {
                   <div className="inline-flex items-center justify-center size-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-6">
                     <Sparkles className="size-8 text-emerald-400" />
                   </div>
-                  <h2 className="text-2xl font-bold mb-3">Message sent!</h2>
-                  <p className="text-muted-foreground mb-6">Thanks for reaching out. We&apos;ll get back to you soon.</p>
+                  <h2 className="text-2xl font-bold mb-3">{t("contact.sentTitle")}</h2>
+                  <p className="text-muted-foreground mb-6">{t("contact.sentDesc")}</p>
                   <Button variant="outline" onClick={() => { setSent(false); setForm({ name: "", email: "", subject: "", message: "" }); }}>
-                    Send another message
+                    {t("contact.sendAnother")}
                   </Button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid md:grid-cols-2 gap-5">
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Your Name</label>
+                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">{t("contact.nameLabel")}</label>
                       <input
                         required
                         className="w-full rounded-xl border border-border/50 bg-muted/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500/40 transition-all"
-                        placeholder="John Doe"
+                        placeholder={t("contact.namePlaceholder")}
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Email Address</label>
+                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">{t("contact.emailLabel")}</label>
                       <input
                         required
                         type="email"
                         className="w-full rounded-xl border border-border/50 bg-muted/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500/40 transition-all"
-                        placeholder="you@example.com"
+                        placeholder={t("contact.emailPlaceholder")}
                         value={form.email}
                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Subject</label>
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">{t("contact.subjectLabel")}</label>
                     <input
                       required
                       className="w-full rounded-xl border border-border/50 bg-muted/20 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500/40 transition-all"
-                      placeholder="How can we help?"
+                      placeholder={t("contact.subjectPlaceholder")}
                       value={form.subject}
                       onChange={(e) => setForm({ ...form, subject: e.target.value })}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Message</label>
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">{t("contact.messageLabel")}</label>
                     <textarea
                       required
                       rows={5}
                       className="w-full rounded-xl border border-border/50 bg-muted/20 px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500/40 transition-all"
-                      placeholder="Tell us what's on your mind..."
+                      placeholder={t("contact.messagePlaceholder")}
                       value={form.message}
                       onChange={(e) => setForm({ ...form, message: e.target.value })}
                     />
@@ -182,10 +184,10 @@ export default function ContactPage() {
                     className="w-full md:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all px-8 py-3 gap-2"
                     size="lg"
                   >
-                    {sending ? "Sending..." : (
+                    {sending ? t("contact.sendingBtn") : (
                       <>
                         <Send className="size-4" />
-                        Send Message
+                        {t("contact.sendBtn")}
                       </>
                     )}
                   </Button>
@@ -197,7 +199,7 @@ export default function ContactPage() {
 
         {/* Footer note */}
         <p className="text-center text-xs text-muted-foreground mt-8">
-          You can also email us directly at{" "}
+          {t("contact.footerNote")}{" "}
           <a href="mailto:hello@syllabi.online" className="text-violet-400 hover:underline">
             hello@syllabi.online
           </a>
