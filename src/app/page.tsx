@@ -164,11 +164,11 @@ const freePlanFeatures = [
   { text: "PDF & Notion export", included: true },
   { text: "Shareable course links", included: true },
   { text: "Audio narration", included: false },
-  { text: "Unlimited generations", included: false },
+  { text: "15 generations/month (Pro)", included: false },
 ];
 
 const proPlanFeatures = [
-  { text: "Unlimited course generations", included: true },
+  { text: "15 course generations/month", included: true },
   { text: "Full modules, lessons & quizzes", included: true },
   { text: "PDF, Markdown & Notion export", included: true },
   { text: "All course lengths & styles", included: true },
@@ -577,6 +577,18 @@ export default function Home() {
             >
               Pricing
             </a>
+            <a
+              href="/tutorial"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Tutorial
+            </a>
+            <a
+              href="/contact"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Contact Us
+            </a>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -633,6 +645,20 @@ export default function Home() {
               >
                 Pricing
               </a>
+              <a
+                href="/tutorial"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                Tutorial
+              </a>
+              <a
+                href="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                Contact Us
+              </a>
               <div className="pt-2 pb-1">
                 <Button
                   className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20"
@@ -682,11 +708,13 @@ export default function Home() {
 
               <motion.h1
                 variants={fadeUp}
-                className="text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
+                className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
               >
-                The Course Generator That
-                <br />
-                <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
+                <span className="block">The Course Generator</span>
+                <span className="block text-[0.65em] font-semibold tracking-wide text-muted-foreground/70 mt-1">
+                  that
+                </span>
+                <span className="block bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent tracking-[-0.02em] w-full text-center">
                   Sounds as Good as It Looks
                 </span>
               </motion.h1>
@@ -1094,7 +1122,7 @@ export default function Home() {
                 variants={fadeUp}
                 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
               >
-                They tried the rest. Then they heard Syllabi.
+                They tried the rest. Then they heard Syllabi.ai
               </motion.h2>
               <motion.p
                 variants={fadeUp}
@@ -1186,7 +1214,7 @@ export default function Home() {
                       Free
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      $0
+                      €0
                       <span className="text-base font-normal text-muted-foreground">
                         /forever
                       </span>
@@ -1238,14 +1266,14 @@ export default function Home() {
                       Pro
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      $19
+                      €28
                       <span className="text-base font-normal text-muted-foreground">
                         /month
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm line-through text-muted-foreground/60">$29/mo</span>
-                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 34%</span>
+                      <span className="text-sm line-through text-muted-foreground/60">€35/mo</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 20%</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       For serious course creators who ship regularly.
@@ -1268,7 +1296,7 @@ export default function Home() {
                       size="lg"
                       onClick={() => setShowPaywall(true)}
                     >
-                      Start Pro — $19/mo
+                      Start Pro — €28/mo
                     </Button>
                   </CardFooter>
                 </Card>
@@ -1288,14 +1316,14 @@ export default function Home() {
                       Pro Max · 5-Pack
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      $29
+                      €33
                       <span className="text-base font-normal text-muted-foreground">
                         {" "}one-time
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm line-through text-muted-foreground/60">$39</span>
-                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 26%</span>
+                      <span className="text-sm line-through text-muted-foreground/60">€42</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 21%</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
                       5 premium generations. No subscription.
@@ -1325,7 +1353,7 @@ export default function Home() {
                       size="lg"
                       onClick={() => setShowPaywall(true)}
                     >
-                      Try Pro Max — $29
+                      Try Pro Max — €33
                     </Button>
                   </CardFooter>
                 </Card>
@@ -1348,13 +1376,13 @@ export default function Home() {
                       Pro Max
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      $69
+                      €69
                       <span className="text-base font-normal text-muted-foreground">
                         /month
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm line-through text-muted-foreground/60">$79/mo</span>
+                      <span className="text-sm line-through text-muted-foreground/60">€79/mo</span>
                       <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />Save 13%</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -1388,7 +1416,7 @@ export default function Home() {
                       size="lg"
                       onClick={() => setShowPaywall(true)}
                     >
-                      Go Pro Max — $69/mo
+                      Go Pro Max — €69/mo
                       <ArrowRight className="ml-2 size-4" />
                     </Button>
                   </CardFooter>
@@ -1404,7 +1432,7 @@ export default function Home() {
                   <Card className="relative flex flex-col h-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
                     <CardHeader className="pt-6 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Free</CardDescription>
-                      <CardTitle className="text-2xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/forever</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€0<span className="text-sm font-normal text-muted-foreground">/forever</span></CardTitle>
                       <p className="text-xs text-muted-foreground">Create 3 mini-courses free. No card required.</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
@@ -1434,10 +1462,10 @@ export default function Home() {
                     </div>
                     <CardHeader className="pt-7 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Pro</CardDescription>
-                      <CardTitle className="text-2xl font-bold">$19<span className="text-sm font-normal text-muted-foreground">/month</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€28<span className="text-sm font-normal text-muted-foreground">/month</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-xs line-through text-muted-foreground/60">$29/mo</span>
-                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-34%</span>
+                        <span className="text-xs line-through text-muted-foreground/60">€35/mo</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-20%</span>
                       </div>
                       <p className="text-xs text-muted-foreground">For serious course creators.</p>
                     </CardHeader>
@@ -1453,7 +1481,7 @@ export default function Home() {
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
                       <Button className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20" size="sm" onClick={() => setShowPaywall(true)}>
-                        Start Pro — $19/mo
+                        Start Pro — €28/mo
                       </Button>
                     </CardFooter>
                   </Card>
@@ -1466,10 +1494,10 @@ export default function Home() {
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
                         <Crown className="size-3" />Pro Max · 5-Pack
                       </CardDescription>
-                      <CardTitle className="text-2xl font-bold">$29<span className="text-sm font-normal text-muted-foreground"> one-time</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€33<span className="text-sm font-normal text-muted-foreground"> one-time</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-xs line-through text-muted-foreground/60">$39</span>
-                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-26%</span>
+                        <span className="text-xs line-through text-muted-foreground/60">€42</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-21%</span>
                       </div>
                       <p className="text-xs text-muted-foreground">5 premium generations. No subscription.</p>
                     </CardHeader>
@@ -1485,7 +1513,7 @@ export default function Home() {
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
                       <Button className="w-full rounded-full bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20" size="sm" onClick={() => setShowPaywall(true)}>
-                        Try Pro Max — $29
+                        Try Pro Max — €33
                       </Button>
                     </CardFooter>
                   </Card>
@@ -1504,9 +1532,9 @@ export default function Home() {
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1">
                         <Crown className="size-3" />Pro Max
                       </CardDescription>
-                      <CardTitle className="text-2xl font-bold">$69<span className="text-sm font-normal text-muted-foreground">/month</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€69<span className="text-sm font-normal text-muted-foreground">/month</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-xs line-through text-muted-foreground/60">$79/mo</span>
+                        <span className="text-xs line-through text-muted-foreground/60">€79/mo</span>
                         <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-13%</span>
                       </div>
                       <p className="text-xs text-muted-foreground">The ultimate course creation toolkit.</p>
@@ -1532,7 +1560,7 @@ export default function Home() {
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
                       <Button className="w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40" size="sm" onClick={() => setShowPaywall(true)}>
-                        Go Pro Max — $69/mo
+                        Go Pro Max — €69/mo
                       </Button>
                     </CardFooter>
                   </Card>
@@ -1665,10 +1693,26 @@ export default function Home() {
                 </li>
                 <li>
                   <a
+                    href="/tutorial"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Tutorial
+                  </a>
+                </li>
+                <li>
+                  <a
                     href="/docs#faq"
                     className="hover:text-foreground transition-colors"
                   >
                     API
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/contact"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Contact Us
                   </a>
                 </li>
               </ul>

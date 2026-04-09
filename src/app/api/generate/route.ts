@@ -881,7 +881,9 @@ async function createSupabaseServer() {
 /**
  * Checks whether the authenticated user is allowed to generate a curriculum.
  * Free plan: 3 mini-course generations.
- * Pro plan: unlimited.
+ * Pro plan: 15 generations/month.
+ * Pro Max monthly: unlimited (-1).
+ * Pro Max 5-Pack: 5 one-time generations.
  *
  * @param userId - The authenticated user's UUID
  * @returns true if generation is allowed, false if the limit is reached
@@ -900,15 +902,10 @@ async function checkGenerationLimit(userId: string): Promise<boolean> {
     return true;
   }
 
-  // Pro users have unlimited generations
-  if (profile.plan === "pro") return true;
-
   // Pro Max monthly subscribers: generations_limit = -1 means unlimited.
-  // Pro Max 5-Pack (one-time): generations_limit is a positive integer that
-  // gets decremented via generations_used just like free plans.
   if (profile.plan === "pro_max" && profile.generations_limit < 0) return true;
 
-  // Free / Pro Max 5-Pack / any other bounded plan: limit by counter
+  // All other plans (free=3, pro=15, pro_max 5-pack=5): limit by counter
   return profile.generations_used < profile.generations_limit;
 }
 
@@ -1108,7 +1105,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
             success: false,
             error: "Generation limit reached.",
             details:
-              "You have used all your free generations. Upgrade to Pro for unlimited access.",
+              "You have used all your generations. Upgrade to Pro for 15 generations/month.",
           },
           { status: 403 }
         );

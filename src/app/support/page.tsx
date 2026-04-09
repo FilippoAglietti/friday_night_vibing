@@ -75,7 +75,7 @@ const faqs = [
       },
       {
         q: "What's the difference between Pro and the 5-Pack?",
-        a: "Pro ($29/month) is a subscription with unlimited generations — ideal if you create courses regularly. The 5-Pack ($39 one-time) gives you 5 generations with no recurring charges — ideal if you just need a few courses.",
+        a: "Pro (€28/month) gives you 15 course generations per month — ideal if you create courses regularly. The 5-Pack (€33 one-time) gives you 5 premium generations with no recurring charges — ideal if you just need a few courses.",
       },
       {
         q: "Is my payment information secure?",

@@ -49,6 +49,7 @@ import {
   Eye,
   Presentation,
   FileDown,
+  Pencil,
 } from "lucide-react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
@@ -58,6 +59,7 @@ import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
 import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength } from "@/components/CurriculumForm";
+import CourseEditor from "@/components/CourseEditor";
 import PaywallModal from "@/components/PaywallModal";
 import OnboardingQuiz, { type OnboardingAnswers } from "@/components/OnboardingQuiz";
 import WelcomeAnimation from "@/components/WelcomeAnimation";
@@ -330,6 +332,7 @@ export default function ProfilePage() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [editingGenId, setEditingGenId] = useState<string | null>(null);
 
   // Read URL params for welcome animation and onboarding quiz
   useEffect(() => {
@@ -599,6 +602,22 @@ export default function ProfilePage() {
     setTimeout(() => setCopiedId(null), 2000);
   }, []);
 
+  // ── Course editor save handler ────────────────────────────
+  const handleSaveEditedCourse = useCallback(async (genId: string, updated: Curriculum) => {
+    // Update local state immediately
+    setGenerations((prev) =>
+      prev.map((g) => (g.id === genId ? { ...g, curriculum: updated, topic: updated.title } : g))
+    );
+    setEditingGenId(null);
+
+    // Persist to Supabase
+    try {
+      await supabaseBrowser.from("courses").update({ curriculum: JSON.parse(JSON.stringify(updated)) }).eq("id", genId);
+    } catch (e) {
+      console.error("Failed to save edited course:", e);
+    }
+  }, []);
+
   // ── Onboarding complete handler ────────────────────────────
   const handleOnboardingComplete = useCallback(async (answers: OnboardingAnswers) => {
     setShowOnboarding(false);
@@ -763,6 +782,9 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between pt-2 border-t border-border/20">
               <span className="text-[10px] text-muted-foreground">{timeAgo(gen.created_at)}</span>
               <div className="flex gap-0.5">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-indigo-500/10 hover:text-indigo-400" onClick={(e) => { e.stopPropagation(); setEditingGenId(gen.id); }} title="Edit Course">
+                  <Pencil className="size-3.5" />
+                </Button>
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c); }} title="Download PDF">
                   <Download className="size-3.5" />
                 </Button>
@@ -1599,6 +1621,19 @@ export default function ProfilePage() {
                   )}
                 </CardContent>
               </Card>
+            ) : editingGenId ? (
+              /* ── Course Editor View ── */
+              (() => {
+                const editingGen = generations.find((g) => g.id === editingGenId);
+                if (!editingGen?.curriculum) { setEditingGenId(null); return null; }
+                return (
+                  <CourseEditor
+                    curriculum={editingGen.curriculum}
+                    onSave={(updated) => handleSaveEditedCourse(editingGenId, updated)}
+                    onClose={() => setEditingGenId(null)}
+                  />
+                );
+              })()
             ) : (
               <>
                 <p className="text-xs text-muted-foreground mb-4">
@@ -1766,7 +1801,7 @@ export default function ProfilePage() {
                   <div>
                     <p className="font-semibold text-sm">{planLabel} Plan</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {userProfile?.plan === "free" ? "3 mini-course generations included" : userProfile?.plan === "pro" ? "Unlimited generations" : userProfile && userProfile.generations_limit > 0 && userProfile.generations_limit < 1000 ? `${userProfile.generations_limit} Pro Max generations` : "Unlimited generations"}
+                      {userProfile?.plan === "free" ? "3 mini-course generations included" : userProfile?.plan === "pro" ? "15 generations/month" : userProfile && userProfile.generations_limit > 0 && userProfile.generations_limit < 1000 ? `${userProfile.generations_limit} Pro Max generations` : "Unlimited generations"}
                     </p>
                   </div>
                   <Badge variant="outline" className={`text-xs ${planBadgeClass}`}>{planLabel}</Badge>

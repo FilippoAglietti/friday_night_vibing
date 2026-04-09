@@ -170,25 +170,25 @@ export async function POST(req: NextRequest) {
 
         console.log(`[stripe-webhook] Upgraded user ${userId} to Pro Max monthly (unlimited)`);
       } else if (plan === "pro") {
-        // ── Pro monthly subscription: unlimited (legacy, 999999) ──
+        // ── Pro monthly subscription: 15 generations/month ──
         await supabaseAdmin
           .from("profiles")
           .update({
             plan: "pro",
-            generations_limit: 999999,
+            generations_limit: 15,
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
 
-        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro monthly`);
+        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro monthly (15 generations)`);
       } else {
         console.warn(`[stripe-webhook] Unknown plan for price ${priceId}, treating as Pro`);
         await supabaseAdmin
           .from("profiles")
           .update({
             plan: "pro",
-            generations_limit: 999999,
+            generations_limit: 15,
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
           })
@@ -239,7 +239,7 @@ export async function POST(req: NextRequest) {
           .from("profiles")
           .update({
             plan: "pro",
-            generations_limit: 999999,
+            generations_limit: 15,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
@@ -311,7 +311,7 @@ export async function POST(req: NextRequest) {
           .from("profiles")
           .update({
             plan: "pro",
-            generations_limit: 999999,
+            generations_limit: 15,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);

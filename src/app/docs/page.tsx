@@ -78,11 +78,11 @@ const sections = [
         body: "Generate 1 mini-course at no cost. Exports are limited to JSON. No credit card required.",
       },
       {
-        heading: "Pro ($29/month)",
-        body: "Unlimited course generations. Full content including quizzes, pacing schedules, and all export formats (JSON, Markdown, PDF, Notion). Custom pacing and priority AI processing.",
+        heading: "Pro (€28/month)",
+        body: "15 course generations/month. Full content including quizzes, pacing schedules, and all export formats (JSON, Markdown, PDF, Notion). Custom pacing and priority AI processing.",
       },
       {
-        heading: "5-Pack ($39 one-time)",
+        heading: "5-Pack (€33 one-time)",
         body: "5 full course generations with no recurring subscription. All export formats included.",
       },
     ],
