@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "src/app/api/generate/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/audio/generate/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/curriculum/[id]/regenerate-module/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/curriculum/[id]/add-module/route.ts": {
+      "maxDuration": 300
+    },
+    "src/app/api/curriculum/[id]/adjust-depth/route.ts": {
+      "maxDuration": 300
+    }
+  }
+}
