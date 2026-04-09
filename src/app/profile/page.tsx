@@ -51,6 +51,7 @@ import {
   FileDown,
   Pencil,
 } from "lucide-react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
@@ -921,6 +922,7 @@ export default function ProfilePage() {
             <span>syllabi<span className="text-violet-500">.ai</span></span>
           </a>
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setDark(!dark)}>
               {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </Button>
