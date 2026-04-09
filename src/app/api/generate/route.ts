@@ -278,7 +278,8 @@ function getMaxTokensForLength(length: CourseLength): number {
   //   crash   : 5120  / 120s single-shot → needs 43 tok/s (safe)
   //   short   : 10240 / 180s single-shot → needs 57 tok/s (fits happy path)
   //   full/masterclass: these values are IGNORED — chunked path passes
-  //     explicit overrideMaxTokens for skeleton (16384) and modules (5120).
+  //     explicit overrideMaxTokens for skeleton (24576) and modules (24576)
+  //     and uses Haiku 4.5 (~150 tok/s), not Sonnet.
   switch (length) {
     case "crash": return 5120;
     case "short": return 10240;
@@ -544,13 +545,20 @@ async function generateCurriculumChunked(
   // same work in ~50-70s, freeing ~100s for the expensive per-module
   // content generation (which stays on Sonnet for quality).
   //
-  // 16k max_tokens and 100s timeout comfortably fit a full 10-module
+  // 24k max_tokens and 100s timeout comfortably fit a full 10-module
   // non-English academic outline with generous streaming headroom.
+  // Haiku 4.5 supports 64k output tokens natively, and Italian/other
+  // non-English languages tokenize ~20-30% heavier than English, so we
+  // carry the headroom all the way to the skeleton phase too. At ~150
+  // tok/s that's a worst-case ~164s stream — still inside the 100s
+  // typical window because skeletons rarely exceed 8k tokens in practice.
+  // The extra ceiling is insurance, not the expected path.
+  //
   // Skeleton retries are allowed (maxAttempts=2 default) because this is
   // the one phase cheap enough to pay for one — ~60s × 2 = 120s budget,
   // which fits in 280s global deadline even if the retry fires.
   const skelResponse = await callClaudeWithRetry(
-    anthropic, skelSystem, skelMessages, request.length, 1, 16384,
+    anthropic, skelSystem, skelMessages, request.length, 1, 24576,
     `${courseId}/skeleton`, 100_000, "claude-haiku-4-5-20251001",
   );
 
@@ -599,17 +607,20 @@ async function generateCurriculumChunked(
   const detailedModules: Module[] = new Array(totalModules);
   let completedModules = 0;
 
-  // Gentle kickoff stagger: spacing module launches by 150ms over 10
-  // modules = 1.5s total extra latency, but it spreads the initial TCP
-  // handshake + token bucket burn across the Anthropic edge and has
-  // measurably reduced the "initial burst throttled" phenomenon where
-  // the first 0.5s of a parallel fan-out starves N streams simultaneously.
-  const KICKOFF_STAGGER_MS = 150;
+  // Kickoff stagger DISABLED (was 150ms per module → mod-10 lost ~1.5s
+  // of runway vs mod-1 and frequently fell to the skeleton-stub backfill
+  // in Tentativo 12). Haiku 4.5 on Anthropic's edge has independent rate
+  // buckets from Sonnet and comfortably handles 10 concurrent streams
+  // without the "initial burst throttled" phenomenon that motivated the
+  // original stagger on Sonnet. Zero stagger = every module gets the
+  // full 280s global budget and we get 10/10 clean instead of 9/10 with
+  // a stub on the last slot.
+  const KICKOFF_STAGGER_MS = 0;
 
   const modulePromises = skeleton.modules.map(async (moduleData, moduleIndex) => {
-    // Stagger the start of each module request by index * 150ms so we
-    // don't slam the API with a 10-request burst in the same millisecond.
-    if (moduleIndex > 0) {
+    // Stagger kept for defensiveness (guard against future regressions
+    // if we re-enable). Currently a no-op because KICKOFF_STAGGER_MS = 0.
+    if (moduleIndex > 0 && KICKOFF_STAGGER_MS > 0) {
       await new Promise((r) => setTimeout(r, moduleIndex * KICKOFF_STAGGER_MS));
     }
     const { system: modSystem, messages: modMessages } = buildModuleDetailCurriculumPrompt(
@@ -621,7 +632,7 @@ async function generateCurriculumChunked(
       totalModules,
     );
 
-    // Module budget: 16k tokens / 180s timeout / NO retry / HAIKU 4.5.
+    // Module budget: 24k tokens / 180s timeout / NO retry / HAIKU 4.5.
     //
     // Post-Tentativo 11 pivot (the diagnostic breakthrough):
     //   Tentativo 11 surfaced the TRUE failure via per-module error
@@ -635,21 +646,27 @@ async function generateCurriculumChunked(
     //   markdown" per lesson with no upper bound, which a capable model
     //   happily expands into 8k+ tokens of prose per module.
     //
-    // Two stacked fixes:
-    //   1. Bump to 16384 tokens — Haiku 4.5 supports up to 64k output
-    //      tokens, so 16k is safe, and at 100-150 tok/s it still fits
-    //      the 180s timeout comfortably (107-164s stream time).
+    // Current stacked defense:
+    //   1. Bumped to 24576 tokens (from 16384) — Haiku 4.5 supports up to
+    //      64k output tokens, so 24k is safe and gives us comfortable
+    //      ~50% headroom on top of the 16k that already worked in the
+    //      English Tentativi. This is specifically for non-English (IT,
+    //      ES, DE, FR) which tokenize ~20-30% heavier and were the last
+    //      failure surface after the Tentativo 12 English validation.
+    //      Per Filippo's explicit ask: "metti di default più token per
+    //      haiku tanto il limite è alto". At ~150 tok/s that's a
+    //      worst-case ~164s stream — still inside the 180s timeout.
     //   2. Tightened prompt in MODULE_DETAIL_SYSTEM_PROMPT / builder to
     //      enforce strict per-lesson word budgets (280-400 words, 4
     //      keyPoints, 2 resources). This keeps actual generated output
-    //      in the 5-8k token range with 8k+ tokens of ceiling margin.
+    //      in the 5-8k token range with massive ceiling margin.
     //
     // Retry stays DISABLED: same reasoning as before (retry doubles
     // budget, blows Vercel cap, and backfill already recovers).
     const modResponse = await callClaudeWithRetry(
       anthropic, modSystem, modMessages, request.length,
       /* attempt */ 1,
-      /* overrideMaxTokens */ 16384,
+      /* overrideMaxTokens */ 24576,
       /* label */ `${courseId}/module-${moduleData.id}`,
       /* timeoutMs */ 180_000,
       /* model */ "claude-haiku-4-5-20251001",

@@ -223,27 +223,37 @@ export async function POST(req: NextRequest) {
       const renewalPriceId = (invoice.lines?.data?.[0] as any)?.price?.id || "";
       const renewalPlan = getPlanFromPriceId(renewalPriceId);
 
+      // CRITICAL: reset generations_used on every monthly renewal so the
+      // 15 gen/month budget actually means "per month" and not "per
+      // lifetime of the subscription". Without this reset, a Pro user
+      // hitting 15 in month 1 stays blocked forever despite renewing.
+      //
+      // We reset on any non-initial invoice.paid (the initial one is
+      // filtered out above via billing_reason === "subscription_create").
+      // subscription_cycle is the normal monthly renewal.
       if (renewalPlan === "promax") {
         await supabaseAdmin
           .from("profiles")
           .update({
             plan: "pro_max",
             generations_limit: -1,
+            generations_used: 0, // fresh month → fresh budget
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
-        console.log(`[stripe-webhook] Invoice paid — confirmed pro_max for user ${userId}`);
+        console.log(`[stripe-webhook] Invoice paid — confirmed pro_max for user ${userId}, counter reset to 0`);
       } else {
-        // Default: legacy Pro monthly renewal
+        // Default: Pro monthly renewal (€28/mo → 15 generations)
         await supabaseAdmin
           .from("profiles")
           .update({
             plan: "pro",
             generations_limit: 15,
+            generations_used: 0, // fresh month → fresh 15 generations
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
-        console.log(`[stripe-webhook] Invoice paid — confirmed pro for user ${userId}`);
+        console.log(`[stripe-webhook] Invoice paid — confirmed pro for user ${userId}, counter reset to 0`);
       }
       break;
     }
@@ -302,30 +312,48 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // Sync the current plan from the subscription's price
+      // Sync the current plan from the subscription's price.
+      // When the tier actually CHANGES (pro <-> pro_max) we also reset
+      // generations_used to 0 so the user gets a fair fresh budget on
+      // their new plan. If the price stays the same (cosmetic update
+      // like payment method change), we leave the counter alone.
       const currentPriceId = subscription.items.data[0]?.price?.id || "";
       const plan = getPlanFromPriceId(currentPriceId);
 
+      // Read the user's current plan to detect a real tier change
+      const { data: currentProfile } = await supabaseAdmin
+        .from("profiles")
+        .select("plan")
+        .eq("id", userId)
+        .single();
+      const previousPlan = currentProfile?.plan as "free" | "pro" | "pro_max" | null;
+
       if (plan === "pro") {
+        const tierChanged = previousPlan !== "pro";
+        const updatePayload: Record<string, unknown> = {
+          plan: "pro",
+          generations_limit: 15,
+          updated_at: new Date().toISOString(),
+        };
+        if (tierChanged) updatePayload.generations_used = 0;
         await supabaseAdmin
           .from("profiles")
-          .update({
-            plan: "pro",
-            generations_limit: 15,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updatePayload)
           .eq("id", userId);
-        console.log(`[stripe-webhook] Subscription updated — user ${userId} on pro`);
+        console.log(`[stripe-webhook] Subscription updated — user ${userId} on pro${tierChanged ? " (tier change, counter reset)" : ""}`);
       } else if (plan === "promax") {
+        const tierChanged = previousPlan !== "pro_max";
+        const updatePayload: Record<string, unknown> = {
+          plan: "pro_max",
+          generations_limit: -1,
+          updated_at: new Date().toISOString(),
+        };
+        if (tierChanged) updatePayload.generations_used = 0;
         await supabaseAdmin
           .from("profiles")
-          .update({
-            plan: "pro_max",
-            generations_limit: -1,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updatePayload)
           .eq("id", userId);
-        console.log(`[stripe-webhook] Subscription updated — user ${userId} on pro_max`);
+        console.log(`[stripe-webhook] Subscription updated — user ${userId} on pro_max${tierChanged ? " (tier change, counter reset)" : ""}`);
       }
 
       break;
