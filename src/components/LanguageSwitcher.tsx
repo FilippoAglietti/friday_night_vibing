@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Globe } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { LANGUAGES } from "@/lib/i18n";
 
@@ -28,9 +27,8 @@ export default function LanguageSwitcher() {
         className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
         aria-label="Select language"
       >
-        <Globe className="size-3.5 shrink-0" />
+        <span className="text-base leading-none" aria-hidden="true">{current.flag}</span>
         <span className="hidden sm:inline">{current.label}</span>
-        <span className="sm:hidden">{current.flag}</span>
       </button>
 
       {open && (
