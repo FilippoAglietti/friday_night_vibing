@@ -696,7 +696,7 @@ export default function Home() {
                 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl"
               >
                 <span className="block">{t("hero.title1")}</span>
-                <span className="block text-[0.65em] font-semibold tracking-wide text-muted-foreground/70 mt-1">
+                <span className="block text-[0.65em] font-semibold tracking-wide text-muted-foreground/40 mt-1">
                   {t("hero.titleConnector")}
                 </span>
                 <span className="block bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent tracking-[-0.02em] w-full text-center">
