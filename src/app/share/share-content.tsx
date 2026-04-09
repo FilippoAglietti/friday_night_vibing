@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Curriculum } from "@/types/curriculum";
 import {
   decodeSharePayload,
@@ -12,6 +12,11 @@ import {
 export default function SharePageContent() {
   const searchParams = useSearchParams();
   const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set());
+
+  // Ensure dark theme matches the main website
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+  }, []);
   const [email, setEmail] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [emailError, setEmailError] = useState("");

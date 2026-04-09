@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -111,6 +112,11 @@ const colorMap: Record<string, { gradient: string; bg: string; text: string; bor
 };
 
 export default function TutorialPage() {
+  // Ensure dark theme matches the main website
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Background */}
