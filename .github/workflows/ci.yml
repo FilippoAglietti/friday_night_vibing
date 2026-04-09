@@ -1,0 +1,112 @@
+# ─────────────────────────────────────────────────────────────
+# ci.yml — Syllabi.ai pre-merge guard
+# ─────────────────────────────────────────────────────────────
+# WHY THIS EXISTS
+# On 2026-04-08 Gianmarco's commit 7f97f6b added new deps to
+# package.json but only refreshed package-lock.json — pnpm-lock.yaml
+# (the one Vercel actually uses) was left stale. Vercel's build
+# step runs `pnpm install --frozen-lockfile`, which immediately
+# fails when the lockfile disagrees with package.json, bricking
+# every deploy on main from 06:52 to 08:19 CET the next morning
+# until commit 79d9b2b regenerated pnpm-lock.yaml.
+#
+# WHAT THIS GUARD DOES
+#   1. Runs on every PR and on pushes to main.
+#   2. Installs deps with `pnpm install --frozen-lockfile` — the
+#      exact same command Vercel uses — so any lockfile drift is
+#      caught before it reaches production.
+#   3. Runs `pnpm run lint` and `pnpm run build` so type errors /
+#      lint regressions also block merge. Matches Vercel's build
+#      signal but without burning a deploy slot.
+#
+# REQUIREMENTS
+#   - Node 20 (matches Vercel's default Next 16 runtime).
+#   - pnpm 10.x (latest GA, matches package manager in use).
+#   - All secrets needed at BUILD time must be defined as repo
+#     secrets. We pass empty defaults via `env:` so `next build`
+#     completes the static-analysis pass even without real keys
+#     — we care about the compile, not runtime execution.
+# ─────────────────────────────────────────────────────────────
+
+name: CI
+
+# Run on PRs to any branch and on direct pushes to main.
+# Pushes to feature branches don't trigger — they'll get hit by
+# the PR run instead, which halves CI minutes without losing a
+# single guard.
+on:
+  pull_request:
+    branches: ["**"]
+  push:
+    branches: ["main"]
+
+# Cancel older runs on the same branch when a new commit lands.
+# Saves minutes and makes "latest push wins" the expected UX.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lockfile-and-build:
+    name: Lockfile + Lint + Build
+    runs-on: ubuntu-latest
+
+    # Keep the job tight — Next build on this repo runs in ~2 min.
+    # A 15 min ceiling means a genuinely stuck install/build fails
+    # loud instead of burning an hour of billing.
+    timeout-minutes: 15
+
+    steps:
+      # 1) Pull the exact commit under test.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) Install pnpm BEFORE setup-node so we can wire up the
+      #    pnpm cache via setup-node's built-in cache support.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
+      # 3) Node 20 to match Vercel's Next 16 runtime.
+      #    cache: pnpm makes repeat runs snappy (~5-10s installs).
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      # 4) THE MAIN GUARD.
+      #    --frozen-lockfile makes pnpm refuse to modify
+      #    pnpm-lock.yaml. If package.json and the lockfile
+      #    disagree (exactly the 7f97f6b scenario), this step
+      #    fails — which blocks merge before Vercel ever sees it.
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      # 5) Lint catches type-adjacent issues and dead imports
+      #    cheap — it runs in seconds and has caught real bugs
+      #    (empty catch blocks, unused vars) on this repo before.
+      - name: Lint
+        run: pnpm run lint
+
+      # 6) The actual compile. Passing empty env vars for the
+      #    build-time consts lets `next build` succeed without
+      #    real Supabase/Stripe/Anthropic keys — we want the TS
+      #    typecheck + bundle, not end-to-end runtime.
+      - name: Build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-anon-key"
+          SUPABASE_SERVICE_ROLE_KEY: "placeholder-service-role-key"
+          ANTHROPIC_API_KEY: "placeholder-anthropic-key"
+          STRIPE_SECRET_KEY: "placeholder-stripe-secret"
+          STRIPE_WEBHOOK_SECRET: "placeholder-webhook-secret"
+          NEXT_PUBLIC_STRIPE_PRO_PRICE_ID: "price_placeholder_pro"
+          NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID: "price_placeholder_5pack"
+          NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID: "price_placeholder_promax"
+          OPENAI_API_KEY: "placeholder-openai-key"
+          ELEVENLABS_API_KEY: "placeholder-elevenlabs-key"
+          RESEND_API_KEY: "placeholder-resend-key"
+        run: pnpm run build
