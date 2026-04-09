@@ -4,8 +4,26 @@ import SubpageNav from "@/components/SubpageNav";
 import SubpageBackLink from "@/components/SubpageBackLink";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Syllabi.ai",
-  description: "Terms of Service for Syllabi.ai (syllabi.online). Governing your use of the AI course generation platform.",
+  title: "Terms of Service | Syllabi",
+  description:
+    "Read Syllabi's Terms of Service governing your use of the AI-powered course generation platform at syllabi.online.",
+  alternates: {
+    canonical: "/terms",
+  },
+  openGraph: {
+    title: "Terms of Service | Syllabi",
+    description:
+      "Read Syllabi's Terms of Service governing your use of the AI-powered course generation platform.",
+    url: "https://www.syllabi.online/terms",
+    siteName: "Syllabi",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Terms of Service | Syllabi",
+    description:
+      "Read Syllabi's Terms of Service governing your use of the AI-powered course generation platform.",
+  },
 };
 
 const EFFECTIVE_DATE = "March 31, 2026";

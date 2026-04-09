@@ -4,8 +4,26 @@ import SubpageNav from "@/components/SubpageNav";
 import SubpageBackLink from "@/components/SubpageBackLink";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Syllabi.ai",
-  description: "Privacy Policy for Syllabi.ai (syllabi.online). How we collect, use, and protect your personal data.",
+  title: "Privacy Policy | Syllabi",
+  description:
+    "Read Syllabi's Privacy Policy. Learn how we collect, use, and protect your personal data on the AI-powered course generation platform.",
+  alternates: {
+    canonical: "/privacy",
+  },
+  openGraph: {
+    title: "Privacy Policy | Syllabi",
+    description:
+      "Read Syllabi's Privacy Policy. Learn how we collect, use, and protect your personal data.",
+    url: "https://www.syllabi.online/privacy",
+    siteName: "Syllabi",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Privacy Policy | Syllabi",
+    description:
+      "Read Syllabi's Privacy Policy. Learn how we collect, use, and protect your personal data.",
+  },
 };
 
 const EFFECTIVE_DATE = "March 31, 2026";

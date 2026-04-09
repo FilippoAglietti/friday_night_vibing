@@ -4,8 +4,26 @@ import SubpageNav from "@/components/SubpageNav";
 import SubpageBackLink from "@/components/SubpageBackLink";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy — Syllabi.ai",
-  description: "Cookie Policy for Syllabi.ai (syllabi.online). What cookies and local storage we use and why.",
+  title: "Cookie Policy | Syllabi",
+  description:
+    "Read Syllabi's Cookie Policy. Understand what cookies and local storage we use on syllabi.online and why.",
+  alternates: {
+    canonical: "/cookies",
+  },
+  openGraph: {
+    title: "Cookie Policy | Syllabi",
+    description:
+      "Read Syllabi's Cookie Policy. Understand what cookies and local storage we use and why.",
+    url: "https://www.syllabi.online/cookies",
+    siteName: "Syllabi",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Cookie Policy | Syllabi",
+    description:
+      "Read Syllabi's Cookie Policy. Understand what cookies and local storage we use and why.",
+  },
 };
 
 const EFFECTIVE_DATE = "March 31, 2026";
