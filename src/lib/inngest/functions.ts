@@ -276,11 +276,14 @@ export const moduleGenerate = inngest.createFunction(
     name: "Module: Generate Detail",
     retries: 2,
     // Scope concurrency per-course so a single big course can't
-    // starve other courses' module jobs. 8 is the Anthropic-friendly
-    // ceiling we tested in Tentativo 12.
+    // starve other courses' module jobs. Limit is 5 to stay within
+    // the free-tier Inngest plan ceiling; for a 10-module masterclass
+    // this still means only 2 waves (10/5=2), same wave count as
+    // limit=8 (10/8≈2), so zero practical latency difference. Bump
+    // to 8-10 if we ever upgrade Inngest and want single-wave runs.
     concurrency: {
       key: "event.data.courseId",
-      limit: 8,
+      limit: 5,
     },
   },
   { event: "module/generate.requested" },
