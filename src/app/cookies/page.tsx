@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SubpageNav from "@/components/SubpageNav";
+import SubpageBackLink from "@/components/SubpageBackLink";
 
 export const metadata: Metadata = {
   title: "Cookie Policy — Syllabi.ai",
@@ -273,7 +274,7 @@ export default function CookiesPage() {
         <div className="mt-16 pt-8 border-t border-border/40 flex flex-wrap gap-4 text-sm text-muted-foreground">
           <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
-          <Link href="/" className="hover:text-foreground transition-colors">← Home</Link>
+          <SubpageBackLink />
         </div>
       </main>
 

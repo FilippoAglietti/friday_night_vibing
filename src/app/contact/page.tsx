@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -65,11 +66,14 @@ export default function ContactPage() {
       </div>
 
       <div className="relative max-w-4xl mx-auto px-4 py-12 md:py-20">
-        {/* Back link */}
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
-          <ArrowLeft className="size-4" />
-          {t("contact.backToHome")}
-        </Link>
+        {/* Back link + language switcher */}
+        <div className="flex items-center justify-between mb-8">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="size-4" />
+            {t("contact.backToHome")}
+          </Link>
+          <LanguageSwitcher />
+        </div>
 
         {/* Header */}
         <motion.div {...fadeUp} className="text-center mb-12">
