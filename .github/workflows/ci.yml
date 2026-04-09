@@ -69,12 +69,14 @@ jobs:
           version: 10
           run_install: false
 
-      # 3) Node 20 to match Vercel's Next 16 runtime.
+      # 3) Node 24 to match Vercel project setting (nodeVersion: 24.x).
+      #    Matching the exact prod version catches Node-version-specific
+      #    breaks (deprecated APIs, ESM changes) in CI instead of prod.
       #    cache: pnpm makes repeat runs snappy (~5-10s installs).
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "pnpm"
 
       # 4) THE MAIN GUARD.

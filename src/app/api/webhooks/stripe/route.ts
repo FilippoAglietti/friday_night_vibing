@@ -148,13 +148,14 @@ export async function POST(req: NextRequest) {
           .update({
             plan: "pro_max",
             generations_limit: nextLimit,
+            white_label: true, // 5-Pack buyers get white-label exports
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
 
         console.log(
-          `[stripe-webhook] 5-Pack purchased by ${userId}: plan=pro_max, limit ${currentLimit} → ${nextLimit}`
+          `[stripe-webhook] 5-Pack purchased by ${userId}: plan=pro_max, limit ${currentLimit} → ${nextLimit}, white_label=true`
         );
       } else if (plan === "promax") {
         // ── Pro Max monthly subscription: unlimited (-1) ──
@@ -163,12 +164,13 @@ export async function POST(req: NextRequest) {
           .update({
             plan: "pro_max",
             generations_limit: -1,
+            white_label: true,
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
 
-        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro Max monthly (unlimited)`);
+        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro Max monthly (unlimited, white_label=true)`);
       } else if (plan === "pro") {
         // ── Pro monthly subscription: 15 generations/month ──
         await supabaseAdmin
@@ -176,12 +178,13 @@ export async function POST(req: NextRequest) {
           .update({
             plan: "pro",
             generations_limit: 15,
+            white_label: false, // Pro keeps Syllabi branding
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
 
-        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro monthly (15 generations)`);
+        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro monthly (15 generations, white_label=false)`);
       } else {
         console.warn(`[stripe-webhook] Unknown plan for price ${priceId}, treating as Pro`);
         await supabaseAdmin
@@ -189,6 +192,7 @@ export async function POST(req: NextRequest) {
           .update({
             plan: "pro",
             generations_limit: 15,
+            white_label: false,
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
           })
@@ -238,10 +242,11 @@ export async function POST(req: NextRequest) {
             plan: "pro_max",
             generations_limit: -1,
             generations_used: 0, // fresh month → fresh budget
+            white_label: true,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
-        console.log(`[stripe-webhook] Invoice paid — confirmed pro_max for user ${userId}, counter reset to 0`);
+        console.log(`[stripe-webhook] Invoice paid — confirmed pro_max for user ${userId}, counter reset to 0, white_label=true`);
       } else {
         // Default: Pro monthly renewal (€28/mo → 15 generations)
         await supabaseAdmin
@@ -250,10 +255,11 @@ export async function POST(req: NextRequest) {
             plan: "pro",
             generations_limit: 15,
             generations_used: 0, // fresh month → fresh 15 generations
+            white_label: false,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
-        console.log(`[stripe-webhook] Invoice paid — confirmed pro for user ${userId}, counter reset to 0`);
+        console.log(`[stripe-webhook] Invoice paid — confirmed pro for user ${userId}, counter reset to 0, white_label=false`);
       }
       break;
     }
@@ -333,6 +339,7 @@ export async function POST(req: NextRequest) {
         const updatePayload: Record<string, unknown> = {
           plan: "pro",
           generations_limit: 15,
+          white_label: false, // Pro tier = branded exports
           updated_at: new Date().toISOString(),
         };
         if (tierChanged) updatePayload.generations_used = 0;
@@ -346,6 +353,7 @@ export async function POST(req: NextRequest) {
         const updatePayload: Record<string, unknown> = {
           plan: "pro_max",
           generations_limit: -1,
+          white_label: true, // Pro Max tier = white-label exports
           updated_at: new Date().toISOString(),
         };
         if (tierChanged) updatePayload.generations_used = 0;
@@ -377,11 +385,12 @@ export async function POST(req: NextRequest) {
         .update({
           plan: "free",
           generations_limit: 3, // Updated default per latest product spec
+          white_label: false, // Free tier = branded exports
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);
 
-      console.log(`[stripe-webhook] Downgraded user ${userId} to free`);
+      console.log(`[stripe-webhook] Downgraded user ${userId} to free (white_label=false)`);
       break;
     }
 
