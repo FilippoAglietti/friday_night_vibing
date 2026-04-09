@@ -41,27 +41,47 @@ async function findUserByCustomerId(
   return profiles && profiles.length > 0 ? profiles[0].id : null;
 }
 
+// ─── Canonical EUR price IDs (source of truth) ────────────────
+// All pricing migrated to EUR on 2026-04-09. USD price IDs were deprecated
+// in the same cutover. These are hard-coded here as a backstop in case the
+// NEXT_PUBLIC_STRIPE_*_PRICE_ID env vars are missing or misconfigured on
+// Vercel — the webhook MUST always resolve a known price ID to a plan,
+// otherwise invoice.paid events for existing subscribers would downgrade
+// them to `unknown` and their monthly renewals would silently break.
+const EUR_PRICE_IDS = {
+  pro: "price_1TKBpS3kBvceiBKLANxOEgzs", // €28/mo
+  fivePack: "price_1TKBpT3kBvceiBKLgw6NIFap", // €33 one-time
+  proMax: "price_1TKBpU3kBvceiBKLmKdWHeub", // €69/mo
+} as const;
+
 /**
  * Maps a Stripe price ID to our internal plan type.
- * Uses env vars for the active price IDs (launch or original).
+ *
+ * Resolution order:
+ *   1. Env var match (NEXT_PUBLIC_STRIPE_*_PRICE_ID) — preferred, lets ops
+ *      rotate price IDs without a redeploy.
+ *   2. Hard-coded EUR price ID match — backstop if env vars are missing.
+ *   3. "unknown" — caller decides how to degrade.
+ *
+ * USD price IDs are intentionally no longer recognized. Any legacy USD
+ * subscriber would need to be migrated in Stripe dashboard first.
  */
 function getPlanFromPriceId(priceId: string): "pro" | "5pack" | "promax" | "unknown" {
   const proPriceId = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "";
   const fivePackPriceId = process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "";
   const proMaxPriceId = process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "";
 
+  // ── 1) Env var match (ops-rotatable) ────────────────────────
   if (priceId === proPriceId) return "pro";
   if (priceId === fivePackPriceId) return "5pack";
   if (priceId === proMaxPriceId) return "promax";
 
-  // Fallback: check if the price ID matches any known original/launch/EUR IDs
-  // Pro price IDs (original USD + launch USD + EUR)
-  if (["price_1THTSs3kBvceiBKLWaWvcHef", "price_1THU2d3kBvceiBKLeH3Hrq1l", "price_1TKBpS3kBvceiBKLANxOEgzs"].includes(priceId)) return "pro";
-  // 5-Pack price IDs (original USD + launch USD + EUR)
-  if (["price_1THTSs3kBvceiBKLi04yrG5U", "price_1THU2e3kBvceiBKLZByaCJhs", "price_1TKBpT3kBvceiBKLgw6NIFap"].includes(priceId)) return "5pack";
-  // Pro Max price IDs (original USD + launch USD + EUR)
-  if (["price_1THTSt3kBvceiBKLu18Yziia", "price_1THU2f3kBvceiBKL88FKLczZ", "price_1TKBpU3kBvceiBKLmKdWHeub"].includes(priceId)) return "promax";
+  // ── 2) Hard-coded EUR backstop ──────────────────────────────
+  if (priceId === EUR_PRICE_IDS.pro) return "pro";
+  if (priceId === EUR_PRICE_IDS.fivePack) return "5pack";
+  if (priceId === EUR_PRICE_IDS.proMax) return "promax";
 
+  // ── 3) Unknown — webhook will log + skip ────────────────────
   return "unknown";
 }
 

@@ -46,7 +46,9 @@ const plans = [
       "Priority AI processing",
     ],
     cta: PROMO_ACTIVE ? "Start Pro — €28/mo" : "Start Pro — €35/mo",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_pro_monthly",
+    // Fallback = canonical EUR Pro price ID (€28/mo) — keeps checkout working
+    // even if the NEXT_PUBLIC env var is missing on Vercel.
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_1TKBpS3kBvceiBKLANxOEgzs",
     icon: Crown,
     gradient: "from-violet-600 to-indigo-600",
     badgeGradient: "from-violet-600 to-indigo-600",
@@ -72,7 +74,8 @@ const plans = [
       "Dedicated AI processing",
     ],
     cta: PROMO_ACTIVE ? "Go Pro Max — €69/mo" : "Go Pro Max — €79/mo",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "price_promax_monthly",
+    // Fallback = canonical EUR Pro Max price ID (€69/mo).
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "price_1TKBpU3kBvceiBKLmKdWHeub",
     icon: Sparkles,
     gradient: "from-amber-500 to-orange-600",
     badgeGradient: "from-amber-500 to-orange-600",
@@ -97,7 +100,8 @@ const plans = [
       "No recurring charges",
     ],
     cta: PROMO_ACTIVE ? "Try Pro Max — €33" : "Try Pro Max — €42",
-    priceId: process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "price_5pack",
+    // Fallback = canonical EUR 5-Pack price ID (€33 one-time).
+    priceId: process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "price_1TKBpT3kBvceiBKLgw6NIFap",
     icon: Crown,
     gradient: "from-amber-600 to-orange-600",
     badgeGradient: "from-amber-600 to-orange-600",

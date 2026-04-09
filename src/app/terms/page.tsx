@@ -109,7 +109,7 @@ export default function TermsPage() {
                 the renewal date.
               </li>
               <li>
-                All prices are in <strong>USD</strong> and are exclusive of applicable taxes. We will charge applicable
+                All prices are in <strong>EUR</strong> and are exclusive of applicable taxes. We will charge applicable
                 sales tax or VAT where required by law.
               </li>
               <li>
@@ -246,7 +246,7 @@ export default function TermsPage() {
             </p>
             <ol>
               <li>The amount you paid to Syllabi.ai in the <strong>twelve (12) months</strong> preceding the claim, or</li>
-              <li><strong>USD $50</strong></li>
+              <li><strong>EUR €50</strong></li>
             </ol>
             <p className="mt-3">
               Some jurisdictions do not allow the exclusion or limitation of certain damages. In such jurisdictions,

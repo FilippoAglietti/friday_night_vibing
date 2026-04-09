@@ -215,7 +215,7 @@ const testimonials = [
     gradient: "from-emerald-500 to-teal-500",
   },
   {
-    quote: "I use it as a lead magnet — a free mini-course behind an email gate. 400+ signups in the first week. The ROI on $29 is insane.",
+    quote: "I use it as a lead magnet — a free mini-course behind an email gate. 400+ signups in the first week. The ROI on €28 is insane.",
     name: "Elena Vasquez",
     role: "Digital Marketing Consultant",
     avatar: "EV",
