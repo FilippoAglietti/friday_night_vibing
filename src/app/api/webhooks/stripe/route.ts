@@ -54,13 +54,13 @@ function getPlanFromPriceId(priceId: string): "pro" | "5pack" | "promax" | "unkn
   if (priceId === fivePackPriceId) return "5pack";
   if (priceId === proMaxPriceId) return "promax";
 
-  // Fallback: check if the price ID matches any known original/launch IDs
-  // Pro price IDs (original + launch)
-  if (["price_1THTSs3kBvceiBKLWaWvcHef", "price_1THU2d3kBvceiBKLeH3Hrq1l"].includes(priceId)) return "pro";
-  // 5-Pack price IDs (original + launch)
-  if (["price_1THTSs3kBvceiBKLi04yrG5U", "price_1THU2e3kBvceiBKLZByaCJhs"].includes(priceId)) return "5pack";
-  // Pro Max price IDs (original + launch)
-  if (["price_1THTSt3kBvceiBKLu18Yziia", "price_1THU2f3kBvceiBKL88FKLczZ"].includes(priceId)) return "promax";
+  // Fallback: check if the price ID matches any known original/launch/EUR IDs
+  // Pro price IDs (original USD + launch USD + EUR)
+  if (["price_1THTSs3kBvceiBKLWaWvcHef", "price_1THU2d3kBvceiBKLeH3Hrq1l", "price_1TKBpS3kBvceiBKLANxOEgzs"].includes(priceId)) return "pro";
+  // 5-Pack price IDs (original USD + launch USD + EUR)
+  if (["price_1THTSs3kBvceiBKLi04yrG5U", "price_1THU2e3kBvceiBKLZByaCJhs", "price_1TKBpT3kBvceiBKLgw6NIFap"].includes(priceId)) return "5pack";
+  // Pro Max price IDs (original USD + launch USD + EUR)
+  if (["price_1THTSt3kBvceiBKLu18Yziia", "price_1THU2f3kBvceiBKL88FKLczZ", "price_1TKBpU3kBvceiBKLmKdWHeub"].includes(priceId)) return "promax";
 
   return "unknown";
 }
