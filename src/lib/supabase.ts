@@ -19,7 +19,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import { createBrowserClient } from "@supabase/ssr";
+import { createBrowserClient, createServerClient } from "@supabase/ssr";
 import type { Database } from "@/types/database.types";
 
 // ─── Environment variable helpers ────────────────────────────
@@ -149,9 +149,6 @@ export function createSupabaseServer(cookieStore?: {
   set?: (name: string, value: string, options?: object) => void;
   delete?: (name: string, options?: object) => void;
 }) {
-  // Lazy import to avoid issues in client-side bundles
-  const { createServerClient } = require("@supabase/ssr");
-
   return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
       get(name: string) {

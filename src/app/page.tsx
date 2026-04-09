@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import CurriculumForm, { type CurriculumFormData } from "@/components/CurriculumForm";
 import CurriculumOutput from "@/components/CurriculumOutput";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
@@ -60,7 +61,6 @@ function useCountdown(target: Date) {
   // Start with null to avoid hydration mismatch (server date ≠ client date)
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
-    setNow(new Date());
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
@@ -514,7 +514,7 @@ export default function Home() {
   const handleGenerated = useCallback((c: Curriculum) => {
     setCurriculum(c);
     toast(t("toast.courseGenerated"), "success");
-  }, [toast]);
+  }, [toast, t]);
 
   /* ── (waitlist removed — Pro Max is now live) ── */
 
@@ -562,7 +562,7 @@ export default function Home() {
       {/* ── NAV ─────────────────────────────────────────── */}
       <nav className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <a
+          <Link
             href="/"
             id="nav-logo"
             className="flex items-center gap-2 text-lg font-bold tracking-tight"
@@ -571,7 +571,7 @@ export default function Home() {
             <span>
               syllabi<span className="text-violet-500">.ai</span>
             </span>
-          </a>
+          </Link>
           <div className="hidden items-center gap-6 text-sm font-medium md:flex">
             <a
               href="#how-it-works"
@@ -642,8 +642,8 @@ export default function Home() {
               <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.howItWorks")}</a>
               <a href="#examples" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.examples")}</a>
               <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.pricing")}</a>
-              <a href="/tutorial" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.tutorial")}</a>
-              <a href="/contact" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.contactUs")}</a>
+              <Link href="/tutorial" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.tutorial")}</Link>
+              <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{t("nav.contactUs")}</Link>
               <div className="pt-2 pb-1">
                 <div className="px-4 pb-2">
                   <LanguageSwitcher />
@@ -1593,7 +1593,7 @@ export default function Home() {
           <div className="grid gap-8 grid-cols-2 lg:grid-cols-4">
             {/* Brand */}
             <div className="col-span-2 lg:col-span-1">
-              <a
+              <Link
                 href="/"
                 className="flex items-center gap-2 text-lg font-bold tracking-tight"
               >
@@ -1601,7 +1601,7 @@ export default function Home() {
                 <span>
                   syllabi<span className="text-violet-500">.ai</span>
                 </span>
-              </a>
+              </Link>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {t("footer.tagline")}
               </p>
@@ -1637,9 +1637,9 @@ export default function Home() {
                 <li><a href="#how-it-works" className="hover:text-foreground transition-colors">{t("footer.howItWorks")}</a></li>
                 <li><a href="#examples" className="hover:text-foreground transition-colors">{t("footer.examples")}</a></li>
                 <li><a href="#pricing" className="hover:text-foreground transition-colors">{t("footer.pricing")}</a></li>
-                <li><a href="/tutorial" className="hover:text-foreground transition-colors">{t("footer.tutorial")}</a></li>
-                <li><a href="/docs#faq" className="hover:text-foreground transition-colors">{t("footer.api")}</a></li>
-                <li><a href="/contact" className="hover:text-foreground transition-colors">{t("footer.contactUs")}</a></li>
+                <li><Link href="/tutorial" className="hover:text-foreground transition-colors">{t("footer.tutorial")}</Link></li>
+                <li><Link href="/docs#faq" className="hover:text-foreground transition-colors">{t("footer.api")}</Link></li>
+                <li><Link href="/contact" className="hover:text-foreground transition-colors">{t("footer.contactUs")}</Link></li>
               </ul>
             </div>
 
@@ -1647,10 +1647,10 @@ export default function Home() {
             <div>
               <h4 className="text-sm font-semibold">{t("footer.resources")}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><a href="/docs" className="hover:text-foreground transition-colors">{t("footer.documentation")}</a></li>
-                <li><a href="/blog" className="hover:text-foreground transition-colors">{t("footer.blog")}</a></li>
-                <li><a href="/changelog" className="hover:text-foreground transition-colors">{t("footer.changelog")}</a></li>
-                <li><a href="/support" className="hover:text-foreground transition-colors">{t("footer.support")}</a></li>
+                <li><Link href="/docs" className="hover:text-foreground transition-colors">{t("footer.documentation")}</Link></li>
+                <li><Link href="/blog" className="hover:text-foreground transition-colors">{t("footer.blog")}</Link></li>
+                <li><Link href="/changelog" className="hover:text-foreground transition-colors">{t("footer.changelog")}</Link></li>
+                <li><Link href="/support" className="hover:text-foreground transition-colors">{t("footer.support")}</Link></li>
                 <li>
                   <a href="https://docs.google.com/forms/d/e/1FAIpQLScHZQ9cSmQwUnDnHiSPSFaRyeS1Ijh4jbnueFAJ4fdedQZdfA/viewform" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors text-violet-400 font-medium">
                     {t("footer.feedback")}
@@ -1663,9 +1663,9 @@ export default function Home() {
             <div>
               <h4 className="text-sm font-semibold">{t("footer.legal")}</h4>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li><a href="/privacy" className="hover:text-foreground transition-colors">{t("footer.privacyPolicy")}</a></li>
-                <li><a href="/terms" className="hover:text-foreground transition-colors">{t("footer.termsOfService")}</a></li>
-                <li><a href="/cookies" className="hover:text-foreground transition-colors">{t("footer.cookiePolicy")}</a></li>
+                <li><Link href="/privacy" className="hover:text-foreground transition-colors">{t("footer.privacyPolicy")}</Link></li>
+                <li><Link href="/terms" className="hover:text-foreground transition-colors">{t("footer.termsOfService")}</Link></li>
+                <li><Link href="/cookies" className="hover:text-foreground transition-colors">{t("footer.cookiePolicy")}</Link></li>
               </ul>
             </div>
           </div>

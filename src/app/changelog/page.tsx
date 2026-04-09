@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { GraduationCap, ArrowLeft, Sparkles, Wrench, Zap, Bug } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -114,14 +115,14 @@ export default function ChangelogPage() {
       {/* Header */}
       <header className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
             <GraduationCap className="size-5 text-violet-500" />
             <span>syllabi<span className="text-violet-500">.ai</span></span>
-          </a>
-          <a href="/" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          </Link>
+          <Link href="/" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="size-4" />
             Back to home
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -171,9 +172,9 @@ export default function ChangelogPage() {
         <div className="mx-auto max-w-3xl px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} Syllabi. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="/docs" className="hover:text-foreground transition-colors">Docs</a>
-            <a href="/blog" className="hover:text-foreground transition-colors">Blog</a>
-            <a href="/privacy" className="hover:text-foreground transition-colors">Privacy</a>
+            <Link href="/docs" className="hover:text-foreground transition-colors">Docs</Link>
+            <Link href="/blog" className="hover:text-foreground transition-colors">Blog</Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
           </div>
         </div>
       </footer>

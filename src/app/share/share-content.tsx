@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Curriculum } from "@/types/curriculum";
 import {
@@ -66,12 +67,12 @@ export default function SharePageContent() {
           <p className="text-violet-300 mb-8">
             The course data could not be loaded. Please check your link.
           </p>
-          <a
+          <Link
             href="/"
             className="inline-block px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-lg transition"
           >
             Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     );

@@ -64,7 +64,11 @@ function getNestedValue(obj: Record<string, unknown>, path: string): string {
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Language>(DEFAULT_LANG);
+  const [lang, setLangState] = useState<Language>(() => {
+    if (typeof window === "undefined") return DEFAULT_LANG;
+    const stored = localStorage.getItem(STORAGE_KEY) as Language | null;
+    return stored && LANGUAGES.some((l) => l.code === stored) ? stored : DEFAULT_LANG;
+  });
   const [translations, setTranslations] = useState<Translations | null>(null);
 
   // Load translations for a given language
@@ -86,14 +90,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // On mount: read from localStorage
+  // On mount: load translations for the initial language (resolved from localStorage in state init)
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as Language | null;
-    const initial =
-      stored && LANGUAGES.some((l) => l.code === stored) ? stored : DEFAULT_LANG;
-    setLangState(initial);
-    loadTranslations(initial);
-  }, [loadTranslations]);
+    loadTranslations(lang);
+  }, [lang, loadTranslations]);
 
   // When lang changes: update dir + lang attribute on <html>
   useEffect(() => {

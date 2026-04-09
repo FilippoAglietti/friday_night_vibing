@@ -64,6 +64,7 @@ import CourseEditor from "@/components/CourseEditor";
 import PaywallModal from "@/components/PaywallModal";
 import OnboardingQuiz, { type OnboardingAnswers } from "@/components/OnboardingQuiz";
 import WelcomeAnimation from "@/components/WelcomeAnimation";
+import Link from "next/link";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -525,7 +526,7 @@ export default function ProfilePage() {
   const timelineGroups = useMemo(() => {
     const groups: { label: string; date: string; items: Generation[] }[] = [];
     const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const yesterday = new Date(new Date().getTime() - 86400000).toISOString().slice(0, 10);
 
     const dateMap = new Map<string, Generation[]>();
     readyGenerations.forEach((g) => {
@@ -917,10 +918,10 @@ export default function ProfilePage() {
       {/* ── Nav ───────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <a href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
             <GraduationCap className="size-5 text-violet-500" />
             <span>syllabi<span className="text-violet-500">.ai</span></span>
-          </a>
+          </Link>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setDark(!dark)}>
