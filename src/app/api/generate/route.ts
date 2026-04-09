@@ -26,6 +26,16 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getSupabaseAdmin } from "@/lib/supabase";
+// Upstash-backed sliding-window rate limiter. Replaces the in-memory
+// Map<> below, which silently reset on every Vercel cold start and
+// let the same IP blow past 5/hour by hopping across isolates. Root
+// cause of the April 8-9 Anthropic cost blow-up.
+import { generateRateLimit } from "@/lib/rate-limiter";
+// Inngest client for Fase 3 (queue-based chunked generation). Only
+// used when INNGEST_ENABLED=true AND the course length is
+// full/masterclass. Short/crash always stay on the in-process
+// single-shot path because they're fast enough to not need a queue.
+import { inngest } from "@/lib/inngest/client";
 
 export const dynamic = "force-dynamic";
 
@@ -55,52 +65,19 @@ import type {
   CourseLanguage,
 } from "@/types/curriculum";
 
-// ─── Rate limiter (in-memory) ─────────────────────────────────
-
-/**
- * Simple in-memory rate limiter.
- * Maps IP → { count, windowStart }.
- * Resets the window every RATE_WINDOW_MS milliseconds.
- *
- * NOTE: This resets on every serverless cold-start.
- *       Replace with Redis/Upstash for production resilience.
- */
-const RATE_LIMIT_MAX = 5; // max requests per window
-const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour in milliseconds
-
-interface RateLimitEntry {
-  count: number;
-  windowStart: number;
-}
-
-const rateLimitMap = new Map<string, RateLimitEntry>();
-
-/**
- * Checks whether the given IP has exceeded the rate limit.
- * Increments the counter if within the window.
- *
- * @param ip - Client IP address
- * @returns true if the request is allowed, false if rate-limited
- */
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-
-  if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
-    // First request or window expired — reset counter
-    rateLimitMap.set(ip, { count: 1, windowStart: now });
-    return true;
-  }
-
-  if (entry.count >= RATE_LIMIT_MAX) {
-    // Too many requests in the current window
-    return false;
-  }
-
-  // Increment counter within the current window
-  entry.count += 1;
-  return true;
-}
+// ─── Rate limiter ─────────────────────────────────────────────
+//
+// The previous in-memory Map<string, RateLimitEntry> rate limiter
+// lived here. It was fatally broken on serverless: each Vercel cold
+// start gave the calling IP a fresh empty Map, so the same client
+// could launch arbitrary generations across isolates and burn the
+// Anthropic API budget. The fix lives in src/lib/rate-limiter.ts —
+// an Upstash-backed sliding window limiter whose counters survive
+// cold starts. It's imported at the top of this file as
+// `generateRateLimit` and invoked in the route handler below.
+//
+// The route handler still enforces 5/hour per IP (unchanged UX) —
+// see step 1 of the POST handler.
 
 // ─── Input validation ─────────────────────────────────────────
 
@@ -458,14 +435,31 @@ async function generateCurriculumSingleShot(request: GenerateRequest): Promise<C
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const { system, messages } = buildCurriculumPrompt(request);
 
-  // Per-length single-shot timeout. Sonnet 4.6 streams at ~50-80 tok/s,
-  // so the budget must match the max_tokens from getMaxTokensForLength:
-  //   crash: 5120 tok ÷ 60 tok/s ≈ 85s → 120s timeout (35s headroom)
-  //   short: 10240 tok ÷ 60 tok/s ≈ 170s → 180s timeout (10s headroom)
+  // Model selection for single-shot (crash/short): HAIKU 4.5.
+  //
+  // This is the Fase 1 fix for the April 8-9 Anthropic cost blow-up.
+  // Previously this path used claude-sonnet-4-6 for crash (5-min
+  // lesson) and short (30-min lesson) courses — which was overkill
+  // by roughly an order of magnitude on €/token. Per the test matrix
+  // and Filippo's explicit instruction, short/crash never need
+  // Sonnet-level reasoning; they're essentially outlines with thin
+  // lesson prose, and Haiku 4.5 handles them at ~150 tok/s with
+  // identical user-facing quality on the typed grading rubric.
+  //
+  // The chunked masterclass path already uses Haiku for both
+  // skeleton AND module content (see generateCurriculumChunked),
+  // so after this commit ALL generation paths run on Haiku unless
+  // explicitly opted into Sonnet via the Fase 3 Inngest queue
+  // (feature-flagged, opt-in per course length).
+  //
+  // Per-length single-shot timeout. Haiku 4.5 streams at ~150 tok/s,
+  // so the budget fits very comfortably:
+  //   crash: 5120 tok ÷ 150 tok/s ≈ 35s → 90s timeout (55s headroom)
+  //   short: 10240 tok ÷ 150 tok/s ≈ 70s → 120s timeout (50s headroom)
   // maxAttempts=1 disables retries: with Vercel's 300s hard cap there's
-  // no budget to retry a 180s call (would total 362s+). A failed single
+  // no budget to retry a 120s call (would total 242s+). A failed single
   // call surfaces a clear error instead of a silent "429 + retry + nuke".
-  const timeoutMs = request.length === "crash" ? 120_000 : 180_000;
+  const timeoutMs = request.length === "crash" ? 90_000 : 120_000;
 
   const response = await callClaudeWithRetry(
     anthropic,
@@ -476,7 +470,7 @@ async function generateCurriculumSingleShot(request: GenerateRequest): Promise<C
     /* overrideMaxTokens */ undefined,
     /* label */ `single-shot/${request.length}`,
     /* timeoutMs */ timeoutMs,
-    /* model */ "claude-sonnet-4-6",
+    /* model */ "claude-haiku-4-5-20251001",
     /* maxAttempts */ 1,
   );
 
@@ -1297,15 +1291,40 @@ async function updateCourseRecord(
  */
 export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsyncResponse | GenerateErrorResponse>> {
   // ── Step 1: Rate limit ──────────────────────────────────────
+  // IP extraction: Vercel always sets x-forwarded-for with the real
+  // client IP as the leftmost entry. Fall back to x-real-ip for any
+  // proxy chain that uses the older header. "unknown" is the final
+  // fallback — all requests that hit it share one bucket, which is
+  // intentional: an IP-less request is suspicious and should be
+  // aggressively rate-limited together.
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     req.headers.get("x-real-ip") ??
     "unknown";
 
-  if (!checkRateLimit(ip)) {
+  // Upstash sliding window: 5 requests / 1 hour per IP. See
+  // src/lib/rate-limiter.ts for why this replaces the previous
+  // in-memory Map-based limiter (short answer: cold-start amnesia).
+  // Fails open on Upstash errors so a Redis outage can't take the
+  // generate endpoint down — the ratelimiter logs the issue and we
+  // monitor for it.
+  const rateLimitResult = await generateRateLimit.limit(ip);
+  if (!rateLimitResult.success) {
+    console.warn(
+      `[/api/generate] Rate limit hit for ip=${ip} limit=${rateLimitResult.limit} reset=${rateLimitResult.reset}`,
+    );
     return NextResponse.json(
       { success: false, error: "Too many requests. Please wait before generating again." },
-      { status: 429 }
+      {
+        status: 429,
+        headers: {
+          // Standard rate limit headers so the frontend can surface
+          // a useful message ("retry in 42 minutes") without guessing.
+          "X-RateLimit-Limit": String(rateLimitResult.limit),
+          "X-RateLimit-Remaining": String(Math.max(0, rateLimitResult.remaining)),
+          "X-RateLimit-Reset": String(rateLimitResult.reset),
+        },
+      },
     );
   }
 
@@ -1402,12 +1421,35 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
 
-  // ── Step 6: Background generation with after() ──────────────
-  // Runs AFTER the 202 response is sent. With Vercel Pro + maxDuration=300,
-  // the function stays alive for up to 5 minutes.
-  // Using stream() + finalMessage() with capped max_tokens keeps
-  // each Claude call fast (~30-60s).
-  after(async () => {
+  // ── Step 6: Background generation ───────────────────────────
+  //
+  // Two paths, selected via the INNGEST_ENABLED feature flag:
+  //
+  //   Path A (INNGEST_ENABLED=true, full/masterclass only):
+  //     Send a course/generate.requested event to Inngest and
+  //     return immediately. Inngest picks up the event, runs
+  //     course.generate (skeleton + fan-out), which fans out to
+  //     N parallel module.generate functions. Each module gets
+  //     its own 300s Vercel budget instead of sharing one global
+  //     budget. This is the fix for the Tentativo 13 wall.
+  //
+  //   Path B (the after() fallback for everything else):
+  //     The existing monolithic path. Runs within a single Vercel
+  //     function invocation with a 280s global deadline. Fine for
+  //     crash/short (both single-shot with Haiku), and fine for
+  //     full/masterclass when Inngest is disabled (e.g. during an
+  //     Inngest outage or local dev).
+  //
+  // The flag is opt-in per length: even with INNGEST_ENABLED=true,
+  // crash/short still run single-shot on the after() path because
+  // they're fast enough that queue overhead (~2-3s round trip to
+  // Inngest) would actually be a regression. Only full/masterclass
+  // courses benefit from the queue architecture.
+  // Path B closure first — defined before the Inngest branch so
+  // Path A's fallback can reference it without hitting the TDZ
+  // (const declarations don't hoist). This is the existing
+  // monolithic path, unchanged.
+  const runInProcessGeneration = async () => {
     const startTime = Date.now();
     try {
       console.log(`[/api/generate] [${courseId}] after() started at ${new Date().toISOString()}`);
@@ -1452,7 +1494,63 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
         console.error(`[/api/generate] [${courseId}] CRITICAL: Failed to update error state:`, updateErr);
       }
     }
-  });
+  };
+
+  // ── Path A: Inngest queue (opt-in, full/masterclass only) ──
+  //
+  // Gate: INNGEST_ENABLED=true AND length ∈ {full, masterclass}.
+  //
+  // Why not crash/short: they're single-shot on Haiku and finish
+  // well inside one Vercel invocation. Shoving them through Inngest
+  // would add ~2-3s of event round-trip overhead and hide errors
+  // behind an extra layer for zero benefit.
+  //
+  // Why a try/catch with fallback: if Inngest is down, or if the
+  // event key is invalid, we don't want to black-hole the user's
+  // course. We fall through to the existing after() path and the
+  // course generates normally (just without the per-module queue
+  // concurrency benefit). The fallback is logged loud so we notice.
+  const inngestEnabled =
+    process.env.INNGEST_ENABLED === "true" &&
+    (generateRequest.length === "full" || generateRequest.length === "masterclass");
+
+  if (inngestEnabled) {
+    try {
+      // Fire-and-forget the course/generate.requested event. Inngest
+      // will hand this off to the courseGenerate function, which
+      // runs the skeleton phase, inserts generation_jobs rows, and
+      // fans out one module/generate.requested event per module.
+      // Each module then runs in its own 300s Vercel invocation.
+      await inngest.send({
+        name: "course/generate.requested",
+        data: {
+          courseId,
+          request: generateRequest,
+          userId: userId ?? null,
+        },
+      });
+      console.log(
+        `[/api/generate] [${courseId}] Dispatched to Inngest queue (length=${generateRequest.length})`,
+      );
+      // Successful dispatch — return the 202 and let Inngest drive
+      // the rest. No after() needed on this path.
+      return res;
+    } catch (inngestErr) {
+      // Don't let an Inngest outage break course generation. Log
+      // loudly, then fall through to the monolithic after() path
+      // below as if INNGEST_ENABLED were false.
+      console.error(
+        `[/api/generate] [${courseId}] Inngest dispatch FAILED, falling back to after() path:`,
+        inngestErr,
+      );
+    }
+  }
+
+  // ── Path B: in-process after() ──
+  // Schedule the in-process generation to run AFTER the 202 response
+  // is sent. `after()` keeps the Vercel function alive (up to 300s)
+  // while the response has already been flushed to the client.
+  after(runInProcessGeneration);
 
   return res;
 }

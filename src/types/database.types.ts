@@ -1,7 +1,7 @@
 // ============================================================
 // SUPABASE DATABASE TYPES - AUTO-GENERATED
 // Progetto: syllabi-ai (gmxseuttpurnxbluvcwx)
-// Generato il: 2026-04-07
+// Generato il: 2026-04-09
 // NON modificare manualmente — rigenera con: supabase gen types
 // ============================================================
 
@@ -128,6 +128,118 @@ export type Database = {
           },
         ]
       }
+      generation_jobs: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          course_id: string
+          created_at: string
+          error: Json | null
+          id: string
+          max_tokens: number | null
+          model: string | null
+          module_id: string
+          module_index: number
+          result: Json | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          course_id: string
+          created_at?: string
+          error?: Json | null
+          id?: string
+          max_tokens?: number | null
+          model?: string | null
+          module_id: string
+          module_index: number
+          result?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          course_id?: string
+          created_at?: string
+          error?: Json | null
+          id?: string
+          max_tokens?: number | null
+          model?: string | null
+          module_id?: string
+          module_index?: number
+          result?: Json | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_jobs_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          consent_marketing: boolean
+          course_owner_id: string | null
+          created_at: string
+          curriculum_id: string | null
+          email: string
+          id: string
+          ip_address: unknown
+          metadata: Json
+          name: string | null
+          source: string | null
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          consent_marketing?: boolean
+          course_owner_id?: string | null
+          created_at?: string
+          curriculum_id?: string | null
+          email: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json
+          name?: string | null
+          source?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          consent_marketing?: boolean
+          course_owner_id?: string | null
+          created_at?: string
+          curriculum_id?: string | null
+          email?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json
+          name?: string | null
+          source?: string | null
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_curriculum_id_fkey"
+            columns: ["curriculum_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_assets: {
         Row: {
           course_id: string
@@ -201,6 +313,7 @@ export type Database = {
           stripe_customer_id: string | null
           updated_at: string
           username: string | null
+          white_label: boolean
         }
         Insert: {
           avatar_url?: string | null
@@ -217,6 +330,7 @@ export type Database = {
           stripe_customer_id?: string | null
           updated_at?: string
           username?: string | null
+          white_label?: boolean
         }
         Update: {
           avatar_url?: string | null
@@ -233,6 +347,7 @@ export type Database = {
           stripe_customer_id?: string | null
           updated_at?: string
           username?: string | null
+          white_label?: boolean
         }
         Relationships: []
       }
@@ -384,6 +499,13 @@ export type Database = {
         Args: { p_username: string }
         Returns: boolean
       }
+      cleanup_stuck_generating_courses: {
+        Args: never
+        Returns: {
+          affected_age_minutes: number
+          affected_course_id: string
+        }[]
+      }
       hypopg: { Args: never; Returns: Record<string, unknown>[] }
       hypopg_create_index: {
         Args: { sql_order: string }
@@ -403,6 +525,13 @@ export type Database = {
       hypopg_reset_index: { Args: never; Returns: undefined }
       hypopg_unhide_all_indexes: { Args: never; Returns: undefined }
       hypopg_unhide_index: { Args: { indexid: unknown }; Returns: boolean }
+      increment_course_progress: {
+        Args: { p_course_id: string }
+        Returns: {
+          new_completed: number
+          total_modules: number
+        }[]
+      }
       increment_generation_usage: {
         Args: { p_course_id: string; p_event_type: string; p_user_id: string }
         Returns: undefined
@@ -449,7 +578,7 @@ export type Database = {
       content_type: "text" | "audio" | "video" | "mixed"
       course_level: "beginner" | "intermediate" | "advanced"
       generation_status: "pending" | "generating" | "ready" | "failed"
-      plan_type: "free" | "pro" | "team"
+      plan_type: "free" | "pro" | "team" | "pro_max"
       subscription_status:
         | "active"
         | "canceled"
@@ -586,7 +715,7 @@ export const Constants = {
       content_type: ["text", "audio", "video", "mixed"],
       course_level: ["beginner", "intermediate", "advanced"],
       generation_status: ["pending", "generating", "ready", "failed"],
-      plan_type: ["free", "pro", "team"],
+      plan_type: ["free", "pro", "team", "pro_max"],
       subscription_status: [
         "active",
         "canceled",
