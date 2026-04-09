@@ -488,6 +488,159 @@ async function generateCurriculumSingleShot(request: GenerateRequest): Promise<C
   return parseClaudeJson<Curriculum>(textBlock.text.trim(), response.stop_reason, "single-shot");
 }
 
+// ─── Structured per-module failure records ──────────────────
+
+/**
+ * One structured record of a module- or phase-level failure during
+ * chunked generation. Persisted to courses.generation_errors (JSONB).
+ *
+ * This closes the observability gap exposed by Tentativo 13 (Italian
+ * masterclass 8/10 cliff, 2026-04-09): when the overall success ratio
+ * stays above MIN_SUCCESS_RATIO (0.6), the course ships as status='ready'
+ * and the per-module rejection reasons used to only land in console.warn()
+ * — which Vercel runtime logs MCP can't retrieve. Now they land in the
+ * DB as structured records regardless of overall outcome.
+ *
+ * phase values:
+ *   "skeleton" — Phase 1 (outline) failure
+ *   "module"   — Phase 2 (per-module) failure
+ *   "global"   — global watchdog / timeout hit
+ *
+ * category values (normalized buckets, keep in sync with the
+ * categorizeGenerationError function below):
+ *   truncation  — Claude hit max_tokens mid-output (stop_reason=max_tokens)
+ *   timeout     — per-call AbortController fired (individual 180s timeout)
+ *   deadline    — Phase 2 hard deadline (Promise.race) preempted us
+ *   parse_error — JSON.parse failed even after repair (malformed output)
+ *   rate_limit  — Anthropic 429 (tokens/minute or requests/minute)
+ *   api_error   — other 5xx/4xx from Anthropic API
+ *   unknown     — didn't match any bucket; fall-through
+ */
+type GenerationErrorCategory =
+  | "truncation"
+  | "timeout"
+  | "deadline"
+  | "parse_error"
+  | "rate_limit"
+  | "api_error"
+  | "unknown";
+
+type GenerationErrorPhase = "skeleton" | "module" | "global";
+
+interface GenerationError {
+  moduleId: string;       // "mod-7" or "skeleton" or "global"
+  moduleIndex: number;    // 0-based; -1 for skeleton/global
+  phase: GenerationErrorPhase;
+  category: GenerationErrorCategory;
+  reason: string;         // original error text, truncated to 500 chars
+  ts: string;             // ISO 8601
+}
+
+/**
+ * Classify a raw error message into a normalized bucket, so analytics
+ * queries and future auto-retry logic have something structured to key off.
+ *
+ * Heuristics follow the strings this codebase actually produces:
+ *   • parseClaudeJson throws "JSON parse failed (len=..., stop=max_tokens)"
+ *     when Claude filled the token budget mid-object — this is the
+ *     Tentativo 11 smoking gun. We key on "stop=max_tokens" for that.
+ *   • callClaudeWithRetry throws "... timed out after Xms" on AbortController
+ *   • Phase 2 race throws "PHASE2_DEADLINE" or "Phase 2 deadline reached..."
+ *   • The global watchdog throws "Global timeout: ..."
+ *   • Anthropic SDK rate limits surface as HTTP 429 / "rate_limit_error"
+ *   • Anthropic SDK other API errors usually include "APIError" or "status"
+ *
+ * Ordering matters: check the most specific patterns first.
+ */
+function categorizeGenerationError(reason: string): GenerationErrorCategory {
+  const r = reason.toLowerCase();
+
+  // Token budget exhausted mid-output — the Tentativo 11 diagnosis.
+  // We check this BEFORE parse_error because a truncation ALSO produces
+  // a parse failure, but the root cause is the token cap, not malformed JSON.
+  if (r.includes("stop=max_tokens") || r.includes("stop_reason=max_tokens")) {
+    return "truncation";
+  }
+
+  // Deadline preemption fires with a specific sentinel string.
+  if (
+    r.includes("phase2_deadline") ||
+    r.includes("phase 2 deadline") ||
+    r.includes("global timeout")
+  ) {
+    return "deadline";
+  }
+
+  // Per-call AbortController timeout (individual module).
+  if (r.includes("timed out after") || r.includes("aborterror") || r.includes("request was aborted")) {
+    return "timeout";
+  }
+
+  // Anthropic rate limiting — tokens-per-minute or requests-per-minute.
+  if (r.includes("429") || r.includes("rate_limit") || r.includes("rate limit")) {
+    return "rate_limit";
+  }
+
+  // JSON parse failure without the truncation signature above = malformed
+  // output that wasn't just a chopped tail. Rare in practice but worth
+  // separating so we can tell prompt-quality bugs from budget bugs.
+  if (r.includes("json parse failed") || r.includes("json.parse") || r.includes("unexpected token")) {
+    return "parse_error";
+  }
+
+  // Generic Anthropic API errors — 5xx, 400s that aren't rate limits, etc.
+  if (r.includes("apierror") || r.includes("status code") || r.includes("status ")) {
+    return "api_error";
+  }
+
+  return "unknown";
+}
+
+/**
+ * Build a GenerationError record from a raw rejection reason.
+ * Keeps `reason` bounded to 500 chars so a single rogue error can't
+ * blow up the JSONB column size.
+ */
+function buildGenerationError(params: {
+  moduleId: string;
+  moduleIndex: number;
+  phase: GenerationErrorPhase;
+  rawReason: unknown;
+}): GenerationError {
+  const rawString =
+    params.rawReason instanceof Error
+      ? params.rawReason.message
+      : String(params.rawReason);
+  const reason = rawString.replace(/\s+/g, " ").slice(0, 500);
+  return {
+    moduleId: params.moduleId,
+    moduleIndex: params.moduleIndex,
+    phase: params.phase,
+    category: categorizeGenerationError(reason),
+    reason,
+    ts: new Date().toISOString(),
+  };
+}
+
+/**
+ * Custom Error subclass that carries a structured generationErrors payload
+ * through the throw/catch boundary between generateCurriculumChunked and
+ * the top-level after() handler. Without this, hard failures would lose
+ * all their per-module context by the time updateCourseRecord is called.
+ *
+ * The after() catch block does an `instanceof GenerationPipelineError`
+ * check and forwards the .generationErrors array to updateCourseRecord,
+ * which persists it alongside the hard-failure error_message.
+ */
+class GenerationPipelineError extends Error {
+  generationErrors: GenerationError[];
+  constructor(message: string, generationErrors: GenerationError[]) {
+    super(message);
+    this.name = "GenerationPipelineError";
+    this.generationErrors = generationErrors;
+  }
+}
+
 // ─── Chunked generation (for full/masterclass courses) ───────
 
 /**
@@ -508,9 +661,15 @@ async function generateCurriculumSingleShot(request: GenerateRequest): Promise<C
 async function generateCurriculumChunked(
   request: GenerateRequest,
   courseId: string,
-): Promise<Curriculum> {
+): Promise<{ curriculum: Curriculum; generationErrors: GenerationError[] }> {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const supabase = getSupabaseAdmin();
+
+  // Accumulator for structured per-module failure records. Populated by
+  // the backfill loop below AND — on hard failure — attached to the
+  // GenerationPipelineError so the catch at the top of after() can
+  // persist them alongside the hard-failure error_message.
+  const generationErrors: GenerationError[] = [];
 
   // Global safety: track total elapsed time. Vercel Pro kills at 300s.
   // We abort at 280s to leave ~20s for DB cleanup + after() bookkeeping.
@@ -768,9 +927,19 @@ async function generateCurriculumChunked(
 
   // Backfill any failed modules (or deadline-cancelled ones) with their
   // skeleton stub so the user still receives a complete, navigable course.
-  // We also collect the first few rejection reasons so the DB error_message
-  // column carries actionable diagnostic data when Vercel runtime logs are
-  // unavailable (as has been the case throughout this debugging cycle).
+  //
+  // Structured observability (post-Tentativo 13, 2026-04-09):
+  //   Every rejection here now produces a GenerationError record in the
+  //   `generationErrors` accumulator, regardless of whether we end up
+  //   throwing (hard failure) or returning (partial success). Callers
+  //   then persist the whole array to courses.generation_errors (JSONB)
+  //   so analytics / retry UX / next-debug have a real forensic trail
+  //   instead of lost console.warn() output.
+  //
+  // `failureReasons` (the legacy first-3-distinct text list) is kept
+  // because the hard-failure path still embeds it in the thrown Error
+  // message — that text ends up in courses.error_message where the
+  // frontend expects it on status='failed'.
   let failureCount = 0;
   const failureReasons: string[] = [];
   settled.forEach((outcome, i) => {
@@ -784,6 +953,18 @@ async function generateCurriculumChunked(
       if (failureReasons.length < 3 && !failureReasons.includes(err)) {
         failureReasons.push(err);
       }
+      // Always append the full structured record. No dedup here — each
+      // module gets its own entry even if the reason text is identical,
+      // because `moduleId` + `moduleIndex` are the primary keys for
+      // future retry UX.
+      generationErrors.push(
+        buildGenerationError({
+          moduleId: skeleton.modules[i].id,
+          moduleIndex: i,
+          phase: "module",
+          rawReason: outcome.reason,
+        }),
+      );
       if (!detailedModules[i]) {
         // Promote the skeleton module as-is; the viewer handles missing
         // lesson.content by showing a "regenerate" prompt.
@@ -815,8 +996,12 @@ async function generateCurriculumChunked(
     const reasonSummary = failureReasons.length > 0
       ? ` Reasons: ${failureReasons.map((r) => r.replace(/\s+/g, " ").slice(0, 220)).join(" | ")}`
       : "";
-    throw new Error(
-      `Too many modules failed (${failureCount}/${totalModules} — ${(successRatio * 100).toFixed(0)}% success).${reasonSummary}`
+    // GenerationPipelineError carries the full structured `generationErrors`
+    // array through the catch boundary in after() so updateCourseRecord can
+    // persist both the free-text error_message AND the JSONB detail.
+    throw new GenerationPipelineError(
+      `Too many modules failed (${failureCount}/${totalModules} — ${(successRatio * 100).toFixed(0)}% success).${reasonSummary}`,
+      generationErrors,
     );
   }
   if (failureCount > 0) {
@@ -834,8 +1019,13 @@ async function generateCurriculumChunked(
     modules: detailedModules,
   };
 
-  console.log(`[/api/generate] [${courseId}] Chunked generation complete: ${totalModules} modules assembled`);
-  return finalCurriculum;
+  console.log(
+    `[/api/generate] [${courseId}] Chunked generation complete: ${totalModules} modules assembled` +
+      (generationErrors.length > 0
+        ? ` (${generationErrors.length} module(s) degraded to skeleton stub — persisted to generation_errors)`
+        : ""),
+  );
+  return { curriculum: finalCurriculum, generationErrors };
 }
 
 /**
@@ -845,14 +1035,24 @@ async function generateCurriculumChunked(
  * - crash / short → single-shot (fast, fits in one call)
  * - full / masterclass → chunked (skeleton + per-module, parallel)
  *
+ * Return shape is normalized so the caller always gets a `generationErrors`
+ * array. Single-shot has no per-module failure surface, so it always
+ * returns an empty array on success; any exception propagates up as-is.
+ *
  * @param request - Validated generation request
  * @param courseId - The course ID for progress updates (used by chunked)
- * @returns Parsed Curriculum object
+ * @returns { curriculum, generationErrors } where generationErrors is
+ *          empty on a perfect success and non-empty on partial success
+ *          (only possible for chunked length=full|masterclass).
  */
-async function generateCurriculum(request: GenerateRequest, courseId: string): Promise<Curriculum> {
+async function generateCurriculum(
+  request: GenerateRequest,
+  courseId: string,
+): Promise<{ curriculum: Curriculum; generationErrors: GenerationError[] }> {
   if (request.length === "crash" || request.length === "short") {
     console.log(`[/api/generate] [${courseId}] Using single-shot generation for ${request.length} course`);
-    return generateCurriculumSingleShot(request);
+    const curriculum = await generateCurriculumSingleShot(request);
+    return { curriculum, generationErrors: [] };
   } else {
     console.log(`[/api/generate] [${courseId}] Using chunked generation for ${request.length} course`);
     return generateCurriculumChunked(request, courseId);
@@ -986,27 +1186,47 @@ async function createCourseRecord(
 /**
  * Updates an existing course record with the generated curriculum or error.
  * Sets status to "ready" on success or "failed" on error.
- * Also increments the user's generation counter.
+ * Also increments the user's generation counter on success.
+ *
+ * `generationErrors` is persisted in both paths (success and failure) so
+ * partial-success cases (e.g. 8/10 modules, success_ratio >= 0.6) have a
+ * structured forensic trail. An empty array is the honest signal for
+ * "generation completed with zero issues".
  *
  * @param userId - The authenticated user's UUID
  * @param courseId - The course ID to update
  * @param curriculum - The generated curriculum (if successful)
  * @param error - The error message (if generation failed)
+ * @param generationErrors - Structured per-module failure records; always
+ *                           persisted, defaults to [] when undefined
  */
 async function updateCourseRecord(
   userId: string,
   courseId: string,
   curriculum?: Curriculum,
-  error?: string
+  error?: string,
+  generationErrors: GenerationError[] = [],
 ): Promise<void> {
   // Use supabaseAdmin (service role) for background operations inside after().
   // The cookies-based createSupabaseServer() is unreliable after the response
   // has been sent — the cookie context may be gone.
   const supabase = getSupabaseAdmin();
 
+  // Supabase client types generation_errors as Json (see database.types.ts).
+  // We coerce via JSON.parse(JSON.stringify(...)) to (a) enforce that the
+  // runtime payload is a pure JSON value and (b) silence any structural
+  // type mismatches between the GenerationError interface and the Json
+  // alias — same pattern used for curriculum on line ~1013.
+  const generationErrorsJson = JSON.parse(JSON.stringify(generationErrors));
+
   if (curriculum) {
     // Update with successful curriculum
-    console.log("[/api/generate] Updating course", courseId, "with generated curriculum");
+    console.log(
+      `[/api/generate] Updating course ${courseId} with generated curriculum` +
+        (generationErrors.length > 0
+          ? ` (+${generationErrors.length} partial failure record(s))`
+          : ""),
+    );
     const { error: updateError } = await supabase
       .from("courses")
       .update({
@@ -1014,6 +1234,7 @@ async function updateCourseRecord(
         status: "ready",
         title: curriculum.title ?? curriculum.id,
         description: curriculum.subtitle ?? null,
+        generation_errors: generationErrorsJson,
       })
       .eq("id", courseId);
 
@@ -1037,12 +1258,17 @@ async function updateCourseRecord(
     }
   } else if (error) {
     // Update with error state
-    console.log("[/api/generate] Updating course", courseId, "with error:", error);
+    console.log(
+      `[/api/generate] Updating course ${courseId} with error:`,
+      error,
+      generationErrors.length > 0 ? `(+${generationErrors.length} structured record(s))` : "",
+    );
     const { error: updateError } = await supabase
       .from("courses")
       .update({
         status: "failed",
         error_message: error,
+        generation_errors: generationErrorsJson,
       })
       .eq("id", courseId);
 
@@ -1185,10 +1411,18 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
     const startTime = Date.now();
     try {
       console.log(`[/api/generate] [${courseId}] after() started at ${new Date().toISOString()}`);
-      const curriculum = await generateCurriculum(generateRequest, courseId);
+      const { curriculum, generationErrors } = await generateCurriculum(generateRequest, courseId);
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      console.log(`[/api/generate] [${courseId}] Generation complete in ${elapsed}s — saving to DB...`);
-      await updateCourseRecord(userId!, courseId, curriculum, undefined);
+      console.log(
+        `[/api/generate] [${courseId}] Generation complete in ${elapsed}s — saving to DB...` +
+          (generationErrors.length > 0
+            ? ` [${generationErrors.length} partial failure record(s) will be persisted]`
+            : ""),
+      );
+      // Pass the structured errors through — partial success (e.g. 8/10)
+      // will still land here, and updateCourseRecord persists them to
+      // courses.generation_errors regardless of the success branch.
+      await updateCourseRecord(userId!, courseId, curriculum, undefined, generationErrors);
       console.log(`[/api/generate] [${courseId}] Course saved successfully. Total: ${elapsed}s`);
     } catch (err) {
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
@@ -1198,9 +1432,22 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
       if (err instanceof Error && err.stack) {
         console.error(`[/api/generate] [${courseId}] Stack:`, err.stack);
       }
+      // If the pipeline threw a GenerationPipelineError (hard failure below
+      // MIN_SUCCESS_RATIO), the per-module structured reasons are attached
+      // to the exception — forward them to updateCourseRecord so the DB
+      // captures both the headline error_message AND the JSONB detail.
+      // For any other Error (validation, Supabase, unexpected), fall back
+      // to an empty array.
+      const structuredErrors =
+        err instanceof GenerationPipelineError ? err.generationErrors : [];
       try {
-        await updateCourseRecord(userId!, courseId, undefined, errorMessage);
-        console.log(`[/api/generate] [${courseId}] Error state saved to DB`);
+        await updateCourseRecord(userId!, courseId, undefined, errorMessage, structuredErrors);
+        console.log(
+          `[/api/generate] [${courseId}] Error state saved to DB` +
+            (structuredErrors.length > 0
+              ? ` with ${structuredErrors.length} structured record(s)`
+              : ""),
+        );
       } catch (updateErr) {
         console.error(`[/api/generate] [${courseId}] CRITICAL: Failed to update error state:`, updateErr);
       }

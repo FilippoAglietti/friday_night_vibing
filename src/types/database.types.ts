@@ -32,6 +32,7 @@ export type Database = {
           embedding: string | null
           error_message: string | null
           generation_completed_modules: number | null
+          generation_errors: Json
           generation_progress: string | null
           generation_total_modules: number | null
           has_attachments: boolean | null
@@ -63,6 +64,7 @@ export type Database = {
           embedding?: string | null
           error_message?: string | null
           generation_completed_modules?: number | null
+          generation_errors?: Json
           generation_progress?: string | null
           generation_total_modules?: number | null
           has_attachments?: boolean | null
@@ -94,6 +96,7 @@ export type Database = {
           embedding?: string | null
           error_message?: string | null
           generation_completed_modules?: number | null
+          generation_errors?: Json
           generation_progress?: string | null
           generation_total_modules?: number | null
           has_attachments?: boolean | null
