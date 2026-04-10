@@ -15,6 +15,7 @@ import type { Curriculum } from "@/types/curriculum";
 import { exampleCurricula as fullExampleCurricula } from "@/data/exampleCurricula";
 import { motion, AnimatePresence, useScroll, useTransform, useAnimation, type Variants } from "framer-motion";
 import ScrollProgress from "@/components/ScrollProgress";
+import InteractiveDemo from "@/components/InteractiveDemo";
 import { Button } from "@/components/ui/button";
 import { supabaseBrowser } from "@/lib/supabase";
 import {
@@ -396,7 +397,7 @@ function AnimateInView({
 
 /* ─── Section Meta ────────────────────────────────────── */
 
-const SECTION_IDS = ["hero", "problem-solution", "how-it-works", "generate", "examples", "testimonials", "pricing", "final-cta"];
+const SECTION_IDS = ["hero", "problem-solution", "how-it-works", "demo", "generate", "examples", "testimonials", "pricing", "final-cta"];
 
 /* ─── Section Dots ────────────────────────────────────── */
 
@@ -406,6 +407,7 @@ function SectionDots({ activeSection }: { activeSection: string }) {
     { id: "hero",             label: t("sections.hero")          },
     { id: "problem-solution", label: t("sections.theProblem")    },
     { id: "how-it-works",     label: t("sections.howItWorks")    },
+    { id: "demo",             label: "See It in Action"          },
     { id: "generate",         label: t("sections.tryItNow")      },
     { id: "examples",         label: t("sections.examples")      },
     { id: "testimonials",     label: t("sections.testimonials")  },
@@ -855,6 +857,46 @@ export default function Home() {
                   </div>
                 </motion.div>
               ))}
+            </AnimateInView>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════
+            INTERACTIVE DEMO — "See what Syllabi creates"
+        ═══════════════════════════════════════════════════ */}
+        <section
+          id="demo"
+          className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20"
+        >
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute top-[10%] left-[10%] h-[45vh] w-[45vh] rounded-full bg-violet-500/[0.04] blur-[100px] dark:bg-violet-400/[0.07]" />
+            <div className="absolute bottom-[15%] right-[8%] h-[30vh] w-[30vh] rounded-full bg-indigo-500/[0.03] blur-[80px] dark:bg-indigo-400/[0.05]" />
+          </div>
+
+          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
+            <AnimateInView containerRef={containerRef} amount={0.2} variants={stagger} className="text-center mb-8 md:mb-12">
+              <motion.p
+                variants={fadeUp}
+                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
+              >
+                See it in action
+              </motion.p>
+              <motion.h2
+                variants={fadeUp}
+                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
+              >
+                See what Syllabi creates
+              </motion.h2>
+              <motion.p
+                variants={fadeUp}
+                className="mx-auto mt-4 max-w-2xl text-muted-foreground"
+              >
+                Watch a real course being built in real-time. No signup needed to see the magic.
+              </motion.p>
+            </AnimateInView>
+
+            <AnimateInView containerRef={containerRef} amount={0.15} variants={fadeUp}>
+              <InteractiveDemo />
             </AnimateInView>
           </div>
         </section>

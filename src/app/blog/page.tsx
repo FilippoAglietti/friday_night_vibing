@@ -25,15 +25,45 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "/blog/how-to-create-online-course-2026",
+    category: "Guide",
+    date: "April 10, 2026",
+    readTime: "12 min read",
+    title: "How to Create an Online Course in 2026 — Complete Guide",
+    excerpt:
+      "The definitive step-by-step guide to creating a professional online course in 2026. From topic validation to launch, using AI tools and proven frameworks.",
+    accent: "text-violet-400",
+    featured: true,
+  },
+  {
+    slug: "/blog/ai-course-generator-comparison",
+    category: "Comparison",
+    date: "April 8, 2026",
+    readTime: "10 min read",
+    title: "AI Course Generator Comparison 2026 — Syllabi vs CourseAI vs Coursebox",
+    excerpt:
+      "Honest side-by-side comparison of the top AI course generators. We break down features, pricing, output quality, and where each tool shines.",
+    accent: "text-cyan-400",
+  },
+  {
+    slug: "/blog/best-tools-course-creators",
+    category: "Resources",
+    date: "April 6, 2026",
+    readTime: "8 min read",
+    title: "Best Tools for Course Creators in 2026 — The Complete Stack",
+    excerpt:
+      "The essential tool stack for course creators: from AI course generators to email marketing, design, and distribution. Every tool you need, organized by workflow.",
+    accent: "text-emerald-400",
+  },
+  {
     slug: "#",
     category: "Product",
-    date: "April 8, 2026",
+    date: "April 4, 2026",
     readTime: "3 min read",
     title: "AI Audio Lessons Are Here — Turn Your Course into a Podcast",
     excerpt:
       "Pro Max users can now generate professional voice narration for every lesson. Choose from multiple AI voices and let your students learn on the go.",
     accent: "text-rose-400",
-    featured: true,
   },
   {
     slug: "#",
@@ -107,7 +137,7 @@ const posts = [
   },
 ];
 
-const categories = ["All", "Product", "Guide", "Insights"];
+const categories = ["All", "Product", "Guide", "Comparison", "Resources", "Insights"];
 
 export default function BlogPage() {
   return (
@@ -203,65 +233,92 @@ export default function BlogPage() {
         </div>
 
         {/* Featured post */}
-        <article className="mb-12 rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm p-8 sm:p-10 group relative overflow-hidden">
-          {/* Gradient left border */}
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-indigo-500" />
-
-          <div className="relative">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <span className={`text-xs font-semibold uppercase tracking-wider ${posts[0].accent}`}>
-                {posts[0].category}
-              </span>
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Clock className="size-3" />
-                {posts[0].readTime}
-              </span>
+        {posts[0].slug !== "#" ? (
+          <Link href={posts[0].slug} className="block mb-12">
+            <article className="rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm p-8 sm:p-10 group relative overflow-hidden hover:border-violet-500/30 transition-colors">
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-indigo-500" />
+              <div className="relative">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                  <span className={`text-xs font-semibold uppercase tracking-wider ${posts[0].accent}`}>{posts[0].category}</span>
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground"><Clock className="size-3" />{posts[0].readTime}</span>
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-bold leading-snug mb-4 text-foreground group-hover:text-violet-300 transition-colors">{posts[0].title}</h2>
+                <p className="text-base text-muted-foreground leading-relaxed mb-6 max-w-2xl">{posts[0].excerpt}</p>
+                <div className="flex items-center justify-between mt-8">
+                  <span className="text-xs text-muted-foreground/60">{posts[0].date}</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-violet-400 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20">
+                    Read article <ArrowRight className="size-3" />
+                  </span>
+                </div>
+              </div>
+            </article>
+          </Link>
+        ) : (
+          <article className="mb-12 rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm p-8 sm:p-10 group relative overflow-hidden">
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-indigo-500" />
+            <div className="relative">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <span className={`text-xs font-semibold uppercase tracking-wider ${posts[0].accent}`}>{posts[0].category}</span>
+                <span className="flex items-center gap-1 text-xs text-muted-foreground"><Clock className="size-3" />{posts[0].readTime}</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold leading-snug mb-4 text-foreground">{posts[0].title}</h2>
+              <p className="text-base text-muted-foreground leading-relaxed mb-6 max-w-2xl">{posts[0].excerpt}</p>
+              <div className="flex items-center justify-between mt-8">
+                <span className="text-xs text-muted-foreground/60">{posts[0].date}</span>
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-full bg-muted/50">Coming Soon</span>
+              </div>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold leading-snug mb-4 text-foreground group-hover:text-violet-300 transition-colors">
-              {posts[0].title}
-            </h2>
-            <p className="text-base text-muted-foreground leading-relaxed mb-6 max-w-2xl">
-              {posts[0].excerpt}
-            </p>
-            <div className="flex items-center justify-between mt-8">
-              <span className="text-xs text-muted-foreground/60">{posts[0].date}</span>
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-full bg-muted/50">
-                Coming Soon
-              </span>
-            </div>
-          </div>
-        </article>
+          </article>
+        )}
 
         {/* Posts grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-16">
-          {posts.slice(1).map((post) => (
-            <article
-              key={post.title}
-              className="group flex flex-col rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm p-6 hover:border-violet-500/20 hover:scale-[1.01] transition-all duration-300"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <span className={`text-xs font-semibold uppercase tracking-wider ${post.accent}`}>
-                  {post.category}
-                </span>
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="size-3" />
-                  {post.readTime}
-                </span>
+          {posts.slice(1).map((post) => {
+            const isLive = post.slug !== "#";
+            const cardContent = (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`text-xs font-semibold uppercase tracking-wider ${post.accent}`}>
+                    {post.category}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Clock className="size-3" />
+                    {post.readTime}
+                  </span>
+                </div>
+                <h2 className="font-bold leading-snug mb-3 text-foreground group-hover:text-violet-300 transition-colors">
+                  {post.title}
+                </h2>
+                <p className="text-sm text-muted-foreground leading-relaxed flex-1 mb-4">
+                  {post.excerpt}
+                </p>
+                <div className="flex items-center justify-between mt-auto">
+                  <span className="text-xs text-muted-foreground/60">{post.date}</span>
+                  {isLive ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-violet-400 px-2 py-1 rounded bg-violet-500/10 border border-violet-500/20">
+                      Read <ArrowRight className="size-3" />
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground px-2 py-1 rounded bg-muted/50">
+                      Coming Soon
+                    </span>
+                  )}
+                </div>
+              </>
+            );
+
+            const className = "group flex flex-col rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm p-6 hover:border-violet-500/20 hover:scale-[1.01] transition-all duration-300";
+
+            return isLive ? (
+              <Link key={post.title} href={post.slug} className={className}>
+                {cardContent}
+              </Link>
+            ) : (
+              <div key={post.title} className={className}>
+                {cardContent}
               </div>
-              <h2 className="font-bold leading-snug mb-3 text-foreground group-hover:text-violet-300 transition-colors">
-                {post.title}
-              </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed flex-1 mb-4">
-                {post.excerpt}
-              </p>
-              <div className="flex items-center justify-between mt-auto">
-                <span className="text-xs text-muted-foreground/60">{post.date}</span>
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground px-2 py-1 rounded bg-muted/50">
-                  Coming Soon
-                </span>
-              </div>
-            </article>
-          ))}
+            );
+          })}
         </div>
 
         {/* Newsletter CTA */}
