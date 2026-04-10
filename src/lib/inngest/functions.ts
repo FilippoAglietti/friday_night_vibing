@@ -173,7 +173,11 @@ export const courseGenerate = inngest.createFunction(
   {
     id: "course-generate",
     name: "Course: Skeleton + Fan-out",
-    retries: 2,
+    // Sonnet skeleton can take 120-200s. With retries > 0, multiple
+    // attempts within a single Vercel invocation exceed the 300s
+    // maxDuration limit. retries: 0 means one attempt per invocation;
+    // Inngest still re-invokes on infrastructure failures.
+    retries: 0,
   },
   { event: "course/generate.requested" },
   async ({ event, step }) => {
@@ -198,7 +202,9 @@ export const courseGenerate = inngest.createFunction(
         model: GENERATION_MODEL,
         maxTokens: 24576,
         label: `${courseId}/skeleton`,
-        timeoutMs: 100_000,
+        // Sonnet needs 120-200s for a masterclass skeleton.
+        // 240s leaves 60s headroom within Vercel's 300s limit.
+        timeoutMs: 240_000,
       });
 
       return parseClaudeJson<Curriculum>(rawText, "skeleton");
