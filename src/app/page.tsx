@@ -569,7 +569,7 @@ export default function Home() {
           >
             <GraduationCap className="size-5 text-violet-500" />
             <span>
-              syllabi<span className="text-violet-500">.ai</span>
+              syllabi<span className="text-violet-500">.online</span>
             </span>
           </Link>
           <div className="hidden items-center gap-6 text-sm font-medium md:flex">
@@ -1590,7 +1590,7 @@ export default function Home() {
       ═══════════════════════════════════════════════════ */}
       <footer className="snap-section-footer relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:py-12 sm:px-6">
-          <div className="grid gap-8 grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-8 grid-cols-2 lg:grid-cols-5">
             {/* Brand */}
             <div className="col-span-2 lg:col-span-1">
               <Link
@@ -1599,7 +1599,7 @@ export default function Home() {
               >
                 <GraduationCap className="size-5 text-violet-500" />
                 <span>
-                  syllabi<span className="text-violet-500">.ai</span>
+                  syllabi<span className="text-violet-500">.online</span>
                 </span>
               </Link>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -1621,7 +1621,7 @@ export default function Home() {
                   <Globe className="size-4" />
                 </a>
                 <a
-                  href="mailto:hello@syllabi.ai"
+                  href="mailto:hello@syllabi.online"
                   className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label="Email"
                 >
@@ -1666,6 +1666,19 @@ export default function Home() {
                 <li><Link href="/privacy" className="hover:text-foreground transition-colors">{t("footer.privacyPolicy")}</Link></li>
                 <li><Link href="/terms" className="hover:text-foreground transition-colors">{t("footer.termsOfService")}</Link></li>
                 <li><Link href="/cookies" className="hover:text-foreground transition-colors">{t("footer.cookiePolicy")}</Link></li>
+              </ul>
+            </div>
+
+            {/* Generators (internal links for SEO) */}
+            <div>
+              <h4 className="text-sm font-semibold">Generators</h4>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <li><Link href="/generator/teachers" className="hover:text-foreground transition-colors">For Teachers</Link></li>
+                <li><Link href="/generator/corporate-training" className="hover:text-foreground transition-colors">Corporate Training</Link></li>
+                <li><Link href="/generator/course-creators" className="hover:text-foreground transition-colors">Course Creators</Link></li>
+                <li><Link href="/generator/python-developers" className="hover:text-foreground transition-colors">Python Developers</Link></li>
+                <li><Link href="/generator/coaches" className="hover:text-foreground transition-colors">Coaches</Link></li>
+                <li><Link href="/generator" className="hover:text-foreground transition-colors text-violet-400 font-medium">View All →</Link></li>
               </ul>
             </div>
           </div>

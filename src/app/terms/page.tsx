@@ -1,28 +1,24 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import { Metadata } from "next";
 import SubpageNav from "@/components/SubpageNav";
 import SubpageBackLink from "@/components/SubpageBackLink";
+import { JsonLd, breadcrumbJsonLd, BREADCRUMBS } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Terms of Service | Syllabi",
-  description:
-    "Read Syllabi's Terms of Service governing your use of the AI-powered course generation platform at syllabi.online.",
-  alternates: {
-    canonical: "/terms",
-  },
+  description: "Read the terms and conditions that govern your use of Syllabi.",
+  alternates: { canonical: "/terms" },
   openGraph: {
     title: "Terms of Service | Syllabi",
-    description:
-      "Read Syllabi's Terms of Service governing your use of the AI-powered course generation platform.",
+    description: "Read the terms and conditions that govern your use of Syllabi.",
     url: "https://www.syllabi.online/terms",
     siteName: "Syllabi",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Terms of Service | Syllabi",
-    description:
-      "Read Syllabi's Terms of Service governing your use of the AI-powered course generation platform.",
+    description: "Read the terms and conditions that govern your use of Syllabi.",
   },
 };
 
@@ -31,349 +27,202 @@ const CONTACT_EMAIL = "legal@syllabi.online";
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground dark">
+      <JsonLd data={breadcrumbJsonLd(BREADCRUMBS.terms)} />
       <SubpageNav />
+      
+      {/* Gradient background */}
+      <div className="absolute inset-0 h-[400px] bg-gradient-to-b from-violet-500/5 via-indigo-500/3 to-transparent pointer-events-none" />
+      
+      {/* Dot pattern */}
+      <div className="absolute inset-0 h-[400px] bg-[radial-gradient(circle,rgba(139,92,246,0.06)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
-      <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-        <div className="mb-12">
-          <p className="text-sm font-semibold uppercase tracking-widest text-violet-500 mb-3">Legal</p>
-          <h1 className="text-4xl font-extrabold tracking-tight">Terms of Service</h1>
-          <p className="mt-3 text-muted-foreground">Effective date: {EFFECTIVE_DATE}</p>
+      <main className="relative mx-auto max-w-4xl px-4 py-16 md:py-24">
+        <div className="mb-8">
+          <h1 className="mb-4 text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-violet-200 bg-clip-text text-transparent">
+            Terms of Service
+          </h1>
+          <span className="inline-flex items-center rounded-full bg-violet-500/10 border border-violet-500/20 px-3 py-1 text-xs font-medium text-violet-400">
+            Updated {EFFECTIVE_DATE}
+          </span>
         </div>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-10 text-sm leading-relaxed text-muted-foreground [&_h2]:text-foreground [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-10 [&_h2]:mb-3 [&_h3]:text-foreground [&_h3]:font-medium [&_h3]:mt-6 [&_h3]:mb-2 [&_strong]:text-foreground [&_a]:text-violet-400 [&_a]:underline [&_a]:underline-offset-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1.5">
-
+        <div className="prose prose-invert max-w-none space-y-8">
           <section>
-            <p>
-              These Terms of Service (&quot;Terms&quot;) constitute a legally binding agreement between you
-              (&quot;User&quot;, &quot;you&quot;, or &quot;your&quot;) and Syllabi.ai (&quot;Syllabi&quot;,
-              &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), governing your access to and use of the Syllabi.ai
-              website at <a href="https://syllabi.online">syllabi.online</a> and all related services
-              (collectively, the &quot;Service&quot;).
-            </p>
-            <p className="mt-3">
-              By creating an account or using the Service, you confirm that you are at least 18 years old (or the age
-              of majority in your jurisdiction, whichever is greater), that you have read and understood these Terms,
-              and that you agree to be bound by them. If you do not agree, do not use the Service.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              1. Acceptance of Terms
+            </h2>
+            <p className="text-gray-300">
+              By accessing and using Syllabi ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this Service.
             </p>
           </section>
 
           <section>
-            <h2>1. The Service</h2>
-            <p>
-              Syllabi.ai provides an AI-powered platform that generates structured course curricula — including modules,
-              lessons, quizzes, learning objectives, and pacing schedules — based on inputs you provide. The Service
-              also offers exports in PDF and Notion formats, a course history dashboard, and subscription plan
-              management.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              2. Use License
+            </h2>
+            <p className="text-gray-300">
+              Permission is granted to temporarily download one copy of the materials (information or software) on Syllabi for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
             </p>
-            <p className="mt-3">
-              We use Anthropic&apos;s Claude AI to generate content. AI-generated content is inherently probabilistic
-              and may occasionally be inaccurate, incomplete, or unsuitable for your specific use case. You are
-              responsible for reviewing, editing, and validating all generated content before use.
-            </p>
-          </section>
-
-          <section>
-            <h2>2. Accounts</h2>
-            <ul>
-              <li>
-                <strong>Registration:</strong> You must sign in via Google OAuth. You are responsible for maintaining
-                the security of your Google account.
-              </li>
-              <li>
-                <strong>One account per user:</strong> You may not create multiple accounts to circumvent plan limits
-                or free-tier restrictions.
-              </li>
-              <li>
-                <strong>Accurate information:</strong> You agree to provide accurate information and to keep it
-                up to date.
-              </li>
-              <li>
-                <strong>Account security:</strong> You are responsible for all activity under your account. Notify us
-                immediately at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> if you suspect unauthorized
-                access.
-              </li>
+            <ul className="space-y-2 text-gray-300 ml-4">
+              <li>• Modifying or copying the materials</li>
+              <li>• Using the materials for any commercial purpose or for any public display</li>
+              <li>• Attempting to reverse engineer, disassemble, or decompile any software contained on Syllabi</li>
+              <li>• Transferring the materials to another person or "mirroring" the materials on any other server</li>
+              <li>• Removing any copyright or other proprietary notations from the materials</li>
+              <li>• Transmitting the materials over a network</li>
             </ul>
           </section>
 
           <section>
-            <h2>3. Subscription Plans and Billing</h2>
-
-            <h3>3.1 Plan Tiers</h3>
-            <p>
-              Syllabi.ai offers a free Starter plan and paid subscription plans (Pro and Pro Max) as described on our{" "}
-              <Link href="/#pricing">pricing page</Link>. Plan features, generation limits, and pricing may change with
-              reasonable notice.
-            </p>
-
-            <h3>3.2 Billing</h3>
-            <ul>
-              <li>
-                Paid plans are billed on a <strong>monthly or annual</strong> basis (as selected at checkout) via
-                Stripe, Inc.
-              </li>
-              <li>
-                Subscriptions <strong>auto-renew</strong> at the end of each billing period unless cancelled before
-                the renewal date.
-              </li>
-              <li>
-                All prices are in <strong>EUR</strong> and are exclusive of applicable taxes. We will charge applicable
-                sales tax or VAT where required by law.
-              </li>
-              <li>
-                By providing payment information, you authorize Syllabi.ai (via Stripe) to charge your payment method
-                for all fees incurred.
-              </li>
-            </ul>
-
-            <h3>3.3 Refunds</h3>
-            <ul>
-              <li>
-                We offer a <strong>7-day money-back guarantee</strong> on your first purchase of a paid plan. To
-                request a refund within this window, email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-              </li>
-              <li>
-                After 7 days, <strong>payments are non-refundable</strong> except as required by applicable law.
-              </li>
-              <li>
-                Refunds are not provided for partial months if you downgrade or cancel mid-cycle. You retain access
-                to the paid plan features until the end of the current billing period.
-              </li>
-            </ul>
-
-            <h3>3.4 Plan Changes</h3>
-            <ul>
-              <li>
-                Upgrades take effect immediately; you will be charged a prorated amount for the remainder of the
-                current billing period.
-              </li>
-              <li>
-                Downgrades take effect at the start of the next billing period. Your current plan features remain
-                active until then.
-              </li>
-              <li>
-                If your payment fails, we will attempt to retry the charge. If payment remains outstanding, your
-                account may be downgraded to the free Starter plan.
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h2>4. Intellectual Property</h2>
-
-            <h3>4.1 Your Content and Generated Courses</h3>
-            <p>
-              You retain full ownership of the <strong>inputs</strong> you provide to the Service (topic, audience,
-              niche, etc.) and of the <strong>course curricula generated</strong> from those inputs.
-            </p>
-            <p className="mt-3">
-              You may use, reproduce, modify, publish, distribute, and sell generated courses for any lawful purpose,
-              including commercial use. You do not need to attribute Syllabi.ai.
-            </p>
-            <p className="mt-3">
-              By using the Service, you grant Syllabi.ai a limited, non-exclusive, royalty-free license to store,
-              process, and display your inputs and generated courses <strong>solely to provide the Service to you</strong>{" "}
-              (e.g., to save your history and render exports). We will not use your content to train AI models or
-              share it with third parties except as described in our{" "}
-              <Link href="/privacy">Privacy Policy</Link>.
-            </p>
-
-            <h3>4.2 Syllabi.ai IP</h3>
-            <p>
-              The Syllabi.ai brand, logo, website design, underlying software, and service infrastructure are owned
-              by Syllabi.ai or our licensors and protected by copyright, trademark, and other intellectual property
-              laws. These Terms do not grant you any rights to use our trademarks or branding.
-            </p>
-
-            <h3>4.3 AI Output Considerations</h3>
-            <p>
-              AI-generated content may vary across generations and may not always be novel or unique. We make no
-              warranty that generated course content is original, free from similarity to existing works, or suitable
-              for copyright protection in your jurisdiction. You are responsible for conducting any clearance review
-              appropriate to your use case.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              3. Disclaimer
+            </h2>
+            <p className="text-gray-300">
+              The materials on Syllabi are provided "as is". Syllabi makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
             </p>
           </section>
 
           <section>
-            <h2>5. Acceptable Use</h2>
-            <p>You agree not to use the Service to:</p>
-            <ul>
-              <li>Generate content that is illegal, harmful, harassing, defamatory, obscene, or fraudulent</li>
-              <li>Violate any third party&apos;s intellectual property, privacy, or other rights</li>
-              <li>Circumvent plan limits through automation, scripting, or multiple accounts</li>
-              <li>Probe, scan, or test the security of the Service or any related system</li>
-              <li>Reverse engineer or extract the underlying models, algorithms, or source code</li>
-              <li>Resell or sublicense access to the Service without our written permission</li>
-              <li>Generate content for deceptive, spam, or phishing campaigns</li>
-            </ul>
-            <p className="mt-3">
-              We reserve the right to suspend or terminate accounts that violate these rules, with or without notice.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              4. Limitations
+            </h2>
+            <p className="text-gray-300">
+              In no event shall Syllabi or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Syllabi, even if Syllabi or a Syllabi authorized representative has been notified orally or in writing of the possibility of such damage.
             </p>
           </section>
 
           <section>
-            <h2>6. Disclaimers</h2>
-            <p className="uppercase font-semibold text-xs tracking-wide text-foreground">
-              The service is provided &quot;as is&quot; and &quot;as available&quot;
-            </p>
-            <p className="mt-3">
-              To the fullest extent permitted by applicable law, Syllabi.ai disclaims all warranties, express or
-              implied, including without limitation:
-            </p>
-            <ul>
-              <li>Warranties of merchantability, fitness for a particular purpose, and non-infringement</li>
-              <li>That the Service will be uninterrupted, error-free, or free of viruses or other harmful components</li>
-              <li>That AI-generated content will be accurate, complete, up-to-date, or suitable for your needs</li>
-              <li>That results obtained from using the Service will meet your expectations or requirements</li>
-            </ul>
-            <p className="mt-3">
-              AI-generated educational content should be reviewed by a qualified subject-matter expert before
-              deployment to students. Syllabi.ai is a course <em>structuring</em> tool — the accuracy of factual
-              content within generated lessons is your responsibility.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              5. Accuracy of Materials
+            </h2>
+            <p className="text-gray-300">
+              The materials appearing on Syllabi could include technical, typographical, or photographic errors. Syllabi does not warrant that any of the materials on its website are accurate, complete, or current. Syllabi may make changes to the materials contained on its website at any time without notice.
             </p>
           </section>
 
           <section>
-            <h2>7. Limitation of Liability</h2>
-            <p className="uppercase font-semibold text-xs tracking-wide text-foreground">
-              Important — please read carefully
-            </p>
-            <p className="mt-3">
-              To the maximum extent permitted by applicable law, in no event shall Syllabi.ai, its officers,
-              directors, employees, agents, or licensors be liable for any:
-            </p>
-            <ul>
-              <li>Indirect, incidental, special, consequential, or punitive damages</li>
-              <li>Loss of profits, revenue, data, goodwill, or business opportunities</li>
-              <li>Damages arising from your reliance on AI-generated content</li>
-              <li>Unauthorized access to or alteration of your data</li>
-            </ul>
-            <p className="mt-3">
-              In all cases, our total aggregate liability to you for any claims arising out of or related to these
-              Terms or the Service shall not exceed the greater of:
-            </p>
-            <ol>
-              <li>The amount you paid to Syllabi.ai in the <strong>twelve (12) months</strong> preceding the claim, or</li>
-              <li><strong>EUR €50</strong></li>
-            </ol>
-            <p className="mt-3">
-              Some jurisdictions do not allow the exclusion or limitation of certain damages. In such jurisdictions,
-              our liability is limited to the fullest extent permitted by law.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              6. Materials and Content
+            </h2>
+            <p className="text-gray-300">
+              Syllabi has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Syllabi of the site. Use of any such linked website is at the user's own risk.
             </p>
           </section>
 
           <section>
-            <h2>8. Indemnification</h2>
-            <p>
-              You agree to indemnify, defend, and hold harmless Syllabi.ai and its affiliates, officers, directors,
-              employees, and agents from and against any claims, liabilities, damages, losses, costs, and expenses
-              (including reasonable legal fees) arising out of or in connection with:
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              7. Modifications
+            </h2>
+            <p className="text-gray-300">
+              Syllabi may revise these terms of service for its website at any time without notice. By using this website, you are agreeing to be bound by the then current version of these terms of service.
             </p>
-            <ul>
-              <li>Your use of the Service in violation of these Terms</li>
-              <li>Content you input into or publish from the Service</li>
-              <li>Your violation of any applicable law or third-party rights</li>
+          </section>
+
+          <section>
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              8. Governing Law
+            </h2>
+            <p className="text-gray-300">
+              These terms and conditions are governed by and construed in accordance with the laws of the United States, and you irrevocably submit to the exclusive jurisdiction of the courts in that location.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              9. User Accounts
+            </h2>
+            <p className="text-gray-300">
+              If you create an account on Syllabi, you are responsible for maintaining the confidentiality of your account information and password. You agree to accept responsibility for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              10. User Content
+            </h2>
+            <p className="text-gray-300">
+              When you upload, submit, or display content on Syllabi, you grant us a worldwide, non-exclusive, royalty-free license to use, copy, reproduce, process, adapt, modify, publish, transmit, display, and distribute such content in any media or medium and for any purpose. You represent and warrant that you own or have the necessary rights to the content you provide.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              11. Prohibited Activities
+            </h2>
+            <p className="text-gray-300">
+              You agree not to engage in any of the following prohibited activities:
+            </p>
+            <ul className="space-y-2 text-gray-300 ml-4">
+              <li>• Harassing or causing distress or inconvenience to any person</li>
+              <li>• Disrupting the normal flow of dialogue within our platform</li>
+              <li>• Attempting to gain unauthorized access to our systems</li>
+              <li>• Uploading files that contain viruses or malicious code</li>
+              <li>• Violating any applicable laws or regulations</li>
             </ul>
           </section>
 
           <section>
-            <h2>9. Termination</h2>
-            <ul>
-              <li>
-                <strong>By you:</strong> You may cancel your subscription at any time from your account settings.
-                Cancellation takes effect at the end of the current billing period. You may also request account
-                deletion by emailing <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-              </li>
-              <li>
-                <strong>By us:</strong> We may suspend or terminate your account immediately if you violate these
-                Terms, engage in fraudulent activity, or if required by law. We may also discontinue the Service
-                with 30 days&apos; notice.
-              </li>
-              <li>
-                <strong>Effect of termination:</strong> Upon termination, your right to access the Service ceases
-                immediately. We will delete your data in accordance with our{" "}
-                <Link href="/privacy">Privacy Policy</Link>.
-              </li>
-            </ul>
-          </section>
-
-          <section>
-            <h2>10. Governing Law and Disputes</h2>
-            <p>
-              These Terms are governed by the laws of the <strong>State of Delaware, USA</strong>, without regard to
-              its conflict of law provisions.
-            </p>
-            <p className="mt-3">
-              For users in the EU or UK, nothing in these Terms limits your rights under applicable consumer
-              protection laws, including the right to bring claims before your local courts.
-            </p>
-            <p className="mt-3">
-              Before initiating formal legal proceedings, both parties agree to attempt to resolve disputes informally
-              by contacting us at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. We will make reasonable
-              efforts to resolve issues within 30 days of receiving written notice.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              12. Intellectual Property Rights
+            </h2>
+            <p className="text-gray-300">
+              All content on Syllabi, including text, graphics, logos, images, and software, is the property of Syllabi or its content suppliers and protected by international copyright laws. The collection, arrangement, and assembly of all content on this website is the exclusive property of Syllabi.
             </p>
           </section>
 
           <section>
-            <h2>11. Changes to These Terms</h2>
-            <p>
-              We may update these Terms from time to time. For material changes, we will provide at least{" "}
-              <strong>30 days&apos; notice</strong> via email or a prominent notice on the Service before the new
-              Terms take effect. Your continued use of the Service after the effective date constitutes acceptance of
-              the updated Terms.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              13. Limitation of Liability
+            </h2>
+            <p className="text-gray-300">
+              In no case shall Syllabi, its directors, officers, employees, agents, or third-party content providers be liable for any direct, indirect, incidental, special, or consequential damages arising out of your use of or inability to use the website or the content, materials, and functions associated with it.
             </p>
           </section>
 
           <section>
-            <h2>12. Miscellaneous</h2>
-            <ul>
-              <li>
-                <strong>Entire agreement:</strong> These Terms, together with our Privacy Policy and Cookie Policy,
-                constitute the entire agreement between you and Syllabi.ai regarding the Service and supersede any
-                prior agreements.
-              </li>
-              <li>
-                <strong>Severability:</strong> If any provision of these Terms is found unenforceable, the remaining
-                provisions will continue in full force.
-              </li>
-              <li>
-                <strong>No waiver:</strong> Failure to enforce any provision does not constitute a waiver of our right
-                to enforce it in the future.
-              </li>
-              <li>
-                <strong>Assignment:</strong> You may not assign your rights under these Terms without our prior written
-                consent. We may assign our rights in connection with a merger, acquisition, or sale of assets.
-              </li>
-            </ul>
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              14. Termination
+            </h2>
+            <p className="text-gray-300">
+              Syllabi may terminate your account and access to the Service at any time for any reason, including if we believe you have violated these Terms of Service. Upon termination, all rights granted to you will cease, and you must immediately stop all use of the Service.
+            </p>
           </section>
 
           <section>
-            <h2>13. Contact</h2>
-            <p>
-              For questions about these Terms, contact us at:
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              15. Contact Information
+            </h2>
+            <p className="text-gray-300">
+              If you have any questions about these Terms of Service, please contact us at:
             </p>
-            <ul>
-              <li><strong>Email:</strong> <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></li>
-              <li><strong>Website:</strong> <a href="https://syllabi.online">syllabi.online</a></li>
-            </ul>
+            <p className="text-gray-300 mt-4">
+              <strong>Email:</strong> {CONTACT_EMAIL}
+            </p>
           </section>
-        </div>
-
-        {/* Footer nav */}
-        <div className="mt-16 pt-8 border-t border-border/40 flex flex-wrap gap-4 text-sm text-muted-foreground">
-          <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-          <Link href="/cookies" className="hover:text-foreground transition-colors">Cookie Policy</Link>
-          <SubpageBackLink />
         </div>
       </main>
 
-      <footer className="border-t border-border/40 mt-8">
-        <div className="mx-auto max-w-4xl px-4 py-6">
-          <p className="text-xs text-muted-foreground text-center">
-            © {new Date().getFullYear()} Syllabi. All rights reserved.
-          </p>
+      {/* Footer */}
+      <footer className="relative border-t border-gray-800 bg-gray-950/40 backdrop-blur-sm mt-16">
+        <div className="mx-auto max-w-4xl px-4 py-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-gray-400">
+              &copy; {new Date().getFullYear()} Syllabi. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm">
+              <a href="/privacy" className="text-gray-400 transition-colors hover:text-violet-400">
+                Privacy Policy
+              </a>
+              <a href="/cookies" className="text-gray-400 transition-colors hover:text-violet-400">
+                Cookie Policy
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
+
+      <SubpageBackLink />
     </div>
   );
 }

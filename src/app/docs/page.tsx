@@ -1,10 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GraduationCap, ArrowLeft, BookOpen, Zap, Download, Key, Sparkles, Layers } from "lucide-react";
+import { JsonLd, breadcrumbJsonLd, BREADCRUMBS } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Documentation — Syllabi.ai",
-  description: "Learn how to use Syllabi.ai to generate AI-powered course curricula.",
+  title: "Documentation — AI Course Generator Guide",
+  description:
+    "Complete guide to Syllabi's AI course generator. Learn how to create courses, export to PDF & Notion, add audio narration, and customize curricula.",
+  alternates: { canonical: "/docs" },
+  openGraph: {
+    title: "Documentation — Syllabi AI Course Generator",
+    description:
+      "Complete guide to creating AI-powered courses with Syllabi. Modules, lessons, quizzes, audio, and export options explained.",
+    url: "https://www.syllabi.online/docs",
+    siteName: "Syllabi",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Syllabi Documentation — AI Course Generator Guide",
+    description:
+      "Learn how to create complete courses with Syllabi's AI. Quick start, export formats, plans, and best practices.",
+  },
 };
 
 const sections = [
@@ -76,15 +93,19 @@ const sections = [
     content: [
       {
         heading: "Free tier",
-        body: "Generate 1 mini-course at no cost. Exports are limited to JSON. No credit card required.",
+        body: "Generate 3 mini-courses at no cost with 3 free mini-course generations. Exports are limited to JSON. No credit card required.",
       },
       {
         heading: "Pro (€28/month)",
         body: "15 course generations/month. Full content including quizzes, pacing schedules, and all export formats (JSON, Markdown, PDF, Notion). Custom pacing and priority AI processing.",
       },
       {
+        heading: "Pro Max (€69/month)",
+        body: "Unlimited generations with AI-generated audio narration, full chapter content generation, premium Notion and PDF export, shareable course links, white-label branding, and PPTX and DOCX export.",
+      },
+      {
         heading: "5-Pack (€33 one-time)",
-        body: "5 full course generations with no recurring subscription. All export formats included.",
+        body: "5 Pro Max generations with audio, chapter content, and all export formats. No subscription required. Perfect for one-time projects.",
       },
     ],
   },
@@ -118,11 +139,11 @@ const sections = [
     content: [
       {
         heading: "Can I edit the generated curriculum?",
-        body: "Currently, Syllabi generates complete curricula that you export and edit in your preferred tool. In-app editing is on our roadmap.",
+        body: "Yes! After generating, open the Course Editor to rewrite titles, edit lesson content, add or remove quiz questions, reorder modules, and delete anything that doesn't fit.",
       },
       {
         heading: "How long does generation take?",
-        body: "Most courses generate in 10–30 seconds, depending on course length and server load.",
+        body: "Most courses generate in 15–60 seconds depending on length. Full courses with 8+ modules take under 60 seconds.",
       },
       {
         heading: "Are my generations saved?",
@@ -138,13 +159,23 @@ const sections = [
 
 export default function DocsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground dark">
+    <div className="min-h-screen bg-background text-foreground dark relative overflow-hidden">
+      <JsonLd data={breadcrumbJsonLd(BREADCRUMBS.docs)} />
+      {/* Gradient background */}
+      <div className="absolute inset-0 h-[500px] bg-gradient-to-b from-violet-500/5 via-indigo-500/3 to-transparent pointer-events-none" />
+      
+      {/* Dot pattern */}
+      <div className="absolute inset-0 h-[500px] bg-[radial-gradient(circle,rgba(139,92,246,0.06)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+
+      {/* Header border gradient */}
+      <div className="absolute top-16 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/50 to-transparent" />
+
       {/* Header */}
-      <header className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-10 relative">
         <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
             <GraduationCap className="size-5 text-violet-500" />
-            <span>syllabi<span className="text-violet-500">.ai</span></span>
+            <span>syllabi<span className="text-violet-500">.online</span></span>
           </Link>
           <Link href="/" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="size-4" />
@@ -153,7 +184,7 @@ export default function DocsPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:py-16 flex gap-10">
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:py-16 flex gap-10 relative z-0">
         {/* Sidebar */}
         <aside className="hidden lg:block w-52 shrink-0">
           <nav className="sticky top-24 space-y-1">
@@ -162,7 +193,7 @@ export default function DocsPage() {
               <a
                 key={s.anchor}
                 href={`#${s.anchor}`}
-                className="block text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
+                className="block text-sm text-muted-foreground hover:text-foreground hover:bg-violet-500/5 rounded-lg px-2.5 py-1.5 transition-all duration-200"
               >
                 {s.title}
               </a>
@@ -172,9 +203,11 @@ export default function DocsPage() {
 
         {/* Main content */}
         <main className="flex-1 min-w-0">
-          <div className="mb-10">
+          <div className="mb-12">
             <p className="text-sm font-semibold uppercase tracking-widest text-violet-500 mb-3">Resources</p>
-            <h1 className="text-4xl font-bold tracking-tight mb-4">Documentation</h1>
+            <h1 className="text-5xl font-bold tracking-tight mb-4 bg-gradient-to-r from-white to-violet-200 bg-clip-text text-transparent">
+              Documentation
+            </h1>
             <p className="text-muted-foreground text-base">
               Everything you need to know about generating, exporting, and using Syllabi.ai curricula.
             </p>
@@ -182,20 +215,22 @@ export default function DocsPage() {
 
           <div className="space-y-14">
             {sections.map((section) => (
-              <section key={section.anchor} id={section.anchor}>
+              <section key={section.anchor} id={section.anchor} className="relative">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="flex items-center justify-center size-9 rounded-lg bg-violet-500/10 border border-violet-500/20 shrink-0">
-                    <section.icon className="size-4 text-violet-500" />
+                  <div className="flex items-center justify-center size-10 rounded-xl bg-violet-500/10 border border-violet-500/20 shrink-0 shadow-lg shadow-violet-500/10 transition-all duration-200">
+                    <section.icon className="size-5 text-violet-500" />
                   </div>
                   <h2 className="text-2xl font-bold">{section.title}</h2>
                 </div>
-                <div className="space-y-5 pl-12">
-                  {section.content.map((item, i) => (
-                    <div key={i}>
-                      <h3 className="font-semibold text-foreground mb-1">{item.heading}</h3>
-                      <p className="text-sm text-foreground/70 leading-relaxed">{item.body}</p>
-                    </div>
-                  ))}
+                <div className="rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm p-6 hover:border-violet-500/20 transition-all duration-300">
+                  <div className="space-y-5">
+                    {section.content.map((item, i) => (
+                      <div key={i}>
+                        <h3 className="font-semibold text-foreground mb-2">{item.heading}</h3>
+                        <p className="text-sm text-foreground/70 leading-relaxed">{item.body}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </section>
             ))}
@@ -203,7 +238,7 @@ export default function DocsPage() {
         </main>
       </div>
 
-      <footer className="border-t border-border/40 mt-8">
+      <footer className="border-t border-border/40 mt-16 relative z-0">
         <div className="mx-auto max-w-5xl px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} Syllabi. All rights reserved.</p>
           <div className="flex gap-6">

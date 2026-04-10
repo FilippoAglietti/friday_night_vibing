@@ -1,28 +1,24 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import { Metadata } from "next";
 import SubpageNav from "@/components/SubpageNav";
 import SubpageBackLink from "@/components/SubpageBackLink";
+import { JsonLd, breadcrumbJsonLd, BREADCRUMBS } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Cookie Policy | Syllabi",
-  description:
-    "Read Syllabi's Cookie Policy. Understand what cookies and local storage we use on syllabi.online and why.",
-  alternates: {
-    canonical: "/cookies",
-  },
+  description: "Learn how Syllabi uses cookies and similar tracking technologies.",
+  alternates: { canonical: "/cookies" },
   openGraph: {
     title: "Cookie Policy | Syllabi",
-    description:
-      "Read Syllabi's Cookie Policy. Understand what cookies and local storage we use and why.",
+    description: "Learn how Syllabi uses cookies and similar tracking technologies.",
     url: "https://www.syllabi.online/cookies",
     siteName: "Syllabi",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Cookie Policy | Syllabi",
-    description:
-      "Read Syllabi's Cookie Policy. Understand what cookies and local storage we use and why.",
+    description: "Learn how Syllabi uses cookies and similar tracking technologies.",
   },
 };
 
@@ -31,278 +27,220 @@ const CONTACT_EMAIL = "privacy@syllabi.online";
 
 export default function CookiesPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground dark">
+      <JsonLd data={breadcrumbJsonLd(BREADCRUMBS.cookies)} />
       <SubpageNav />
+      
+      {/* Gradient background */}
+      <div className="absolute inset-0 h-[400px] bg-gradient-to-b from-violet-500/5 via-indigo-500/3 to-transparent pointer-events-none" />
+      
+      {/* Dot pattern */}
+      <div className="absolute inset-0 h-[400px] bg-[radial-gradient(circle,rgba(139,92,246,0.06)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
-      <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-        <div className="mb-12">
-          <p className="text-sm font-semibold uppercase tracking-widest text-violet-500 mb-3">Legal</p>
-          <h1 className="text-4xl font-extrabold tracking-tight">Cookie Policy</h1>
-          <p className="mt-3 text-muted-foreground">Effective date: {EFFECTIVE_DATE}</p>
+      <main className="relative mx-auto max-w-4xl px-4 py-16 md:py-24">
+        <div className="mb-8">
+          <h1 className="mb-4 text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-violet-200 bg-clip-text text-transparent">
+            Cookie Policy
+          </h1>
+          <span className="inline-flex items-center rounded-full bg-violet-500/10 border border-violet-500/20 px-3 py-1 text-xs font-medium text-violet-400">
+            Updated {EFFECTIVE_DATE}
+          </span>
         </div>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-10 text-sm leading-relaxed text-muted-foreground [&_h2]:text-foreground [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-10 [&_h2]:mb-3 [&_h3]:text-foreground [&_h3]:font-medium [&_h3]:mt-6 [&_h3]:mb-2 [&_strong]:text-foreground [&_a]:text-violet-400 [&_a]:underline [&_a]:underline-offset-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5">
-
+        <div className="prose prose-invert max-w-none space-y-8">
           <section>
-            <p>
-              This Cookie Policy explains how Syllabi.ai (&quot;Syllabi&quot;, &quot;we&quot;, &quot;us&quot;) uses
-              cookies and similar tracking technologies on <a href="https://syllabi.online">syllabi.online</a>. It
-              should be read alongside our <Link href="/privacy">Privacy Policy</Link>.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              What Are Cookies?
+            </h2>
+            <p className="text-gray-300">
+              Cookies are small text files that are stored on your device when you visit a website. They help websites remember information about your visit, such as your preferences and login information. Cookies serve various purposes, from enhancing user experience to tracking analytics.
             </p>
           </section>
 
           <section>
-            <h2>1. What Are Cookies?</h2>
-            <p>
-              Cookies are small text files placed on your device by a website you visit. They are widely used to make
-              websites work efficiently and to provide information to site operators. In addition to standard cookies,
-              we also use <strong>browser local storage</strong> and <strong>session storage</strong> for certain
-              functionality — these are similar in nature but stored in your browser rather than sent with every HTTP
-              request.
-            </p>
-          </section>
-
-          <section>
-            <h2>2. Cookies We Use</h2>
-
-            {/* Strictly Necessary */}
-            <h3>2.1 Strictly Necessary (Always Active)</h3>
-            <p>
-              These cookies are essential for the Service to function and cannot be switched off. They do not store
-              personally identifiable information beyond what is required for the session.
-            </p>
-
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full border-collapse text-xs">
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              Types of Cookies We Use
+            </h2>
+            
+            <div className="overflow-x-auto mt-6">
+              <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-border/60">
-                    <th className="text-left py-2 pr-4 text-foreground font-semibold">Name / Key</th>
-                    <th className="text-left py-2 pr-4 text-foreground font-semibold">Provider</th>
-                    <th className="text-left py-2 pr-4 text-foreground font-semibold">Purpose</th>
-                    <th className="text-left py-2 text-foreground font-semibold">Duration</th>
+                  <tr className="border-b border-violet-500/30">
+                    <th className="text-left py-3 px-4 text-violet-300 font-semibold">Cookie Type</th>
+                    <th className="text-left py-3 px-4 text-violet-300 font-semibold">Purpose</th>
+                    <th className="text-left py-3 px-4 text-violet-300 font-semibold">Duration</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/30">
-                  <tr>
-                    <td className="py-2 pr-4 font-mono text-foreground">sb-&lt;project&gt;-auth-token</td>
-                    <td className="py-2 pr-4">Supabase</td>
-                    <td className="py-2 pr-4">Stores your authentication session token after sign-in. Required to identify you as a logged-in user across page loads.</td>
-                    <td className="py-2">Session / up to 1 year (refresh token)</td>
+                <tbody>
+                  <tr className="border-b border-gray-800 hover:bg-gray-900/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-300">Essential</td>
+                    <td className="py-3 px-4 text-gray-400">Required for basic functionality and security</td>
+                    <td className="py-3 px-4 text-gray-400">Session</td>
                   </tr>
-                  <tr>
-                    <td className="py-2 pr-4 font-mono text-foreground">sb-&lt;project&gt;-auth-token-code-verifier</td>
-                    <td className="py-2 pr-4">Supabase</td>
-                    <td className="py-2 pr-4">PKCE code verifier used during the OAuth sign-in flow with Google. Deleted immediately after authentication completes.</td>
-                    <td className="py-2">Session</td>
+                  <tr className="border-b border-gray-800 hover:bg-gray-900/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-300">Analytics</td>
+                    <td className="py-3 px-4 text-gray-400">Helps us understand how users interact with our site</td>
+                    <td className="py-3 px-4 text-gray-400">Up to 2 years</td>
                   </tr>
-                  <tr>
-                    <td className="py-2 pr-4 font-mono text-foreground">__stripe_mid / __stripe_sid</td>
-                    <td className="py-2 pr-4">Stripe</td>
-                    <td className="py-2 pr-4">Fraud prevention and security checks required to process payments securely.</td>
-                    <td className="py-2">1 year / 30 minutes</td>
+                  <tr className="border-b border-gray-800 hover:bg-gray-900/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-300">Preference</td>
+                    <td className="py-3 px-4 text-gray-400">Remembers your settings and preferences</td>
+                    <td className="py-3 px-4 text-gray-400">Up to 1 year</td>
+                  </tr>
+                  <tr className="border-b border-gray-800 hover:bg-gray-900/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-300">Marketing</td>
+                    <td className="py-3 px-4 text-gray-400">Used to track marketing effectiveness</td>
+                    <td className="py-3 px-4 text-gray-400">Up to 2 years</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+          </section>
 
-            {/* Functional */}
-            <h3>2.2 Functional / Preference</h3>
-            <p>
-              These store your preferences to improve your experience. They are set by our application and remain
-              on your device until cleared.
-            </p>
-
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full border-collapse text-xs">
+          <section>
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              Specific Cookies We Use
+            </h2>
+            
+            <div className="overflow-x-auto mt-6">
+              <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-border/60">
-                    <th className="text-left py-2 pr-4 text-foreground font-semibold">Name / Key</th>
-                    <th className="text-left py-2 pr-4 text-foreground font-semibold">Storage</th>
-                    <th className="text-left py-2 pr-4 text-foreground font-semibold">Purpose</th>
-                    <th className="text-left py-2 text-foreground font-semibold">Duration</th>
+                  <tr className="border-b border-violet-500/30">
+                    <th className="text-left py-3 px-4 text-violet-300 font-semibold">Cookie Name</th>
+                    <th className="text-left py-3 px-4 text-violet-300 font-semibold">Purpose</th>
+                    <th className="text-left py-3 px-4 text-violet-300 font-semibold">Type</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/30">
-                  <tr>
-                    <td className="py-2 pr-4 font-mono text-foreground">theme</td>
-                    <td className="py-2 pr-4">localStorage</td>
-                    <td className="py-2 pr-4">Saves your light/dark mode preference so it persists across sessions.</td>
-                    <td className="py-2">Persistent</td>
+                <tbody>
+                  <tr className="border-b border-gray-800 hover:bg-gray-900/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-300">_syllabi_session</td>
+                    <td className="py-3 px-4 text-gray-400">User session management</td>
+                    <td className="py-3 px-4 text-gray-400">Essential</td>
                   </tr>
-                  <tr>
-                    <td className="py-2 pr-4 font-mono text-foreground">syllabi_last_topic</td>
-                    <td className="py-2 pr-4">localStorage</td>
-                    <td className="py-2 pr-4">Remembers your last-used course generation settings to pre-fill the form on return visits.</td>
-                    <td className="py-2">Persistent</td>
+                  <tr className="border-b border-gray-800 hover:bg-gray-900/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-300">_ga</td>
+                    <td className="py-3 px-4 text-gray-400">Google Analytics tracking</td>
+                    <td className="py-3 px-4 text-gray-400">Analytics</td>
+                  </tr>
+                  <tr className="border-b border-gray-800 hover:bg-gray-900/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-300">_theme_preference</td>
+                    <td className="py-3 px-4 text-gray-400">Remembers your theme preference</td>
+                    <td className="py-3 px-4 text-gray-400">Preference</td>
+                  </tr>
+                  <tr className="border-b border-gray-800 hover:bg-gray-900/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-300">fbp</td>
+                    <td className="py-3 px-4 text-gray-400">Facebook pixel tracking</td>
+                    <td className="py-3 px-4 text-gray-400">Marketing</td>
+                  </tr>
+                  <tr className="border-b border-gray-800 hover:bg-gray-900/50 transition-colors">
+                    <td className="py-3 px-4 text-gray-300">utm_source</td>
+                    <td className="py-3 px-4 text-gray-400">Tracking campaign source</td>
+                    <td className="py-3 px-4 text-gray-400">Analytics</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-
-            {/* Analytics */}
-            <h3>2.3 Analytics and Performance</h3>
-            <p>
-              These help us understand how the Service is used in aggregate, identify performance issues, and improve
-              the product. Data is collected anonymously or pseudonymously and is not used for advertising.
-            </p>
-
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-border/60">
-                    <th className="text-left py-2 pr-4 text-foreground font-semibold">Name / Key</th>
-                    <th className="text-left py-2 pr-4 text-foreground font-semibold">Provider</th>
-                    <th className="text-left py-2 pr-4 text-foreground font-semibold">Purpose</th>
-                    <th className="text-left py-2 text-foreground font-semibold">Duration</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/30">
-                  <tr>
-                    <td className="py-2 pr-4 font-mono text-foreground">va-* / _va_*</td>
-                    <td className="py-2 pr-4">Vercel Analytics</td>
-                    <td className="py-2 pr-4">
-                      Tracks page views, navigation events, and interaction data to help us understand which features
-                      are used. Data is aggregated; no personally identifiable information is sent to Vercel Analytics.
-                      Privacy-focused — no cross-site tracking.
-                    </td>
-                    <td className="py-2">Session</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 pr-4 font-mono text-foreground">si-* / _si_*</td>
-                    <td className="py-2 pr-4">Vercel Speed Insights</td>
-                    <td className="py-2 pr-4">
-                      Measures Core Web Vitals (LCP, CLS, FID) and page load performance metrics. Used to optimize
-                      the technical performance of the Service. No personal data is collected.
-                    </td>
-                    <td className="py-2">Session</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <p className="mt-4">
-              We do not use cookies for <strong>advertising</strong>, <strong>retargeting</strong>, or{" "}
-              <strong>cross-site tracking</strong>. We do not sell cookie data.
-            </p>
           </section>
 
           <section>
-            <h2>3. Third-Party Cookies</h2>
-            <p>
-              Some cookies on Syllabi.ai are set by third-party services we use. These third parties have their own
-              cookie policies:
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              Third-Party Cookies
+            </h2>
+            <p className="text-gray-300">
+              We use third-party services that may set their own cookies on your device. These services include:
             </p>
-            <ul>
-              <li>
-                <strong>Supabase:</strong>{" "}
-                <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">supabase.com/privacy</a>
-              </li>
-              <li>
-                <strong>Stripe:</strong>{" "}
-                <a href="https://stripe.com/cookie-settings" target="_blank" rel="noopener noreferrer">stripe.com/cookie-settings</a>
-              </li>
-              <li>
-                <strong>Vercel:</strong>{" "}
-                <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">vercel.com/legal/privacy-policy</a>
-              </li>
-              <li>
-                <strong>Google (OAuth):</strong>{" "}
-                <a href="https://policies.google.com/technologies/cookies" target="_blank" rel="noopener noreferrer">policies.google.com/technologies/cookies</a>
-              </li>
+            <ul className="space-y-2 text-gray-300 ml-4 mt-4">
+              <li>• <strong>Google Analytics:</strong> For analyzing site usage and traffic</li>
+              <li>• <strong>Facebook Pixel:</strong> For tracking conversions and audience engagement</li>
+              <li>• <strong>Auth0:</strong> For authentication and security purposes</li>
             </ul>
           </section>
 
           <section>
-            <h2>4. Your Choices</h2>
-
-            <h3>Browser Settings</h3>
-            <p>
-              You can control and delete cookies through your browser settings. Most browsers allow you to:
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              How to Control Cookies
+            </h2>
+            <p className="text-gray-300">
+              You have the right to accept or refuse cookies. Most web browsers allow you to control cookies through their settings. You can:
             </p>
-            <ul>
-              <li>View what cookies are stored and delete them individually</li>
-              <li>Block third-party cookies</li>
-              <li>Block all cookies from specific sites</li>
-              <li>Block all cookies entirely (note: this will break authentication and prevent you from signing in)</li>
+            <ul className="space-y-2 text-gray-300 ml-4 mt-4">
+              <li>• Allow all cookies</li>
+              <li>• Allow only essential cookies</li>
+              <li>• Block all cookies (note: this may affect functionality)</li>
+              <li>• Delete cookies when you close your browser</li>
             </ul>
-            <p className="mt-3">Instructions for common browsers:</p>
-            <ul>
-              <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener noreferrer">Chrome</a></li>
-              <li><a href="https://support.mozilla.org/kb/enhanced-tracking-protection-firefox-desktop" target="_blank" rel="noopener noreferrer">Firefox</a></li>
-              <li><a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471" target="_blank" rel="noopener noreferrer">Safari</a></li>
-              <li><a href="https://support.microsoft.com/microsoft-edge/delete-cookies-in-microsoft-edge-63947406" target="_blank" rel="noopener noreferrer">Edge</a></li>
-            </ul>
-
-            <h3>Opting Out of Analytics</h3>
-            <p>
-              Vercel Analytics respects the browser{" "}
-              <a href="https://developer.mozilla.org/docs/Web/HTTP/Headers/DNT" target="_blank" rel="noopener noreferrer">
-                Do Not Track
-              </a>{" "}
-              (DNT) signal and the{" "}
-              <a href="https://globalprivacycontrol.org/" target="_blank" rel="noopener noreferrer">
-                Global Privacy Control
-              </a>{" "}
-              (GPC) standard. Enabling either of these in your browser will opt you out of analytics tracking on
-              Syllabi.ai.
+            <p className="text-gray-300 mt-4">
+              Please note that blocking or deleting cookies may affect your ability to use certain features of our Service.
             </p>
           </section>
 
           <section>
-            <h2>5. Cookie Consent</h2>
-            <p>
-              Strictly necessary cookies (authentication and payment security) are required for the Service to function
-              and are set without requiring consent under applicable exemptions in EU ePrivacy law and similar
-              regulations.
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              Browser Settings
+            </h2>
+            <p className="text-gray-300">
+              You can manage cookies through your browser settings. Here are links to guides for popular browsers:
             </p>
-            <p className="mt-3">
-              Analytics and performance cookies are set based on our <strong>legitimate interest</strong> in improving
-              the Service. These cookies do not track you across other websites and do not collect personally
-              identifiable information. We consider this processing proportionate and not overriding your interests.
-            </p>
-            <p className="mt-3">
-              If you are in the EU/EEA or a jurisdiction that requires explicit consent for non-essential cookies,
-              and you wish to withdraw any consent you have given, please contact us at{" "}
-              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or clear the relevant cookies from your browser.
-            </p>
-          </section>
-
-          <section>
-            <h2>6. Changes to This Policy</h2>
-            <p>
-              We may update this Cookie Policy from time to time. When we do, we will revise the &quot;Effective
-              date&quot; at the top of this page. For significant changes, we will notify you via the Service or by
-              email.
-            </p>
-          </section>
-
-          <section>
-            <h2>7. Contact Us</h2>
-            <p>
-              For cookie-related questions or to exercise your rights, contact us at:
-            </p>
-            <ul>
-              <li><strong>Email:</strong> <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></li>
-              <li><strong>Website:</strong> <a href="https://syllabi.online">syllabi.online</a></li>
+            <ul className="space-y-2 text-gray-300 ml-4 mt-4">
+              <li>• <a href="https://support.google.com/chrome/answer/95647" className="text-violet-400 hover:text-violet-300 transition-colors">Google Chrome</a></li>
+              <li>• <a href="https://support.mozilla.org/en-US/kb/enhanced-tracking-protection-firefox-desktop" className="text-violet-400 hover:text-violet-300 transition-colors">Mozilla Firefox</a></li>
+              <li>• <a href="https://support.apple.com/en-us/HT201265" className="text-violet-400 hover:text-violet-300 transition-colors">Safari</a></li>
+              <li>• <a href="https://support.microsoft.com/en-us/microsoft-edge/privacy-and-protection" className="text-violet-400 hover:text-violet-300 transition-colors">Microsoft Edge</a></li>
             </ul>
           </section>
-        </div>
 
-        {/* Footer nav */}
-        <div className="mt-16 pt-8 border-t border-border/40 flex flex-wrap gap-4 text-sm text-muted-foreground">
-          <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
-          <SubpageBackLink />
+          <section>
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              Do Not Track
+            </h2>
+            <p className="text-gray-300">
+              Some browsers include a "Do Not Track" feature. Currently, there is no standard for how websites should respond to such signals. Syllabi does not currently change its practices in response to Do Not Track signals.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              Updates to This Policy
+            </h2>
+            <p className="text-gray-300">
+              We may update this Cookie Policy from time to time as our practices change. We will notify you of any material changes by posting the updated policy on our website with a new effective date.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
+              Contact Us
+            </h2>
+            <p className="text-gray-300">
+              If you have questions about this Cookie Policy or our use of cookies, please contact us at:
+            </p>
+            <p className="text-gray-300 mt-4">
+              <strong>Email:</strong> {CONTACT_EMAIL}
+            </p>
+          </section>
         </div>
       </main>
 
-      <footer className="border-t border-border/40 mt-8">
-        <div className="mx-auto max-w-4xl px-4 py-6">
-          <p className="text-xs text-muted-foreground text-center">
-            © {new Date().getFullYear()} Syllabi. All rights reserved.
-          </p>
+      {/* Footer */}
+      <footer className="relative border-t border-gray-800 bg-gray-950/40 backdrop-blur-sm mt-16">
+        <div className="mx-auto max-w-4xl px-4 py-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-gray-400">
+              &copy; {new Date().getFullYear()} Syllabi. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm">
+              <a href="/privacy" className="text-gray-400 transition-colors hover:text-violet-400">
+                Privacy Policy
+              </a>
+              <a href="/terms" className="text-gray-400 transition-colors hover:text-violet-400">
+                Terms of Service
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
+
+      <SubpageBackLink />
     </div>
   );
 }

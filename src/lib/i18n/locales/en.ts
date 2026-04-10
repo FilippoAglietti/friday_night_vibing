@@ -11,7 +11,7 @@ const en: Translations = {
   },
   hero: {
     badge: "Audio Courses · Shareable Links · Stunning Design",
-    title1: "The Course Generator",
+    title1: "The AI Course Generator",
     titleConnector: "that",
     title2: "Sounds as Good as It Looks",
     subtitle:

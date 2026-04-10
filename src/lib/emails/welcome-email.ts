@@ -16,7 +16,7 @@ interface WelcomeEmailProps {
 
 export function generateWelcomeEmail({ userName, email }: WelcomeEmailProps): string {
   const displayName = userName || email.split("@")[0];
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://syllabi.ai";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.syllabi.online";
 
   return `<!DOCTYPE html>
 <html lang="en" xmlns:v="urn:schemas-microsoft-com:vml">

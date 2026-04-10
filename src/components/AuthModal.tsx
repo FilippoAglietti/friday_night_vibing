@@ -53,7 +53,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
 
     try {
       if (mode === "signup") {
-        const { error: signUpError } = await supabaseBrowser.auth.signUp({
+        const { data, error: signUpError } = await supabaseBrowser.auth.signUp({
           email: email.trim(),
           password,
           options: {
@@ -62,6 +62,24 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         });
 
         if (signUpError) throw signUpError;
+
+        // Supabase returns a fake user with empty identities when the email
+        // already exists and email confirmation is enabled. Detect this and
+        // show a helpful message instead of the misleading "check your inbox".
+        const identities = data?.user?.identities;
+        if (identities && identities.length === 0) {
+          setError("An account with this email already exists. Try signing in instead.");
+          setMode("signin");
+          return;
+        }
+
+        // If Supabase returned a session directly, the user is confirmed
+        // (e.g. email confirmation is disabled in project settings).
+        if (data?.session) {
+          onClose();
+          window.location.href = "/profile?welcome=true&onboarding=true";
+          return;
+        }
 
         setSuccess(
           "Account created! Check your inbox and click the confirmation link to activate it."
@@ -88,9 +106,15 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         setError("Account already exists. Sign in instead.");
         switchMode("signin");
       } else if (msg.includes("Email not confirmed")) {
-        setError("Please confirm your email before signing in.");
+        setError("Please confirm your email before signing in. Check your inbox (and spam folder).");
       } else if (msg.includes("Password should be")) {
         setError("Password must be at least 6 characters.");
+      } else if (msg.includes("Email rate limit exceeded") || msg.includes("rate limit")) {
+        setError("Too many attempts. Please wait a minute and try again.");
+      } else if (msg.includes("Signups not allowed") || msg.includes("signups not allowed")) {
+        setError("Sign-ups are temporarily disabled. Please try again later or use Google sign-in.");
+      } else if (msg.includes("Unable to validate email")) {
+        setError("Please enter a valid email address.");
       } else {
         setError(msg);
       }
@@ -104,14 +128,22 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
     setGoogleLoading(true);
     setError(null);
     try {
-      await supabaseBrowser.auth.signInWithOAuth({
+      const { error: oauthError } = await supabaseBrowser.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=/profile`,
         },
       });
-    } catch {
-      setError("Google sign in failed. Use email & password instead.");
+      if (oauthError) {
+        throw oauthError;
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("provider is not enabled") || msg.includes("Unsupported provider")) {
+        setError("Google sign-in is not available yet. Please use email & password.");
+      } else {
+        setError("Google sign-in failed. Please try email & password instead.");
+      }
       setGoogleLoading(false);
     }
   };

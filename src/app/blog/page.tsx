@@ -1,13 +1,50 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { GraduationCap, ArrowLeft, Clock, ArrowRight } from "lucide-react";
+import { GraduationCap, ArrowLeft, Clock, ArrowRight, Mail } from "lucide-react";
+import { JsonLd, breadcrumbJsonLd, BREADCRUMBS } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Blog — Syllabi.ai",
-  description: "Insights, tips, and updates from the Syllabi.ai team on AI-powered course creation.",
+  title: "Blog — AI Course Creation Tips & Updates",
+  description:
+    "Tips, guides, and product updates for course creators using AI. Learn how to create better online courses, grow your audience, and sell your curricula.",
+  alternates: { canonical: "/blog" },
+  openGraph: {
+    title: "Syllabi Blog — AI Course Creation Tips & Updates",
+    description:
+      "Insights, guides, and updates for educators and course creators building with AI.",
+    url: "https://www.syllabi.online/blog",
+    siteName: "Syllabi",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Syllabi Blog — AI Course Creation Tips",
+    description: "Tips and guides for creating better online courses with AI.",
+  },
 };
 
 const posts = [
+  {
+    slug: "#",
+    category: "Product",
+    date: "April 8, 2026",
+    readTime: "3 min read",
+    title: "AI Audio Lessons Are Here — Turn Your Course into a Podcast",
+    excerpt:
+      "Pro Max users can now generate professional voice narration for every lesson. Choose from multiple AI voices and let your students learn on the go.",
+    accent: "text-rose-400",
+    featured: true,
+  },
+  {
+    slug: "#",
+    category: "Guide",
+    date: "April 2, 2026",
+    readTime: "5 min read",
+    title: "How to Create a Lead Magnet Mini-Course in 60 Seconds",
+    excerpt:
+      "The fastest way to grow your email list: create a free mini-course, add email capture, and share the link. Here's exactly how to do it with Syllabi.",
+    accent: "text-amber-400",
+  },
   {
     slug: "#",
     category: "Product",
@@ -74,39 +111,90 @@ const categories = ["All", "Product", "Guide", "Insights"];
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground dark">
+    <div className="min-h-screen bg-background text-foreground dark overflow-hidden">
+      <JsonLd data={[
+        breadcrumbJsonLd(BREADCRUMBS.blog),
+        {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Syllabi Blog — AI Course Creation Tips & Updates",
+          description: "Tips, guides, and product updates for course creators using AI.",
+          url: "https://www.syllabi.online/blog",
+          publisher: {
+            "@type": "Organization",
+            name: "Syllabi",
+            url: "https://www.syllabi.online",
+          },
+          mainEntity: {
+            "@type": "ItemList",
+            itemListElement: posts.map((post, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              item: {
+                "@type": "BlogPosting",
+                headline: post.title,
+                description: post.excerpt,
+                datePublished: new Date(post.date).toISOString().split("T")[0],
+                author: { "@type": "Organization", name: "Syllabi" },
+                publisher: { "@type": "Organization", name: "Syllabi", url: "https://www.syllabi.online" },
+                url: "https://www.syllabi.online/blog",
+              },
+            })),
+          },
+        },
+      ]} />
+      {/* Gradient background */}
+      <div className="absolute inset-0 h-[500px] bg-gradient-to-b from-violet-500/5 via-indigo-500/3 to-transparent pointer-events-none" />
+
+      {/* Dot pattern overlay */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+      </div>
+
       {/* Header */}
-      <header className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+      <header className="relative border-b border-transparent bg-gradient-to-r from-transparent via-violet-500/5 to-transparent bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
             <GraduationCap className="size-5 text-violet-500" />
-            <span>syllabi<span className="text-violet-500">.ai</span></span>
+            <span>syllabi<span className="text-violet-500">.online</span></span>
           </Link>
-          <Link href="/" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ArrowLeft className="size-4" />
             Back to home
           </Link>
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-12 sm:py-16">
-        <div className="mb-10">
+      <main className="relative mx-auto max-w-5xl px-4 py-12 sm:py-16">
+        {/* Hero section */}
+        <div className="mb-12">
           <p className="text-sm font-semibold uppercase tracking-widest text-violet-500 mb-3">Resources</p>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Blog</h1>
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-white to-violet-200 bg-clip-text text-transparent">
+            Blog
+          </h1>
           <p className="text-muted-foreground text-base max-w-xl">
             Tips, guides, and updates for course creators building with AI.
           </p>
         </div>
 
-        {/* Category filter — static display */}
-        <div className="flex gap-2 mb-10 flex-wrap">
+        {/* Category filter — glass style */}
+        <div className="flex gap-2 mb-12 flex-wrap">
           {categories.map((cat, i) => (
             <span
               key={cat}
               className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 i === 0
                   ? "bg-violet-500/20 text-violet-300 border border-violet-500/30"
-                  : "bg-card/50 text-muted-foreground border border-border/50 hover:text-foreground"
+                  : "bg-white/5 backdrop-blur-sm border border-border/40 text-muted-foreground hover:text-foreground hover:border-violet-500/30"
               }`}
             >
               {cat}
@@ -114,12 +202,42 @@ export default function BlogPage() {
           ))}
         </div>
 
+        {/* Featured post */}
+        <article className="mb-12 rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm p-8 sm:p-10 group relative overflow-hidden">
+          {/* Gradient left border */}
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-indigo-500" />
+
+          <div className="relative">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <span className={`text-xs font-semibold uppercase tracking-wider ${posts[0].accent}`}>
+                {posts[0].category}
+              </span>
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="size-3" />
+                {posts[0].readTime}
+              </span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold leading-snug mb-4 text-foreground group-hover:text-violet-300 transition-colors">
+              {posts[0].title}
+            </h2>
+            <p className="text-base text-muted-foreground leading-relaxed mb-6 max-w-2xl">
+              {posts[0].excerpt}
+            </p>
+            <div className="flex items-center justify-between mt-8">
+              <span className="text-xs text-muted-foreground/60">{posts[0].date}</span>
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-full bg-muted/50">
+                Coming Soon
+              </span>
+            </div>
+          </div>
+        </article>
+
         {/* Posts grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-16">
+          {posts.slice(1).map((post) => (
             <article
               key={post.title}
-              className="group flex flex-col rounded-2xl border border-border/50 bg-card/40 backdrop-blur-sm p-6 hover:border-border transition-colors"
+              className="group flex flex-col rounded-2xl border border-border/40 bg-card/20 backdrop-blur-sm p-6 hover:border-violet-500/20 hover:scale-[1.01] transition-all duration-300"
             >
               <div className="flex items-center justify-between mb-4">
                 <span className={`text-xs font-semibold uppercase tracking-wider ${post.accent}`}>
@@ -145,15 +263,49 @@ export default function BlogPage() {
             </article>
           ))}
         </div>
+
+        {/* Newsletter CTA */}
+        <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-b from-violet-500/10 to-indigo-500/10 p-8 sm:p-10 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="p-3 rounded-full bg-violet-500/10 border border-violet-500/20">
+              <Mail className="size-6 text-violet-400" />
+            </div>
+          </div>
+          <h3 className="text-2xl sm:text-3xl font-bold mb-2 text-foreground">Stay in the loop</h3>
+          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+            Get the latest updates on AI course creation, tips from power users, and product launches delivered to your inbox.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <div className="flex-1 px-4 py-3 rounded-lg bg-white/5 border border-border/40 flex items-center gap-2">
+              <Mail className="size-4 text-muted-foreground" />
+              <input
+                type="email"
+                placeholder="you@example.com"
+                className="bg-transparent flex-1 text-sm placeholder-muted-foreground/50 outline-none"
+                disabled
+              />
+            </div>
+            <button className="px-6 py-3 rounded-lg bg-violet-500/20 border border-violet-500/40 text-violet-300 font-medium hover:bg-violet-500/30 transition-colors text-sm whitespace-nowrap" disabled>
+              Subscribe
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground/60 mt-4">No spam, unsubscribe anytime.</p>
+        </div>
       </main>
 
-      <footer className="border-t border-border/40 mt-16">
+      <footer className="relative border-t border-border/40 mt-20">
         <div className="mx-auto max-w-5xl px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} Syllabi. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/docs" className="hover:text-foreground transition-colors">Docs</Link>
-            <Link href="/changelog" className="hover:text-foreground transition-colors">Changelog</Link>
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link href="/docs" className="hover:text-foreground transition-colors">
+              Docs
+            </Link>
+            <Link href="/changelog" className="hover:text-foreground transition-colors">
+              Changelog
+            </Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">
+              Privacy
+            </Link>
           </div>
         </div>
       </footer>

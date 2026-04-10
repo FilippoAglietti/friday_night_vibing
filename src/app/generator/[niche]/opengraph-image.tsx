@@ -1,12 +1,22 @@
 import { ImageResponse } from "next/og";
+import { getNicheBySlug } from "@/data/niches";
 
 export const runtime = "edge";
-export const alt =
-  "Syllabi — The #1 AI Course Generator. Create full courses with audio, quizzes, and PDF export in 60 seconds.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OGImage() {
+export default async function OGImage({
+  params,
+}: {
+  params: Promise<{ niche: string }>;
+}) {
+  const { niche: slug } = await params;
+  const niche = getNicheBySlug(slug);
+
+  const headline = niche?.headline ?? "AI Course Generator";
+  const tagline = niche?.tagline ?? "Create full courses in seconds.";
+  const emoji = niche?.emoji ?? "🎓";
+
   return new ImageResponse(
     (
       <div
@@ -15,14 +25,15 @@ export default function OGImage() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          background: "linear-gradient(135deg, #0a0a1a 0%, #0f0a2a 40%, #1a0a30 100%)",
+          background:
+            "linear-gradient(135deg, #0a0a1a 0%, #0f0a2a 40%, #1a0a30 100%)",
           padding: "60px 80px",
           fontFamily: "Inter, system-ui, sans-serif",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Grid pattern overlay */}
+        {/* Grid pattern */}
         <div
           style={{
             position: "absolute",
@@ -34,7 +45,7 @@ export default function OGImage() {
           }}
         />
 
-        {/* Decorative glow — top right */}
+        {/* Glow top-right */}
         <div
           style={{
             position: "absolute",
@@ -49,7 +60,7 @@ export default function OGImage() {
           }}
         />
 
-        {/* Decorative glow — bottom left */}
+        {/* Glow bottom-left */}
         <div
           style={{
             position: "absolute",
@@ -95,36 +106,36 @@ export default function OGImage() {
           </span>
         </div>
 
-        {/* Main title */}
+        {/* Niche emoji + headline */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            marginTop: "48px",
+            marginTop: "40px",
             flex: "1",
           }}
         >
+          <span style={{ fontSize: "64px", display: "flex" }}>{emoji}</span>
           <div
             style={{
-              fontSize: "58px",
+              fontSize: "52px",
               fontWeight: 800,
-              lineHeight: "1.1",
+              lineHeight: "1.15",
               display: "flex",
               flexDirection: "column",
-              color: "white",
+              marginTop: "16px",
             }}
           >
-            <span style={{ display: "flex" }}>The #1 AI Course</span>
             <span
               style={{
                 display: "flex",
                 background:
-                  "linear-gradient(90deg, #8b5cf6, #6366f1, #06b6d4)",
+                  "linear-gradient(90deg, #ffffff, #e0e0ff)",
                 backgroundClip: "text",
                 color: "transparent",
               }}
             >
-              Generator
+              {headline}
             </span>
           </div>
 
@@ -132,24 +143,23 @@ export default function OGImage() {
             style={{
               fontSize: "22px",
               color: "rgba(255,255,255,0.55)",
-              marginTop: "20px",
+              marginTop: "16px",
               lineHeight: "1.5",
-              maxWidth: "600px",
+              maxWidth: "700px",
               display: "flex",
             }}
           >
-            Full courses with audio narration, quizzes, and PDF export — ready
-            in 60 seconds.
+            {tagline}
           </p>
         </div>
 
         {/* Feature pills */}
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           {[
+            "AI-Powered",
             "Audio Narration",
             "PDF & Notion Export",
-            "AI Quizzes",
-            "16 Languages",
+            "Quizzes",
             "Free to Start",
           ].map((f) => (
             <div

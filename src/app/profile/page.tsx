@@ -920,7 +920,7 @@ export default function ProfilePage() {
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
             <GraduationCap className="size-5 text-violet-500" />
-            <span>syllabi<span className="text-violet-500">.ai</span></span>
+            <span>syllabi<span className="text-violet-500">.online</span></span>
           </Link>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
