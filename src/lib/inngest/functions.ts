@@ -49,6 +49,12 @@ import type {
   Module,
 } from "@/types/curriculum";
 
+// ─── Model selection ────────────────────────────────────────
+//
+// Configurable via GENERATION_MODEL env var. Defaults to Haiku 4.5
+// for cost efficiency. Set to "claude-sonnet-4-6" for higher quality.
+const GENERATION_MODEL = process.env.GENERATION_MODEL || "claude-haiku-4-5-20251001";
+
 // ─── Shared helpers ─────────────────────────────────────────
 
 /**
@@ -189,7 +195,7 @@ export const courseGenerate = inngest.createFunction(
       const rawText = await callClaude({
         system,
         messages,
-        model: "claude-haiku-4-5-20251001",
+        model: GENERATION_MODEL,
         maxTokens: 24576,
         label: `${courseId}/skeleton`,
         timeoutMs: 100_000,
@@ -221,7 +227,7 @@ export const courseGenerate = inngest.createFunction(
         module_index: i,
         module_id: m.id,
         status: "pending" as const,
-        model: "claude-haiku-4-5-20251001",
+        model: GENERATION_MODEL,
         max_tokens: 24576,
       }));
       const { error } = await supabase
@@ -362,7 +368,7 @@ export const moduleGenerate = inngest.createFunction(
       const rawText = await callClaude({
         system,
         messages,
-        model: "claude-haiku-4-5-20251001",
+        model: GENERATION_MODEL,
         maxTokens: 24576,
         label: `${courseId}/module-${moduleId}`,
         timeoutMs: 180_000,
