@@ -515,6 +515,40 @@ export const courseFinalize = inngest.createFunction(
         .eq("id", courseId);
     });
 
+    // Step 4: increment the user's generation counter. This was
+    // previously only done in the after() fallback path inside
+    // route.ts (updateCourseRecord). Now that ALL lengths route
+    // through Inngest, this step ensures the counter is always
+    // incremented on successful course generation.
+    await step.run("increment-usage", async () => {
+      // Fetch the user_id from the course record — it's not passed
+      // through the event chain to courseFinalize.
+      const { data: course } = await supabase
+        .from("courses")
+        .select("user_id")
+        .eq("id", courseId)
+        .single();
+
+      if (course?.user_id) {
+        const { error } = await supabase.rpc("increment_generation_usage", {
+          p_user_id: course.user_id,
+          p_course_id: courseId,
+          p_event_type: "course_generated",
+        });
+        if (error) {
+          // Non-fatal: generation counter is important but not worth
+          // failing the entire finalize over. Log loudly for monitoring.
+          console.error(
+            `[inngest/courseFinalize] [${courseId}] increment_generation_usage failed: ${error.message}`,
+          );
+        }
+      } else {
+        console.warn(
+          `[inngest/courseFinalize] [${courseId}] No user_id found — skipping usage increment`,
+        );
+      }
+    });
+
     return { courseId, status: "ready", totalModules: merged.modules.length };
   },
 );

@@ -31,10 +31,11 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 // let the same IP blow past 5/hour by hopping across isolates. Root
 // cause of the April 8-9 Anthropic cost blow-up.
 import { generateRateLimit } from "@/lib/rate-limiter";
-// Inngest client for Fase 3 (queue-based chunked generation). Only
-// used when INNGEST_ENABLED=true AND the course length is
-// full/masterclass. Short/crash always stay on the in-process
-// single-shot path because they're fast enough to not need a queue.
+// Inngest client for queue-based chunked generation. ALL course
+// lengths now route through Inngest for a unified pipeline. The
+// prompt controls output size (crash=1-2 modules, masterclass=6-10),
+// not the generation architecture. The after() fallback only fires
+// if inngest.send() itself throws (e.g. Inngest outage).
 import { inngest } from "@/lib/inngest/client";
 
 export const dynamic = "force-dynamic";
@@ -48,7 +49,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 import {
-  buildCurriculumPrompt,
   buildSkeletonCurriculumPrompt,
   buildModuleDetailCurriculumPrompt,
 } from "@/lib/prompts/curriculum";
@@ -421,66 +421,18 @@ function parseClaudeJson<T>(rawText: string, stopReason: string | null, label: s
   );
 }
 
-// ─── Single-shot generation (for crash/short courses) ────────
-
-/**
- * Generates a complete curriculum in a single Claude call.
- * Best for crash and short courses (~5-12 lessons) that fit within
- * the 5-minute Vercel Pro timeout.
- *
- * @param request - Validated generation request
- * @returns Parsed Curriculum object
- */
-async function generateCurriculumSingleShot(request: GenerateRequest): Promise<Curriculum> {
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const { system, messages } = buildCurriculumPrompt(request);
-
-  // Model selection for single-shot (crash/short): HAIKU 4.5.
-  //
-  // This is the Fase 1 fix for the April 8-9 Anthropic cost blow-up.
-  // Previously this path used claude-sonnet-4-6 for crash (5-min
-  // lesson) and short (30-min lesson) courses — which was overkill
-  // by roughly an order of magnitude on €/token. Per the test matrix
-  // and Filippo's explicit instruction, short/crash never need
-  // Sonnet-level reasoning; they're essentially outlines with thin
-  // lesson prose, and Haiku 4.5 handles them at ~150 tok/s with
-  // identical user-facing quality on the typed grading rubric.
-  //
-  // The chunked masterclass path already uses Haiku for both
-  // skeleton AND module content (see generateCurriculumChunked),
-  // so after this commit ALL generation paths run on Haiku unless
-  // explicitly opted into Sonnet via the Fase 3 Inngest queue
-  // (feature-flagged, opt-in per course length).
-  //
-  // Per-length single-shot timeout. Haiku 4.5 streams at ~150 tok/s,
-  // so the budget fits very comfortably:
-  //   crash: 5120 tok ÷ 150 tok/s ≈ 35s → 90s timeout (55s headroom)
-  //   short: 10240 tok ÷ 150 tok/s ≈ 70s → 120s timeout (50s headroom)
-  // maxAttempts=1 disables retries: with Vercel's 300s hard cap there's
-  // no budget to retry a 120s call (would total 242s+). A failed single
-  // call surfaces a clear error instead of a silent "429 + retry + nuke".
-  const timeoutMs = request.length === "crash" ? 90_000 : 120_000;
-
-  const response = await callClaudeWithRetry(
-    anthropic,
-    system,
-    messages,
-    request.length,
-    /* attempt */ 1,
-    /* overrideMaxTokens */ undefined,
-    /* label */ `single-shot/${request.length}`,
-    /* timeoutMs */ timeoutMs,
-    /* model */ "claude-haiku-4-5-20251001",
-    /* maxAttempts */ 1,
-  );
-
-  const textBlock = response.content.find((block) => block.type === "text");
-  if (!textBlock || textBlock.type !== "text") {
-    throw new Error("Claude returned an empty or non-text response.");
-  }
-
-  return parseClaudeJson<Curriculum>(textBlock.text.trim(), response.stop_reason, "single-shot");
-}
+// ─── Single-shot generation (REMOVED) ───────────────────────
+//
+// The single-shot path (generateCurriculumSingleShot) has been removed.
+// ALL course lengths now use the chunked pipeline (skeleton → per-module
+// → finalize) routed through Inngest. The prompt's LENGTH_DESCRIPTIONS
+// controls output size: crash="1-2 modules with 4-6 lessons total",
+// masterclass="6-10 modules with 20-30 lessons total". Each individual
+// Claude call stays well within token budget regardless of course length.
+//
+// The after() fallback still uses generateCurriculumChunked (not single-shot)
+// if Inngest dispatch fails, so even the disaster-recovery path benefits
+// from the robust per-module error handling.
 
 // ─── Structured per-module failure records ──────────────────
 
@@ -1023,34 +975,22 @@ async function generateCurriculumChunked(
 }
 
 /**
- * Main entry point for curriculum generation.
- * Routes to single-shot or chunked generation based on course length.
+ * Main entry point for curriculum generation (fallback path only).
  *
- * - crash / short → single-shot (fast, fits in one call)
- * - full / masterclass → chunked (skeleton + per-module, parallel)
- *
- * Return shape is normalized so the caller always gets a `generationErrors`
- * array. Single-shot has no per-module failure surface, so it always
- * returns an empty array on success; any exception propagates up as-is.
+ * ALL course lengths now use the chunked pipeline (skeleton → per-module
+ * → finalize). This function is only called from the after() fallback
+ * when Inngest dispatch fails. The normal path is Inngest-driven.
  *
  * @param request - Validated generation request
- * @param courseId - The course ID for progress updates (used by chunked)
- * @returns { curriculum, generationErrors } where generationErrors is
- *          empty on a perfect success and non-empty on partial success
- *          (only possible for chunked length=full|masterclass).
+ * @param courseId - The course ID for progress updates
+ * @returns { curriculum, generationErrors }
  */
 async function generateCurriculum(
   request: GenerateRequest,
   courseId: string,
 ): Promise<{ curriculum: Curriculum; generationErrors: GenerationError[] }> {
-  if (request.length === "crash" || request.length === "short") {
-    console.log(`[/api/generate] [${courseId}] Using single-shot generation for ${request.length} course`);
-    const curriculum = await generateCurriculumSingleShot(request);
-    return { curriculum, generationErrors: [] };
-  } else {
-    console.log(`[/api/generate] [${courseId}] Using chunked generation for ${request.length} course`);
-    return generateCurriculumChunked(request, courseId);
-  }
+  console.log(`[/api/generate] [${courseId}] Using chunked generation for ${request.length} course (fallback path)`);
+  return generateCurriculumChunked(request, courseId);
 }
 
 // ─── Supabase helpers ─────────────────────────────────────────
@@ -1421,38 +1361,27 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
 
-  // ── Step 6: Background generation ───────────────────────────
+  // ── Step 6: Background generation via Inngest ──────────────
   //
-  // Two paths, selected via the INNGEST_ENABLED feature flag:
+  // Unified pipeline: ALL course lengths (crash, short, full,
+  // masterclass) route through Inngest. The prompt controls output
+  // size — crash produces 1-2 modules, masterclass produces 6-10.
+  // Each module gets its own Inngest function invocation with its
+  // own 300s Vercel budget, eliminating the max_tokens truncation
+  // bug that plagued the old single-shot path for crash/short.
   //
-  //   Path A (INNGEST_ENABLED=true, full/masterclass only):
-  //     Send a course/generate.requested event to Inngest and
-  //     return immediately. Inngest picks up the event, runs
-  //     course.generate (skeleton + fan-out), which fans out to
-  //     N parallel module.generate functions. Each module gets
-  //     its own 300s Vercel budget instead of sharing one global
-  //     budget. This is the fix for the Tentativo 13 wall.
-  //
-  //   Path B (the after() fallback for everything else):
-  //     The existing monolithic path. Runs within a single Vercel
-  //     function invocation with a 280s global deadline. Fine for
-  //     crash/short (both single-shot with Haiku), and fine for
-  //     full/masterclass when Inngest is disabled (e.g. during an
-  //     Inngest outage or local dev).
-  //
-  // The flag is opt-in per length: even with INNGEST_ENABLED=true,
-  // crash/short still run single-shot on the after() path because
-  // they're fast enough that queue overhead (~2-3s round trip to
-  // Inngest) would actually be a regression. Only full/masterclass
-  // courses benefit from the queue architecture.
-  // Path B closure first — defined before the Inngest branch so
-  // Path A's fallback can reference it without hitting the TDZ
-  // (const declarations don't hoist). This is the existing
-  // monolithic path, unchanged.
+  // Fallback: if inngest.send() itself throws (Inngest outage,
+  // invalid event key), we fall through to the after() path which
+  // runs the same chunked pipeline in-process. The course still
+  // generates — just constrained by a single 280s global deadline
+  // instead of per-module independent budgets.
+
+  // Fallback closure defined first (before the Inngest try/catch)
+  // to avoid TDZ issues with const declarations.
   const runInProcessGeneration = async () => {
     const startTime = Date.now();
     try {
-      console.log(`[/api/generate] [${courseId}] after() started at ${new Date().toISOString()}`);
+      console.log(`[/api/generate] [${courseId}] after() fallback started at ${new Date().toISOString()}`);
       const { curriculum, generationErrors } = await generateCurriculum(generateRequest, courseId);
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       console.log(
@@ -1461,25 +1390,15 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
             ? ` [${generationErrors.length} partial failure record(s) will be persisted]`
             : ""),
       );
-      // Pass the structured errors through — partial success (e.g. 8/10)
-      // will still land here, and updateCourseRecord persists them to
-      // courses.generation_errors regardless of the success branch.
       await updateCourseRecord(userId!, courseId, curriculum, undefined, generationErrors);
       console.log(`[/api/generate] [${courseId}] Course saved successfully. Total: ${elapsed}s`);
     } catch (err) {
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
       const errorMessage = err instanceof Error ? err.message : "Unknown error during generation";
       console.error(`[/api/generate] [${courseId}] FAILED after ${elapsed}s:`, errorMessage);
-      // Stack trace helps identify exactly where the failure occurred
       if (err instanceof Error && err.stack) {
         console.error(`[/api/generate] [${courseId}] Stack:`, err.stack);
       }
-      // If the pipeline threw a GenerationPipelineError (hard failure below
-      // MIN_SUCCESS_RATIO), the per-module structured reasons are attached
-      // to the exception — forward them to updateCourseRecord so the DB
-      // captures both the headline error_message AND the JSONB detail.
-      // For any other Error (validation, Supabase, unexpected), fall back
-      // to an empty array.
       const structuredErrors =
         err instanceof GenerationPipelineError ? err.generationErrors : [];
       try {
@@ -1496,60 +1415,32 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
     }
   };
 
-  // ── Path A: Inngest queue (opt-in, full/masterclass only) ──
-  //
-  // Gate: INNGEST_ENABLED=true AND length ∈ {full, masterclass}.
-  //
-  // Why not crash/short: they're single-shot on Haiku and finish
-  // well inside one Vercel invocation. Shoving them through Inngest
-  // would add ~2-3s of event round-trip overhead and hide errors
-  // behind an extra layer for zero benefit.
-  //
-  // Why a try/catch with fallback: if Inngest is down, or if the
-  // event key is invalid, we don't want to black-hole the user's
-  // course. We fall through to the existing after() path and the
-  // course generates normally (just without the per-module queue
-  // concurrency benefit). The fallback is logged loud so we notice.
-  const inngestEnabled =
-    process.env.INNGEST_ENABLED === "true" &&
-    (generateRequest.length === "full" || generateRequest.length === "masterclass");
-
-  if (inngestEnabled) {
-    try {
-      // Fire-and-forget the course/generate.requested event. Inngest
-      // will hand this off to the courseGenerate function, which
-      // runs the skeleton phase, inserts generation_jobs rows, and
-      // fans out one module/generate.requested event per module.
-      // Each module then runs in its own 300s Vercel invocation.
-      await inngest.send({
-        name: "course/generate.requested",
-        data: {
-          courseId,
-          request: generateRequest,
-          userId: userId ?? null,
-        },
-      });
-      console.log(
-        `[/api/generate] [${courseId}] Dispatched to Inngest queue (length=${generateRequest.length})`,
-      );
-      // Successful dispatch — return the 202 and let Inngest drive
-      // the rest. No after() needed on this path.
-      return res;
-    } catch (inngestErr) {
-      // Don't let an Inngest outage break course generation. Log
-      // loudly, then fall through to the monolithic after() path
-      // below as if INNGEST_ENABLED were false.
-      console.error(
-        `[/api/generate] [${courseId}] Inngest dispatch FAILED, falling back to after() path:`,
-        inngestErr,
-      );
-    }
+  // ── Primary path: Inngest queue ──
+  try {
+    await inngest.send({
+      name: "course/generate.requested",
+      data: {
+        courseId,
+        request: generateRequest,
+        userId: userId ?? null,
+      },
+    });
+    console.log(
+      `[/api/generate] [${courseId}] Dispatched to Inngest queue (length=${generateRequest.length})`,
+    );
+    // Successful dispatch — Inngest drives the rest. No after() needed.
+    return res;
+  } catch (inngestErr) {
+    // Inngest is down — fall through to the chunked after() fallback.
+    // The course still generates, just within a single 280s budget.
+    console.error(
+      `[/api/generate] [${courseId}] Inngest dispatch FAILED, falling back to after() path:`,
+      inngestErr,
+    );
   }
 
-  // ── Path B: in-process after() ──
-  // Schedule the in-process generation to run AFTER the 202 response
-  // is sent. `after()` keeps the Vercel function alive (up to 300s)
-  // while the response has already been flushed to the client.
+  // ── Fallback: in-process after() ──
+  // Only reached if inngest.send() threw above.
   after(runInProcessGeneration);
 
   return res;
