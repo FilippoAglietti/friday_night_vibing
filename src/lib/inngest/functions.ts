@@ -230,10 +230,42 @@ export const courseGenerate = inngest.createFunction(
       if (error) throw new Error(`generation_jobs insert failed: ${error.message}`);
     });
 
-    // Step 4: fan out. Each sendEvent is its own Inngest step so a
-    // retry here will skip already-sent events. Inngest deduplicates
-    // events with the same key automatically, but we're belt-and-
-    // suspenders with the step boundaries.
+    // Step 4: check contentDepth. If "structure_only", the user only
+    // wants the skeleton/syllabus — skip fan-out and mark ready now.
+    const contentDepth = (request.contentDepth as string | undefined) ?? "full_content";
+    if (contentDepth === "structure_only") {
+      await step.run("mark-ready-structure-only", async () => {
+        // Fetch user_id for generation counter increment
+        const { data: course } = await supabase
+          .from("courses")
+          .select("user_id")
+          .eq("id", courseId)
+          .single();
+
+        await supabase
+          .from("courses")
+          .update({
+            status: "ready",
+            generation_progress: null,
+            generation_completed_modules: skeleton.modules.length,
+          })
+          .eq("id", courseId);
+
+        // Increment generation counter
+        if (course?.user_id) {
+          await supabase.rpc("increment_generation_usage", {
+            p_user_id: course.user_id,
+            p_course_id: courseId,
+            p_event_type: "course_generated",
+          });
+        }
+      });
+
+      return { courseId, totalModules: skeleton.modules.length, contentDepth: "structure_only" };
+    }
+
+    // Step 5: fan out for full content. Each sendEvent is its own
+    // Inngest step so a retry here will skip already-sent events.
     await step.run("fanout-module-events", async () => {
       const events = skeleton.modules.map((m, i) => ({
         name: "module/generate.requested" as const,
@@ -251,7 +283,7 @@ export const courseGenerate = inngest.createFunction(
       await inngest.send(events);
     });
 
-    return { courseId, totalModules: skeleton.modules.length };
+    return { courseId, totalModules: skeleton.modules.length, contentDepth: "full_content" };
   },
 );
 

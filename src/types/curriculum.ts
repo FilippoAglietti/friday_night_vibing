@@ -57,6 +57,13 @@ export type TeachingStyle = "academic" | "conversational" | "hands-on" | "storyt
 /** Output structure — how the course is organized */
 export type OutputStructure = "modules" | "workshop" | "bootcamp";
 
+/**
+ * Controls how deep the generation pipeline goes:
+ *   structure_only → skeleton only (syllabus/outline, no lesson content)
+ *   full_content   → skeleton + per-module content fill (default)
+ */
+export type ContentDepth = "structure_only" | "full_content";
+
 /** Supported languages for course generation */
 export type CourseLanguage =
   | "en" | "es" | "pt" | "fr" | "de" | "it"
@@ -243,6 +250,8 @@ export interface GenerateRequest {
   outputStructure?: OutputStructure;
   /** Whether the user uploaded attachments (PDF/files) during generation */
   hasAttachments?: boolean;
+  /** How deep the generation goes: structure_only = syllabus only, full_content = complete course (default) */
+  contentDepth?: ContentDepth;
 }
 
 /** Success response from POST /api/generate (synchronous) */

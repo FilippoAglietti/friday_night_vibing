@@ -63,6 +63,7 @@ import type {
   TeachingStyle,
   OutputStructure,
   CourseLanguage,
+  ContentDepth,
 } from "@/types/curriculum";
 
 // ─── Rate limiter ─────────────────────────────────────────────
@@ -89,6 +90,7 @@ const VALID_LENGTHS: CourseLength[] = ["crash", "short", "full", "masterclass"];
 const VALID_TEACHING_STYLES: TeachingStyle[] = ["academic", "conversational", "hands-on", "storytelling"];
 const VALID_OUTPUT_STRUCTURES: OutputStructure[] = ["modules", "workshop", "bootcamp"];
 const VALID_LANGUAGES: CourseLanguage[] = ["en", "es", "pt", "fr", "de", "it", "nl", "pl", "ja", "ko", "zh", "ar", "hi", "ru", "tr", "sv"];
+const VALID_CONTENT_DEPTHS: ContentDepth[] = ["structure_only", "full_content"];
 
 /**
  * Validates and parses the incoming request body.
@@ -161,6 +163,12 @@ function validateRequest(body: unknown): GenerateRequest {
   // hasAttachments — optional boolean, defaults to false
   const hasAttachments = b.hasAttachments !== undefined ? Boolean(b.hasAttachments) : false;
 
+  // contentDepth — optional, defaults to "full_content"
+  const contentDepth = (b.contentDepth as ContentDepth | undefined) ?? "full_content";
+  if (!VALID_CONTENT_DEPTHS.includes(contentDepth)) {
+    throw new Error(`'contentDepth' must be one of: ${VALID_CONTENT_DEPTHS.join(", ")}.`);
+  }
+
   // Sanitize: strip HTML tags and limit length
   const sanitizedTopic = b.topic
     .trim()
@@ -181,6 +189,7 @@ function validateRequest(body: unknown): GenerateRequest {
     teachingStyle,
     outputStructure,
     hasAttachments,
+    contentDepth,
   };
 }
 

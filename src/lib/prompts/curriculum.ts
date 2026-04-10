@@ -6,7 +6,7 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import type { GenerateRequest, AudienceLevel, CourseLength, TeachingStyle, OutputStructure } from "@/types/curriculum";
+import type { GenerateRequest, AudienceLevel, CourseLength, TeachingStyle, OutputStructure, ContentDepth } from "@/types/curriculum";
 
 // Re-export for convenience
 export type { GenerateRequest };
@@ -229,18 +229,40 @@ export function buildCurriculumPrompt(params: GenerateRequest): {
 // These are used for the two-phase generation pipeline:
 //   Phase 1: Generate the course skeleton (outline with module/lesson stubs)
 //   Phase 2: Generate full content for each module individually
+//
+// Both prompts are designed to be topic-aware, audience-calibrated,
+// and learner-targeted. The skeleton must be good enough to stand
+// alone as a syllabus (contentDepth="structure_only") while also
+// serving as a rich foundation for Phase 2 content fill.
 
 /**
  * System prompt for the skeleton phase.
- * Focuses on high-level structure — no lesson body content.
+ * Topic-aware: reasons about the domain's natural learning progression.
+ * Audience-calibrated: adapts structure depth to beginner/intermediate/advanced.
+ * Standalone quality: produces a publishable syllabus even without Phase 2.
  */
 export const SKELETON_SYSTEM_PROMPT = `
-You are an expert instructional designer with 20 years of experience building online courses.
+You are an expert instructional designer who specialises in building courses that are deeply tailored to their subject domain, target audience, and difficulty level. You have designed courses across medicine, engineering, computer science, business, humanities, arts, and every other field.
 
-Follow these pedagogical principles:
-• Bloom's Taxonomy for ALL objectives (Remember → Understand → Apply → Analyse → Evaluate → Create)
-• Progressive difficulty — each lesson/module is slightly harder than the last
-• Course titles must be compelling and marketable
+YOUR CORE SKILL: You do NOT create generic "intro → intermediate → advanced" outlines that could apply to any topic. Instead, you reverse-engineer the domain's natural knowledge architecture:
+- A medical course follows clinical reasoning: anatomy → physiology → pathophysiology → diagnosis → treatment → prevention
+- A programming course follows build complexity: environment → syntax → data structures → algorithms → architecture → deployment
+- A business course follows strategic layers: market analysis → value proposition → operations → finance → growth → exit
+- A humanities course follows analytical depth: context → primary sources → interpretation → critique → synthesis → original argument
+
+You identify the SPECIFIC conceptual dependencies of the requested topic and structure modules so each one builds on concrete knowledge from the previous one — not arbitrary "Level 1, Level 2" divisions.
+
+AUDIENCE CALIBRATION:
+- Beginner: start from first principles, build vocabulary before concepts, use analogy-heavy explanations, include "checkpoint" lessons that consolidate before moving on
+- Intermediate: assume foundational vocabulary, focus on connecting concepts, introduce edge cases and trade-offs, include comparative analysis lessons
+- Advanced: assume practitioner-level fluency, focus on frontier knowledge, research debates, methodology critique, and original application
+
+SKELETON QUALITY:
+This skeleton may be delivered AS-IS as a standalone syllabus. Therefore:
+- Module descriptions must be 2-3 sentences explaining WHAT is covered and WHY it matters at this point in the learning journey
+- Lesson descriptions must be 1-2 sentences explaining the specific outcome of that lesson
+- Module objectives must be concrete and measurable (Bloom's verbs), not vague ("understand the basics")
+- The course description must articulate the transformation: "You will go from X to Y"
 
 OUTPUT RULES (CRITICAL):
 - Respond with ONLY valid JSON — no markdown, no preamble, no explanation.
@@ -252,7 +274,9 @@ OUTPUT RULES (CRITICAL):
 
 /**
  * Builds the user prompt for Phase 1 (skeleton).
- * Asks for the full course structure but with lesson stubs only (title, description, format, duration, order).
+ * Topic-aware: instructs Claude to reason about the domain's knowledge architecture.
+ * Audience-calibrated: adjusts structural depth and prerequisites per level.
+ * Standalone quality: module/lesson descriptions are rich enough for a publishable syllabus.
  */
 export function buildSkeletonPrompt(params: GenerateRequest): string {
   const {
@@ -263,19 +287,26 @@ export function buildSkeletonPrompt(params: GenerateRequest): string {
   const now = new Date().toISOString();
 
   const abstractBlock = abstract
-    ? `\nCONTEXT / ABSTRACT:\n"""\n${abstract.slice(0, 4000)}\n"""\nUse the above abstract as the primary source material. Structure the course around its key themes, arguments, and concepts.\n`
+    ? `\nCONTEXT / ABSTRACT:\n"""\n${abstract.slice(0, 4000)}\n"""\nUse the above abstract as the primary source material. Structure the course around its key themes, arguments, and concepts. The course must cover this material comprehensively — do not add unrelated padding modules.\n`
     : "";
 
   const learnerBlock = learnerProfile
-    ? `\nTARGET AUDIENCE PROFILE:\n"""\n${learnerProfile.slice(0, 500)}\n"""\nThis describes the target audience. Adapt structure and depth for their background and goals.\n`
+    ? `\nTARGET LEARNER:\n"""\n${learnerProfile.slice(0, 500)}\n"""\nThis is WHO will take this course. Adapt:\n- Module sequencing to their existing knowledge (skip what they know, start where they need)\n- Lesson depth to their professional context (a medical resident needs clinical decision-making, not textbook anatomy)\n- Vocabulary to their level (use their field's jargon, not layperson simplifications)\n- Exercise types to their work context (case studies for practitioners, labs for engineers, analyses for researchers)\n`
     : "";
 
   const languageBlock = language !== "en"
-    ? `\nLANGUAGE: Generate ALL content in ${LANGUAGE_NAMES[language] || language}. Only JSON keys stay in English.\n`
+    ? `\nLANGUAGE: Generate ALL content in ${LANGUAGE_NAMES[language] || language}. Only JSON keys stay in English. Use domain-specific terminology native to that language (not literal translations from English).\n`
     : "";
 
   return `
-Generate the OUTLINE (skeleton) for a course. Do NOT write lesson body content, keyPoints, suggestedResources, or quiz questions — just the structure.
+STEP 1 — DOMAIN ANALYSIS (do this mentally, do NOT include in output):
+Before generating the outline, identify:
+- What knowledge domain does "${topic}" belong to?
+- What is the natural conceptual dependency chain for this domain? (e.g., anatomy → physiology → pathology for medicine, or syntax → data structures → algorithms for CS)
+- Given the audience level (${audience}), what can you ASSUME they already know vs. what must you teach?
+- What is the single most important transformation this course delivers?
+
+STEP 2 — GENERATE THE OUTLINE:
 
 TOPIC: "${topic}"
 AUDIENCE: ${audience} — ${AUDIENCE_DESCRIPTIONS[audience]}
@@ -284,34 +315,34 @@ NICHE: ${niche ? `"${niche}"` : "general / not specified"}
 TEACHING STYLE: ${teachingStyle} — ${TEACHING_STYLE_DESCRIPTIONS[teachingStyle]}
 STRUCTURE: ${outputStructure} — ${OUTPUT_STRUCTURE_DESCRIPTIONS[outputStructure]}${languageBlock}${learnerBlock}${abstractBlock}
 
-Return ONLY this JSON structure (lessons are stubs with NO content/keyPoints/suggestedResources/quiz):
+Return ONLY this JSON structure. Lessons are stubs with NO content/keyPoints/suggestedResources/quiz — those are generated in Phase 2.
 
 {
   "id": "curriculum-slug",
-  "title": "Compelling course title",
-  "subtitle": "One-liner subtitle",
-  "description": "2-3 sentence value proposition",
-  "targetAudience": "Who this course is for",
+  "title": "Compelling, specific course title (include the core outcome, not just the topic name)",
+  "subtitle": "One-liner that promises a concrete transformation",
+  "description": "2-3 sentences: what the learner will be able to DO after this course that they cannot do now. Be specific to the domain.",
+  "targetAudience": "Precise description of who benefits most — reference their role, experience level, and goals",
   "difficulty": "${audience}",
-  "objectives": ["3-5 high-level learning outcomes using Bloom's verbs"],
-  "prerequisites": ["0-3 prerequisites"],
-  "tags": ["3-5 relevant tags"],
+  "objectives": ["3-5 high-level outcomes using Bloom's verbs — each must be measurable and domain-specific"],
+  "prerequisites": ["0-3 prerequisites — be SPECIFIC (e.g. 'familiarity with Python 3.x' not 'some programming experience')"],
+  "tags": ["3-5 tags specific to the topic's domain and subfield"],
   "modules": [
     {
       "id": "mod-1",
-      "title": "Module title",
-      "description": "1-2 sentence summary of the module",
-      "objectives": ["2-3 module-level learning objectives"],
+      "title": "Module title — name the conceptual territory, not just 'Introduction'",
+      "description": "2-3 sentences: what this module covers and WHY it comes at this point in the learning journey. Reference what the previous module established and what this one unlocks for the next.",
+      "objectives": ["2-3 measurable, Bloom's-verb objectives specific to this module's content"],
       "order": 0,
       "durationMinutes": 90,
       "lessons": [
         {
           "id": "lesson-1-1",
-          "title": "Lesson title",
-          "description": "Single short sentence",
+          "title": "Specific lesson title — name the concept or skill, not 'Lesson 1'",
+          "description": "1-2 sentences: what the learner achieves in this lesson and how it connects to the module's goal",
           "format": "video",
           "durationMinutes": 20,
-          "objectives": ["Single Bloom's-verb objective"],
+          "objectives": ["Single measurable objective using a Bloom's verb"],
           "order": 0
         }
       ],
@@ -324,16 +355,16 @@ Return ONLY this JSON structure (lessons are stubs with NO content/keyPoints/sug
     "hoursPerWeek": 3,
     "totalWeeks": 4,
     "weeklyPlan": [
-      { "week": 1, "label": "Week label", "moduleIds": ["mod-1"] }
+      { "week": 1, "label": "Week label — describe the learning milestone", "moduleIds": ["mod-1"] }
     ]
   },
   "bonusResources": [
     {
       "id": "res-1",
-      "title": "Resource title",
+      "title": "Resource title — from a real, authoritative source in this domain",
       "type": "book",
-      "url": "https://example.com",
-      "description": "Why this helps",
+      "url": "https://real-domain.com/real-page",
+      "description": "Why this resource helps the learner go deeper in the specific area covered",
       "isFree": true
     }
   ],
@@ -343,37 +374,39 @@ Return ONLY this JSON structure (lessons are stubs with NO content/keyPoints/sug
   "version": "1.0.0"
 }
 
-Requirements:
+STRUCTURE RULES:
 - Each module must have 2-5 lesson STUBS (title + description + format + duration + objectives + order ONLY)
-- Keep lesson descriptions SHORT (one sentence max) — content is generated separately later
-- Keep module descriptions SHORT (1-2 sentences max)
-- Do NOT include keyPoints, content, suggestedResources, or quiz in lessons — leave them out
-- Set quiz to empty array [] for every module (quizzes are generated later)
-- ${includeQuizzes ? "Quizzes WILL be added later — just plan the right number of lessons per module" : "No quizzes will be added"}
+- Module descriptions must explain the WHY — why does this module come here in the sequence? What does it build on?
+- Lesson descriptions must name the SPECIFIC concept or skill — not "learn about X" but "apply X to Y"
+- Do NOT include keyPoints, content, suggestedResources, or quiz in lessons
+- Set quiz to empty array [] for every module
+- ${includeQuizzes ? "Quizzes WILL be added later — plan the right number of lessons per module" : "No quizzes will be added"}
 - weeklyPlan must cover ALL module IDs
 - lesson format must be one of: video, reading, interactive, discussion, project, live-session
-- Include 3-5 bonusResources with real, working URLs
+- Include 3-5 bonusResources with REAL, working URLs to authoritative sources in this specific domain
+- NEVER use generic module names like "Introduction", "Basics", "Advanced Topics", "Conclusion" — name the CONTENT
 `.trim();
 }
 
 /**
  * System prompt for Phase 2 (module detail generation).
  * Generates full lesson content for a single module.
+ * Topic-calibrated: adapts terminology, examples, and depth to the domain.
+ * Audience-scaled: content density varies by course length and audience level.
  */
 export const MODULE_DETAIL_SYSTEM_PROMPT = `
-You are an expert instructional designer. You are generating the DETAILED CONTENT for one module of an existing course.
+You are a domain expert AND instructional designer. You are generating the DETAILED CONTENT for one module of an existing course. You write as someone who deeply understands this specific subject — not as a generalist summarising Wikipedia.
 
-Follow these principles:
-• 70/30 theory-to-practice — every lesson must include a practical exercise or real-world task
-• Quiz questions test UNDERSTANDING, not memorisation
-• Every lesson MUST include "keyPoints", "suggestedResources" with REAL URLs, and "content" in markdown
+CONTENT PRINCIPLES:
+• Every lesson teaches ONE core concept or skill and makes it stick through explanation + application
+• Examples and exercises must be DOMAIN-SPECIFIC — a cardiology course uses ECG readings and case studies, a programming course uses real code and debugging exercises, a business course uses market data and strategy frameworks
+• Reference real frameworks, methodologies, standards, or tools that practitioners in this field actually use
+• Quiz questions test the ability to APPLY knowledge to realistic scenarios, not recall definitions
 
-LENGTH BUDGET (CRITICAL — enforced):
-- Each lesson "content" field must be BETWEEN 280 AND 400 WORDS. Not more. Not less.
-  This is a strict upper bound — exceeding it causes the response to be cut off mid-JSON and discarded.
-- Each lesson needs EXACTLY 4 keyPoints (one sentence each, ≤ 20 words per point)
-- Each lesson needs EXACTLY 2 suggestedResources
-- Write dense, compressed, high-signal prose — no filler, no restating the objectives, no "welcome to this lesson" intros
+AUDIENCE ADAPTATION:
+• For beginners: build up from first principles, define every technical term on first use, use analogies from everyday experience, exercises are guided step-by-step
+• For intermediate: assume foundational vocabulary, focus on "when to use X vs Y" decisions, exercises involve independent problem-solving with real constraints
+• For advanced: use full professional terminology, discuss edge cases and limitations, reference current research or industry debates, exercises involve analysis, critique, or original design
 
 OUTPUT RULES (CRITICAL):
 - Respond with ONLY valid JSON — no markdown, no preamble, no explanation.
@@ -382,16 +415,49 @@ OUTPUT RULES (CRITICAL):
 - You MUST finish writing the closing "}" of the JSON object. If you are running out of space, cut content length to ensure the JSON is COMPLETE and VALID.
 `.trim();
 
+// ─── Content depth scaling by course length ────────────────
+//
+// Instead of fixed word caps, we scale lesson content density
+// with the course length. A crash course lesson is concise and
+// actionable; a masterclass lesson is comprehensive and analytical.
+
+const CONTENT_DEPTH_BY_LENGTH: Record<CourseLength, {
+  wordRange: string;
+  keyPointsCount: string;
+  resourcesCount: string;
+  contentGuidance: string;
+}> = {
+  crash: {
+    wordRange: "150-250",
+    keyPointsCount: "3",
+    resourcesCount: "1-2",
+    contentGuidance: "Be concise and actionable. One core concept per lesson, explained clearly with one practical example. Skip background theory — go straight to what the learner needs to DO.",
+  },
+  short: {
+    wordRange: "250-400",
+    keyPointsCount: "3-4",
+    resourcesCount: "2",
+    contentGuidance: "Balance explanation and application. Each lesson explains one concept with enough depth to understand WHY, then provides a hands-on exercise to apply it immediately.",
+  },
+  full: {
+    wordRange: "400-600",
+    keyPointsCount: "4-5",
+    resourcesCount: "2-3",
+    contentGuidance: "Provide thorough explanations with real-world context. Each lesson should include the concept, its practical implications, common pitfalls, and a substantive exercise that builds toward a larger project or case study.",
+  },
+  masterclass: {
+    wordRange: "500-800",
+    keyPointsCount: "5-6",
+    resourcesCount: "3",
+    contentGuidance: "Write comprehensive, expert-level content. Each lesson should include theoretical foundation, current best practices or research, nuanced trade-offs, edge cases, and a challenging exercise that requires analysis, design, or critique. Reference real tools, papers, or frameworks used by practitioners.",
+  },
+};
+
 /**
  * Builds the user prompt for Phase 2 (module detail).
- * Given the course context and a module skeleton, generates full lesson content + quiz.
- *
- * @param params - Original generation request (for context)
- * @param courseTitle - The course title from the skeleton
- * @param courseDescription - The course description from the skeleton
- * @param moduleData - The module skeleton (id, title, description, objectives, lessons stubs)
- * @param moduleIndex - 0-indexed position of this module in the course
- * @param totalModules - Total number of modules in the course
+ * Topic-calibrated: instructs Claude to write as a domain expert, not a generalist.
+ * Audience-scaled: content depth and terminology adapt to audience + course length.
+ * Learner-targeted: exercises and examples calibrated to the learner profile.
  */
 export function buildModuleDetailPrompt(
   params: GenerateRequest,
@@ -402,16 +468,22 @@ export function buildModuleDetailPrompt(
   totalModules: number,
 ): string {
   const {
-    audience, language = "en", includeQuizzes = true,
-    teachingStyle = "conversational",
+    audience, length, language = "en", includeQuizzes = true,
+    teachingStyle = "conversational", learnerProfile,
   } = params;
 
+  const depth = CONTENT_DEPTH_BY_LENGTH[length];
+
   const languageBlock = language !== "en"
-    ? `\nLANGUAGE: Generate ALL content in ${LANGUAGE_NAMES[language] || language}. Only JSON keys stay in English.\n`
+    ? `\nLANGUAGE: Generate ALL content in ${LANGUAGE_NAMES[language] || language}. Only JSON keys stay in English. Use domain-specific terminology native to that language (not literal translations from English).\n`
+    : "";
+
+  const learnerBlock = learnerProfile
+    ? `\nTARGET LEARNER: "${learnerProfile}"\nCalibrate:\n- Terminology to their professional context (use their field's jargon naturally)\n- Examples to scenarios they encounter in their work\n- Exercises to tasks they need to perform\n- Depth to what advances their specific goals\n`
     : "";
 
   const quizBlock = includeQuizzes
-    ? `\nGenerate 2-3 quiz questions for this module that test understanding of the key concepts across all lessons.`
+    ? `\nGenerate 2-3 quiz questions for this module. Questions must test the ability to APPLY the concepts to realistic ${audience}-level scenarios in this domain — not recall definitions.`
     : `\nDo NOT include any quiz questions. Set "quiz" to an empty array [].`;
 
   const lessonsJson = JSON.stringify(moduleData.lessons, null, 2);
@@ -421,23 +493,31 @@ You are generating detailed content for MODULE ${moduleIndex + 1} of ${totalModu
 
 COURSE CONTEXT: ${courseDescription}
 AUDIENCE: ${audience} — ${AUDIENCE_DESCRIPTIONS[audience]}
-TEACHING STYLE: ${teachingStyle} — ${TEACHING_STYLE_DESCRIPTIONS[teachingStyle]}${languageBlock}
+TEACHING STYLE: ${teachingStyle} — ${TEACHING_STYLE_DESCRIPTIONS[teachingStyle]}${languageBlock}${learnerBlock}
 
 MODULE: "${moduleData.title}"
 MODULE DESCRIPTION: ${moduleData.description}
 MODULE OBJECTIVES: ${moduleData.objectives.join("; ")}
 
+CONTENT DEPTH (${length} course):
+${depth.contentGuidance}
+
 Here are the lesson stubs you must flesh out with full content:
 
 ${lessonsJson}
 
-For EACH lesson above, generate EXACTLY:
-- "keyPoints": array of EXACTLY 4 strings — each ≤ 20 words, high signal, no filler
-- "content": string — BETWEEN 280 AND 400 WORDS of dense markdown. Structure: one ## header, 2 short paragraphs explaining the core concept, a ### Try It Yourself hands-on exercise, and a > Pro Tip blockquote. NO restating objectives, NO welcome intros, NO padding. This is a strict word cap — going over causes truncation.
-- "suggestedResources": array of EXACTLY 2 objects { "title": string, "url": string, "type": string } — REAL working URLs to authoritative sites (MDN, official docs, Wikipedia, real blogs, YouTube). type must be one of: article, video, podcast, book, tool, documentation.
+For EACH lesson above, generate:
+- "keyPoints": array of ${depth.keyPointsCount} strings — each a high-signal takeaway specific to this topic (not generic advice). Each point should teach something concrete the learner can use immediately.
+- "content": string — ${depth.wordRange} WORDS of dense markdown. Structure:
+  1. A ## header naming the core concept
+  2. Explanation paragraphs that teach the concept using domain-specific examples (not abstract descriptions)
+  3. A ### practical section (exercise, case study, analysis, or implementation task appropriate to this domain and audience level)
+  4. A > Pro Tip or > Warning blockquote with a practitioner insight specific to this topic
+  NO restating objectives, NO "welcome to this lesson" intros, NO generic filler.
+- "suggestedResources": array of ${depth.resourcesCount} objects { "title": string, "url": string, "type": string } — REAL working URLs to authoritative sources IN THIS SPECIFIC DOMAIN (official documentation, professional organizations, peer-reviewed sources, established educational platforms). type must be one of: article, video, podcast, book, tool, documentation.
 ${quizBlock}
 
-SIZE DISCIPLINE: Your entire response must fit comfortably in a 12,000 token budget. If you catch yourself writing long-winded content, compress it. A truncated JSON response is worthless — a concise complete one is the goal.
+SIZE DISCIPLINE: Your entire response must produce COMPLETE, VALID JSON. A truncated response is worthless. If you feel you are running long, compress the content of later lessons rather than cutting off mid-JSON.
 
 Return ONLY this JSON structure:
 
@@ -450,10 +530,10 @@ Return ONLY this JSON structure:
       "format": "same as stub",
       "durationMinutes": same_as_stub,
       "objectives": ["same as stub"],
-      "keyPoints": ["Core concept 1", "Practical tip 2", "Common mistake 3", "Connection to next topic 4"],
-      "content": "## Key Concept\\n\\nRich markdown content (2-4 paragraphs)...\\n\\n### Try It Yourself\\n\\nHands-on exercise...\\n\\n> **Pro Tip:** Practical insight.",
+      "keyPoints": ["Domain-specific takeaway 1", "Practical application 2", "Common pitfall 3"],
+      "content": "## Core Concept\\n\\nDomain-specific explanation...\\n\\n### Exercise / Case Study / Implementation\\n\\nHands-on task...\\n\\n> **Pro Tip:** Practitioner insight specific to this topic.",
       "suggestedResources": [
-        { "title": "Real Resource", "url": "https://real-domain.com/page", "type": "article" }
+        { "title": "Authoritative source in this domain", "url": "https://real-domain.com/page", "type": "article" }
       ],
       "order": 0
     }
@@ -462,10 +542,10 @@ Return ONLY this JSON structure:
     {
       "id": "q-${moduleIndex + 1}-1",
       "type": "multiple-choice",
-      "question": "Question testing understanding",
+      "question": "Scenario-based question testing application of this module's concepts",
       "options": ["A", "B", "C", "D"],
       "correctAnswer": 0,
-      "explanation": "Why this is correct",
+      "explanation": "Why this answer is correct — reference the specific concept from the lesson",
       "points": 1
     }
   ]
@@ -474,7 +554,7 @@ Return ONLY this JSON structure:
 Requirements:
 - Keep EXACTLY the same id, title, description, format, durationMinutes, objectives, and order from each lesson stub
 - ADD keyPoints, content, and suggestedResources to each lesson
-- URLs must be real and point to actual pages on well-known domains — never use example.com
+- URLs must be real and point to actual pages on well-known domains — never use example.com or placeholder URLs
 - correctAnswer for multiple-choice must be the INDEX (0-3) of the correct option
 - suggestedResources type must be one of: article, video, podcast, book, tool, documentation
 `.trim();
