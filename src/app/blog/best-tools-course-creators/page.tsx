@@ -129,7 +129,7 @@ export default function Article() {
           <h2>1. Course creation & structuring</h2>
           <p>
             The foundation of any successful course starts with solid structure. These tools help you
-            go from topic idea to a complete curriculum.
+            go from topic idea to a complete course.
           </p>
         </div>
 
@@ -138,7 +138,7 @@ export default function Article() {
           <ToolCard
             name="Syllabi"
             category="AI Course Generator"
-            description="Generate complete curricula with modules, lessons, quizzes, and AI audio narration in 60 seconds. Supports 16 languages and exports to PDF, Notion, DOCX, and more."
+            description="Generate complete courses with modules, lessons, quizzes, and AI audio narration in 60 seconds. Supports 16 languages and exports to PDF, Notion, DOCX, and more."
             price="Free / from $28/mo"
             highlight
           />
@@ -151,7 +151,7 @@ export default function Article() {
           <ToolCard
             name="Miro"
             category="Visual Planning"
-            description="Map out your curriculum visually before building it. Great for workshop-style courses where the learning path isn't linear."
+            description="Map out your course visually before building it. Great for workshop-style courses where the learning path isn't linear."
             price="Free / from $8/mo"
           />
         </div>
@@ -283,7 +283,7 @@ export default function Article() {
             You don&apos;t need all of these tools to get started. The minimum viable course creator stack is:
           </p>
           <ol>
-            <li><strong>Syllabi</strong> (free tier) &mdash; Generate your curriculum and course content</li>
+            <li><strong>Syllabi</strong> (free tier) &mdash; Generate your course structure and content</li>
             <li><strong>Notion</strong> (free) &mdash; Organize and host your course content</li>
             <li><strong>ConvertKit</strong> (free tier) &mdash; Collect emails and send updates</li>
             <li><strong>Canva</strong> (free) &mdash; Create visuals and social media assets</li>

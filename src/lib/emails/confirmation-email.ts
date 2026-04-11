@@ -20,7 +20,7 @@ export function getConfirmationEmailHTML(): string {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light" />
-  <title>Verify your email — Syllabi.ai</title>
+  <title>Verify your email — Syllabi</title>
   <style>
     body, table, td, p, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     body { margin: 0; padding: 0; width: 100% !important; }
@@ -31,7 +31,7 @@ export function getConfirmationEmailHTML(): string {
 <body style="margin: 0; padding: 0; background-color: #f5f3ff; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
 
   <div style="display: none; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #f5f3ff;">
-    Verify your email to start creating AI-powered courses with Syllabi.ai
+    Verify your email to start creating AI-powered courses with Syllabi
   </div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f3ff;">
@@ -65,7 +65,7 @@ export function getConfirmationEmailHTML(): string {
             <td style="background: white; padding: 40px;">
 
               <p style="margin: 0 0 24px; font-size: 15px; color: #374151; line-height: 1.6; text-align: center;">
-                Click the button below to verify <strong>{{ .Email }}</strong> and activate your Syllabi.ai account.
+                Click the button below to verify <strong>{{ .Email }}</strong> and activate your Syllabi account.
               </p>
 
               <!-- CTA -->
@@ -96,8 +96,8 @@ export function getConfirmationEmailHTML(): string {
                 <span style="color: white;">syllabi</span><span style="color: #A855F7;">.ai</span>
               </p>
               <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.6;">
-                If you didn't sign up for Syllabi.ai, you can safely ignore this email.<br/>
-                &copy; ${new Date().getFullYear()} Syllabi.ai
+                If you didn't sign up for Syllabi, you can safely ignore this email.<br/>
+                &copy; ${new Date().getFullYear()} Syllabi
               </p>
             </td>
           </tr>

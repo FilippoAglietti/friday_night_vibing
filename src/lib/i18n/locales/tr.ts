@@ -80,7 +80,7 @@ const tr: Translations = {
   },
   testimonials: {
     eyebrow: "İçerik Üreticiler Ne Diyor",
-    heading: "Diğerlerini denediler. Sonra Syllabi.ai'yi duydular.",
+    heading: "Diğerlerini denediler. Sonra Syllabi'yi duydular.",
     subheading:
       "Ses öncelikli kurslara geçen ve bir daha geriye bakmayan kurs üreticileri, koçlar ve eğitmenler.",
   },

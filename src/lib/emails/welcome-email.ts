@@ -1,5 +1,5 @@
 /**
- * Premium Welcome Email Template for Syllabi.ai
+ * Premium Welcome Email Template for Syllabi
  * ──────────────────────────────────────────────
  * Beautiful HTML email with confetti-style decorative elements,
  * gradient branding, and a compelling CTA.
@@ -25,7 +25,7 @@ export function generateWelcomeEmail({ userName, email }: WelcomeEmailProps): st
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light" />
   <meta name="supported-color-schemes" content="light" />
-  <title>Welcome to Syllabi.ai</title>
+  <title>Welcome to Syllabi</title>
   <style>
     /* Reset */
     body, table, td, p, a, li { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
@@ -95,7 +95,7 @@ export function generateWelcomeEmail({ userName, email }: WelcomeEmailProps): st
 
   <!-- Preheader text (hidden) -->
   <div style="display: none; max-height: 0; overflow: hidden; font-size: 1px; line-height: 1px; color: #f5f3ff;">
-    Welcome to Syllabi.ai! Your AI-powered course creation journey starts now.
+    Welcome to Syllabi! Your AI-powered course creation journey starts now.
   </div>
 
   <!-- Main wrapper -->
@@ -217,7 +217,7 @@ export function generateWelcomeEmail({ userName, email }: WelcomeEmailProps): st
                         <span style="font-size: 22px;">&#x26A1;</span>
                       </div>
                       <p style="margin: 0 0 6px; font-size: 15px; font-weight: 700; color: #1E1B4B;">AI-Generated Courses</p>
-                      <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.5;">Full curriculum with modules, lessons, quizzes &amp; pacing in seconds.</p>
+                      <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.5;">Full courses with modules, lessons, quizzes &amp; pacing in seconds.</p>
                     </div>
                   </td>
                   <td width="50%" style="padding: 0 0 16px 8px; vertical-align: top;">
@@ -294,7 +294,7 @@ export function generateWelcomeEmail({ userName, email }: WelcomeEmailProps): st
                           <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #7C3AED, #A855F7); border-radius: 50%; text-align: center; line-height: 40px; font-size: 16px; font-weight: 800; color: white;">2</div>
                         </td>
                         <td style="vertical-align: middle;">
-                          <p style="margin: 0 0 2px; font-size: 15px; font-weight: 600; color: #1E1B4B;">AI generates your curriculum</p>
+                          <p style="margin: 0 0 2px; font-size: 15px; font-weight: 600; color: #1E1B4B;">AI generates your course</p>
                           <p style="margin: 0; font-size: 13px; color: #6B7280;">Modules, lessons, quizzes, pacing, and rich content appear instantly.</p>
                         </td>
                       </tr>
@@ -366,8 +366,8 @@ export function generateWelcomeEmail({ userName, email }: WelcomeEmailProps): st
               </table>
 
               <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.6;">
-                You're receiving this because you signed up for Syllabi.ai<br/>
-                &copy; ${new Date().getFullYear()} Syllabi.ai &mdash; All rights reserved.
+                You're receiving this because you signed up for Syllabi<br/>
+                &copy; ${new Date().getFullYear()} Syllabi &mdash; All rights reserved.
               </p>
             </td>
           </tr>

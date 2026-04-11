@@ -6,7 +6,7 @@ import { JsonLd, breadcrumbJsonLd, BREADCRUMBS } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Documentation — AI Course Generator Guide",
   description:
-    "Complete guide to Syllabi's AI course generator. Learn how to create courses, export to PDF & Notion, add audio narration, and customize curricula.",
+    "Complete guide to Syllabi's AI course generator. Learn how to create courses, export to PDF & Notion, add audio narration, and customize your courses.",
   alternates: { canonical: "/docs" },
   openGraph: {
     title: "Documentation — Syllabi AI Course Generator",
@@ -32,11 +32,11 @@ const sections = [
     content: [
       {
         heading: "Generate your first course",
-        body: "Head to the homepage and fill in the course form. Enter a topic (e.g. \"Machine Learning for Beginners\"), select your target audience, choose a course length, and optionally add a niche or context. Click Generate and your full curriculum will be ready in seconds.",
+        body: "Head to the homepage and fill in the course form. Enter a topic (e.g. \"Machine Learning for Beginners\"), select your target audience, choose a course length, and optionally add a niche or context. Click Generate and your full course will be ready in seconds.",
       },
       {
         heading: "What gets generated",
-        body: "Each generation produces a complete curriculum: course title, description, learning objectives, modules (each with lessons, lesson content, key points, and objectives), multiple-choice quizzes, bonus resources, and a pacing schedule tailored to your audience.",
+        body: "Each generation produces a complete course: title, description, learning objectives, modules (each with lessons, lesson content, key points, and objectives), multiple-choice quizzes, bonus resources, and a pacing schedule tailored to your audience.",
       },
     ],
   },
@@ -70,19 +70,19 @@ const sections = [
     content: [
       {
         heading: "JSON Export",
-        body: "Download the raw curriculum as a structured JSON file. This is useful for importing into your own LMS, processing programmatically, or building on top of the data.",
+        body: "Download the raw course data as a structured JSON file. This is useful for importing into your own LMS, processing programmatically, or building on top of the data.",
       },
       {
         heading: "Markdown Export",
-        body: "Export the curriculum as a well-formatted Markdown document. Paste it directly into Notion, GitHub, or any Markdown-compatible editor.",
+        body: "Export your course as a well-formatted Markdown document. Paste it directly into Notion, GitHub, or any Markdown-compatible editor.",
       },
       {
         heading: "PDF Export",
-        body: "Generate a clean, formatted PDF of the entire curriculum — ideal for sharing with clients, students, or stakeholders who prefer a polished document.",
+        body: "Generate a clean, formatted PDF of the entire course — ideal for sharing with clients, students, or stakeholders who prefer a polished document.",
       },
       {
         heading: "Notion Export",
-        body: "Copy the curriculum as Notion-compatible blocks that you can paste directly into any Notion page. Modules, lessons, and quizzes all render as proper Notion blocks.",
+        body: "Copy your course as Notion-compatible blocks that you can paste directly into any Notion page. Modules, lessons, and quizzes all render as proper Notion blocks.",
       },
     ],
   },
@@ -93,15 +93,15 @@ const sections = [
     content: [
       {
         heading: "Free tier",
-        body: "Generate 3 mini-courses at no cost with 3 free mini-course generations. Exports are limited to JSON. No credit card required.",
+        body: "3 free mini-course generations. Includes modules, lessons, quizzes, and all export formats (JSON, Markdown, PDF, Notion). Shareable course links included. No credit card required.",
       },
       {
         heading: "Pro (€28/month)",
-        body: "15 course generations/month. Full content including quizzes, pacing schedules, and all export formats (JSON, Markdown, PDF, Notion). Custom pacing and priority AI processing.",
+        body: "15 course generations/month. All course lengths and styles (crash to masterclass). Full content including quizzes, pacing schedules, and all export formats. Custom pacing and priority AI processing.",
       },
       {
         heading: "Pro Max (€69/month)",
-        body: "Unlimited generations with AI-generated audio narration, full chapter content generation, premium Notion and PDF export, shareable course links, white-label branding, and PPTX and DOCX export.",
+        body: "Unlimited generations with AI-generated audio narration, full chapter content generation, premium Notion and PDF export, PPTX and DOCX export, white-label branding, and dedicated AI processing.",
       },
       {
         heading: "5-Pack (€33 one-time)",
@@ -116,7 +116,7 @@ const sections = [
     content: [
       {
         heading: "Be specific with your topic",
-        body: "\"Python for Data Science\" generates a better curriculum than just \"Python\". The more specific you are, the more targeted and actionable the output.",
+        body: "\"Python for Data Science\" generates a better course than just \"Python\". The more specific you are, the more targeted and actionable the output.",
       },
       {
         heading: "Set the right audience level",
@@ -138,7 +138,7 @@ const sections = [
     anchor: "faq",
     content: [
       {
-        heading: "Can I edit the generated curriculum?",
+        heading: "Can I edit the generated course?",
         body: "Yes! After generating, open the Course Editor to rewrite titles, edit lesson content, add or remove quiz questions, reorder modules, and delete anything that doesn't fit.",
       },
       {
@@ -151,7 +151,7 @@ const sections = [
       },
       {
         heading: "What AI model powers Syllabi?",
-        body: "Syllabi uses Anthropic's Claude — one of the most capable language models available — with a carefully crafted curriculum generation prompt.",
+        body: "Syllabi uses Anthropic's Claude — one of the most capable language models available — with a carefully crafted course generation prompt.",
       },
     ],
   },
@@ -209,7 +209,7 @@ export default function DocsPage() {
               Documentation
             </h1>
             <p className="text-muted-foreground text-base">
-              Everything you need to know about generating, exporting, and using Syllabi.ai curricula.
+              Everything you need to know about generating, exporting, and sharing your courses.
             </p>
           </div>
 

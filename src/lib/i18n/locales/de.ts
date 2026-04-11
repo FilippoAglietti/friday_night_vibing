@@ -81,7 +81,7 @@ const de: Translations = {
   },
   testimonials: {
     eyebrow: "Was Ersteller sagen",
-    heading: "Sie haben alles ausprobiert. Dann hörten sie Syllabi.ai",
+    heading: "Sie haben alles ausprobiert. Dann hörten sie Syllabi",
     subheading:
       "Kursersteller, Coaches und Trainer, die zu audio-first-Kursen gewechselt haben und nie zurückgeblickt haben.",
   },

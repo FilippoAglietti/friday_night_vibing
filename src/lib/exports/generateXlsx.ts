@@ -75,7 +75,7 @@ function addTitle(ws: ExcelJS.Worksheet, title: string, colSpan: number) {
 
 export async function generateCurriculumXlsx(curriculum: Curriculum): Promise<Blob> {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Syllabi.ai";
+  wb.creator = "Syllabi";
   wb.created = new Date();
 
   const totalLessons = curriculum.modules.reduce((a, m) => a + (m.lessons?.length || 0), 0);

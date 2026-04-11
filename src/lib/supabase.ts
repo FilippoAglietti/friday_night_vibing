@@ -1,7 +1,7 @@
 /**
  * lib/supabase.ts
  * ─────────────────────────────────────────────────────────────
- * Supabase client configuration for Syllabi.ai.
+ * Supabase client configuration for Syllabi.
  *
  * Exports three clients for different contexts:
  *   - supabaseBrowser  → client-side (React components, hooks)

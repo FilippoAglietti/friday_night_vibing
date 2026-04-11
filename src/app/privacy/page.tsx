@@ -67,7 +67,7 @@ export default function PrivacyPage() {
             <ul className="space-y-2 text-gray-300 ml-4">
               <li>• Name, email address, and password</li>
               <li>• Educational institution and role</li>
-              <li>• Course materials and curriculum data you upload</li>
+              <li>• Course materials and content you upload</li>
               <li>• Communications with our support team</li>
             </ul>
             <p className="text-gray-300 mt-4">

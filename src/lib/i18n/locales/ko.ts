@@ -65,7 +65,7 @@ const ko: Translations = {
   },
   testimonials: {
     eyebrow: "창작자들의 말",
-    heading: "다른 것들을 써봤습니다. 그리고 Syllabi.ai를 들었습니다",
+    heading: "다른 것들을 써봤습니다. 그리고 Syllabi를 들었습니다",
     subheading: "오디오 우선 강의로 전환하고 다시는 돌아보지 않은 강의 제작자, 코치, 트레이너들.",
   },
   pricing: {

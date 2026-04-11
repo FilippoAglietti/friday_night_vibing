@@ -31,7 +31,7 @@ const faqs = [
       },
       {
         q: "What should I type into the course topic field?",
-        a: "Be specific. Instead of \"Photography\", try \"Portrait Photography for Beginners\" or \"Food Photography for Instagram\". A clear topic produces a tighter, more actionable curriculum.",
+        a: "Be specific. Instead of \"Photography\", try \"Portrait Photography for Beginners\" or \"Food Photography for Instagram\". A clear topic produces a tighter, more actionable course.",
       },
       {
         q: "Can I edit my course after generating?",
@@ -48,7 +48,7 @@ const faqs = [
       },
       {
         q: "Why does my generation sometimes look different from my last one?",
-        a: "AI generation has some inherent variability — this is by design. Each run produces a fresh, unique curriculum. If you want to explore different structures for the same topic, try generating multiple times.",
+        a: "AI generation has some inherent variability — this is by design. Each run produces a fresh, unique course. If you want to explore different structures for the same topic, try generating multiple times.",
       },
       {
         q: "Can I adjust the number of modules or lessons?",
@@ -56,7 +56,7 @@ const faqs = [
       },
       {
         q: "What does the 'niche' field do?",
-        a: "It scopes your course to a specific industry or context. For example, 'Data Analysis' + niche 'healthcare' produces a curriculum with healthcare data examples and use cases, rather than generic ones.",
+        a: "It scopes your course to a specific industry or context. For example, 'Data Analysis' + niche 'healthcare' produces a course with healthcare data examples and use cases, rather than generic ones.",
       },
     ],
   },
@@ -65,7 +65,7 @@ const faqs = [
     questions: [
       {
         q: "Which export formats are available?",
-        a: "Free tier: JSON only. Pro and 5-Pack: JSON, Markdown, PDF, and Notion export. Pro Max adds AI-generated audio narration, PPTX and DOCX exports, white-label branding, and shareable course links with email capture. The Notion export copies blocks you can paste directly into any Notion page.",
+        a: "All plans include JSON, Markdown, PDF, and Notion export. Pro Max adds AI-generated audio narration, PPTX and DOCX exports, white-label branding, and shareable course links with email capture. The Notion export copies blocks you can paste directly into any Notion page.",
       },
       {
         q: "Can I re-export a course I generated earlier?",
@@ -107,11 +107,11 @@ const faqs = [
       },
       {
         q: "Is there an API?",
-        a: "A public API is on our roadmap. If you're interested in early access, reach out to us at api@syllabi.ai.",
+        a: "A public API is on our roadmap. If you're interested in early access, reach out to us at api@syllabi.online.",
       },
       {
         q: "Are my generations private?",
-        a: "Yes. Your generated curricula are private to your account and not visible to other users or shared publicly.",
+        a: "Yes. Your generated courses are private to your account and not visible to other users or shared publicly.",
       },
     ],
   },
@@ -167,7 +167,7 @@ export default function SupportPage() {
         {/* Contact cards */}
         <div className="grid gap-4 sm:grid-cols-3 mb-14">
           <a
-            href="mailto:support@syllabi.ai"
+            href="mailto:support@syllabi.online"
             className="flex flex-col items-center text-center gap-3 rounded-2xl border border-border/40 bg-card/10 backdrop-blur-sm p-6 hover:shadow-lg hover:shadow-violet-500/10 hover:border-violet-500/30 transition-all duration-300 group"
           >
             <div className="flex items-center justify-center size-10 rounded-full bg-violet-500/10 border border-violet-500/20 group-hover:bg-violet-500/20 transition-colors">
@@ -175,7 +175,7 @@ export default function SupportPage() {
             </div>
             <div>
               <p className="font-semibold text-sm">Email Support</p>
-              <p className="text-xs text-muted-foreground mt-1">support@syllabi.ai</p>
+              <p className="text-xs text-muted-foreground mt-1">support@syllabi.online</p>
             </div>
           </a>
           <a
@@ -245,7 +245,7 @@ export default function SupportPage() {
             Our team typically responds within one business day.
           </p>
           <a
-            href="mailto:support@syllabi.ai"
+            href="mailto:support@syllabi.online"
             className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:shadow-xl transition-all hover:scale-[1.02] relative z-10"
           >
             <Mail className="size-4" />

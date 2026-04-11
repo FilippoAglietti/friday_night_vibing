@@ -1,7 +1,7 @@
 /**
  * lib/prompts/curriculum.ts
  * ─────────────────────────────────────────────────────────────
- * Master AI prompt factory for Syllabi.ai curriculum generation.
+ * Master AI prompt factory for Syllabi curriculum generation.
  * Output JSON matches the shared Curriculum type in types/curriculum.ts.
  * ─────────────────────────────────────────────────────────────
  */

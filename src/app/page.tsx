@@ -136,28 +136,28 @@ const steps = [
 
 const exampleCurricula = [
   {
-    title: "Machine Learning Fundamentals",
+    title: "AI-Powered Marketing: From Data to Revenue",
     modules: 8,
-    lessons: 42,
-    hours: 36,
+    lessons: 24,
+    hours: 20,
     difficulty: "Intermediate" as const,
-    tags: ["AI/ML", "Python", "Data Science"],
+    tags: ["Marketing", "AI", "Growth", "Analytics"],
   },
   {
-    title: "UX Research & Design Sprint",
-    modules: 6,
-    lessons: 28,
-    hours: 22,
+    title: "Product Design Sprint: Problem to Prototype",
+    modules: 5,
+    lessons: 15,
+    hours: 12,
     difficulty: "Beginner" as const,
-    tags: ["Design", "UX", "Research"],
+    tags: ["Design", "UX", "Product", "Workshop"],
   },
   {
-    title: "Advanced TypeScript Patterns",
-    modules: 10,
-    lessons: 55,
-    hours: 48,
+    title: "Full-Stack TypeScript Bootcamp",
+    modules: 7,
+    lessons: 21,
+    hours: 28,
     difficulty: "Advanced" as const,
-    tags: ["TypeScript", "Engineering", "Architecture"],
+    tags: ["TypeScript", "React", "Node.js", "Bootcamp"],
   },
 ];
 

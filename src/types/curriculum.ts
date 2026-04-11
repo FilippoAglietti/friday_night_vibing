@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────
-// Syllabi.ai — Shared Curriculum Types (Frontend ↔ Backend)
+// Syllabi — Shared Curriculum Types (Frontend ↔ Backend)
 // ─────────────────────────────────────────────────────────
 // This file is the CONTRACT between the frontend (page.tsx / components/)
 // and the backend (lib/ / app/api/). Do NOT change these interfaces

@@ -6,7 +6,7 @@ import { JsonLd, breadcrumbJsonLd, BREADCRUMBS } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Blog — AI Course Creation Tips & Updates",
   description:
-    "Tips, guides, and product updates for course creators using AI. Learn how to create better online courses, grow your audience, and sell your curricula.",
+    "Tips, guides, and product updates for course creators using AI. Learn how to create better online courses, grow your audience, and sell your courses.",
   alternates: { canonical: "/blog" },
   openGraph: {
     title: "Syllabi Blog — AI Course Creation Tips & Updates",
@@ -82,7 +82,7 @@ const posts = [
     readTime: "4 min read",
     title: "Introducing Notion Export: Paste Your Course Directly into Notion",
     excerpt:
-      "We're excited to launch Notion export — your entire curriculum, formatted as Notion blocks, ready to paste in one click. No more manual reformatting.",
+      "We're excited to launch Notion export — your entire course, formatted as Notion blocks, ready to paste in one click. No more manual reformatting.",
     accent: "text-violet-400",
   },
   {
@@ -92,7 +92,7 @@ const posts = [
     readTime: "6 min read",
     title: "How to Write Better Course Prompts: 7 Tips from Our Power Users",
     excerpt:
-      "The quality of your AI-generated curriculum depends heavily on what you put in. Here are seven proven strategies our top users use to get outstanding results.",
+      "The quality of your AI-generated course depends heavily on what you put in. Here are seven proven strategies our top users use to get outstanding results.",
     accent: "text-cyan-400",
   },
   {
@@ -110,9 +110,9 @@ const posts = [
     category: "Guide",
     date: "March 4, 2026",
     readTime: "7 min read",
-    title: "From Syllabus to Sale: Packaging Your Syllabi.ai Course for Platforms",
+    title: "From Syllabus to Sale: Packaging Your Syllabi Course for Platforms",
     excerpt:
-      "You've generated a great curriculum. Now what? A step-by-step guide to turning your Syllabi output into a sellable product on Teachable, Kajabi, or your own site.",
+      "You've generated a great course. Now what? A step-by-step guide to turning your Syllabi output into a sellable product on Teachable, Kajabi, or your own site.",
     accent: "text-amber-400",
   },
   {
@@ -120,7 +120,7 @@ const posts = [
     category: "Product",
     date: "February 24, 2026",
     readTime: "3 min read",
-    title: "PDF Export Is Here — Print-Ready Curricula in One Click",
+    title: "PDF Export Is Here — Print-Ready Courses in One Click",
     excerpt:
       "Share polished course outlines with clients, co-creators, and students without leaving Syllabi. Our new PDF export generates a beautifully formatted document instantly.",
     accent: "text-violet-400",
@@ -132,7 +132,7 @@ const posts = [
     readTime: "8 min read",
     title: "What Makes a Great Online Course? We Analyzed 500 Top Courses",
     excerpt:
-      "We studied 500 highly-rated online courses across categories to find common structural patterns. The results shaped how Syllabi generates curricula.",
+      "We studied 500 highly-rated online courses across categories to find common structural patterns. The results shaped how Syllabi generates courses.",
     accent: "text-cyan-400",
   },
 ];

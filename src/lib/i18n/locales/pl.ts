@@ -65,7 +65,7 @@ const pl: Translations = {
   },
   testimonials: {
     eyebrow: "Co mówią twórcy",
-    heading: "Próbowali reszty. Potem usłyszeli Syllabi.ai",
+    heading: "Próbowali reszty. Potem usłyszeli Syllabi",
     subheading: "Twórcy kursów, coachowie i trenerzy, którzy przeszli na kursy z priorytetem audio i nigdy nie wrócili.",
   },
   pricing: {

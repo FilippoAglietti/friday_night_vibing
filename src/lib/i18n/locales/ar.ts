@@ -80,7 +80,7 @@ const ar: Translations = {
   },
   testimonials: {
     eyebrow: "ماذا يقول المنشئون",
-    heading: "جرّبوا البقية. ثم سمعوا Syllabi.ai",
+    heading: "جرّبوا البقية. ثم سمعوا Syllabi",
     subheading:
       "منشئو الدورات والمدربون والمعلمون الذين تحوّلوا إلى الدورات الصوتية أولاً ولم يلتفتوا للخلف.",
   },

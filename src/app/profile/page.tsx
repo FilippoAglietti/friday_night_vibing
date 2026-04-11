@@ -218,7 +218,7 @@ function getStreak(generations: Generation[]): number {
 /** Get smart suggestions based on user's past topics */
 function getSmartSuggestions(generations: Generation[]): { title: string; reason: string }[] {
   if (generations.length === 0) {
-    return FALLBACK_SUGGESTIONS.slice(0, 4).map((s) => ({ title: s, reason: "Popular on Syllabi.ai" }));
+    return FALLBACK_SUGGESTIONS.slice(0, 4).map((s) => ({ title: s, reason: "Popular on Syllabi" }));
   }
 
   const allTopics = generations.map((g) => g.topic || g.curriculum?.title || "").filter(Boolean);
@@ -1534,7 +1534,7 @@ export default function ProfilePage() {
                         const progressPercent = hasProgress
                           ? Math.round(10 + (completedMods / totalMods) * 90)
                           : 5;
-                        const progressMessage = gen.generation_progress || "AI is crafting your curriculum";
+                        const progressMessage = gen.generation_progress || "AI is crafting your course";
 
                         return (
                           <Card key={gen.id} className="relative border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-indigo-500/3 to-violet-500/5 overflow-hidden">
@@ -1655,7 +1655,7 @@ export default function ProfilePage() {
                       const progressPercent = hasProgress
                         ? Math.round(10 + (completedMods / totalMods) * 90)
                         : 5; // indeterminate — just show a sliver
-                      const progressMessage = gen.generation_progress || "AI is crafting your curriculum";
+                      const progressMessage = gen.generation_progress || "AI is crafting your course";
 
                       return (
                         <Card key={gen.id} className="relative border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-indigo-500/3 to-violet-500/5 overflow-hidden">
@@ -1881,7 +1881,7 @@ export default function ProfilePage() {
                 </Button>
                 <p className="text-[11px] text-muted-foreground">
                   To request account deletion, please contact{" "}
-                  <a href="mailto:support@syllabi.ai" className="underline hover:text-muted-foreground transition-colors">support@syllabi.ai</a>.
+                  <a href="mailto:support@syllabi.online" className="underline hover:text-muted-foreground transition-colors">support@syllabi.online</a>.
                 </p>
               </CardContent>
             </Card>

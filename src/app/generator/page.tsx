@@ -13,13 +13,13 @@ export const metadata: Metadata = {
     "AI course generator",
     "course builder by industry",
     "online course creator",
-    "curriculum generator",
+    "course structure generator",
     "training program builder",
   ],
   openGraph: {
     title: "AI Course Generator by Industry & Role | Syllabi",
     description:
-      "Browse 30+ specialized AI course generators. Create professional curricula for any industry in under 60 seconds.",
+      "Browse 30+ specialized AI course generators. Create professional courses for any industry in under 60 seconds.",
     url: `${BASE_URL}/generator`,
     siteName: "Syllabi",
     type: "website",

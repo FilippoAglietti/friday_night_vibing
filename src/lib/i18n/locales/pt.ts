@@ -81,7 +81,7 @@ const pt: Translations = {
   },
   testimonials: {
     eyebrow: "O Que Dizem os Criadores",
-    heading: "Eles tentaram outras opções. Depois ouviram o Syllabi.ai",
+    heading: "Eles tentaram outras opções. Depois ouviram o Syllabi",
     subheading:
       "Criadores de cursos, coaches e treinadores que migraram para cursos com foco em áudio e nunca mais voltaram atrás.",
   },

@@ -65,7 +65,7 @@ const zh: Translations = {
   },
   testimonials: {
     eyebrow: "创作者的评价",
-    heading: "他们试过其他的。然后听到了 Syllabi.ai",
+    heading: "他们试过其他的。然后听到了 Syllabi",
     subheading: "转向音频优先课程并再也没有回头的课程创作者、教练和培训师。",
   },
   pricing: {

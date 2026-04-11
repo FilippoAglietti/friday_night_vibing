@@ -81,7 +81,7 @@ const es: Translations = {
   },
   testimonials: {
     eyebrow: "Lo Que Dicen los Creadores",
-    heading: "Probaron los demás. Luego escucharon Syllabi.ai",
+    heading: "Probaron los demás. Luego escucharon Syllabi",
     subheading:
       "Creadores de cursos, coaches y formadores que cambiaron a cursos de audio y nunca miraron atrás.",
   },

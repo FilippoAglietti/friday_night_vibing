@@ -80,7 +80,7 @@ const nl: Translations = {
   },
   testimonials: {
     eyebrow: "Wat Creators Zeggen",
-    heading: "Ze probeerden de rest. Toen hoorden ze Syllabi.ai",
+    heading: "Ze probeerden de rest. Toen hoorden ze Syllabi",
     subheading:
       "Cursusontwikkelaars, coaches en trainers die overstapten op audio-first cursussen en nooit meer terugkeken.",
   },

@@ -16,7 +16,7 @@ const BUILD_STEPS = [
   { icon: FileText,    text: "Writing lesson content...",           phase: "content",    duration: 5000  },
   { icon: Headphones,  text: "Preparing audio narration...",        phase: "audio",      duration: 3000  },
   { icon: Clock,       text: "Building pacing schedule...",         phase: "pacing",     duration: 2500  },
-  { icon: Sparkles,    text: "Polishing your curriculum...",        phase: "polish",     duration: 3000  },
+  { icon: Sparkles,    text: "Polishing your course...",            phase: "polish",     duration: 3000  },
 ];
 
 /* ─── Animated book page ────────────────────────────────── */

@@ -46,11 +46,20 @@ export interface CurriculumFormData {
   outputStructure: OutputStructure;
 }
 
+export interface GenerationProgress {
+  status: string;
+  progress?: string;
+  completedModules?: number;
+  totalModules?: number;
+}
+
 export interface CurriculumFormProps {
   /** Called with the generated curriculum on success */
   onGenerated?: (curriculum: Curriculum) => void;
   /** Called when generation starts */
   onLoadingChange?: (loading: boolean) => void;
+  /** Called with real-time generation progress from polling */
+  onProgressUpdate?: (progress: GenerationProgress) => void;
   /** Called when the user hits the free-tier generation limit */
   onLimitReached?: () => void;
   /** Called before submit — return false to block (e.g. for auth gate) */
@@ -72,7 +81,7 @@ const DIFFICULTY_OPTIONS: { value: DifficultyLevel; label: string; desc: string;
 const COURSE_LENGTH_OPTIONS: { value: CourseLength; label: string; desc: string; info: string; tooltip: string }[] = [
   { value: "crash", label: "Crash", desc: "~5 lessons · 1-2 modules", info: "Perfect for a quick overview or lead magnet. Covers one key outcome in a focused, bite-sized format.", tooltip: "Quick introduction or promotional course. Best for lead magnets, webinars, or teasers to larger programs." },
   { value: "short", label: "Short", desc: "8–12 lessons · 3-4 modules", info: "A solid foundation course. Great for teaching a specific skill with room to explore subtopics.", tooltip: "Comprehensive single-skill course. Ideal for bestseller-level content that teaches one topic in depth." },
-  { value: "full", label: "Full", desc: "12–18 lessons · 4-6 modules", info: "In-depth coverage balancing breadth and depth. Ideal for flagship courses your students will pay for.", tooltip: "Full curriculum course with multiple topics and applications. Perfect for flagship products with premium pricing." },
+  { value: "full", label: "Full", desc: "12–18 lessons · 4-6 modules", info: "In-depth coverage balancing breadth and depth. Ideal for flagship courses your students will pay for.", tooltip: "Full course with multiple topics and applications. Perfect for flagship products with premium pricing." },
   { value: "masterclass", label: "Masterclass", desc: "20+ lessons · 6-10 modules", info: "Comprehensive deep dive from foundation to mastery. Best for premium, high-ticket courses.", tooltip: "Premium, in-depth program from fundamentals to advanced mastery. Best for high-ticket courses and exclusive programs." },
 ];
 

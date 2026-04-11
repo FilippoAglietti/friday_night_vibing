@@ -80,7 +80,7 @@ const sv: Translations = {
   },
   testimonials: {
     eyebrow: "Vad skapare säger",
-    heading: "De provade resten. Sedan hörde de Syllabi.ai",
+    heading: "De provade resten. Sedan hörde de Syllabi",
     subheading:
       "Kursskapare, coacher och utbildare som bytte till ljudfokuserade kurser och aldrig tittade tillbaka.",
   },

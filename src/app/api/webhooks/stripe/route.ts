@@ -1,7 +1,7 @@
 /**
  * app/api/webhooks/stripe/route.ts
  * ─────────────────────────────────────────────────────────────
- * Stripe webhook handler for Syllabi.ai.
+ * Stripe webhook handler for Syllabi.
  *
  * Handles:
  *   - checkout.session.completed → upgrades user plan in Supabase

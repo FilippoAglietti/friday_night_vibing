@@ -80,7 +80,7 @@ const ja: Translations = {
   },
   testimonials: {
     eyebrow: "クリエイターの声",
-    heading: "他を試した。そしてSyllabi.aiを聴いた。",
+    heading: "他を試した。そしてSyllabiを聴いた。",
     subheading:
       "音声ファーストのコースに切り替えて後悔しなかったコースクリエーター、コーチ、トレーナーたち。",
   },

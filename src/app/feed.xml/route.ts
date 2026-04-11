@@ -18,14 +18,14 @@ const blogPosts = [
   {
     title: "Introducing Notion Export: Paste Your Course Directly into Notion",
     description:
-      "Notion export — your entire curriculum, formatted as Notion blocks, ready to paste in one click. No more manual reformatting.",
+      "Notion export — your entire course, formatted as Notion blocks, ready to paste in one click. No more manual reformatting.",
     date: "2026-03-28",
     category: "Product",
   },
   {
     title: "How to Write Better Course Prompts: 7 Tips from Our Power Users",
     description:
-      "The quality of your AI-generated curriculum depends heavily on what you put in. Seven proven strategies our top users use to get outstanding results.",
+      "The quality of your AI-generated course depends heavily on what you put in. Seven proven strategies our top users use to get outstanding results.",
     date: "2026-03-20",
     category: "Guide",
   },
@@ -44,7 +44,7 @@ const blogPosts = [
     category: "Guide",
   },
   {
-    title: "PDF Export Is Here — Print-Ready Curricula in One Click",
+    title: "PDF Export Is Here — Print-Ready Courses in One Click",
     description:
       "Share polished course outlines with clients, co-creators, and students without leaving Syllabi.",
     date: "2026-02-24",

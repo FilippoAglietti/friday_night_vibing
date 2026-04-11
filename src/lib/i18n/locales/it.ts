@@ -80,7 +80,7 @@ const it: Translations = {
   },
   testimonials: {
     eyebrow: "Cosa Dicono i Creator",
-    heading: "Hanno provato gli altri. Poi hanno ascoltato Syllabi.ai",
+    heading: "Hanno provato gli altri. Poi hanno ascoltato Syllabi",
     subheading:
       "Creator di corsi, coach e formatori che sono passati ai corsi audio e non sono più tornati indietro.",
   },

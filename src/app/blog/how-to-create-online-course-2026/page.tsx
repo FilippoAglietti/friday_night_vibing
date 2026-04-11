@@ -123,7 +123,7 @@ export default function Article() {
             <li><strong>Existing competition:</strong> Some competition is healthy &mdash; it proves demand. No competition often means no market.</li>
           </ul>
 
-          <h2>Step 2: Structure your curriculum</h2>
+          <h2>Step 2: Structure your course</h2>
           <p>
             Course structure is where most creators stall. You know your subject, but organizing it into
             a logical learning path is a different skill. This is where AI course generators have changed
@@ -131,11 +131,11 @@ export default function Article() {
           </p>
           <p>
             Tools like <Link href="/" className="text-violet-400 hover:text-violet-300 underline underline-offset-4">Syllabi</Link> can
-            generate a complete curriculum structure &mdash; modules, lessons, quizzes, learning objectives,
+            generate a complete course structure &mdash; modules, lessons, quizzes, learning objectives,
             and pacing &mdash; in under 60 seconds. You describe what you want to teach, set the difficulty
             and style, and the AI produces a professional outline that you can edit and refine.
           </p>
-          <p>A strong curriculum structure follows these principles:</p>
+          <p>A strong course structure follows these principles:</p>
           <ol>
             <li><strong>Progressive complexity:</strong> Start with foundations, build to advanced topics. Each module should assume the previous one was completed.</li>
             <li><strong>Outcome-driven modules:</strong> Each module should have clear learning objectives that students can check off.</li>
@@ -178,7 +178,7 @@ export default function Article() {
           <ul>
             <li><strong>Shareable links:</strong> The fastest option. Generate a share link and send it directly to students or embed it on your website.</li>
             <li><strong>PDF/DOCX export:</strong> For clients who prefer downloadable formats or need to distribute internally.</li>
-            <li><strong>Notion export:</strong> Paste your entire curriculum into a Notion workspace for collaborative learning environments.</li>
+            <li><strong>Notion export:</strong> Paste your entire course into a Notion workspace for collaborative learning environments.</li>
             <li><strong>LMS platforms:</strong> Upload to Teachable, Kajabi, or Thinkific if you want built-in payment processing and student management.</li>
           </ul>
 
@@ -205,7 +205,7 @@ export default function Article() {
           <h2>Ready to build your first course?</h2>
           <p>
             <Link href="/" className="text-violet-400 hover:text-violet-300 underline underline-offset-4">Try Syllabi for free</Link> and
-            generate your first curriculum in 60 seconds. No credit card required.
+            generate your first course in 60 seconds. No credit card required.
           </p>
         </div>
       </article>

@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     "course outline generator",
     "AI lesson plan generator",
     "course design tool",
-    "curriculum generator",
+    "course structure generator",
     "AI course maker",
     "create online course",
     "course creation platform",
@@ -220,7 +220,7 @@ const jsonLd = {
           "@type": "HowToStep",
           position: 1,
           name: "Choose Your Topic",
-          text: "Enter any topic — from Python programming to yoga instruction. Add an optional niche or context to focus the curriculum.",
+          text: "Enter any topic — from Python programming to yoga instruction. Add an optional niche or context to focus the course.",
           url: `${BASE_URL}/#form`,
         },
         {

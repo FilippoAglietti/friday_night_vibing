@@ -206,7 +206,7 @@ export function generateNotionHtml(c: Curriculum): string {
   }
 
   // ── Footer ──
-  parts.push(`<p><em>Generated with <a href="https://www.syllabi.online">Syllabi.ai</a> — AI-powered curriculum design</em></p>`);
+  parts.push(`<p><em>Generated with <a href="https://www.syllabi.online">Syllabi</a> — AI-powered course generator</em></p>`);
 
   return parts.join("\n");
 }

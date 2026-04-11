@@ -115,7 +115,7 @@ export default function Article() {
           <h2>The landscape in 2026</h2>
           <p>
             AI course generators have exploded in the last 18 months. What started as simple outline
-            generators have evolved into comprehensive platforms that produce structured curricula with
+            generators have evolved into comprehensive platforms that produce structured courses with
             quizzes, audio narration, and export capabilities. Here are the major players:
           </p>
           <ul>
@@ -142,7 +142,7 @@ export default function Article() {
               </tr>
             </thead>
             <tbody>
-              <FeatureRow feature="AI curriculum generation" values={[true, true, true, true]} />
+              <FeatureRow feature="AI course generation" values={[true, true, true, true]} />
               <FeatureRow feature="AI audio narration" values={[true, false, false, false]} />
               <FeatureRow feature="Quiz generation" values={[true, true, true, true]} />
               <FeatureRow feature="PDF export" values={[true, true, true, false]} />

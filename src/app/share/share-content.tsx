@@ -400,12 +400,12 @@ export default function SharePageContent() {
             </section>
           )}
 
-          {/* Detailed Curriculum */}
+          {/* Detailed Course Content */}
           {curriculum.modules && curriculum.modules.length > 0 && (
             <section className="px-4 py-16 sm:px-6 lg:px-8 bg-white/2">
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-3xl font-bold mb-8 text-violet-100">
-                  Complete Curriculum
+                  Complete Course
                 </h2>
                 <div className="space-y-4">
                   {curriculum.modules.map((module, moduleIndex) => (
@@ -550,7 +550,7 @@ export default function SharePageContent() {
             <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
             <path d="M6 12v5c3 3 9 3 12 0v-5" />
           </svg>
-          Made with Syllabi.ai
+          Made with Syllabi
         </a>
       </div>
     </div>

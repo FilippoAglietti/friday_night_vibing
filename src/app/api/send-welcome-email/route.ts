@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
     const html = generateWelcomeEmail({ email, userName });
 
     const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || "Syllabi.ai <welcome@syllabi.ai>",
+      from: process.env.RESEND_FROM_EMAIL || "Syllabi <welcome@syllabi.online>",
       to: email,
-      subject: "Welcome to Syllabi.ai — Let's Create Something Amazing! 🎓",
+      subject: "Welcome to Syllabi — Let's Create Something Amazing! 🎓",
       html,
     });
 
