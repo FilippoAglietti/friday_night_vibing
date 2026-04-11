@@ -100,8 +100,14 @@ async function callClaude(params: {
 
   // Race the stream against a hard timeout. This is the ONLY reliable
   // way to enforce time limits with the Anthropic streaming SDK.
+  //
+  // CRITICAL: The timeout timer MUST be cleared on both success and
+  // failure. If left running, it creates an unhandled promise rejection
+  // when it fires after Promise.race() has already settled — which
+  // crashes the Node.js process and kills all in-flight DB operations.
+  let timeoutId: ReturnType<typeof setTimeout>;
   const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => {
+    timeoutId = setTimeout(() => {
       controller.abort(); // also close the socket
       reject(new Error(
         `[${params.label}] Claude stream timed out after ${params.timeoutMs}ms`,
@@ -115,7 +121,9 @@ async function callClaude(params: {
       stream.finalMessage(),
       timeoutPromise,
     ]);
+    clearTimeout(timeoutId!); // Success: prevent dangling timer
   } catch (err) {
+    clearTimeout(timeoutId!); // Failure: prevent dangling timer
     // Ensure the stream is cleaned up on any error (timeout or otherwise)
     try { stream.abort(); } catch { /* ignore cleanup errors */ }
     throw err;
