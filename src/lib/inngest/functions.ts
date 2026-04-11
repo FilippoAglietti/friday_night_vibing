@@ -106,12 +106,13 @@ async function callClaude(params: {
       throw new Error(`[${params.label}] Claude returned empty response`);
     }
 
-    // Throw on max_tokens truncation so Inngest can retry with a
-    // bigger budget if we ever wire that in. For now it just
-    // surfaces in the failure log.
+    // If Claude hit the token ceiling, the JSON is likely truncated.
+    // Instead of throwing (which wastes the entire response), we warn
+    // and pass the text through — the repairTruncatedJson() strategy
+    // in parseClaudeJson will attempt to recover valid partial JSON.
     if (response.stop_reason === "max_tokens") {
-      throw new Error(
-        `[${params.label}] Claude hit max_tokens (truncated at ${params.maxTokens})`,
+      console.warn(
+        `[inngest/callClaude] [${params.label}] Response truncated (max_tokens=${params.maxTokens}). Will attempt JSON repair.`,
       );
     }
 
@@ -122,34 +123,108 @@ async function callClaude(params: {
 }
 
 /**
- * Parse a Claude JSON response, trimming any markdown code fences.
- * Throws on unparseable input so Inngest's retry logic kicks in.
+ * Repair truncated JSON by removing incomplete trailing key-value
+ * pairs and closing unclosed brackets/braces. Ported from route.ts
+ * where it has been battle-tested across 13+ iterations.
+ *
+ * This recovers valid (but potentially incomplete) JSON from Claude
+ * responses that hit the max_tokens ceiling. A truncated course
+ * with 3/5 lessons is infinitely better than a thrown error.
+ */
+function repairTruncatedJson(json: string): string {
+  let repaired = json;
+
+  // Remove trailing incomplete string value (e.g., "key": "value that got cut)
+  repaired = repaired.replace(/,\s*"[^"]*"?\s*:\s*"[^"]*$/, "");
+  // Remove trailing incomplete number/boolean (e.g., "key": 12)
+  repaired = repaired.replace(/,\s*"[^"]*"?\s*:\s*[\d.tfn][^,}\]]*$/, "");
+  // Remove trailing incomplete key (e.g., , "incomplet)
+  repaired = repaired.replace(/,\s*"[^"]*$/, "");
+  // Remove trailing comma before we close brackets (invalid JSON)
+  repaired = repaired.replace(/,\s*$/, "");
+
+  // Count unclosed brackets and braces (respecting string context)
+  let openBraces = 0;
+  let openBrackets = 0;
+  let inString = false;
+  let escapeNext = false;
+
+  for (const char of repaired) {
+    if (escapeNext) { escapeNext = false; continue; }
+    if (char === "\\") { escapeNext = true; continue; }
+    if (char === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (char === "{") openBraces++;
+    if (char === "}") openBraces--;
+    if (char === "[") openBrackets++;
+    if (char === "]") openBrackets--;
+  }
+
+  // Close any unclosed brackets and braces (brackets first, then braces)
+  while (openBrackets > 0) { repaired += "]"; openBrackets--; }
+  while (openBraces > 0) { repaired += "}"; openBraces--; }
+
+  return repaired;
+}
+
+/**
+ * Parse a Claude JSON response with 3 strategies:
+ *   1. Direct JSON.parse (happy path)
+ *   2. Extract between first { and last } (markdown/preamble stripping)
+ *   3. repairTruncatedJson (recover from max_tokens truncation)
+ *
+ * Throws on unparseable input so Inngest's retry logic kicks in,
+ * but only after all 3 strategies have been exhausted.
  */
 function parseClaudeJson<T>(raw: string, label: string): T {
   let cleaned = raw;
+
+  // Strip markdown code fences if present
   const fenceStart = cleaned.match(/^```(?:json)?\s*\n?/);
   if (fenceStart) {
     cleaned = cleaned.slice(fenceStart[0].length);
     const fenceEnd = cleaned.lastIndexOf("```");
     if (fenceEnd !== -1) cleaned = cleaned.slice(0, fenceEnd).trim();
   }
+
+  // Strategy 1: Direct parse (happy path — works ~80% of the time)
   try {
     return JSON.parse(cleaned) as T;
-  } catch (err) {
-    // Last-ditch: try to extract JSON object between first { and last }
-    const firstBrace = cleaned.indexOf("{");
-    const lastBrace = cleaned.lastIndexOf("}");
-    if (firstBrace !== -1 && lastBrace > firstBrace) {
-      try {
-        return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1)) as T;
-      } catch {
-        /* fall through to throw below */
-      }
-    }
-    throw new Error(
-      `[${label}] JSON parse failed (len=${raw.length}): ${err instanceof Error ? err.message : String(err)}`,
-    );
+  } catch {
+    /* fall through to Strategy 2 */
   }
+
+  // Strategy 2: Extract JSON between first { and last }
+  // Handles cases where Claude adds preamble text before the JSON
+  const firstBrace = cleaned.indexOf("{");
+  const lastBrace = cleaned.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    try {
+      return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1)) as T;
+    } catch {
+      /* fall through to Strategy 3 */
+    }
+  }
+
+  // Strategy 3: Repair truncated JSON (max_tokens truncation recovery)
+  // This is the critical path for non-English languages and large modules
+  // that hit the 24k token ceiling.
+  if (firstBrace !== -1) {
+    const repairedJson = repairTruncatedJson(cleaned.slice(firstBrace));
+    try {
+      const result = JSON.parse(repairedJson) as T;
+      console.warn(
+        `[inngest/parseClaudeJson] [${label}] JSON repaired after truncation — content may be incomplete but usable.`,
+      );
+      return result;
+    } catch {
+      /* fall through to throw */
+    }
+  }
+
+  throw new Error(
+    `[${label}] JSON parse failed after 3 strategies (len=${raw.length}). Response may be severely malformed.`,
+  );
 }
 
 // ─── Function 1: course.generate (skeleton + fan-out) ────────
@@ -173,11 +248,11 @@ export const courseGenerate = inngest.createFunction(
   {
     id: "course-generate",
     name: "Course: Skeleton + Fan-out",
-    // Sonnet skeleton can take 120-200s. With retries > 0, multiple
-    // attempts within a single Vercel invocation exceed the 300s
-    // maxDuration limit. retries: 0 means one attempt per invocation;
-    // Inngest still re-invokes on infrastructure failures.
-    retries: 0,
+    // Haiku 4.5 skeleton takes ~50-70s for a 10-module masterclass.
+    // With retries: 1, worst case is 70s × 2 = 140s — well within
+    // Vercel's 300s budget. This protects against transient Anthropic
+    // API errors that would otherwise kill the entire course.
+    retries: 1,
   },
   { event: "course/generate.requested" },
   async ({ event, step }) => {
@@ -202,9 +277,11 @@ export const courseGenerate = inngest.createFunction(
         model: GENERATION_MODEL,
         maxTokens: 24576,
         label: `${courseId}/skeleton`,
-        // Sonnet needs 120-200s for a masterclass skeleton.
-        // 240s leaves 60s headroom within Vercel's 300s limit.
-        timeoutMs: 240_000,
+        // Haiku 4.5 completes a masterclass skeleton in ~50-70s.
+        // 120s gives generous headroom. With retries: 1, two
+        // attempts fit comfortably within Vercel's 300s budget
+        // (120s × 2 = 240s + margin for DB writes).
+        timeoutMs: 120_000,
       });
 
       return parseClaudeJson<Curriculum>(rawText, "skeleton");
