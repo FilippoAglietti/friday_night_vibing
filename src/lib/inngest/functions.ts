@@ -304,13 +304,13 @@ export const courseGenerate = inngest.createFunction(
         model: GENERATION_MODEL,
         maxTokens: 24576,
         label: `${courseId}/skeleton`,
-        // Haiku 4.5 completes a masterclass skeleton in ~50-70s (EN)
-        // or ~80-110s (IT/non-English due to heavier tokenization).
-        // 150s gives headroom for non-English. With retries: 1, two
-        // attempts = 300s max, right at Vercel's budget — Inngest
-        // runs each retry as a separate invocation so we actually
-        // get 300s × 2.
-        timeoutMs: 150_000,
+        // Haiku 4.5 skeleton empirically takes 100-180s depending on
+        // API load and language (non-English tokenizes 20-30% heavier).
+        // 240s gives solid headroom. Each Inngest retry is a SEPARATE
+        // Vercel invocation with its own 300s budget, so 240s fits
+        // comfortably. With retries: 1 we get two independent 240s
+        // windows, not a shared 300s.
+        timeoutMs: 240_000,
       });
 
       return parseClaudeJson<Curriculum>(rawText, "skeleton");
