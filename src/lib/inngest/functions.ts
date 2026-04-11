@@ -433,7 +433,80 @@ export const moduleGenerate = inngest.createFunction(
     // to 8-10 if we ever upgrade Inngest and want single-wave runs.
     concurrency: {
       key: "event.data.courseId",
-      limit: 5,
+      // Lowered from 5 to 3 after Test H showed 3/5 modules failing
+      // in wave 1 (likely Anthropic 429 rate limits). With 3 concurrent:
+      // 10-module masterclass = 4 waves instead of 2, but each wave
+      // is reliably under the rate limit. Total time ~4 × 180s = 12min
+      // (vs stuck forever with 5 concurrent failures).
+      limit: 3,
+    },
+    // CRITICAL: onFailure runs AFTER all retries are exhausted.
+    // Without this, the generation_jobs row stays "running" forever
+    // and course.finalize is never triggered — the course stays
+    // stuck at "generating" with a partial progress count.
+    //
+    // This was the root cause of zombie modules in Test H: 8/10
+    // modules failed silently, the finalize query kept finding
+    // "running" rows, and the course never completed.
+    onFailure: async ({ event: failureEvent }) => {
+      const { courseId, moduleIndex, moduleId, totalModules } =
+        failureEvent.data.event.data;
+      const supabase = getSupabaseAdmin();
+
+      // 1. Mark the job as "failed" with the error message.
+      const errorMessage =
+        failureEvent.data.error?.message ?? "Unknown error after all retries";
+      console.error(
+        `[inngest/moduleGenerate/onFailure] [${courseId}/${moduleId}] ` +
+        `Module failed permanently: ${errorMessage}`,
+      );
+      await supabase
+        .from("generation_jobs")
+        .update({
+          status: "failed",
+          error: { message: errorMessage, failedAt: new Date().toISOString() },
+          completed_at: new Date().toISOString(),
+        })
+        .eq("course_id", courseId)
+        .eq("module_index", moduleIndex);
+
+      // 2. Bump the completed count (even for failures) so the
+      //    progress UI reflects reality. A failed module still
+      //    "completes" in the sense that it's no longer in-flight.
+      const { data: course } = await supabase
+        .from("courses")
+        .select("generation_completed_modules, generation_total_modules")
+        .eq("id", courseId)
+        .single();
+      const current = course?.generation_completed_modules ?? 0;
+      const total = course?.generation_total_modules ?? totalModules;
+      await supabase
+        .from("courses")
+        .update({
+          generation_completed_modules: current + 1,
+          generation_progress:
+            current + 1 < total
+              ? `Generated ${current + 1} of ${total} modules (${moduleId} failed)...`
+              : "Finalizing course...",
+        })
+        .eq("id", courseId);
+
+      // 3. Check if this was the last in-flight module. If yes,
+      //    trigger finalize so the course completes with whatever
+      //    modules DID succeed. A course with 7/10 modules is
+      //    infinitely better than one stuck at "generating" forever.
+      const { count } = await supabase
+        .from("generation_jobs")
+        .select("id", { count: "exact", head: true })
+        .eq("course_id", courseId)
+        .in("status", ["pending", "running"]);
+
+      if ((count ?? 0) === 0) {
+        await inngest.send({
+          name: "course/finalize.requested",
+          data: { courseId },
+        });
+      }
     },
   },
   { event: "module/generate.requested" },
