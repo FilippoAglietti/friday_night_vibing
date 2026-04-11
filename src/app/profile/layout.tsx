@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "My Profile | Syllabi",
+  title: "My Profile",
   description:
     "Manage your Syllabi account, view your generated courses, and control your subscription settings.",
   alternates: {

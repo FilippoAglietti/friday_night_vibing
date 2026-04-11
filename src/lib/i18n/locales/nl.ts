@@ -17,7 +17,7 @@ const nl: Translations = {
     subtitle:
       "AI maakt complete cursussen met audiovertelling, prachtig design en deelbare links — klaar om te onderwijzen, verkopen of delen in seconden.",
     cta: "Genereer Gratis Je Eerste Cursus",
-    secondaryCta: "Beluister een Voorbeeldcursus",
+    secondaryCta: "Bekijk een Voorbeeldcursus",
     tagline: "Geen creditcard vereist · Je eerste cursus is gratis",
   },
   problem: {

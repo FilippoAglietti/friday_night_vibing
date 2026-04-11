@@ -9,7 +9,7 @@ const ko: Translations = {
     title2: "잘 들리는",
     subtitle: "AI가 오디오 내레이션, 아름다운 디자인, 공유 링크가 포함된 완전한 강의를 생성합니다 — 몇 초 만에 가르치고, 판매하고, 공유할 준비 완료.",
     cta: "첫 번째 강의 무료 생성",
-    secondaryCta: "샘플 강의 듣기",
+    secondaryCta: "샘플 강의 보기",
     tagline: "신용카드 불필요 · 첫 번째 강의는 무료",
   },
   problem: {

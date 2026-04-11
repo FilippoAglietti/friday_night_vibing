@@ -9,7 +9,7 @@ const pl: Translations = {
     title2: "Brzmi tak dobrze, jak wygląda",
     subtitle: "AI tworzy kompletne kursy z narracją audio, pięknym designem i linkami do udostępniania — gotowe do nauczania, sprzedaży lub udostępniania w sekundach.",
     cta: "Wygeneruj swój pierwszy kurs za darmo",
-    secondaryCta: "Posłuchaj przykładowego kursu",
+    secondaryCta: "Zobacz przykładowy kurs",
     tagline: "Bez karty kredytowej · Twój pierwszy kurs jest bezpłatny",
   },
   problem: {

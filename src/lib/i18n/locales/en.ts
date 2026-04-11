@@ -17,7 +17,7 @@ const en: Translations = {
     subtitle:
       "AI creates complete courses with audio narration, beautiful design, and shareable links — ready to teach, sell, or share in seconds.",
     cta: "Generate Your First Course Free",
-    secondaryCta: "Hear a Sample Course",
+    secondaryCta: "See a Sample Course",
     tagline: "No credit card required · Your first course is free",
   },
   problem: {

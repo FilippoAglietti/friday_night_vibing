@@ -9,7 +9,7 @@ const zh: Translations = {
     title2: "看起来一样精彩",
     subtitle: "AI 创建包含音频解说、精美设计和可分享链接的完整课程 — 几秒内即可教学、销售或分享。",
     cta: "免费生成您的第一门课程",
-    secondaryCta: "试听示例课程",
+    secondaryCta: "查看示例课程",
     tagline: "无需信用卡 · 您的第一门课程免费",
   },
   problem: {

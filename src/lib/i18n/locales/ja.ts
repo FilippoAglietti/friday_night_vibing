@@ -17,7 +17,7 @@ const ja: Translations = {
     subtitle:
       "AIが音声ナレーション、美しいデザイン、共有リンク付きの完全なコースを作成 — 数秒で教えたり、販売したり、共有できます。",
     cta: "無料で最初のコースを作成",
-    secondaryCta: "サンプルコースを聴く",
+    secondaryCta: "サンプルコースを見る",
     tagline: "クレジットカード不要 · 最初のコースは無料",
   },
   problem: {

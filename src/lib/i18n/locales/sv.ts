@@ -17,7 +17,7 @@ const sv: Translations = {
     subtitle:
       "AI skapar kompletta kurser med ljudberättande, vacker design och delbara länkar — redo att lära ut, sälja eller dela på sekunder.",
     cta: "Skapa din första kurs gratis",
-    secondaryCta: "Lyssna på en exempelkurs",
+    secondaryCta: "Se en exempelkurs",
     tagline: "Inget kreditkort krävs · Din första kurs är gratis",
   },
   problem: {

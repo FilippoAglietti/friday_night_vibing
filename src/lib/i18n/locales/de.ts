@@ -17,7 +17,7 @@ const de: Translations = {
     subtitle:
       "KI erstellt vollständige Kurse mit Audio-Narration, ansprechendem Design und teilbaren Links — in Sekunden bereit zum Lehren, Verkaufen oder Teilen.",
     cta: "Ihren ersten Kurs kostenlos erstellen",
-    secondaryCta: "Beispielkurs anhören",
+    secondaryCta: "Beispielkurs ansehen",
     tagline: "Keine Kreditkarte erforderlich · Ihr erster Kurs ist kostenlos",
   },
   problem: {

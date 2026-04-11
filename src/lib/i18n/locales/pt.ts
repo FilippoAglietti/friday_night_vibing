@@ -17,7 +17,7 @@ const pt: Translations = {
     subtitle:
       "A IA cria cursos completos com narração em áudio, design bonito e links compartilháveis — prontos para ensinar, vender ou compartilhar em segundos.",
     cta: "Gere Seu Primeiro Curso Grátis",
-    secondaryCta: "Ouça um Curso de Exemplo",
+    secondaryCta: "Veja um Curso de Exemplo",
     tagline: "Sem cartão de crédito · Seu primeiro curso é gratuito",
   },
   problem: {

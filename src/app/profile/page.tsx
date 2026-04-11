@@ -162,7 +162,7 @@ const stagger = {
 
 const scaleIn = {
   initial: { opacity: 0, scale: 0.95 },
-  animate: { opacity: 1, scale: 1 },
+  animate: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
 };
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -914,7 +914,7 @@ export default function ProfilePage() {
   // ═══════════════════════════════════════════════════════════
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300" style={{ scrollSnapType: "none", height: "auto", overflow: "visible" }}>
       {/* ── Nav ───────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">

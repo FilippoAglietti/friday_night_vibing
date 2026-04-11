@@ -17,7 +17,7 @@ const tr: Translations = {
     subtitle:
       "Yapay zeka, sesli anlatım, güzel tasarım ve paylaşılabilir bağlantılarla eksiksiz kurslar oluşturur — saniyeler içinde öğretmeye, satmaya veya paylaşmaya hazır.",
     cta: "İlk Kursunuzu Ücretsiz Oluşturun",
-    secondaryCta: "Örnek Kurs Dinle",
+    secondaryCta: "Örnek Kursu Gör",
     tagline: "Kredi kartı gerekmez · İlk kursunuz ücretsiz",
   },
   problem: {

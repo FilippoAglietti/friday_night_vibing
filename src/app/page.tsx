@@ -423,7 +423,7 @@ function SectionDots({ activeSection }: { activeSection: string }) {
         <button
           key={id}
           onClick={() =>
-            document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
+            scrollToSection(id)
           }
           title={label}
           className={`section-dot ${
@@ -535,6 +535,18 @@ export default function Home() {
   // Snap scroll container — drives both snap behaviour and parallax
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Helper: scroll to a section inside the snap-scroll-container
+  const scrollToSection = useCallback((id: string) => {
+    const el = document.getElementById(id);
+    const container = containerRef.current;
+    if (el && container) {
+      const top = el.offsetTop - 56; // 56px nav height
+      container.scrollTo({ top, behavior: "smooth" });
+    } else if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
   // Parallax for ambient background — track the snap container, not window
   const { scrollY } = useScroll({ container: containerRef });
   const bgY1 = useTransform(scrollY, [0, 3000], [0, -300]);
@@ -623,7 +635,7 @@ export default function Home() {
               id="nav-cta"
               className="hidden rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all hover:scale-[1.02] sm:inline-flex"
               size="lg"
-              onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => scrollToSection('generate')}
             >
               {t("nav.getStartedFree")}
             </Button>
@@ -652,7 +664,7 @@ export default function Home() {
                 </div>
                 <Button
                   className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20"
-                  onClick={() => { setMobileMenuOpen(false); document.getElementById("generate")?.scrollIntoView({ behavior: "smooth" }); }}
+                  onClick={() => { setMobileMenuOpen(false); scrollToSection("generate"); }}
                 >
                   {t("nav.getStartedFree")}
                 </Button>
@@ -721,7 +733,7 @@ export default function Home() {
                   id="hero-cta"
                   size="lg"
                   className="h-12 xl:h-14 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 xl:px-10 text-base xl:text-lg font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
-                  onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => scrollToSection('generate')}
                 >
                   {t("hero.cta")}
                   <ArrowRight className="ml-2 size-4" />
@@ -731,7 +743,7 @@ export default function Home() {
                   variant="outline"
                   size="lg"
                   className="h-12 w-full sm:w-auto rounded-full px-8 text-base"
-                  onClick={() => document.getElementById('examples')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => scrollToSection('demo')}
                 >
                   {t("hero.secondaryCta")}
                 </Button>
@@ -756,8 +768,8 @@ export default function Home() {
         >
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -bottom-[25%] -left-[15%] h-[55vh] w-[55vh] rounded-full bg-rose-600/[0.04] blur-[100px] dark:bg-rose-500/[0.08]" />
-            <div className="absolute top-[8%] right-[3%] h-[35vh] w-[35vh] rounded-full bg-amber-500/[0.03] blur-[80px] dark:bg-amber-400/[0.05]" />
+            <div className="absolute -bottom-[25%] -left-[15%] h-[55vh] w-[55vh] rounded-full bg-rose-600/[0.06] blur-[100px] dark:bg-rose-500/[0.12]" />
+            <div className="absolute top-[8%] right-[3%] h-[35vh] w-[35vh] rounded-full bg-amber-500/[0.05] blur-[80px] dark:bg-amber-400/[0.09]" />
           </div>
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
@@ -809,8 +821,8 @@ export default function Home() {
         <section id="how-it-works" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute top-[5%] right-[0%] h-[55vh] w-[45vh] rounded-full bg-indigo-500/[0.04] blur-[100px] dark:bg-indigo-400/[0.07]" />
-            <div className="absolute bottom-[10%] left-[5%] h-[30vh] w-[30vh] rounded-full bg-cyan-500/[0.03] blur-[80px] dark:bg-cyan-400/[0.05]" />
+            <div className="absolute top-[5%] right-[0%] h-[55vh] w-[45vh] rounded-full bg-indigo-500/[0.06] blur-[100px] dark:bg-indigo-400/[0.11]" />
+            <div className="absolute bottom-[10%] left-[5%] h-[30vh] w-[30vh] rounded-full bg-cyan-500/[0.05] blur-[80px] dark:bg-cyan-400/[0.09]" />
           </div>
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
@@ -869,8 +881,8 @@ export default function Home() {
           className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20"
         >
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute top-[10%] left-[10%] h-[45vh] w-[45vh] rounded-full bg-violet-500/[0.04] blur-[100px] dark:bg-violet-400/[0.07]" />
-            <div className="absolute bottom-[15%] right-[8%] h-[30vh] w-[30vh] rounded-full bg-indigo-500/[0.03] blur-[80px] dark:bg-indigo-400/[0.05]" />
+            <div className="absolute top-[10%] left-[10%] h-[45vh] w-[45vh] rounded-full bg-violet-500/[0.06] blur-[100px] dark:bg-violet-400/[0.11]" />
+            <div className="absolute bottom-[15%] right-[8%] h-[30vh] w-[30vh] rounded-full bg-indigo-500/[0.05] blur-[80px] dark:bg-indigo-400/[0.09]" />
           </div>
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
@@ -916,7 +928,7 @@ export default function Home() {
         >
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute left-1/2 top-1/3 h-[50vh] w-[60vh] -translate-x-1/2 rounded-full bg-violet-500/[0.03] blur-[80px] dark:bg-violet-500/[0.07]" />
+            <div className="absolute left-1/2 top-1/3 h-[50vh] w-[60vh] -translate-x-1/2 rounded-full bg-violet-500/[0.05] blur-[80px] dark:bg-violet-500/[0.10]" />
           </div>
 
           <div className="mx-auto w-full max-w-3xl xl:max-w-4xl 2xl:max-w-5xl">
@@ -1029,8 +1041,8 @@ export default function Home() {
         <section id="examples" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute top-[8%] left-[3%] h-[45vh] w-[45vh] rounded-full bg-violet-500/[0.04] blur-[100px] dark:bg-violet-400/[0.07]" />
-            <div className="absolute bottom-[5%] right-[5%] h-[30vh] w-[30vh] rounded-full bg-cyan-500/[0.03] blur-[80px] dark:bg-cyan-400/[0.05]" />
+            <div className="absolute top-[8%] left-[3%] h-[45vh] w-[45vh] rounded-full bg-violet-500/[0.06] blur-[100px] dark:bg-violet-400/[0.11]" />
+            <div className="absolute bottom-[5%] right-[5%] h-[30vh] w-[30vh] rounded-full bg-cyan-500/[0.05] blur-[80px] dark:bg-cyan-400/[0.09]" />
           </div>
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
@@ -1127,8 +1139,8 @@ export default function Home() {
         <section id="testimonials" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute top-[15%] left-[8%] h-[40vh] w-[40vh] rounded-full bg-violet-500/[0.04] blur-[100px] dark:bg-violet-500/[0.07]" />
-            <div className="absolute bottom-[10%] right-[5%] h-[35vh] w-[35vh] rounded-full bg-cyan-500/[0.03] blur-[80px] dark:bg-cyan-400/[0.06]" />
+            <div className="absolute top-[15%] left-[8%] h-[40vh] w-[40vh] rounded-full bg-violet-500/[0.06] blur-[100px] dark:bg-violet-500/[0.11]" />
+            <div className="absolute bottom-[10%] right-[5%] h-[35vh] w-[35vh] rounded-full bg-cyan-500/[0.05] blur-[80px] dark:bg-cyan-400/[0.09]" />
           </div>
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
@@ -1190,8 +1202,8 @@ export default function Home() {
         <section id="pricing" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[30vh] w-[80%] rounded-full bg-violet-500/[0.03] blur-[100px] dark:bg-violet-500/[0.06]" />
-            <div className="absolute bottom-[5%] right-[10%] h-[25vh] w-[25vh] rounded-full bg-amber-500/[0.03] blur-[80px] dark:bg-amber-500/[0.05]" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[30vh] w-[80%] rounded-full bg-violet-500/[0.05] blur-[100px] dark:bg-violet-500/[0.10]" />
+            <div className="absolute bottom-[5%] right-[10%] h-[25vh] w-[25vh] rounded-full bg-amber-500/[0.05] blur-[80px] dark:bg-amber-500/[0.09]" />
           </div>
 
           <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
@@ -1265,7 +1277,7 @@ export default function Home() {
                       variant="outline"
                       className="w-full rounded-full"
                       size="lg"
-                      onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
+                      onClick={() => scrollToSection('generate')}
                     >
                       {t("pricing.getStartedFree")}
                     </Button>
@@ -1459,7 +1471,7 @@ export default function Home() {
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
-                      <Button className="w-full rounded-full" variant="outline" size="sm" onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}>
+                      <Button className="w-full rounded-full" variant="outline" size="sm" onClick={() => scrollToSection('generate')}>
                         {t("pricing.startFree")}
                       </Button>
                     </CardFooter>
@@ -1616,7 +1628,7 @@ export default function Home() {
                   id="bottom-cta"
                   size="lg"
                   className="mt-8 xl:mt-10 h-12 xl:h-14 w-full sm:w-auto rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-8 xl:px-12 text-base xl:text-lg font-semibold text-white border-0 shadow-xl shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-[1.03] active:scale-[0.98]"
-                  onClick={() => document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => scrollToSection('generate')}
                 >
                   {t("finalCta.cta")}
                   <ArrowRight className="ml-2 size-4" />
@@ -1694,8 +1706,8 @@ export default function Home() {
                 <li><Link href="/changelog" className="hover:text-foreground transition-colors">{t("footer.changelog")}</Link></li>
                 <li><Link href="/support" className="hover:text-foreground transition-colors">{t("footer.support")}</Link></li>
                 <li>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLScHZQ9cSmQwUnDnHiSPSFaRyeS1Ijh4jbnueFAJ4fdedQZdfA/viewform" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors text-violet-400 font-medium">
-                    {t("footer.feedback")}
+                  <a href="https://docs.google.com/forms/d/e/1FAIpQLScHZQ9cSmQwUnDnHiSPSFaRyeS1Ijh4jbnueFAJ4fdedQZdfA/viewform" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                    {t("footer.feedback")} ↗
                   </a>
                 </li>
               </ul>
