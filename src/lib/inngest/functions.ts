@@ -76,50 +76,69 @@ async function callClaude(params: {
 }): Promise<string> {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  // Abort if the stream stalls beyond timeoutMs. Inngest will retry
-  // on thrown AbortError, so this is the first line of defense
-  // against a stuck Anthropic connection.
+  // CRITICAL: The Anthropic SDK's AbortController integration does NOT
+  // reliably kill an in-flight stream.finalMessage() call. Once the
+  // HTTP connection is established, controller.abort() may fire the
+  // signal but finalMessage() doesn't reject — the promise hangs
+  // indefinitely as a zombie.
+  //
+  // Fix: Use Promise.race() with an explicit timeout rejection.
+  // This guarantees the function throws after timeoutMs regardless
+  // of what the SDK's stream is doing. AbortController is kept as
+  // belt-and-suspenders to also close the underlying TCP socket.
   const controller = new AbortController();
-  const timer = setTimeout(() => {
-    console.error(`[inngest/callClaude] [${params.label}] timeout after ${params.timeoutMs}ms`);
-    controller.abort();
-  }, params.timeoutMs);
 
+  const stream = anthropic.messages.stream(
+    {
+      model: params.model,
+      max_tokens: params.maxTokens,
+      system: params.system,
+      messages: params.messages,
+    },
+    { signal: controller.signal },
+  );
+
+  // Race the stream against a hard timeout. This is the ONLY reliable
+  // way to enforce time limits with the Anthropic streaming SDK.
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => {
+      controller.abort(); // also close the socket
+      reject(new Error(
+        `[${params.label}] Claude stream timed out after ${params.timeoutMs}ms`,
+      ));
+    }, params.timeoutMs);
+  });
+
+  let response: Anthropic.Message;
   try {
-    const stream = anthropic.messages.stream(
-      {
-        model: params.model,
-        max_tokens: params.maxTokens,
-        system: params.system,
-        messages: params.messages,
-      },
-      { signal: controller.signal },
-    );
-
-    const response = await stream.finalMessage();
-    clearTimeout(timer);
-
-    // Extract the first text block. Claude always returns at least
-    // one text block for these prompts.
-    const textBlock = response.content.find((b) => b.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
-      throw new Error(`[${params.label}] Claude returned empty response`);
-    }
-
-    // If Claude hit the token ceiling, the JSON is likely truncated.
-    // Instead of throwing (which wastes the entire response), we warn
-    // and pass the text through — the repairTruncatedJson() strategy
-    // in parseClaudeJson will attempt to recover valid partial JSON.
-    if (response.stop_reason === "max_tokens") {
-      console.warn(
-        `[inngest/callClaude] [${params.label}] Response truncated (max_tokens=${params.maxTokens}). Will attempt JSON repair.`,
-      );
-    }
-
-    return textBlock.text.trim();
-  } finally {
-    clearTimeout(timer);
+    response = await Promise.race([
+      stream.finalMessage(),
+      timeoutPromise,
+    ]);
+  } catch (err) {
+    // Ensure the stream is cleaned up on any error (timeout or otherwise)
+    try { stream.abort(); } catch { /* ignore cleanup errors */ }
+    throw err;
   }
+
+  // Extract the first text block. Claude always returns at least
+  // one text block for these prompts.
+  const textBlock = response.content.find((b) => b.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new Error(`[${params.label}] Claude returned empty response`);
+  }
+
+  // If Claude hit the token ceiling, the JSON is likely truncated.
+  // Instead of throwing (which wastes the entire response), we warn
+  // and pass the text through — the repairTruncatedJson() strategy
+  // in parseClaudeJson will attempt to recover valid partial JSON.
+  if (response.stop_reason === "max_tokens") {
+    console.warn(
+      `[inngest/callClaude] [${params.label}] Response truncated (max_tokens=${params.maxTokens}). Will attempt JSON repair.`,
+    );
+  }
+
+  return textBlock.text.trim();
 }
 
 /**
@@ -277,11 +296,13 @@ export const courseGenerate = inngest.createFunction(
         model: GENERATION_MODEL,
         maxTokens: 24576,
         label: `${courseId}/skeleton`,
-        // Haiku 4.5 completes a masterclass skeleton in ~50-70s.
-        // 120s gives generous headroom. With retries: 1, two
-        // attempts fit comfortably within Vercel's 300s budget
-        // (120s × 2 = 240s + margin for DB writes).
-        timeoutMs: 120_000,
+        // Haiku 4.5 completes a masterclass skeleton in ~50-70s (EN)
+        // or ~80-110s (IT/non-English due to heavier tokenization).
+        // 150s gives headroom for non-English. With retries: 1, two
+        // attempts = 300s max, right at Vercel's budget — Inngest
+        // runs each retry as a separate invocation so we actually
+        // get 300s × 2.
+        timeoutMs: 150_000,
       });
 
       return parseClaudeJson<Curriculum>(rawText, "skeleton");
