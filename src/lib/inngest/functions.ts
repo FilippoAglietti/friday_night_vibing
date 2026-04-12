@@ -678,13 +678,19 @@ export const moduleGenerate = inngest.createFunction(
         moduleIndex,
         totalModules,
       );
+      // Length-aware routing: masterclass module_detail uses Sonnet 4.6
+      // (more incisive, higher quality ceiling) with a 48k output cap
+      // (eliminates the truncation that caused 82% of masterclass failures
+      // in April 2026 dev testing) and a 240s timeout (fits Vercel 300s
+      // budget; Sonnet's median module output is 200–400s of wall clock).
+      const isMasterclass = request.length === "masterclass";
       const rawText = await callClaude({
         system,
         messages,
-        model: GENERATION_MODEL,
-        maxTokens: 24576,
+        model: isMasterclass ? "claude-sonnet-4-6" : GENERATION_MODEL,
+        maxTokens: isMasterclass ? 48_000 : 24_576,
         label: `${courseId}/module-${moduleId}`,
-        timeoutMs: 180_000,
+        timeoutMs: isMasterclass ? 240_000 : 180_000,
         courseId,
         phase: "module_detail",
       });
