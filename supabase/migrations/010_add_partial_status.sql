@@ -1,0 +1,21 @@
+-- Migration 010: add 'partial' to generation_status enum
+-- ─────────────────────────────────────────────────────────────
+-- The Inngest courseFinalize function now enforces a
+-- MIN_SUCCESS_RATIO of 0.8 on module generation. When fewer
+-- than 80% of modules succeed, the course is marked 'partial'
+-- instead of 'ready':
+--
+--   • The course is still viewable and navigable (failed modules
+--     fall back to the skeleton stub).
+--   • The user's generation quota is NOT decremented — partial
+--     courses are treated as free retries, because our pipeline
+--     failed them, not the other way around.
+--   • The UI can surface a retry affordance and a diagnostic
+--     error_message explaining which modules failed.
+--
+-- This migration adds the new enum value. Enum ALTER is
+-- non-transactional in Postgres (CANNOT run inside a BEGIN
+-- block), so this migration must run standalone.
+-- ─────────────────────────────────────────────────────────────
+
+ALTER TYPE public.generation_status ADD VALUE IF NOT EXISTS 'partial';

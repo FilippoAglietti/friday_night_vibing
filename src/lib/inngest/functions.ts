@@ -39,6 +39,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { inngest } from "./client";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { recordEvent } from "@/lib/observability/metrics";
 import {
   buildSkeletonCurriculumPrompt,
   buildModuleDetailCurriculumPrompt,
@@ -507,6 +508,14 @@ export const moduleGenerate = inngest.createFunction(
           data: { courseId },
         });
       }
+
+      recordEvent({
+        courseId,
+        moduleIndex,
+        eventType: "module_failure",
+        phase: "module_detail",
+        metadata: { moduleId, errorMessage },
+      });
     },
   },
   { event: "module/generate.requested" },
@@ -638,6 +647,14 @@ export const moduleGenerate = inngest.createFunction(
       }
     });
 
+    recordEvent({
+      courseId,
+      moduleIndex,
+      eventType: "module_success",
+      phase: "module_detail",
+      metadata: { moduleId },
+    });
+
     return { courseId, moduleIndex, moduleId, status: "done" };
   },
 );
@@ -671,8 +688,11 @@ export const courseFinalize = inngest.createFunction(
         .eq("id", courseId)
         .single();
       if (courseErr) throw new Error(`load course failed: ${courseErr.message}`);
-      // Idempotency guard: if already ready, bail out.
-      if (course?.status === "ready") {
+      // Idempotency guard: if already in a terminal state, bail out.
+      // 'partial' is a new enum value (migration 010) and may not yet
+      // be present in regenerated database.types — widen via cast.
+      const currentStatus = course?.status as string | undefined;
+      if (currentStatus === "ready" || currentStatus === "partial") {
         return { skeleton: null, jobs: [] };
       }
       const { data: jobRows, error: jobsErr } = await supabase
@@ -692,87 +712,113 @@ export const courseFinalize = inngest.createFunction(
       return { courseId, status: "already-ready" };
     }
 
-    // Step 2: merge. For each module, if the job succeeded, use
-    // the detailed result; if it failed, fall back to the skeleton
-    // stub. MIN_SUCCESS_RATIO check stays on the monolithic path —
-    // here we accept whatever we have, because the pg_cron zombie
-    // cleanup is the ultimate safety net.
-    const merged = await step.run("merge-modules", async () => {
-      const mergedModules: Module[] = skeleton.modules.map((skelMod, i) => {
-        const job = jobs.find((j) => j.module_index === i);
-        if (job?.status === "done" && job.result) {
-          // job.result is stored as Supabase Json — we narrow via unknown
-          // because the module/generate step validated it with parseClaudeJson
-          // before persisting, so the shape is trusted at runtime.
-          const detail = job.result as unknown as {
-            lessons: Module["lessons"];
-            quiz?: Module["quiz"];
-          };
-          return {
-            ...skelMod,
-            lessons: detail.lessons,
-            quiz: detail.quiz ?? [],
-          };
-        }
-        // Failed or missing: keep skeleton stub so the course is
-        // still navigable. Per-module regeneration via the dashboard
-        // lets the user fix individual modules later.
-        return skelMod;
+    // Step 2: merge + decide final status. If fewer than
+    // MIN_SUCCESS_RATIO of modules succeeded, the course is marked
+    // 'partial' (still viewable, still navigable — but flagged so
+    // the UI can show a retry affordance and the user is NOT
+    // charged a generation against their quota).
+    const { merged, successRatio, successfulCount, totalCount, finalStatus } =
+      await step.run("merge-modules", async () => {
+        const MIN_SUCCESS_RATIO = 0.8;
+        const mergedModules: Module[] = skeleton.modules.map((skelMod, i) => {
+          const job = jobs.find((j) => j.module_index === i);
+          if (job?.status === "done" && job.result) {
+            const detail = job.result as unknown as {
+              lessons: Module["lessons"];
+              quiz?: Module["quiz"];
+            };
+            return {
+              ...skelMod,
+              lessons: detail.lessons,
+              quiz: detail.quiz ?? [],
+            };
+          }
+          return skelMod;
+        });
+        const total = skeleton.modules.length;
+        const successful = jobs.filter((j) => j.status === "done").length;
+        const ratio = total === 0 ? 0 : successful / total;
+        return {
+          merged: { ...skeleton, modules: mergedModules } as Curriculum,
+          successRatio: ratio,
+          successfulCount: successful,
+          totalCount: total,
+          finalStatus: ratio >= MIN_SUCCESS_RATIO ? ("ready" as const) : ("partial" as const),
+        };
       });
-      return {
-        ...skeleton,
-        modules: mergedModules,
-      };
+
+    // Observability: fire a finalize outcome event BEFORE the
+    // mark-final-status step. Intentionally NOT inside step.run()
+    // so Inngest retries can't replay it from memoised cache.
+    recordEvent({
+      courseId,
+      eventType:
+        finalStatus === "ready" ? "course_finalize_ready" : "course_finalize_partial",
+      phase: "finalize",
+      metadata: {
+        successRatio,
+        successfulCount,
+        totalCount,
+      },
     });
 
-    // Step 3: write the final curriculum + flip status to ready.
-    await step.run("mark-ready", async () => {
+    // Step 3: write the final curriculum + flip status.
+    await step.run("mark-final-status", async () => {
+      const errorMessage =
+        finalStatus === "partial"
+          ? `Partial generation: ${successfulCount}/${totalCount} modules succeeded (${Math.round(successRatio * 100)}%). You can retry failed modules without losing your quota.`
+          : null;
       await supabase
         .from("courses")
         .update({
           curriculum: merged,
-          status: "ready",
+          // 'partial' enum value is added in migration 010 but may
+          // not be present in regenerated database.types yet — cast.
+          status: finalStatus as "ready",
+          error_message: errorMessage,
           generation_progress: null,
-          generation_completed_modules: merged.modules.length,
+          generation_completed_modules: successfulCount,
         })
         .eq("id", courseId);
     });
 
-    // Step 4: increment the user's generation counter. This was
-    // previously only done in the after() fallback path inside
-    // route.ts (updateCourseRecord). Now that ALL lengths route
-    // through Inngest, this step ensures the counter is always
-    // incremented on successful course generation.
-    await step.run("increment-usage", async () => {
-      // Fetch the user_id from the course record — it's not passed
-      // through the event chain to courseFinalize.
-      const { data: course } = await supabase
-        .from("courses")
-        .select("user_id")
-        .eq("id", courseId)
-        .single();
+    // Step 4: increment the user's generation counter — only on
+    // fully-successful generations. Partial courses are free retries
+    // so users aren't penalised for our pipeline failing them.
+    if (finalStatus === "ready") {
+      await step.run("increment-usage", async () => {
+        const { data: course } = await supabase
+          .from("courses")
+          .select("user_id")
+          .eq("id", courseId)
+          .single();
 
-      if (course?.user_id) {
-        const { error } = await supabase.rpc("increment_generation_usage", {
-          p_user_id: course.user_id,
-          p_course_id: courseId,
-          p_event_type: "course_generated",
-        });
-        if (error) {
-          // Non-fatal: generation counter is important but not worth
-          // failing the entire finalize over. Log loudly for monitoring.
-          console.error(
-            `[inngest/courseFinalize] [${courseId}] increment_generation_usage failed: ${error.message}`,
+        if (course?.user_id) {
+          const { error } = await supabase.rpc("increment_generation_usage", {
+            p_user_id: course.user_id,
+            p_course_id: courseId,
+            p_event_type: "course_generated",
+          });
+          if (error) {
+            console.error(
+              `[inngest/courseFinalize] [${courseId}] increment_generation_usage failed: ${error.message}`,
+            );
+          }
+        } else {
+          console.warn(
+            `[inngest/courseFinalize] [${courseId}] No user_id found — skipping usage increment`,
           );
         }
-      } else {
-        console.warn(
-          `[inngest/courseFinalize] [${courseId}] No user_id found — skipping usage increment`,
-        );
-      }
-    });
+      });
+    }
 
-    return { courseId, status: "ready", totalModules: merged.modules.length };
+    return {
+      courseId,
+      status: finalStatus,
+      totalModules: merged.modules.length,
+      successfulModules: successfulCount,
+      successRatio,
+    };
   },
 );
 
