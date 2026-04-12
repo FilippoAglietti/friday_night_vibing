@@ -1,7 +1,7 @@
 // ============================================================
 // SUPABASE DATABASE TYPES - AUTO-GENERATED
 // Progetto: syllabi-ai (gmxseuttpurnxbluvcwx)
-// Generato il: 2026-04-12
+// Generato il: 2026-04-12 (post migration 014)
 // NON modificare manualmente — rigenera con: supabase gen types
 // ============================================================
 
@@ -531,6 +531,70 @@ export type Database = {
           indexrelid: unknown
           schema_name: unknown
           table_name: unknown
+        }
+        Relationships: []
+      }
+      v_course_success_by_length: {
+        Row: {
+          day: string | null
+          failed: number | null
+          length: string | null
+          partial: number | null
+          ready: number | null
+          ready_pct: number | null
+          total: number | null
+          usable_pct: number | null
+        }
+        Relationships: []
+      }
+      v_error_breakdown: {
+        Row: {
+          affected_courses: number | null
+          error_key: string | null
+          event_type: string | null
+          first_seen: string | null
+          last_seen: string | null
+          occurrences: number | null
+          phase: string | null
+        }
+        Relationships: []
+      }
+      v_module_failure_distribution: {
+        Row: {
+          affected_courses: number | null
+          example_module_ids: string[] | null
+          failure_count: number | null
+          module_index: number | null
+        }
+        Relationships: []
+      }
+      v_module_latency: {
+        Row: {
+          length: string | null
+          max_ms: number | null
+          p50_ms: number | null
+          p90_ms: number | null
+          p95_ms: number | null
+          samples: number | null
+        }
+        Relationships: []
+      }
+      v_rate_limit_hourly: {
+        Row: {
+          hour: string | null
+          rate_limited: number | null
+          timed_out: number | null
+          total_failures: number | null
+        }
+        Relationships: []
+      }
+      v_truncation_by_language: {
+        Row: {
+          language: string | null
+          phase: string | null
+          total_calls: number | null
+          truncated_calls: number | null
+          truncation_pct: number | null
         }
         Relationships: []
       }
