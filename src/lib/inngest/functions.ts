@@ -240,15 +240,12 @@ function repairTruncatedJson(json: string): string {
 }
 
 /**
- * Parse a Claude JSON response with 3 strategies:
- *   1. Direct JSON.parse (happy path)
- *   2. Extract between first { and last } (markdown/preamble stripping)
- *   3. repairTruncatedJson (recover from max_tokens truncation)
- *
- * Throws on unparseable input so Inngest's retry logic kicks in,
- * but only after all 3 strategies have been exhausted.
+ * In-memory parse strategies 1–3. Returns the parsed value and the
+ * winning strategy number, or null if all three fail. Pure function:
+ * no telemetry, no LLM calls. Used both on the original Claude
+ * response and on the LLM-repaired response (strategy 4).
  */
-async function parseClaudeJson<T>(raw: string, label: string, courseId?: string): Promise<T> {
+function tryLocalParseStrategies<T>(raw: string): { value: T; strategy: 1 | 2 | 3 } | null {
   let cleaned = raw;
 
   // Strip markdown code fences if present
@@ -261,60 +258,189 @@ async function parseClaudeJson<T>(raw: string, label: string, courseId?: string)
 
   // Strategy 1: Direct parse (happy path — works ~80% of the time)
   try {
-    const result = JSON.parse(cleaned) as T;
-    await recordEvent({
-      courseId,
-      eventType: "json_parse_success",
-      metadata: { strategy: 1, label, rawLength: raw.length },
-    });
-    return result;
-  } catch {
-    /* fall through to Strategy 2 */
-  }
+    return { value: JSON.parse(cleaned) as T, strategy: 1 };
+  } catch { /* fall through */ }
 
   // Strategy 2: Extract JSON between first { and last }
   const firstBrace = cleaned.indexOf("{");
   const lastBrace = cleaned.lastIndexOf("}");
   if (firstBrace !== -1 && lastBrace > firstBrace) {
     try {
-      const result = JSON.parse(cleaned.slice(firstBrace, lastBrace + 1)) as T;
-      await recordEvent({
-        courseId,
-        eventType: "json_parse_success",
-        metadata: { strategy: 2, label, rawLength: raw.length },
-      });
-      return result;
-    } catch {
-      /* fall through to Strategy 3 */
-    }
+      return { value: JSON.parse(cleaned.slice(firstBrace, lastBrace + 1)) as T, strategy: 2 };
+    } catch { /* fall through */ }
   }
 
   // Strategy 3: Repair truncated JSON (max_tokens truncation recovery)
   if (firstBrace !== -1) {
-    const repairedJson = repairTruncatedJson(cleaned.slice(firstBrace));
     try {
-      const result = JSON.parse(repairedJson) as T;
+      return { value: JSON.parse(repairTruncatedJson(cleaned.slice(firstBrace))) as T, strategy: 3 };
+    } catch { /* fall through */ }
+  }
+
+  return null;
+}
+
+/**
+ * Strategy 4: LLM-assisted JSON repair.
+ *
+ * When all three local strategies fail, hand the malformed text back
+ * to Haiku with a strict "fix syntax only, do not change content"
+ * system prompt. Then re-run the local strategies on the response.
+ *
+ * Bounded by maxTokens 8192 + timeoutMs 60_000 — well under the
+ * 290s Vercel ceiling so it cannot starve the surrounding step.
+ *
+ * Returns null if the LLM fails to produce parseable JSON, in which
+ * case the caller throws and Inngest retries the whole step. Never
+ * throws itself — repair must be best-effort.
+ */
+async function llmRepairJson<T>(
+  raw: string,
+  label: string,
+  courseId: string | undefined,
+): Promise<{ value: T; innerStrategy: 1 | 2 | 3 } | null> {
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const startTime = Date.now();
+
+  await recordEvent({
+    courseId,
+    eventType: "json_parse_repair_attempt",
+    metadata: { label, rawLength: raw.length },
+  });
+
+  const system =
+    "You are a JSON repair tool. The user will give you a malformed JSON document. " +
+    "Output ONLY the corrected JSON — no preamble, no explanation, no markdown code fences. " +
+    "Fix syntax errors only: unescaped quotes, missing commas, missing brackets/braces, " +
+    "trailing commas, truncated values. DO NOT change, summarize, or invent any content. " +
+    "If a value is truncated mid-string, terminate it with the closing quote at the cut point. " +
+    "If trailing keys are incomplete, drop them. Preserve all complete keys and values verbatim.";
+
+  let repaired: string;
+  try {
+    const controller = new AbortController();
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        controller.abort();
+        reject(new Error(`[${label}] llmRepairJson timed out after 60000ms`));
+      }, 60_000);
+    });
+
+    const stream = anthropic.messages.stream(
+      {
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 8192,
+        system,
+        messages: [{ role: "user", content: raw }],
+      },
+      { signal: controller.signal },
+    );
+
+    let response: Anthropic.Message;
+    try {
+      response = await Promise.race([stream.finalMessage(), timeoutPromise]);
+      clearTimeout(timeoutId!);
+    } catch (err) {
+      clearTimeout(timeoutId!);
+      try { stream.abort(); } catch { /* ignore */ }
+      throw err;
+    }
+
+    const textBlock = response.content.find((b) => b.type === "text");
+    if (!textBlock || textBlock.type !== "text") {
+      console.warn(`[inngest/llmRepairJson] [${label}] empty response from repair call`);
+      return null;
+    }
+    repaired = textBlock.text.trim();
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.warn(`[inngest/llmRepairJson] [${label}] repair call failed: ${errMsg}`);
+    return null;
+  }
+
+  const result = tryLocalParseStrategies<T>(repaired);
+  if (!result) {
+    console.warn(
+      `[inngest/llmRepairJson] [${label}] repair output still unparseable (repairedLen=${repaired.length})`,
+    );
+    return null;
+  }
+
+  await recordEvent({
+    courseId,
+    eventType: "json_parse_repair_success",
+    durationMs: Date.now() - startTime,
+    metadata: {
+      label,
+      rawLength: raw.length,
+      repairedLength: repaired.length,
+      innerStrategy: result.strategy,
+    },
+  });
+
+  console.warn(
+    `[inngest/llmRepairJson] [${label}] LLM-repaired JSON parsed via inner strategy ${result.strategy}`,
+  );
+
+  return { value: result.value, innerStrategy: result.strategy };
+}
+
+/**
+ * Parse a Claude JSON response with 4 strategies:
+ *   1. Direct JSON.parse (happy path)
+ *   2. Extract between first { and last } (markdown/preamble stripping)
+ *   3. repairTruncatedJson (recover from max_tokens truncation)
+ *   4. LLM-assisted repair (strict syntax-only Haiku call)
+ *
+ * Throws on unparseable input so Inngest's retry logic kicks in,
+ * but only after all 4 strategies have been exhausted.
+ */
+async function parseClaudeJson<T>(raw: string, label: string, courseId?: string): Promise<T> {
+  const local = tryLocalParseStrategies<T>(raw);
+  if (local) {
+    await recordEvent({
+      courseId,
+      eventType: "json_parse_success",
+      metadata: {
+        strategy: local.strategy,
+        label,
+        rawLength: raw.length,
+        repaired: local.strategy === 3,
+      },
+    });
+    if (local.strategy === 3) {
       console.warn(
         `[inngest/parseClaudeJson] [${label}] JSON repaired after truncation — content may be incomplete but usable.`,
       );
-      await recordEvent({
-        courseId,
-        eventType: "json_parse_success",
-        metadata: { strategy: 3, label, rawLength: raw.length, repaired: true },
-      });
-      return result;
-    } catch {
-      /* fall through to throw */
     }
+    return local.value;
+  }
+
+  // Strategy 4: hand the malformed text to Haiku and ask it to fix the syntax.
+  const repaired = await llmRepairJson<T>(raw, label, courseId);
+  if (repaired) {
+    await recordEvent({
+      courseId,
+      eventType: "json_parse_success",
+      metadata: {
+        strategy: 4,
+        label,
+        rawLength: raw.length,
+        repairedByLlm: true,
+        innerStrategy: repaired.innerStrategy,
+      },
+    });
+    return repaired.value;
   }
 
   await recordEvent({
     courseId,
     eventType: "json_parse_failure",
-    metadata: { label, rawLength: raw.length },
+    metadata: { label, rawLength: raw.length, llmRepairAttempted: true },
   });
   throw new Error(
-    `[${label}] JSON parse failed after 3 strategies (len=${raw.length}). Response may be severely malformed.`,
+    `[${label}] JSON parse failed after 4 strategies (len=${raw.length}). Response may be severely malformed.`,
   );
 }
 

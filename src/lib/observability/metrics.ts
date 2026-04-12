@@ -30,6 +30,8 @@ export type GenerationEventType =
   | "claude_call_failure"
   | "json_parse_success"
   | "json_parse_failure"
+  | "json_parse_repair_attempt"
+  | "json_parse_repair_success"
   | "module_success"
   | "module_failure"
   | "course_finalize_ready"
