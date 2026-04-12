@@ -74,8 +74,11 @@ async function callClaude(params: {
   maxTokens: number;
   label: string;
   timeoutMs: number;
+  courseId: string;
+  phase: "skeleton" | "module_detail";
 }): Promise<string> {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const startTime = Date.now();
 
   // CRITICAL: The Anthropic SDK's AbortController integration does NOT
   // reliably kill an in-flight stream.finalMessage() call. Once the
@@ -125,10 +128,35 @@ async function callClaude(params: {
     clearTimeout(timeoutId!); // Success: prevent dangling timer
   } catch (err) {
     clearTimeout(timeoutId!); // Failure: prevent dangling timer
-    // Ensure the stream is cleaned up on any error (timeout or otherwise)
     try { stream.abort(); } catch { /* ignore cleanup errors */ }
+    const errMsg = err instanceof Error ? err.message : String(err);
+    recordEvent({
+      courseId: params.courseId,
+      eventType: "claude_call_failure",
+      phase: params.phase,
+      durationMs: Date.now() - startTime,
+      metadata: {
+        model: params.model,
+        reason: errMsg,
+        rateLimited: errMsg.includes("429") || errMsg.toLowerCase().includes("rate"),
+        timedOut: errMsg.toLowerCase().includes("timed out"),
+      },
+    });
     throw err;
   }
+
+  recordEvent({
+    courseId: params.courseId,
+    eventType: "claude_call_success",
+    phase: params.phase,
+    durationMs: Date.now() - startTime,
+    metadata: {
+      model: params.model,
+      tokensOut: response.usage?.output_tokens ?? null,
+      stopReason: response.stop_reason,
+      truncated: response.stop_reason === "max_tokens",
+    },
+  });
 
   // Extract the first text block. Claude always returns at least
   // one text block for these prompts.
@@ -137,10 +165,6 @@ async function callClaude(params: {
     throw new Error(`[${params.label}] Claude returned empty response`);
   }
 
-  // If Claude hit the token ceiling, the JSON is likely truncated.
-  // Instead of throwing (which wastes the entire response), we warn
-  // and pass the text through — the repairTruncatedJson() strategy
-  // in parseClaudeJson will attempt to recover valid partial JSON.
   if (response.stop_reason === "max_tokens") {
     console.warn(
       `[inngest/callClaude] [${params.label}] Response truncated (max_tokens=${params.maxTokens}). Will attempt JSON repair.`,
@@ -204,7 +228,7 @@ function repairTruncatedJson(json: string): string {
  * Throws on unparseable input so Inngest's retry logic kicks in,
  * but only after all 3 strategies have been exhausted.
  */
-function parseClaudeJson<T>(raw: string, label: string): T {
+function parseClaudeJson<T>(raw: string, label: string, courseId?: string): T {
   let cleaned = raw;
 
   // Strip markdown code fences if present
@@ -217,26 +241,35 @@ function parseClaudeJson<T>(raw: string, label: string): T {
 
   // Strategy 1: Direct parse (happy path — works ~80% of the time)
   try {
-    return JSON.parse(cleaned) as T;
+    const result = JSON.parse(cleaned) as T;
+    recordEvent({
+      courseId,
+      eventType: "json_parse_success",
+      metadata: { strategy: 1, label, rawLength: raw.length },
+    });
+    return result;
   } catch {
     /* fall through to Strategy 2 */
   }
 
   // Strategy 2: Extract JSON between first { and last }
-  // Handles cases where Claude adds preamble text before the JSON
   const firstBrace = cleaned.indexOf("{");
   const lastBrace = cleaned.lastIndexOf("}");
   if (firstBrace !== -1 && lastBrace > firstBrace) {
     try {
-      return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1)) as T;
+      const result = JSON.parse(cleaned.slice(firstBrace, lastBrace + 1)) as T;
+      recordEvent({
+        courseId,
+        eventType: "json_parse_success",
+        metadata: { strategy: 2, label, rawLength: raw.length },
+      });
+      return result;
     } catch {
       /* fall through to Strategy 3 */
     }
   }
 
   // Strategy 3: Repair truncated JSON (max_tokens truncation recovery)
-  // This is the critical path for non-English languages and large modules
-  // that hit the 24k token ceiling.
   if (firstBrace !== -1) {
     const repairedJson = repairTruncatedJson(cleaned.slice(firstBrace));
     try {
@@ -244,12 +277,22 @@ function parseClaudeJson<T>(raw: string, label: string): T {
       console.warn(
         `[inngest/parseClaudeJson] [${label}] JSON repaired after truncation — content may be incomplete but usable.`,
       );
+      recordEvent({
+        courseId,
+        eventType: "json_parse_success",
+        metadata: { strategy: 3, label, rawLength: raw.length, repaired: true },
+      });
       return result;
     } catch {
       /* fall through to throw */
     }
   }
 
+  recordEvent({
+    courseId,
+    eventType: "json_parse_failure",
+    metadata: { label, rawLength: raw.length },
+  });
   throw new Error(
     `[${label}] JSON parse failed after 3 strategies (len=${raw.length}). Response may be severely malformed.`,
   );
@@ -360,6 +403,8 @@ export const courseGenerate = inngest.createFunction(
         model: GENERATION_MODEL,
         maxTokens: 24576,
         label: `${courseId}/skeleton`,
+        courseId,
+        phase: "skeleton",
         // Haiku 4.5 skeleton empirically takes 100-180s depending on
         // API load and language (non-English tokenizes 20-30% heavier).
         // 240s gives solid headroom. Each Inngest retry is a SEPARATE
@@ -369,7 +414,7 @@ export const courseGenerate = inngest.createFunction(
         timeoutMs: 240_000,
       });
 
-      return parseClaudeJson<Curriculum>(rawText, "skeleton");
+      return parseClaudeJson<Curriculum>(rawText, "skeleton", courseId);
     });
 
     // Step 2: persist skeleton to courses.curriculum so the
@@ -621,10 +666,13 @@ export const moduleGenerate = inngest.createFunction(
         maxTokens: 24576,
         label: `${courseId}/module-${moduleId}`,
         timeoutMs: 180_000,
+        courseId,
+        phase: "module_detail",
       });
       return parseClaudeJson<{ lessons: Module["lessons"]; quiz: Module["quiz"] }>(
         rawText,
         `module ${moduleId}`,
+        courseId,
       );
     });
 
