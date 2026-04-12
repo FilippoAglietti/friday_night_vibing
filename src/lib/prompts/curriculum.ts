@@ -505,6 +505,8 @@ Return ONLY this JSON structure. Lessons are stubs with NO content/keyPoints/sug
   "version": "1.0.0"
 }
 
+${buildAllowlistBlock(language)}
+
 STRUCTURE RULES:
 - Each module must have 2-5 lesson STUBS (title + description + format + duration + objectives + order ONLY)
 - Module descriptions must explain the WHY — why does this module come here in the sequence? What does it build on?
@@ -647,6 +649,8 @@ For EACH lesson above, generate:
   NO restating objectives, NO "welcome to this lesson" intros, NO generic filler.
 - "suggestedResources": array of ${depth.resourcesCount} objects { "title": string, "url": string, "type": string } — REAL working URLs to authoritative sources IN THIS SPECIFIC DOMAIN (official documentation, professional organizations, peer-reviewed sources, established educational platforms). type must be one of: article, video, podcast, book, tool, documentation.
 ${quizBlock}
+
+${buildAllowlistBlock(language)}
 
 SIZE DISCIPLINE: Your entire response must produce COMPLETE, VALID JSON. A truncated response is worthless. If you feel you are running long, compress the content of later lessons rather than cutting off mid-JSON.
 
