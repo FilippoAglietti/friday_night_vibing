@@ -56,6 +56,137 @@ const LANGUAGE_NAMES: Record<string, string> = {
   hi: "Hindi", ru: "Russian", tr: "Turkish", sv: "Swedish",
 };
 
+// ─── URL allowlist ─────────────────────────────────────────────
+// Hallucinated URLs are the #1 quality defect in generated courses.
+// Claude readily invents plausible-looking URLs that 404 on real
+// domains. The allowlist steers Claude toward domains where it's
+// likely to know real paths, plus a Wikipedia-in-target-language
+// fallback that always works as an entry point for any topic.
+//
+// Tiers:
+//   1. Universal       — works for any topic in any language
+//   2. Language-native — one list per supported language, cultural fit
+//   3. Domain-specific — one list per broad field (medical, tech, etc.)
+//
+// Structure lets the prompt give Claude a decision tree rather than
+// a flat 80-domain wall.
+
+const URL_UNIVERSAL = [
+  "wikipedia.org", "archive.org", "gutenberg.org",
+  "un.org", "unesco.org", "who.int", "worldbank.org", "oecd.org", "europa.eu",
+] as const;
+
+const URL_NATIVE_BY_LANGUAGE: Record<string, readonly string[]> = {
+  en: ["britannica.com", "bbc.com", "nytimes.com", "theguardian.com"],
+  it: ["treccani.it", "corriere.it", "rai.it", "repubblica.it", "salute.gov.it", "iss.it"],
+  es: ["rae.es", "elpais.com", "bbc.com/mundo", "elmundo.es"],
+  pt: ["priberam.pt", "rtp.pt", "publico.pt"],
+  fr: ["larousse.fr", "lemonde.fr", "radiofrance.fr", "lefigaro.fr"],
+  de: ["duden.de", "spiegel.de", "zeit.de", "dwds.de", "tagesschau.de"],
+  nl: ["rijksoverheid.nl", "nos.nl", "volkskrant.nl"],
+  pl: ["encyklopedia.pwn.pl", "gazeta.pl"],
+  ja: ["kotobank.jp", "nhk.or.jp", "asahi.com", "mainichi.jp"],
+  ko: ["encykorea.aks.ac.kr", "yna.co.kr", "chosun.com"],
+  zh: ["baike.baidu.com", "xinhuanet.com", "people.com.cn"],
+  ar: ["aljazeera.net", "almaany.com", "bbc.com/arabic"],
+  hi: ["bhaskar.com", "ndtv.in", "bbc.com/hindi"],
+  ru: ["ria.ru", "tass.ru", "rbc.ru"],
+  tr: ["tdk.gov.tr", "trthaber.com", "hurriyet.com.tr"],
+  sv: ["sverigesradio.se", "svt.se", "dn.se"],
+};
+
+const URL_DOMAIN_SPECIFIC = {
+  medical_health: [
+    "pubmed.ncbi.nlm.nih.gov", "nejm.org", "thelancet.com", "bmj.com",
+    "jamanetwork.com", "cdc.gov", "nih.gov", "ecdc.europa.eu", "ema.europa.eu",
+    "escardio.org", "heart.org", "mayoclinic.org", "hopkinsmedicine.org",
+  ],
+  technology_cs: [
+    "developer.mozilla.org", "docs.python.org", "react.dev", "nextjs.org",
+    "kubernetes.io", "github.com", "stackoverflow.com",
+    "w3.org", "ietf.org", "ieee.org", "acm.org", "paperswithcode.com",
+  ],
+  business_management: [
+    "hbr.org", "mckinsey.com", "bcg.com", "bain.com", "deloitte.com",
+    "gartner.com", "forrester.com", "shrm.org", "atd.td.org",
+    "ft.com", "economist.com", "bloomberg.com", "hbs.edu",
+  ],
+  law_legal: [
+    "law.cornell.edu", "eur-lex.europa.eu", "justice.gov", "supremecourt.gov",
+  ],
+  academic_research: [
+    "arxiv.org", "biorxiv.org", "ssrn.com", "plos.org", "zenodo.org", "doaj.org",
+    "scholar.google.com", "jstor.org",
+    "nature.com", "sciencedirect.com", "cell.com", "springer.com",
+    "ocw.mit.edu", "oyc.yale.edu", "openstax.org",
+    "mit.edu", "stanford.edu", "harvard.edu", "berkeley.edu",
+    "ox.ac.uk", "cam.ac.uk", "eth.ch",
+  ],
+  humanities_philosophy: [
+    "plato.stanford.edu", "iep.utm.edu", "perseus.tufts.edu", "poetryfoundation.org",
+  ],
+  arts_museums: [
+    "metmuseum.org", "moma.org", "tate.org.uk", "louvre.fr",
+    "britishmuseum.org", "nga.gov", "smithsonianmag.com", "getty.edu",
+  ],
+  music: ["imslp.org", "allmusic.com"],
+  environment_science: [
+    "ipcc.ch", "unep.org", "nasa.gov", "noaa.gov", "esa.int",
+  ],
+  psychology: ["apa.org", "psychologytoday.com"],
+  cybersecurity: ["cve.mitre.org", "owasp.org", "nist.gov"],
+  video_education: [
+    "ted.com", "youtube.com", "coursera.org", "edx.org", "khanacademy.org",
+  ],
+} as const;
+
+function buildAllowlistBlock(language: string): string {
+  const nativeList = URL_NATIVE_BY_LANGUAGE[language] ?? URL_NATIVE_BY_LANGUAGE.en;
+  const intlOrgs = URL_UNIVERSAL.filter(
+    (d) => !["wikipedia.org", "archive.org", "gutenberg.org"].includes(d),
+  );
+  return `
+URL DISCIPLINE (CRITICAL — hallucinated URLs are the #1 quality defect):
+
+Pick every URL you cite using this priority:
+
+1. LANGUAGE-MATCHED WIKIPEDIA — always valid for any concept.
+   Use the subdomain matching this course's language:
+     en → en.wikipedia.org
+     it → it.wikipedia.org
+     ja → ja.wikipedia.org
+   (match "${language}" → ${language}.wikipedia.org — NEVER default to English Wikipedia for a non-English course)
+
+2. LANGUAGE-NATIVE AUTHORITATIVE SOURCES for this course's language (${language}):
+   ${nativeList.join(", ")}
+   Strongly prefer these over translated English sources when the concept exists in the language's intellectual tradition. At least 40% of cited resources in a non-English course should come from tier 1 or tier 2 — otherwise the course reads as translated rather than native.
+
+3. DOMAIN-SPECIFIC AUTHORITIES — pick the tier(s) matching the topic:
+   Medical/health   → ${URL_DOMAIN_SPECIFIC.medical_health.slice(0, 6).join(", ")}
+   Technology/CS    → ${URL_DOMAIN_SPECIFIC.technology_cs.slice(0, 6).join(", ")}
+   Business         → ${URL_DOMAIN_SPECIFIC.business_management.slice(0, 5).join(", ")}
+   Law              → ${URL_DOMAIN_SPECIFIC.law_legal.join(", ")}
+   Academic         → ${URL_DOMAIN_SPECIFIC.academic_research.slice(0, 6).join(", ")}
+   Humanities       → ${URL_DOMAIN_SPECIFIC.humanities_philosophy.join(", ")}
+   Arts/museums     → ${URL_DOMAIN_SPECIFIC.arts_museums.slice(0, 5).join(", ")}
+   Music            → ${URL_DOMAIN_SPECIFIC.music.join(", ")}
+   Environment      → ${URL_DOMAIN_SPECIFIC.environment_science.slice(0, 4).join(", ")}
+   Psychology       → ${URL_DOMAIN_SPECIFIC.psychology.join(", ")}
+   Cybersecurity    → ${URL_DOMAIN_SPECIFIC.cybersecurity.join(", ")}
+   Video/education  → ${URL_DOMAIN_SPECIFIC.video_education.join(", ")}
+
+4. INTERNATIONAL ORGANIZATIONS — always valid:
+   ${intlOrgs.join(", ")}
+
+RULES:
+- NEVER invent URL slugs. If you cannot name the exact page you're citing with full confidence, return the domain root (e.g. "https://pubmed.ncbi.nlm.nih.gov/") or a language-matched Wikipedia article for the concept. Both are guaranteed to work as entry points and never 404.
+- NEVER use example.com, placeholder URLs, or guessed patterns.
+- Prefer 2 working links over 5 broken ones. Under-citing is always better than over-citing with hallucinations.
+- For a course in ${language}, match Wikipedia subdomain to that language (${language}.wikipedia.org).
+- If the topic has no obvious match in tier 3, default to Wikipedia-in-target-language + one tier 4 international source. This combination always works.
+`.trim();
+}
+
 // ─── System prompt ────────────────────────────────────────────
 
 export const CURRICULUM_SYSTEM_PROMPT = `
