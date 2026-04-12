@@ -36,6 +36,9 @@ export type ResourceType =
   | "template"
   | "cheatsheet";
 
+/** Per-URL reachability status written by the async validator */
+export type UrlStatus = "ok" | "unreachable" | "blocked" | "unchecked";
+
 export type PacingStyle =
   | "self-paced"
   | "cohort"
@@ -97,6 +100,8 @@ export interface BonusResource {
   durationMinutes?: number;
   /** Is this resource free or paid? */
   isFree?: boolean;
+  /** Reachability status written by validateCourseUrls. */
+  status?: UrlStatus;
 }
 
 /** Lightweight resource suggestion attached to a lesson */
@@ -104,6 +109,9 @@ export interface SuggestedResource {
   title: string;
   url: string;
   type: string;
+  /** Reachability status written by validateCourseUrls. Undefined on
+   *  pre-validator courses; render layer treats undefined as visible. */
+  status?: UrlStatus;
 }
 
 export interface Lesson {
