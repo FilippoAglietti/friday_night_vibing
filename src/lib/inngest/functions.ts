@@ -56,6 +56,16 @@ import type {
 // for cost efficiency. Set to "claude-sonnet-4-6" for higher quality.
 const GENERATION_MODEL = process.env.GENERATION_MODEL || "claude-haiku-4-5-20251001";
 
+// ─── Anthropic pricing (USD per 1M tokens) ──────────────────
+//
+// Used only for observability metadata — never for billing logic.
+// Public Anthropic pricing as of 2026-04-12. If Anthropic changes
+// prices, update this table and the commit history will record when.
+const CLAUDE_PRICING_USD_PER_MTOK: Record<string, { input: number; output: number }> = {
+  "claude-haiku-4-5-20251001": { input: 1.00, output: 5.00 },
+  "claude-sonnet-4-6":         { input: 3.00, output: 15.00 },
+};
+
 // ─── Shared helpers ─────────────────────────────────────────
 
 /**
@@ -145,6 +155,13 @@ async function callClaude(params: {
     throw err;
   }
 
+  const pricing = CLAUDE_PRICING_USD_PER_MTOK[params.model] ?? { input: 0, output: 0 };
+  const tokensIn  = response.usage?.input_tokens  ?? 0;
+  const tokensOut = response.usage?.output_tokens ?? 0;
+  const costUsd =
+    (tokensIn  / 1_000_000) * pricing.input +
+    (tokensOut / 1_000_000) * pricing.output;
+
   recordEvent({
     courseId: params.courseId,
     eventType: "claude_call_success",
@@ -152,7 +169,9 @@ async function callClaude(params: {
     durationMs: Date.now() - startTime,
     metadata: {
       model: params.model,
-      tokensOut: response.usage?.output_tokens ?? null,
+      tokensIn,
+      tokensOut,
+      costUsd: Number(costUsd.toFixed(6)),
       stopReason: response.stop_reason,
       truncated: response.stop_reason === "max_tokens",
     },
