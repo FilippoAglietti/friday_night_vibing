@@ -38,6 +38,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { inngest } from "./client";
+import { validateCourseUrls } from "./validate-urls";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { recordEvent } from "@/lib/observability/metrics";
 import {
@@ -991,6 +992,21 @@ export const courseFinalize = inngest.createFunction(
       });
     }
 
+    // Step 5: fire async URL validation (fire-and-forget). The
+    // validator runs as its own Inngest function so finalize
+    // returns immediately and the user sees their course. URL
+    // statuses get patched onto curriculum.* after validation
+    // completes; the UI hides `unreachable` resources on the
+    // next render.
+    if (finalStatus === "ready" || finalStatus === "partial") {
+      await step.run("fire-url-validation", async () => {
+        await inngest.send({
+          name: "course/validate.requested",
+          data: { courseId },
+        });
+      });
+    }
+
     return {
       courseId,
       status: finalStatus,
@@ -1012,4 +1028,5 @@ export const inngestFunctions = [
   courseGenerate,
   moduleGenerate,
   courseFinalize,
+  validateCourseUrls,
 ];

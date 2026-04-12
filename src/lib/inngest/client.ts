@@ -78,6 +78,10 @@ type CourseFinalizeRequestedData = {
   courseId: string;
 };
 
+type CourseValidateRequestedData = {
+  courseId: string;
+};
+
 /**
  * Inngest event map. Keys are event names, values are payload shapes.
  * Adding a new event means adding a key here and a function handler
@@ -88,6 +92,7 @@ type Events = {
   "course/generate.requested": { data: CourseGenerateRequestedData };
   "module/generate.requested": { data: ModuleGenerateRequestedData };
   "course/finalize.requested": { data: CourseFinalizeRequestedData };
+  "course/validate.requested": { data: CourseValidateRequestedData };
 };
 
 /**
