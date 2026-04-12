@@ -475,42 +475,48 @@ export default function SharePageContent() {
           )}
 
           {/* Resources Section */}
-          {curriculum.bonusResources && curriculum.bonusResources.length > 0 && (
-            <section className="px-4 py-16 sm:px-6 lg:px-8">
-              <div className="max-w-4xl mx-auto">
-                <h2 className="text-3xl font-bold mb-8 text-violet-100">
-                  Resources
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {curriculum.bonusResources.map((resource, index) => (
-                    <div
-                      key={index}
-                      className="bg-gradient-to-br from-white/5 to-white/2 border border-white/10 rounded-lg p-6"
-                    >
-                      <h3 className="text-lg font-bold text-white mb-2">
-                        {resource.title}
-                      </h3>
-                      {resource.description && (
-                        <p className="text-slate-300 text-sm mb-4">
-                          {resource.description}
-                        </p>
-                      )}
-                      {resource.url && (
-                        <a
-                          href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block text-violet-400 hover:text-violet-300 text-sm font-semibold transition"
-                        >
-                          View Resource {"\u2192"}
-                        </a>
-                      )}
-                    </div>
-                  ))}
+          {(() => {
+            const visibleBonus = (curriculum.bonusResources ?? []).filter(
+              (r) => r.status !== "unreachable",
+            );
+            if (visibleBonus.length === 0) return null;
+            return (
+              <section className="px-4 py-16 sm:px-6 lg:px-8">
+                <div className="max-w-4xl mx-auto">
+                  <h2 className="text-3xl font-bold mb-8 text-violet-100">
+                    Resources
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {visibleBonus.map((resource, index) => (
+                      <div
+                        key={index}
+                        className="bg-gradient-to-br from-white/5 to-white/2 border border-white/10 rounded-lg p-6"
+                      >
+                        <h3 className="text-lg font-bold text-white mb-2">
+                          {resource.title}
+                        </h3>
+                        {resource.description && (
+                          <p className="text-slate-300 text-sm mb-4">
+                            {resource.description}
+                          </p>
+                        )}
+                        {resource.url && (
+                          <a
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block text-violet-400 hover:text-violet-300 text-sm font-semibold transition"
+                          >
+                            View Resource {"\u2192"}
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </section>
-          )}
+              </section>
+            );
+          })()}
         </>
       )}
 

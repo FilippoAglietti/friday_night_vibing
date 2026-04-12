@@ -248,35 +248,41 @@ function LessonItem({ lesson, index }: { lesson: Lesson; index: number }) {
           )}
 
           {/* Suggested resources */}
-          {lesson.suggestedResources && lesson.suggestedResources.length > 0 && (
-            <div>
-              <div className="flex items-center gap-1.5 mb-2">
-                <ExternalLink className="size-3.5 text-cyan-400" />
-                <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wide">
-                  Resources
-                </span>
+          {(() => {
+            const visibleRes = (lesson.suggestedResources ?? []).filter(
+              (r) => r.status !== "unreachable",
+            );
+            if (visibleRes.length === 0) return null;
+            return (
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <ExternalLink className="size-3.5 text-cyan-400" />
+                  <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wide">
+                    Resources
+                  </span>
+                </div>
+                <div className="space-y-1.5">
+                  {visibleRes.map((r, i) => (
+                    <a
+                      key={i}
+                      href={r.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors group/link"
+                    >
+                      <FileText className="size-3 flex-shrink-0" />
+                      <span className="group-hover/link:underline">{r.title}</span>
+                      {r.type && (
+                        <span className="text-[10px] px-1.5 py-0.5 bg-cyan-500/10 text-cyan-500 rounded">
+                          {r.type}
+                        </span>
+                      )}
+                    </a>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-1.5">
-                {lesson.suggestedResources.map((r, i) => (
-                  <a
-                    key={i}
-                    href={r.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors group/link"
-                  >
-                    <FileText className="size-3 flex-shrink-0" />
-                    <span className="group-hover/link:underline">{r.title}</span>
-                    {r.type && (
-                      <span className="text-[10px] px-1.5 py-0.5 bg-cyan-500/10 text-cyan-500 rounded">
-                        {r.type}
-                      </span>
-                    )}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       )}
     </div>

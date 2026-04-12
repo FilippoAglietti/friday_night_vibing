@@ -76,9 +76,12 @@ function toMarkdown(c: Curriculum): string {
         lines.push(`\n**Key Points:**`);
         l.keyPoints.forEach((kp) => lines.push(`- ${kp}`));
       }
-      if (l.suggestedResources && l.suggestedResources.length > 0) {
+      const visibleLessonResources = (l.suggestedResources ?? []).filter(
+        (r) => r.status !== "unreachable",
+      );
+      if (visibleLessonResources.length > 0) {
         lines.push(`\n**Suggested Resources:**`);
-        l.suggestedResources.forEach((r) => lines.push(`- [${r.title}](${r.url}) *(${r.type})*`));
+        visibleLessonResources.forEach((r) => lines.push(`- [${r.title}](${r.url}) *(${r.type})*`));
       }
       lines.push("");
     });
@@ -113,9 +116,12 @@ function toMarkdown(c: Curriculum): string {
   }
   lines.push("");
 
-  if (c.bonusResources && c.bonusResources.length > 0) {
+  const visibleBonusResources = (c.bonusResources ?? []).filter(
+    (r) => r.status !== "unreachable",
+  );
+  if (visibleBonusResources.length > 0) {
     lines.push(`## Bonus Resources`);
-    c.bonusResources.forEach((r) =>
+    visibleBonusResources.forEach((r) =>
       lines.push(`- **${r.title}** *(${r.type})*: ${r.description}`)
     );
   }
@@ -194,29 +200,35 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
                 </div>
               )}
 
-              {lesson.suggestedResources && lesson.suggestedResources.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <ExternalLink className="h-3 w-3 text-violet-500" />
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</span>
+              {(() => {
+                const visibleRes = (lesson.suggestedResources ?? []).filter(
+                  (r) => r.status !== "unreachable",
+                );
+                if (visibleRes.length === 0) return null;
+                return (
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <ExternalLink className="h-3 w-3 text-violet-500" />
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</span>
+                    </div>
+                    <ul className="space-y-1">
+                      {visibleRes.map((res, i) => (
+                        <li key={i} className="text-xs">
+                          <a
+                            href={res.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline underline-offset-2"
+                          >
+                            {res.title}
+                          </a>
+                          <span className="text-muted-foreground ml-1">({res.type})</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className="space-y-1">
-                    {lesson.suggestedResources.map((res, i) => (
-                      <li key={i} className="text-xs">
-                        <a
-                          href={res.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline underline-offset-2"
-                        >
-                          {res.title}
-                        </a>
-                        <span className="text-muted-foreground ml-1">({res.type})</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                );
+              })()}
             </div>
           )}
         </div>
@@ -691,26 +703,32 @@ export default function CurriculumOutput({
       )}
 
       {/* ── Bonus Resources ── */}
-      {curriculum.bonusResources && curriculum.bonusResources.length > 0 && (
-        <Card>
-          <CardContent className="pt-6">
-            <h2 className="font-semibold text-base mb-4">✨ Bonus Resources</h2>
-            <div className="space-y-3">
-              {curriculum.bonusResources.map((r, i) => (
-                <div key={r.id || i} className="flex items-start gap-3">
-                  <Badge variant="secondary" className="text-xs mt-0.5 shrink-0">
-                    {r.type}
-                  </Badge>
-                  <div>
-                    <p className="text-sm font-medium">{r.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{r.description}</p>
+      {(() => {
+        const visibleBonus = (curriculum.bonusResources ?? []).filter(
+          (r) => r.status !== "unreachable",
+        );
+        if (visibleBonus.length === 0) return null;
+        return (
+          <Card>
+            <CardContent className="pt-6">
+              <h2 className="font-semibold text-base mb-4">✨ Bonus Resources</h2>
+              <div className="space-y-3">
+                {visibleBonus.map((r, i) => (
+                  <div key={r.id || i} className="flex items-start gap-3">
+                    <Badge variant="secondary" className="text-xs mt-0.5 shrink-0">
+                      {r.type}
+                    </Badge>
+                    <div>
+                      <p className="text-sm font-medium">{r.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{r.description}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* ── Edit & Refine ── */}
       <Card className="border-dashed border-violet-500/20 bg-violet-500/[0.02]">
