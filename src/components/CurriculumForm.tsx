@@ -1056,7 +1056,13 @@ export default function CurriculumForm({
           </div>
 
           <p className="text-center text-xs text-muted-foreground">
-            {isSubmitting ? "Don't worry, you can leave this page and come back." : "Takes about 15–30 seconds · Your first generation is free"}
+            {isSubmitting
+              ? (!isFreeUser && form.courseLength === "masterclass")
+                ? "Masterclass courses take 10–20 minutes to generate. You can close this page — your course will appear in your profile when it's ready."
+                : "Don't worry, you can leave this page and come back."
+              : (!isFreeUser && form.courseLength === "masterclass")
+                ? "Takes 10–20 minutes · Premium quality · Your first generation is free"
+                : "Takes 1–3 minutes · Your first generation is free"}
           </p>
         </form>
       </CardContent>
