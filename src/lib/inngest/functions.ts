@@ -405,6 +405,63 @@ export const courseGenerate = inngest.createFunction(
     const request = rawRequest as GenerateRequest;
     const supabase = getSupabaseAdmin();
 
+    // Idempotency guard: reject if another generation for the same
+    // (user_id, topic, length, language) tuple is already in-flight.
+    // Catches rage-click double-submits before any Claude spend. Loads
+    // user_id from the DB rather than the event payload because the
+    // DB is canonical — a re-fired event could drift.
+    const { data: thisCourse } = await supabase
+      .from("courses")
+      .select("user_id, topic, length, language")
+      .eq("id", courseId)
+      .single();
+
+    if (thisCourse && thisCourse.user_id !== null && thisCourse.language !== null) {
+      const { data: inFlight } = await supabase
+        .from("courses")
+        .select("id, status")
+        .eq("user_id", thisCourse.user_id)
+        .eq("topic", thisCourse.topic)
+        .eq("length", thisCourse.length)
+        .eq("language", thisCourse.language)
+        .in("status", ["pending", "generating"])
+        .neq("id", courseId)
+        .limit(1)
+        .maybeSingle();
+
+      if (inFlight) {
+        console.log(
+          `[inngest/courseGenerate] [${courseId}] Idempotency: in-flight course ${inFlight.id} (${inFlight.status}) blocks duplicate`,
+        );
+        await supabase
+          .from("courses")
+          .update({
+            status: "failed",
+            error_message: `A generation for the same topic/length/language is already in progress (existing course id: ${inFlight.id}). This duplicate was rejected to prevent parallel spending.`,
+            generation_errors: [
+              {
+                moduleId: "global",
+                moduleIndex: -1,
+                phase: "global",
+                category: "duplicate",
+                reason: `duplicate of ${inFlight.id}`,
+                ts: new Date().toISOString(),
+              },
+            ],
+          })
+          .eq("id", courseId);
+
+        recordEvent({
+          courseId,
+          eventType: "course_finalize_failed",
+          phase: "global",
+          metadata: { category: "duplicate", duplicateOf: inFlight.id },
+        });
+
+        return { duplicated: true, originalCourseId: inFlight.id };
+      }
+    }
+
     // Step 1: generate skeleton. Wrapped in step.run() so Inngest
     // can resume from here if later steps fail — skeleton won't
     // be re-generated on retry (it's memoized by step ID).
