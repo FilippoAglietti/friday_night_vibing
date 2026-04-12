@@ -736,16 +736,21 @@ export const moduleGenerate = inngest.createFunction(
         moduleIndex,
         totalModules,
       );
-      // Length-aware routing: masterclass module_detail uses Sonnet 4.6
-      // (more incisive, higher quality ceiling) with a 48k output cap
-      // (eliminates the truncation that caused 82% of masterclass failures
-      // in April 2026 dev testing) and a 240s timeout (fits Vercel 300s
-      // budget; Sonnet's median module output is 200–400s of wall clock).
+      // Length-aware routing: masterclass keeps Haiku 4.5 but with a 48k
+      // output cap (eliminates the truncation that caused 82% of masterclass
+      // failures in April 2026 dev testing) and a 240s timeout.
+      //
+      // Sonnet 4.6 was tried briefly on 2026-04-12 and produced 87.5%
+      // 429 rate_limit_error under parallel fan-out because the org's
+      // Tier 1 cap is 8k output tokens/minute on Sonnet — three concurrent
+      // 48k-token requests blow the bucket instantly. Reverted to Haiku
+      // until an Anthropic tier upgrade lands; Haiku has a separate,
+      // much higher output-TPM quota that absorbs the masterclass fan-out.
       const isMasterclass = request.length === "masterclass";
       const rawText = await callClaude({
         system,
         messages,
-        model: isMasterclass ? "claude-sonnet-4-6" : GENERATION_MODEL,
+        model: GENERATION_MODEL,
         maxTokens: isMasterclass ? 48_000 : 24_576,
         label: `${courseId}/module-${moduleId}`,
         timeoutMs: isMasterclass ? 240_000 : 180_000,
