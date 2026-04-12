@@ -474,6 +474,13 @@ export const courseGenerate = inngest.createFunction(
       }).eq("id", courseId);
 
       const { system, messages } = buildSkeletonCurriculumPrompt(request);
+      // Length-aware skeleton timeout. Standard lengths complete in
+      // 100–180s on Haiku 4.5; 240s is comfortable. Masterclass
+      // skeletons are denser (8–10 modules with richer descriptions)
+      // and were observed timing out at exactly 240002ms on the
+      // 2026-04-12 smoke run — bumping to 290s gives tail-case
+      // headroom while staying 10s under Vercel's 300s function max.
+      const isMasterclass = request.length === "masterclass";
       const rawText = await callClaude({
         system,
         messages,
@@ -482,13 +489,7 @@ export const courseGenerate = inngest.createFunction(
         label: `${courseId}/skeleton`,
         courseId,
         phase: "skeleton",
-        // Haiku 4.5 skeleton empirically takes 100-180s depending on
-        // API load and language (non-English tokenizes 20-30% heavier).
-        // 240s gives solid headroom. Each Inngest retry is a SEPARATE
-        // Vercel invocation with its own 300s budget, so 240s fits
-        // comfortably. With retries: 1 we get two independent 240s
-        // windows, not a shared 300s.
-        timeoutMs: 240_000,
+        timeoutMs: isMasterclass ? 290_000 : 240_000,
       });
 
       return parseClaudeJson<Curriculum>(rawText, "skeleton", courseId);
@@ -746,10 +747,11 @@ export const moduleGenerate = inngest.createFunction(
       // expected stream time by ~25%, putting the p95 completion
       // comfortably inside the timeout.
       //
-      // Timeout: 280_000 ms — 40s more than the skeleton's 240s budget,
-      // leaving ~20s headroom against Vercel's 300s serverless ceiling.
+      // Timeout: 290_000 ms — maxes out Vercel's 300s serverless ceiling
+      // with 10s headroom for step serialization/transport overhead.
       // Each Inngest step.run is its own Vercel invocation so the whole
-      // budget goes to the Claude stream.
+      // budget goes to the Claude stream. Matches the masterclass
+      // skeleton timeout for consistency.
       //
       // History: Sonnet 4.6 was tried on 2026-04-12 and produced 87.5%
       // 429 rate_limit_error under parallel fan-out (org Tier 1 cap is
@@ -762,7 +764,7 @@ export const moduleGenerate = inngest.createFunction(
         model: GENERATION_MODEL,
         maxTokens: isMasterclass ? 36_864 : 24_576,
         label: `${courseId}/module-${moduleId}`,
-        timeoutMs: isMasterclass ? 280_000 : 180_000,
+        timeoutMs: isMasterclass ? 290_000 : 180_000,
         courseId,
         phase: "module_detail",
       });
