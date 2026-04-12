@@ -1,10 +1,10 @@
 # Syllabi — Product Hunt Launch Page Draft
 
 ## Tagline (60 chars max)
-**AI course generator with audio narration — ready in 60 seconds**
+**Syllabi — AI courses your students actually finish**
 
 ## One-liner
-Create complete online courses with modules, quizzes, AI audio narration, and export to PDF/Notion — in under a minute. No design or teaching experience needed.
+Most AI course generators give you a text dump with quizzes. Syllabi gives you audio-narrated, beautifully designed courses your learners actually want to complete. 60 seconds to generate, 16 languages, export to anything.
 
 ---
 
