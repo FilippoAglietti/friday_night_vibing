@@ -188,51 +188,6 @@ const proMaxFeatures = [
   { text: "Dedicated AI processing", included: true },
 ];
 
-const testimonials = [
-  {
-    quote: "I hit publish on my first audio course 20 minutes after signing up. My students keep telling me it feels like a real product, not an AI thing.",
-    name: "Sarah Chen",
-    role: "Leadership Coach",
-    avatar: "SC",
-    gradient: "from-violet-500 to-indigo-500",
-  },
-  {
-    quote: "The audio narration is what sold me. I shared a link with my team and they thought I'd hired a production studio. It was Syllabi in 45 seconds.",
-    name: "Marcus Rivera",
-    role: "Corporate Trainer",
-    avatar: "MR",
-    gradient: "from-cyan-500 to-blue-500",
-  },
-  {
-    quote: "I've tried CourseAI and Coursebox — they give you a text dump. Syllabi gives you something you're actually proud to share. The design is unmatched.",
-    name: "Priya Patel",
-    role: "Online Educator",
-    avatar: "PP",
-    gradient: "from-amber-500 to-orange-500",
-  },
-  {
-    quote: "Turned my sales training into a shareable course with one click. My reps listen to the audio lessons during commute. Completion rate went from 30% to 89%.",
-    name: "James Whitfield",
-    role: "VP of Sales Enablement",
-    avatar: "JW",
-    gradient: "from-emerald-500 to-teal-500",
-  },
-  {
-    quote: "I use it as a lead magnet — a free mini-course behind an email gate. 400+ signups in the first week. The ROI on €28 is insane.",
-    name: "Elena Vasquez",
-    role: "Digital Marketing Consultant",
-    avatar: "EV",
-    gradient: "from-rose-500 to-pink-500",
-  },
-  {
-    quote: "My Notion export is gorgeous. I embed courses directly in my client workspaces. They think I spent weeks on it. I spent 60 seconds.",
-    name: "David Kim",
-    role: "Freelance Course Designer",
-    avatar: "DK",
-    gradient: "from-indigo-500 to-purple-500",
-  },
-];
-
 /* ─── Course Templates ─────────────────────────────────── */
 
 const courseTemplates: {
@@ -397,7 +352,7 @@ function AnimateInView({
 
 /* ─── Section Meta ────────────────────────────────────── */
 
-const SECTION_IDS = ["hero", "problem-solution", "how-it-works", "demo", "generate", "examples", "testimonials", "pricing", "final-cta"];
+const SECTION_IDS = ["hero", "problem-solution", "how-it-works", "demo", "generate", "examples", "pricing", "final-cta"];
 
 /* ─── Section Dots ────────────────────────────────────── */
 
@@ -410,7 +365,6 @@ function SectionDots({ activeSection }: { activeSection: string }) {
     { id: "demo",             label: "See It in Action"          },
     { id: "generate",         label: t("sections.tryItNow")      },
     { id: "examples",         label: t("sections.examples")      },
-    { id: "testimonials",     label: t("sections.testimonials")  },
     { id: "pricing",          label: t("sections.pricing")       },
     { id: "final-cta",        label: t("sections.getStarted")    },
   ];
@@ -1125,69 +1079,6 @@ export default function Home() {
                           {t}
                         </Badge>
                       ))}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimateInView>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════
-            TESTIMONIALS
-        ═══════════════════════════════════════════════════ */}
-        <section id="testimonials" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
-          {/* Section-specific accent */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute top-[15%] left-[8%] h-[40vh] w-[40vh] rounded-full bg-violet-500/[0.06] blur-[100px] dark:bg-violet-500/[0.11]" />
-            <div className="absolute bottom-[10%] right-[5%] h-[35vh] w-[35vh] rounded-full bg-cyan-500/[0.05] blur-[80px] dark:bg-cyan-400/[0.09]" />
-          </div>
-
-          <div className="mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] w-full">
-            <AnimateInView containerRef={containerRef} amount={0.2} variants={stagger} className="text-center mb-8 md:mb-16">
-              <motion.p
-                variants={fadeUp}
-                className="text-sm font-semibold uppercase tracking-widest text-violet-500"
-              >
-                {t("testimonials.eyebrow")}
-              </motion.p>
-              <motion.h2
-                variants={fadeUp}
-                className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl xl:text-5xl"
-              >
-                {t("testimonials.heading")}
-              </motion.h2>
-              <motion.p
-                variants={fadeUp}
-                className="mx-auto mt-4 max-w-2xl text-muted-foreground"
-              >
-                {t("testimonials.subheading")}
-              </motion.p>
-            </AnimateInView>
-
-            <AnimateInView containerRef={containerRef} amount={0.1} variants={stagger} className="grid gap-4 md:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:gap-8">
-              {testimonials.map((testimonial, i) => (
-                <motion.div key={i} variants={scaleUp}>
-                  <div className="relative flex flex-col h-full p-6 xl:p-8 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/20 hover:bg-card/50">
-                    {/* Quote icon */}
-                    <div className="mb-4">
-                      <MessageCircle className="size-5 text-violet-500/40" />
-                    </div>
-
-                    {/* Quote text */}
-                    <p className="flex-1 text-sm leading-relaxed text-foreground/80 xl:text-base">
-                      &ldquo;{testimonial.quote}&rdquo;
-                    </p>
-
-                    {/* Author */}
-                    <div className="mt-6 flex items-center gap-3">
-                      <div className={`flex size-10 items-center justify-center rounded-full bg-gradient-to-br ${testimonial.gradient} text-xs font-bold text-white`}>
-                        {testimonial.avatar}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold">{testimonial.name}</p>
-                        <p className="text-xs text-muted-foreground">{testimonial.role}</p>
-                      </div>
                     </div>
                   </div>
                 </motion.div>
