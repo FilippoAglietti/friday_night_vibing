@@ -356,7 +356,13 @@ const SECTION_IDS = ["hero", "problem-solution", "how-it-works", "demo", "genera
 
 /* ─── Section Dots ────────────────────────────────────── */
 
-function SectionDots({ activeSection }: { activeSection: string }) {
+function SectionDots({
+  activeSection,
+  scrollToSection,
+}: {
+  activeSection: string;
+  scrollToSection: (id: string) => void;
+}) {
   const { t } = useTranslation();
   const sectionMeta = [
     { id: "hero",             label: t("sections.hero")          },
@@ -515,7 +521,7 @@ export default function Home() {
       <ScrollProgress container={containerRef} />
 
       {/* ── Section Navigation Dots ─────────────────────── */}
-      <SectionDots activeSection={activeSection} />
+      <SectionDots activeSection={activeSection} scrollToSection={scrollToSection} />
 
       {/* ── Ambient Gradient Background with Parallax ──── */}
       <div

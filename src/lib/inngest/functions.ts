@@ -688,11 +688,7 @@ export const courseFinalize = inngest.createFunction(
         .eq("id", courseId)
         .single();
       if (courseErr) throw new Error(`load course failed: ${courseErr.message}`);
-      // Idempotency guard: if already in a terminal state, bail out.
-      // 'partial' is a new enum value (migration 010) and may not yet
-      // be present in regenerated database.types — widen via cast.
-      const currentStatus = course?.status as string | undefined;
-      if (currentStatus === "ready" || currentStatus === "partial") {
+      if (course?.status === "ready" || course?.status === "partial") {
         return { skeleton: null, jobs: [] };
       }
       const { data: jobRows, error: jobsErr } = await supabase
@@ -772,9 +768,7 @@ export const courseFinalize = inngest.createFunction(
         .from("courses")
         .update({
           curriculum: merged,
-          // 'partial' enum value is added in migration 010 but may
-          // not be present in regenerated database.types yet — cast.
-          status: finalStatus as "ready",
+          status: finalStatus,
           error_message: errorMessage,
           generation_progress: null,
           generation_completed_modules: successfulCount,

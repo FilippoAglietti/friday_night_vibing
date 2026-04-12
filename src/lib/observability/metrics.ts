@@ -16,6 +16,7 @@
  */
 
 import { getSupabaseAdmin } from "@/lib/supabase";
+import type { Json } from "@/types/database.types";
 
 export type GenerationEventType =
   | "claude_call_success"
@@ -44,12 +45,7 @@ export interface RecordEventInput {
 }
 
 export function recordEvent(input: RecordEventInput): void {
-  // database.types.ts is regenerated from Supabase and does not
-  // yet include generation_events (migration 011). Casting here
-  // keeps the helper isolated from the rest of the codebase —
-  // when types are regenerated, this cast can be removed.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabase = getSupabaseAdmin() as any;
+  const supabase = getSupabaseAdmin();
   void supabase
     .from("generation_events")
     .insert({
@@ -58,10 +54,9 @@ export function recordEvent(input: RecordEventInput): void {
       event_type: input.eventType,
       phase: input.phase ?? null,
       duration_ms: input.durationMs ?? null,
-      metadata: input.metadata ?? {},
+      metadata: (input.metadata ?? {}) as Json,
     })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .then(({ error }: { error: any }) => {
+    .then(({ error }) => {
       if (error) {
         console.error(
           `[observability] recordEvent(${input.eventType}) failed: ${error.message}`,

@@ -1,7 +1,7 @@
 // ============================================================
 // SUPABASE DATABASE TYPES - AUTO-GENERATED
 // Progetto: syllabi-ai (gmxseuttpurnxbluvcwx)
-// Generato il: 2026-04-09
+// Generato il: 2026-04-12
 // NON modificare manualmente — rigenera con: supabase gen types
 // ============================================================
 
@@ -124,6 +124,47 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generation_events: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          duration_ms: number | null
+          event_type: string
+          id: number
+          metadata: Json
+          module_index: number | null
+          phase: string | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          event_type: string
+          id?: number
+          metadata?: Json
+          module_index?: number | null
+          phase?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          event_type?: string
+          id?: number
+          metadata?: Json
+          module_index?: number | null
+          phase?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_events_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
         ]
@@ -577,7 +618,12 @@ export type Database = {
     Enums: {
       content_type: "text" | "audio" | "video" | "mixed"
       course_level: "beginner" | "intermediate" | "advanced"
-      generation_status: "pending" | "generating" | "ready" | "failed"
+      generation_status:
+        | "pending"
+        | "generating"
+        | "ready"
+        | "failed"
+        | "partial"
       plan_type: "free" | "pro" | "team" | "pro_max"
       subscription_status:
         | "active"
@@ -714,7 +760,13 @@ export const Constants = {
     Enums: {
       content_type: ["text", "audio", "video", "mixed"],
       course_level: ["beginner", "intermediate", "advanced"],
-      generation_status: ["pending", "generating", "ready", "failed"],
+      generation_status: [
+        "pending",
+        "generating",
+        "ready",
+        "failed",
+        "partial",
+      ],
       plan_type: ["free", "pro", "team", "pro_max"],
       subscription_status: [
         "active",
