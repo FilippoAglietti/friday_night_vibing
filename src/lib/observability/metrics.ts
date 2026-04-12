@@ -1,11 +1,18 @@
 /**
  * lib/observability/metrics.ts
  * ─────────────────────────────────────────────────────────────
- * Fire-and-forget telemetry for the course generation pipeline.
+ * Awaited telemetry for the course generation pipeline.
  *
  * Writes land in public.generation_events (migration 011). The
  * helper NEVER throws: if the insert fails, we log and swallow
  * so that observability can never take down a generation.
+ *
+ * Awaited (not fire-and-forget) because Vercel serverless freezes
+ * the function instance the moment the handler returns — any
+ * pending promise is discarded before the Supabase HTTP POST can
+ * drain. The pre-await version wrote 0 rows in production over
+ * 24h. Callers MUST `await recordEvent(...)`; the ~30-100ms cost
+ * per call is cheap compared to losing all observability.
  *
  * CRITICAL: Do NOT call recordEvent from inside Inngest
  * step.run() blocks. Step results are memoised by Inngest on
@@ -44,9 +51,9 @@ export interface RecordEventInput {
   metadata?: Record<string, unknown>;
 }
 
-export function recordEvent(input: RecordEventInput): void {
+export async function recordEvent(input: RecordEventInput): Promise<void> {
   const supabase = getSupabaseAdmin();
-  void supabase
+  const { error } = await supabase
     .from("generation_events")
     .insert({
       course_id: input.courseId ?? null,
@@ -55,12 +62,10 @@ export function recordEvent(input: RecordEventInput): void {
       phase: input.phase ?? null,
       duration_ms: input.durationMs ?? null,
       metadata: (input.metadata ?? {}) as Json,
-    })
-    .then(({ error }) => {
-      if (error) {
-        console.error(
-          `[observability] recordEvent(${input.eventType}) failed: ${error.message}`,
-        );
-      }
     });
+  if (error) {
+    console.error(
+      `[observability] recordEvent(${input.eventType}) failed: ${error.message}`,
+    );
+  }
 }

@@ -141,7 +141,7 @@ async function callClaude(params: {
     clearTimeout(timeoutId!); // Failure: prevent dangling timer
     try { stream.abort(); } catch { /* ignore cleanup errors */ }
     const errMsg = err instanceof Error ? err.message : String(err);
-    recordEvent({
+    await recordEvent({
       courseId: params.courseId,
       eventType: "claude_call_failure",
       phase: params.phase,
@@ -163,7 +163,7 @@ async function callClaude(params: {
     (tokensIn  / 1_000_000) * pricing.input +
     (tokensOut / 1_000_000) * pricing.output;
 
-  recordEvent({
+  await recordEvent({
     courseId: params.courseId,
     eventType: "claude_call_success",
     phase: params.phase,
@@ -248,7 +248,7 @@ function repairTruncatedJson(json: string): string {
  * Throws on unparseable input so Inngest's retry logic kicks in,
  * but only after all 3 strategies have been exhausted.
  */
-function parseClaudeJson<T>(raw: string, label: string, courseId?: string): T {
+async function parseClaudeJson<T>(raw: string, label: string, courseId?: string): Promise<T> {
   let cleaned = raw;
 
   // Strip markdown code fences if present
@@ -262,7 +262,7 @@ function parseClaudeJson<T>(raw: string, label: string, courseId?: string): T {
   // Strategy 1: Direct parse (happy path — works ~80% of the time)
   try {
     const result = JSON.parse(cleaned) as T;
-    recordEvent({
+    await recordEvent({
       courseId,
       eventType: "json_parse_success",
       metadata: { strategy: 1, label, rawLength: raw.length },
@@ -278,7 +278,7 @@ function parseClaudeJson<T>(raw: string, label: string, courseId?: string): T {
   if (firstBrace !== -1 && lastBrace > firstBrace) {
     try {
       const result = JSON.parse(cleaned.slice(firstBrace, lastBrace + 1)) as T;
-      recordEvent({
+      await recordEvent({
         courseId,
         eventType: "json_parse_success",
         metadata: { strategy: 2, label, rawLength: raw.length },
@@ -297,7 +297,7 @@ function parseClaudeJson<T>(raw: string, label: string, courseId?: string): T {
       console.warn(
         `[inngest/parseClaudeJson] [${label}] JSON repaired after truncation — content may be incomplete but usable.`,
       );
-      recordEvent({
+      await recordEvent({
         courseId,
         eventType: "json_parse_success",
         metadata: { strategy: 3, label, rawLength: raw.length, repaired: true },
@@ -308,7 +308,7 @@ function parseClaudeJson<T>(raw: string, label: string, courseId?: string): T {
     }
   }
 
-  recordEvent({
+  await recordEvent({
     courseId,
     eventType: "json_parse_failure",
     metadata: { label, rawLength: raw.length },
@@ -392,7 +392,7 @@ export const courseGenerate = inngest.createFunction(
         })
         .eq("id", courseId);
 
-      recordEvent({
+      await recordEvent({
         courseId,
         eventType: "course_finalize_failed",
         phase: "skeleton",
@@ -452,7 +452,7 @@ export const courseGenerate = inngest.createFunction(
           })
           .eq("id", courseId);
 
-        recordEvent({
+        await recordEvent({
           courseId,
           eventType: "course_finalize_failed",
           phase: "global",
@@ -686,7 +686,7 @@ export const moduleGenerate = inngest.createFunction(
         });
       }
 
-      recordEvent({
+      await recordEvent({
         courseId,
         moduleIndex,
         eventType: "module_failure",
@@ -833,7 +833,7 @@ export const moduleGenerate = inngest.createFunction(
       }
     });
 
-    recordEvent({
+    await recordEvent({
       courseId,
       moduleIndex,
       eventType: "module_success",
@@ -932,7 +932,7 @@ export const courseFinalize = inngest.createFunction(
     // Observability: fire a finalize outcome event BEFORE the
     // mark-final-status step. Intentionally NOT inside step.run()
     // so Inngest retries can't replay it from memoised cache.
-    recordEvent({
+    await recordEvent({
       courseId,
       eventType:
         finalStatus === "ready" ? "course_finalize_ready" : "course_finalize_partial",
