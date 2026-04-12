@@ -255,6 +255,16 @@ function parseClaudeJson<T>(raw: string, label: string): T {
   );
 }
 
+type SkeletonErrorCategory = "timeout" | "rate_limit" | "parse_failure" | "unknown";
+
+function classifySkeletonError(message: string): SkeletonErrorCategory {
+  const lower = message.toLowerCase();
+  if (lower.includes("timed out") || lower.includes("timeout")) return "timeout";
+  if (lower.includes("429") || lower.includes("rate limit") || lower.includes("rate_limit")) return "rate_limit";
+  if (lower.includes("json parse failed") || lower.includes("unexpected token")) return "parse_failure";
+  return "unknown";
+}
+
 // ─── Function 1: course.generate (skeleton + fan-out) ────────
 
 /**
@@ -281,6 +291,51 @@ export const courseGenerate = inngest.createFunction(
     // Vercel's 300s budget. This protects against transient Anthropic
     // API errors that would otherwise kill the entire course.
     retries: 1,
+    // CRITICAL: onFailure runs AFTER all retries are exhausted.
+    // Without this, the skeleton path zombies — courses sit in
+    // 'generating' with total_modules=0 until pg_cron cleans them
+    // up with the generic "stuck in generating" error. Mirrors
+    // moduleGenerate.onFailure but adapted for the pre-fan-out
+    // state (no generation_jobs rows exist yet).
+    onFailure: async ({ event: failureEvent }) => {
+      const { courseId } = failureEvent.data.event.data;
+      const supabase = getSupabaseAdmin();
+
+      const rawMessage =
+        failureEvent.data.error?.message ?? "Unknown error after all retries";
+      const category = classifySkeletonError(rawMessage);
+
+      console.error(
+        `[inngest/courseGenerate/onFailure] [${courseId}] ` +
+        `Skeleton failed permanently (${category}): ${rawMessage}`,
+      );
+
+      await supabase
+        .from("courses")
+        .update({
+          status: "failed",
+          error_message: `[skeleton/${category}] ${rawMessage}`,
+          generation_progress: null,
+          generation_errors: [
+            {
+              moduleId: "skeleton",
+              moduleIndex: -1,
+              phase: "skeleton",
+              category,
+              reason: rawMessage,
+              ts: new Date().toISOString(),
+            },
+          ],
+        })
+        .eq("id", courseId);
+
+      recordEvent({
+        courseId,
+        eventType: "course_finalize_failed",
+        phase: "skeleton",
+        metadata: { category, reason: rawMessage },
+      });
+    },
   },
   { event: "course/generate.requested" },
   async ({ event, step }) => {
