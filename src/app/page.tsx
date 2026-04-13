@@ -181,7 +181,7 @@ const proPlanFeatures = [
 const proMaxFeatures = [
   { text: "Everything in Pro", included: true },
   { text: "AI-generated audio lessons", included: true },
-  { text: "Full chapter content generation", included: true },
+  { text: "Commercial license for sold courses", included: true },
   { text: "Premium Notion & PDF export", included: true },
   { text: "Sell-ready course packages", included: true },
   { text: "White-label branding", included: true },

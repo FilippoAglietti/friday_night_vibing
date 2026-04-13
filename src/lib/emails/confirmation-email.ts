@@ -46,7 +46,7 @@ export function getConfirmationEmailHTML(): string {
               <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 auto 24px;">
                 <tr>
                   <td style="background: rgba(255,255,255,0.2); border-radius: 16px; padding: 12px 20px;">
-                    <span style="font-size: 24px; font-weight: 800; color: white; letter-spacing: -0.5px;">syllabi</span><span style="font-size: 24px; font-weight: 800; color: #FCD34D; letter-spacing: -0.5px;">.ai</span>
+                    <span style="font-size: 24px; font-weight: 800; color: white; letter-spacing: -0.5px;">syllabi</span><span style="font-size: 24px; font-weight: 800; color: #FCD34D; letter-spacing: -0.5px;">.online</span>
                   </td>
                 </tr>
               </table>
@@ -93,7 +93,7 @@ export function getConfirmationEmailHTML(): string {
           <tr>
             <td style="background: #1E1B4B; border-radius: 0 0 24px 24px; padding: 24px 40px; text-align: center;">
               <p style="margin: 0 0 8px; font-size: 16px; font-weight: 700;">
-                <span style="color: white;">syllabi</span><span style="color: #A855F7;">.ai</span>
+                <span style="color: white;">syllabi</span><span style="color: #A855F7;">.online</span>
               </p>
               <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.6;">
                 If you didn't sign up for Syllabi, you can safely ignore this email.<br/>

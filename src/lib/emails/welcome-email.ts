@@ -149,7 +149,7 @@ export function generateWelcomeEmail({ userName, email }: WelcomeEmailProps): st
                               </td>
                               <!-- Text -->
                               <td style="vertical-align: middle;">
-                                <span style="font-size: 28px; font-weight: 800; color: white; letter-spacing: -1px;">syllabi</span><span style="font-size: 28px; font-weight: 800; color: #FCD34D; letter-spacing: -1px;">.ai</span>
+                                <span style="font-size: 28px; font-weight: 800; color: white; letter-spacing: -1px;">syllabi</span><span style="font-size: 28px; font-weight: 800; color: #FCD34D; letter-spacing: -1px;">.online</span>
                               </td>
                             </tr>
                           </table>
@@ -341,7 +341,7 @@ export function generateWelcomeEmail({ userName, email }: WelcomeEmailProps): st
 
               <!-- Logo small -->
               <p style="margin: 0 0 12px; font-size: 18px; font-weight: 700;">
-                <span style="color: white;">syllabi</span><span style="color: #A855F7;">.ai</span>
+                <span style="color: white;">syllabi</span><span style="color: #A855F7;">.online</span>
               </p>
 
               <p style="margin: 0 0 20px; font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6;">

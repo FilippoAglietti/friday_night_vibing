@@ -1,5 +1,6 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { useState } from "react";
 
 /* ── Logo Concepts ─────────────────────────────────────── */
@@ -211,6 +212,7 @@ const logos = [
 ];
 
 export default function LogoPreview() {
+  if (process.env.NODE_ENV === "production") notFound();
   const [selected, setSelected] = useState("stack");
   const activeLogo = logos.find(l => l.id === selected)!;
 

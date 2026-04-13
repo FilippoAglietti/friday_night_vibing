@@ -12,7 +12,7 @@ export default function SubpageNav() {
       <div className="mx-auto max-w-4xl px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
           <GraduationCap className="size-5 text-violet-500" />
-          <span>syllabi<span className="text-violet-500">.ai</span></span>
+          <span>syllabi<span className="text-violet-500">.online</span></span>
         </Link>
         <div className="flex items-center gap-3">
           <LanguageSwitcher />

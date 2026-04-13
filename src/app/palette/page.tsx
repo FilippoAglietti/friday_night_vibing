@@ -1,5 +1,6 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { useState } from "react";
 
 /* ── Palette Definitions ─────────────────────────────────── */
@@ -408,6 +409,7 @@ function FullPreview({ p }: { p: typeof palettes[PaletteKey] }) {
 /* ── Page ────────────────────────────────────────────────── */
 
 export default function PalettePage() {
+  if (process.env.NODE_ENV === "production") notFound();
   const [active, setActive] = useState<PaletteKey>("pastelCoral");
 
   return (
