@@ -160,11 +160,19 @@ export default function AudioPlayer({
           </div>
 
           {/* Expand / Close */}
-          <button onClick={() => setExpanded(true)} className="text-muted-foreground hover:text-foreground">
+          <button
+            onClick={() => setExpanded(true)}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="Expand audio player"
+          >
             <Maximize2 className="size-4" />
           </button>
           {onClose && (
-            <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            <button
+              onClick={onClose}
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Close audio player"
+            >
               <X className="size-4" />
             </button>
           )}
@@ -198,15 +206,28 @@ export default function AudioPlayer({
           </div>
           <div className="flex items-center gap-1">
             {mini && (
-              <button onClick={() => setExpanded(false)} className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50">
+              <button
+                onClick={() => setExpanded(false)}
+                className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                aria-label="Minimize audio player"
+              >
                 <Minimize2 className="size-4" />
               </button>
             )}
-            <button onClick={() => setShowPlaylist(!showPlaylist)} className={`rounded-lg p-1.5 transition-colors ${showPlaylist ? "text-violet-400 bg-violet-500/10" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
+            <button
+              onClick={() => setShowPlaylist(!showPlaylist)}
+              className={`rounded-lg p-1.5 transition-colors ${showPlaylist ? "text-violet-400 bg-violet-500/10" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
+              aria-label={showPlaylist ? "Hide track list" : "Show track list"}
+              aria-pressed={showPlaylist}
+            >
               <ListMusic className="size-4" />
             </button>
             {onClose && (
-              <button onClick={onClose} className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50">
+              <button
+                onClick={onClose}
+                className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                aria-label="Close audio player"
+              >
                 <X className="size-4" />
               </button>
             )}

@@ -190,6 +190,7 @@ export default function PaywallModal({ open, onClose, currentPlan = "free" }: Pa
               <button
                 onClick={onClose}
                 className="absolute top-4 right-4 z-10 rounded-full p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                aria-label="Close upgrade modal"
               >
                 <X className="size-5" />
               </button>
