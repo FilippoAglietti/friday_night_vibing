@@ -925,7 +925,13 @@ export default function ProfilePage() {
           </Link>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
-            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setDark(!dark)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={() => setDark(!dark)}
+              aria-label="Toggle theme"
+            >
               {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </Button>
             <Button

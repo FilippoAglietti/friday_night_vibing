@@ -210,7 +210,11 @@ export default function CourseEditor({ curriculum, onSave, onClose }: CourseEdit
                 value={obj}
                 onChange={(e) => updateObjective(i, e.target.value)}
               />
-              <button onClick={() => removeObjective(i)} className="text-muted-foreground/40 hover:text-rose-400 transition-colors p-0.5">
+              <button
+                onClick={() => removeObjective(i)}
+                aria-label="Remove objective"
+                className="text-muted-foreground/40 hover:text-rose-400 transition-colors p-0.5"
+              >
                 <X className="size-3" />
               </button>
             </div>
@@ -235,10 +239,20 @@ export default function CourseEditor({ curriculum, onSave, onClose }: CourseEdit
             <CardHeader className="pb-2 cursor-pointer" onClick={() => setActiveModule(activeModule === mi ? null : mi)}>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
-                  <button onClick={(e) => { e.stopPropagation(); moveModule(mi, -1); }} disabled={mi === 0} className="text-muted-foreground/30 hover:text-foreground disabled:opacity-20 p-0.5">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); moveModule(mi, -1); }}
+                    disabled={mi === 0}
+                    aria-label="Move module up"
+                    className="text-muted-foreground/30 hover:text-foreground disabled:opacity-20 p-0.5"
+                  >
                     <ChevronUp className="size-3.5" />
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); moveModule(mi, 1); }} disabled={mi === draft.modules.length - 1} className="text-muted-foreground/30 hover:text-foreground disabled:opacity-20 p-0.5">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); moveModule(mi, 1); }}
+                    disabled={mi === draft.modules.length - 1}
+                    aria-label="Move module down"
+                    className="text-muted-foreground/30 hover:text-foreground disabled:opacity-20 p-0.5"
+                  >
                     <ChevronDown className="size-3.5" />
                   </button>
                 </div>
@@ -259,7 +273,11 @@ export default function CourseEditor({ curriculum, onSave, onClose }: CourseEdit
                   <p className="text-[10px] text-muted-foreground">{mod.lessons.length} lessons</p>
                 </div>
                 {activeModule === mi && draft.modules.length > 1 && (
-                  <button onClick={(e) => { e.stopPropagation(); removeModule(mi); }} className="text-muted-foreground/40 hover:text-rose-400 transition-colors p-1">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); removeModule(mi); }}
+                    aria-label="Remove module"
+                    className="text-muted-foreground/40 hover:text-rose-400 transition-colors p-1"
+                  >
                     <Trash2 className="size-3.5" />
                   </button>
                 )}
@@ -301,7 +319,11 @@ export default function CourseEditor({ curriculum, onSave, onClose }: CourseEdit
                         <p className="text-xs font-medium flex-1 truncate">{les.title}</p>
                         <span className="text-[9px] text-muted-foreground shrink-0">{les.durationMinutes}m</span>
                         {mod.lessons.length > 1 && (
-                          <button onClick={(e) => { e.stopPropagation(); removeLesson(mi, li); }} className="text-muted-foreground/30 hover:text-rose-400 transition-colors p-0.5">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); removeLesson(mi, li); }}
+                            aria-label="Remove lesson"
+                            className="text-muted-foreground/30 hover:text-rose-400 transition-colors p-0.5"
+                          >
                             <X className="size-3" />
                           </button>
                         )}

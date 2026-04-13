@@ -1,18 +1,12 @@
 /**
- * middleware.ts
- * ─────────────────────────────────────────────────────────────
- * Supabase Auth middleware for Next.js.
- *
- * Refreshes the auth token on each request to keep sessions alive.
- * Runs on all routes except static files and API webhooks
- * (webhooks need the raw body, not a modified request).
- * ─────────────────────────────────────────────────────────────
+ * proxy.ts — Supabase Auth proxy for Next.js 16.
+ * Refreshes the auth token on each request. Skips static files and webhooks.
  */
 
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   let response = NextResponse.next({ request: req });
 
   const supabase = createServerClient(
@@ -39,7 +33,7 @@ export async function middleware(req: NextRequest) {
     }
   );
 
-  // Refresh the session — this is the main purpose of this middleware
+  // Refresh the session — the main purpose of this proxy.
   await supabase.auth.getUser();
 
   return response;

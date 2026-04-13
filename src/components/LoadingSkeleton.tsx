@@ -56,7 +56,7 @@ function BookPage({ index, total, isBuilding }: { index: number; total: number; 
             <div
               key={i}
               className="h-1 rounded-full bg-violet-500/10"
-              style={{ width: `${60 + Math.random() * 30}%` }}
+              style={{ width: `${60 + ((index * 7 + i * 11) % 30)}%` }}
             />
           ))}
         </div>
@@ -67,16 +67,22 @@ function BookPage({ index, total, isBuilding }: { index: number; total: number; 
 
 /* ─── Floating particles ────────────────────────────────── */
 
+const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
+  left: 10 + ((i * 37) % 80),
+  top: 10 + ((i * 53) % 80),
+  duration: 2 + ((i * 13) % 20) / 10,
+}));
+
 function Particles() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {Array.from({ length: 12 }).map((_, i) => (
+      {PARTICLES.map((p, i) => (
         <motion.div
           key={i}
           className="absolute size-1 rounded-full bg-violet-400/30"
           style={{
-            left: `${10 + Math.random() * 80}%`,
-            top: `${10 + Math.random() * 80}%`,
+            left: `${p.left}%`,
+            top: `${p.top}%`,
           }}
           animate={{
             y: [0, -20, 0],
@@ -84,7 +90,7 @@ function Particles() {
             scale: [0.5, 1, 0.5],
           }}
           transition={{
-            duration: 2 + Math.random() * 2,
+            duration: p.duration,
             delay: i * 0.3,
             repeat: Infinity,
             ease: "easeInOut",
@@ -139,7 +145,7 @@ function ProgressRing({ progress }: { progress: number }) {
 export default function LoadingSkeleton() {
   const [step, setStep] = useState(0);
   const [pagesRevealed, setPagesRevealed] = useState(0);
-  const startTime = useRef(Date.now());
+  const startTime = useRef<number | null>(null);
   const [elapsed, setElapsed] = useState(0);
 
   // Step progression
@@ -162,8 +168,11 @@ export default function LoadingSkeleton() {
 
   // Elapsed time counter
   useEffect(() => {
+    startTime.current = Date.now();
     const interval = setInterval(() => {
-      setElapsed(Math.floor((Date.now() - startTime.current) / 1000));
+      if (startTime.current != null) {
+        setElapsed(Math.floor((Date.now() - startTime.current) / 1000));
+      }
     }, 1000);
     return () => clearInterval(interval);
   }, []);

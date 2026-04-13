@@ -73,11 +73,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate against all known price IDs (Pro, 5-Pack, Pro Max)
+    // Validate against all known price IDs (monthly + annual where set)
     const VALID_PRICE_IDS = [
       process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,
+      process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID,
       process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID,
       process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID,
+      process.env.NEXT_PUBLIC_STRIPE_PROMAX_ANNUAL_PRICE_ID,
     ].filter(Boolean);
 
     if (VALID_PRICE_IDS.length > 0 && !VALID_PRICE_IDS.includes(priceId)) {

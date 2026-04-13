@@ -68,13 +68,15 @@ const EUR_PRICE_IDS = {
  */
 function getPlanFromPriceId(priceId: string): "pro" | "5pack" | "promax" | "unknown" {
   const proPriceId = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "";
+  const proAnnualPriceId = process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || "";
   const fivePackPriceId = process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "";
   const proMaxPriceId = process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "";
+  const proMaxAnnualPriceId = process.env.NEXT_PUBLIC_STRIPE_PROMAX_ANNUAL_PRICE_ID || "";
 
   // ── 1) Env var match (ops-rotatable) ────────────────────────
-  if (priceId === proPriceId) return "pro";
+  if (priceId === proPriceId || priceId === proAnnualPriceId) return "pro";
   if (priceId === fivePackPriceId) return "5pack";
-  if (priceId === proMaxPriceId) return "promax";
+  if (priceId === proMaxPriceId || priceId === proMaxAnnualPriceId) return "promax";
 
   // ── 2) Hard-coded EUR backstop ──────────────────────────────
   if (priceId === EUR_PRICE_IDS.pro) return "pro";
