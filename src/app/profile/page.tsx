@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
+import Image from "next/image";
 import { supabaseBrowser } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import type { Curriculum, DifficultyLevel } from "@/types/curriculum";
@@ -951,7 +952,14 @@ export default function ProfilePage() {
               <div className="absolute -bottom-12 -left-12 size-36 rounded-full bg-cyan-500/8 blur-3xl" />
               <div className="relative flex items-center gap-4">
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt={name} className="size-14 sm:size-16 rounded-2xl ring-2 ring-violet-500/30 shadow-lg shadow-violet-500/20 shrink-0" />
+                  <Image
+                    src={avatarUrl}
+                    alt={name}
+                    width={64}
+                    height={64}
+                    unoptimized
+                    className="size-14 sm:size-16 rounded-2xl ring-2 ring-violet-500/30 shadow-lg shadow-violet-500/20 shrink-0 object-cover"
+                  />
                 ) : (
                   <div className="flex items-center justify-center size-14 sm:size-16 rounded-2xl bg-violet-500/15 text-violet-500 ring-2 ring-violet-500/30 shrink-0">
                     <UserIcon className="size-7 sm:size-8" />
@@ -989,7 +997,14 @@ export default function ProfilePage() {
         {activeTab !== "overview" && (
           <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
             {avatarUrl ? (
-              <img src={avatarUrl} alt={name} className="size-12 sm:size-16 rounded-2xl ring-2 ring-violet-500/30 shadow-lg shrink-0" />
+              <Image
+                src={avatarUrl}
+                alt={name}
+                width={64}
+                height={64}
+                unoptimized
+                className="size-12 sm:size-16 rounded-2xl ring-2 ring-violet-500/30 shadow-lg shrink-0 object-cover"
+              />
             ) : (
               <div className="flex items-center justify-center size-12 sm:size-16 rounded-2xl bg-violet-500/15 text-violet-500 ring-2 ring-violet-500/30 shrink-0">
                 <UserIcon className="size-6 sm:size-8" />
@@ -1768,7 +1783,14 @@ export default function ProfilePage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-3">
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt={name} className="size-12 rounded-xl ring-2 ring-violet-500/20" />
+                    <Image
+                      src={avatarUrl}
+                      alt={name}
+                      width={48}
+                      height={48}
+                      unoptimized
+                      className="size-12 rounded-xl ring-2 ring-violet-500/20 object-cover"
+                    />
                   ) : (
                     <div className="flex items-center justify-center size-12 rounded-xl bg-violet-500/15 text-violet-500"><UserIcon className="size-6" /></div>
                   )}
