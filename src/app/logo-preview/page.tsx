@@ -311,7 +311,7 @@ export default function LogoPreview() {
                   </div>
                   <div>
                     <div className="font-bold text-sm">Syllabi</div>
-                    <div className="text-xs text-zinc-500">@syllabi_ai</div>
+                    <div className="text-xs text-zinc-500">@syllabi_online</div>
                   </div>
                 </div>
                 <p className="mt-3 text-xs text-zinc-300 leading-relaxed">

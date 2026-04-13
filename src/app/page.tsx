@@ -1558,18 +1558,11 @@ export default function Home() {
               </p>
               <div className="mt-4 flex gap-3">
                 <a
-                  href="https://twitter.com/syllabi_ai"
+                  href="https://twitter.com/syllabi_online"
                   className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label="Twitter"
                 >
                   <MessageCircle className="size-4" />
-                </a>
-                <a
-                  href="https://github.com/syllabi-ai"
-                  className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  aria-label="GitHub"
-                >
-                  <Globe className="size-4" />
                 </a>
                 <a
                   href="mailto:hello@syllabi.online"

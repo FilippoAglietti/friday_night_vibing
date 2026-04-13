@@ -201,7 +201,7 @@ export default function QuickCourseClient() {
   }, []);
 
   const shareText = outline
-    ? `I just generated a course outline for "${topic}" in seconds with @syllabi_ai\n\nCheck it out: syllabi.online/quick`
+    ? `I just generated a course outline for "${topic}" in seconds with @syllabi_online\n\nCheck it out: syllabi.online/quick`
     : "";
 
   return (

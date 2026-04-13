@@ -85,7 +85,7 @@ export const metadata: Metadata = {
     description:
       "Generate complete courses with AI — audio narration, quizzes, modules & PDF export. Free to start.",
     images: ["/og.png"],
-    creator: "@syllabi_ai",
+    creator: "@syllabi_online",
   },
   icons: {
     icon: "/favicon.svg",
@@ -126,8 +126,7 @@ const jsonLd = {
         url: `${BASE_URL}/favicon.svg`,
       },
       sameAs: [
-        "https://twitter.com/syllabi_ai",
-        "https://github.com/syllabi-ai",
+        "https://twitter.com/syllabi_online",
       ],
       contactPoint: {
         "@type": "ContactPoint",
