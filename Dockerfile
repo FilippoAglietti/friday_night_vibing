@@ -10,15 +10,16 @@ RUN corepack enable pnpm && pnpm install --frozen-lockfile
 FROM node:${NODE_VERSION} AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
-# Placeholder envs to satisfy module-load during `next build`.
-# Real values are injected at runtime by Cloud Run via Secret Manager.
-ENV NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder_anon_key
+# NEXT_PUBLIC_* vars are inlined by Next.js at build time (even in server code).
+# These are client-safe by design — same values ship in the browser bundle.
+ENV NEXT_PUBLIC_SUPABASE_URL=https://gmxseuttpurnxbluvcwx.supabase.co
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdteHNldXR0cHVybnhibHV2Y3d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NDUwODAsImV4cCI6MjA5MDIyMTA4MH0.xJ23Mr1hJ5F2vPnJOPDiJxtFkBqXtAko1dD02NNlris
+ENV NEXT_PUBLIC_APP_URL=https://www.syllabi.online
+# Server-only secrets — placeholders at build; real values injected at runtime by Cloud Run.
 ENV SUPABASE_SERVICE_ROLE_KEY=placeholder_service_role
-ENV SUPABASE_URL=https://placeholder.supabase.co
+ENV SUPABASE_URL=https://gmxseuttpurnxbluvcwx.supabase.co
 ENV SUPABASE_ANON_KEY=placeholder_anon_key
 ENV ANTHROPIC_API_KEY=placeholder
-ENV NEXT_PUBLIC_APP_URL=https://placeholder.local
 ENV STRIPE_SECRET_KEY=sk_test_placeholder
 ENV INTERNAL_API_SECRET=placeholder
 COPY --from=deps /app/node_modules ./node_modules
