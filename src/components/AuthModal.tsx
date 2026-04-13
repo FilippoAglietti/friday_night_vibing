@@ -174,6 +174,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               <button
                 onClick={onClose}
                 className="absolute top-4 right-4 z-10 rounded-full p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                aria-label="Close sign-in modal"
               >
                 <X className="size-5" />
               </button>
