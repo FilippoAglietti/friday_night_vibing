@@ -139,7 +139,7 @@ export default function Article() {
             name="Syllabi"
             category="AI Course Generator"
             description="Generate complete courses with modules, lessons, quizzes, and AI audio narration in 60 seconds. Supports 16 languages and exports to PDF, Notion, DOCX, and more."
-            price="Free / from $28/mo"
+            price="Free / from €29/mo"
             highlight
           />
           <ToolCard

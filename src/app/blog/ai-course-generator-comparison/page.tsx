@@ -155,7 +155,7 @@ export default function Article() {
               <FeatureRow feature="Course editor" values={[true, true, true, true]} />
               <FeatureRow feature="Built-in LMS" values={[false, false, true, false]} />
               <FeatureRow feature="Free tier" values={[true, false, true, true]} />
-              <FeatureRow feature="Starting price" values={["$28/mo", "$49/mo", "$42/mo", "$25/mo"]} />
+              <FeatureRow feature="Starting price" values={["€29/mo", "$49/mo", "$42/mo", "$25/mo"]} />
             </tbody>
           </table>
         </div>

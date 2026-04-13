@@ -48,28 +48,31 @@ Syllabi is an AI-powered course generator that turns any topic into a polished, 
 ---
 
 ## Pricing (for PH description)
-- **Free** — 3 course generations, PDF export, shareable links
-- **Pro ($28/mo)** — 15 generations/month, all export formats, priority processing
-- **Pro Max 5-Pack ($33 one-time)** — 5 full generations with audio narration
-- **Pro Max ($69/mo)** — Unlimited audio courses, full content generation, white-label
 
-*Launch special: 20% off Pro and Pro Max for the first month.*
+EUR primary, USD shown in parentheses for the PH audience (priced at ~1.08 EUR/USD).
+
+- **Free** — 3 course generations, PDF & Notion export, shareable links
+- **Pro** — €29/mo (~$31) or €19/mo billed annually (~$21). 15 generations/month, full modules + lessons + quizzes, all export formats, priority queue.
+- **Pro Max** — €69/mo (~$74) or €49/mo billed annually (~$53). **Unlimited generations, AI audio narration on every course, white-label branding, commercial license, premium voice library.**
+- **Pro Max 5-Pack** — €33 (~$36) one-time. Trial the hero features: 5 Pro Max generations with audio. The €33 becomes a credit toward Pro Max monthly if redeemed within 30 days.
+
+*No launch discount. Syllabi is already the cheapest serious option in the category.*
 
 ---
 
 ## Maker Story
 
-> We built Syllabi because we were tired of the gap between "I have expertise" and "I have a course."
+> Here's the dirty secret of online courses: **most learners never finish them.** Industry average completion rate is around 5-15%. Your course can be brilliant — if nobody gets past module two, none of that matters.
 >
-> My co-founder and I spent years in education and tech, watching brilliant people struggle to package their knowledge. Not because they lacked content — but because the production process was a nightmare. Outlining, scripting, recording, editing, designing... by the time you're done, you've lost the momentum that made you want to create in the first place.
+> My co-founder and I spent years watching this happen. Experts pouring weeks into courses that looked like a Google Doc, sounded like a textbook, and got abandoned by the third lesson. Meanwhile, the same people would finish a 10-hour podcast in a week.
 >
-> We asked: what if AI could handle the 80% that's structure and production, so you can focus on the 20% that's uniquely yours — your voice, your stories, your insights?
+> So we asked a different question. Not "how do we help people **create** courses faster?" — that's a crowded race. We asked "how do we help creators make courses their students **actually finish?**"
 >
-> Syllabi generates a complete, polished course in 60 seconds. Modules, lessons, quizzes, audio narration, export-ready. You edit what matters and ship.
+> That's what Syllabi is. Every course is audio-narrated so learners can listen on commutes, walks, or at the gym. Every course is visually designed so it doesn't feel like a wall of text. Every course has real pacing, not just a module dump. And yes, every course takes 60 seconds to generate.
 >
-> We're not replacing course creators. We're removing the friction that stops experts from becoming course creators.
+> We're not the fastest AI course generator. We're the one that actually gets finished.
 >
-> — The Syllabi team
+> — Gianmarco & Filippo, co-founders
 
 ---
 
@@ -101,22 +104,21 @@ Syllabi is an AI-powered course generator that turns any topic into a polished, 
 
 > Hey Product Hunt! 👋
 >
-> We're launching Syllabi — an AI course generator that creates complete courses with audio narration in 60 seconds.
+> Most AI course generators sell you speed. Syllabi sells you **completion rate.**
 >
-> **Why we built this:** We saw too many experts sitting on valuable knowledge because the production barrier was too high. Building a professional course shouldn't take weeks.
+> The average online course gets finished by 5-15% of students. That's the problem we built Syllabi to fix. Every course is:
 >
-> **What's new today:**
-> - AI audio narration for every lesson (Pro Max)
-> - Export to PDF, Notion, DOCX, PPTX
-> - 16 language support
-> - Lead magnet mode with email gating
-> - Beautiful shareable course pages
+> - **🎧 Audio-narrated** — learners can finish your course on a walk, not just at their desk. This is the feature nobody else leads with, and it's why our Pro Max users report 3x the learner engagement.
+> - **🎨 Actually designed** — courses that look like they came from a design agency, not ChatGPT
+> - **⚡ Generated in 60 seconds** — so you can iterate on topics, audiences, and angles until you find the one that lands
+> - **🌍 Native in 16 languages** — not machine-translated English; real generation in the target language
+> - **📤 Export anywhere** — PDF, DOCX, PPTX, Notion, SCORM, Markdown, shareable web link
 >
-> **Try it free** — 3 course generations, no credit card needed.
+> **Free to try** — 3 courses, no credit card. If you've ever written a course that nobody finished, you're our target user.
 >
-> We'd love your feedback. What would you build a course about? Drop your topic below and we'll tell you what Syllabi generates. 🎓
+> Here's what I want to know: **what's a course topic you've been sitting on for months?** Drop it in the comments and I'll generate it live and share the result. 🎓
 >
-> — [Your name], Co-founder
+> — Gianmarco, Co-founder & CEO
 
 ---
 
