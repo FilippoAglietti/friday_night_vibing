@@ -28,11 +28,17 @@ interface PaywallModalProps {
 const PROMO_ACTIVE = true;
 const PROMO_EXPIRES = new Date("2026-05-11T23:59:59Z");
 
+const PRO_ANNUAL_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID;
+const PROMAX_ANNUAL_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PROMAX_ANNUAL_PRICE_ID;
+const ANNUAL_BILLING_AVAILABLE = Boolean(PRO_ANNUAL_PRICE_ID && PROMAX_ANNUAL_PRICE_ID);
+
 const plans = [
   {
     id: "pro",
     name: "Pro",
     price: PROMO_ACTIVE ? "€28" : "€35",
+    priceAnnual: "€19",
+    annualBilledLabel: "billed €228/year",
     originalPrice: "€35/mo",
     period: "/month",
     description: "For creators who ship courses every week.",
@@ -46,19 +52,24 @@ const plans = [
       "Priority AI processing",
     ],
     cta: PROMO_ACTIVE ? "Start Pro — €28/mo" : "Start Pro — €35/mo",
+    ctaAnnual: "Start Pro — €19/mo annually",
     // Fallback = canonical EUR Pro price ID (€28/mo) — keeps checkout working
     // even if the NEXT_PUBLIC env var is missing on Vercel.
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_1TKBpS3kBvceiBKLANxOEgzs",
+    priceIdAnnual: PRO_ANNUAL_PRICE_ID,
     icon: Crown,
     gradient: "from-violet-600 to-indigo-600",
     badgeGradient: "from-violet-600 to-indigo-600",
     checkColor: "text-violet-500",
     highlight: false,
+    hasAnnual: true,
   },
   {
     id: "promax",
     name: "Pro Max",
     price: PROMO_ACTIVE ? "€69" : "€79",
+    priceAnnual: "€49",
+    annualBilledLabel: "billed €588/year",
     originalPrice: "€79/mo",
     period: "/month",
     description: "The ultimate toolkit to create & sell courses.",
@@ -74,13 +85,16 @@ const plans = [
       "Dedicated AI processing",
     ],
     cta: PROMO_ACTIVE ? "Go Pro Max — €69/mo" : "Go Pro Max — €79/mo",
+    ctaAnnual: "Go Pro Max — €49/mo annually",
     // Fallback = canonical EUR Pro Max price ID (€69/mo).
     priceId: process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "price_1TKBpU3kBvceiBKLmKdWHeub",
+    priceIdAnnual: PROMAX_ANNUAL_PRICE_ID,
     icon: Sparkles,
     gradient: "from-amber-500 to-orange-600",
     badgeGradient: "from-amber-500 to-orange-600",
     checkColor: "text-amber-500",
     highlight: true,
+    hasAnnual: true,
   },
   {
     id: "5pack",
@@ -100,18 +114,24 @@ const plans = [
       "No recurring charges",
     ],
     cta: PROMO_ACTIVE ? "Try Pro Max — €33" : "Try Pro Max — €42",
+    ctaAnnual: PROMO_ACTIVE ? "Try Pro Max — €33" : "Try Pro Max — €42",
+    priceAnnual: PROMO_ACTIVE ? "€33" : "€42",
+    annualBilledLabel: "one-time",
     // Fallback = canonical EUR 5-Pack price ID (€33 one-time).
     priceId: process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "price_1TKBpT3kBvceiBKLgw6NIFap",
+    priceIdAnnual: undefined,
     icon: Crown,
     gradient: "from-amber-600 to-orange-600",
     badgeGradient: "from-amber-600 to-orange-600",
     checkColor: "text-amber-400",
     highlight: false,
+    hasAnnual: false,
   },
 ];
 
 export default function PaywallModal({ open, onClose, currentPlan = "free" }: PaywallModalProps) {
   const [loading, setLoading] = useState<string | null>(null);
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annual">("monthly");
 
   // Filter plans based on current plan — don't show what they already have
   const visiblePlans = currentPlan === "pro"
@@ -188,11 +208,49 @@ export default function PaywallModal({ open, onClose, currentPlan = "free" }: Pa
                 <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
                   Choose your plan and start creating professional courses with AI.
                 </p>
+
+                {ANNUAL_BILLING_AVAILABLE && (
+                  <div className="mt-5 inline-flex items-center gap-1 rounded-full border border-border/60 bg-card/60 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setBillingPeriod("monthly")}
+                      className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
+                        billingPeriod === "monthly"
+                          ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      aria-pressed={billingPeriod === "monthly"}
+                    >
+                      Monthly
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBillingPeriod("annual")}
+                      className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                        billingPeriod === "annual"
+                          ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      aria-pressed={billingPeriod === "annual"}
+                    >
+                      Annual
+                      <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400">
+                        −30%
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Plans grid */}
               <div className={`grid gap-4 px-6 pb-8 pt-2 ${visiblePlans.length === 2 ? "sm:grid-cols-2 max-w-2xl mx-auto" : "sm:grid-cols-3"}`}>
-                {visiblePlans.map((plan) => (
+                {visiblePlans.map((plan) => {
+                  const showAnnual = billingPeriod === "annual" && plan.hasAnnual && plan.priceIdAnnual;
+                  const displayPrice = showAnnual ? plan.priceAnnual : plan.price;
+                  const displayCta = showAnnual ? plan.ctaAnnual : plan.cta;
+                  const activePriceId = showAnnual && plan.priceIdAnnual ? plan.priceIdAnnual : plan.priceId;
+                  const showBilledLabel = showAnnual && plan.annualBilledLabel && plan.hasAnnual;
+                  return (
                   <div
                     key={plan.id}
                     className={`relative rounded-xl border p-5 transition-all ${
@@ -218,15 +276,20 @@ export default function PaywallModal({ open, onClose, currentPlan = "free" }: Pa
                       )}
                     </div>
 
-                    <div className="mb-2 flex items-baseline gap-1.5">
-                      <span className="text-2xl font-bold">{plan.price}</span>
+                    <div className="mb-1 flex items-baseline gap-1.5">
+                      <span className="text-2xl font-bold">{displayPrice}</span>
                       <span className="text-xs text-muted-foreground">
                         {plan.period}
                       </span>
-                      {PROMO_ACTIVE && (
+                      {PROMO_ACTIVE && !showAnnual && (
                         <span className="text-sm text-muted-foreground/50 line-through">{plan.originalPrice}</span>
                       )}
                     </div>
+                    {showBilledLabel && (
+                      <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-emerald-400">
+                        {plan.annualBilledLabel}
+                      </p>
+                    )}
 
                     <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
                       {plan.description}
@@ -242,7 +305,7 @@ export default function PaywallModal({ open, onClose, currentPlan = "free" }: Pa
                     </ul>
 
                     <Button
-                      onClick={() => handleCheckout(plan.priceId)}
+                      onClick={() => handleCheckout(activePriceId)}
                       disabled={loading !== null}
                       className={`w-full rounded-full text-sm font-semibold border-0 transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r ${plan.gradient} text-white shadow-lg ${
                         plan.highlight || plan.id === "5pack"
@@ -252,20 +315,21 @@ export default function PaywallModal({ open, onClose, currentPlan = "free" }: Pa
                           : "shadow-amber-500/20 hover:shadow-amber-500/40"
                       }`}
                     >
-                      {loading === plan.priceId ? (
+                      {loading === activePriceId ? (
                         <span className="flex items-center gap-2">
                           <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           Redirecting…
                         </span>
                       ) : (
                         <span className="flex items-center gap-2">
-                          {plan.cta}
+                          {displayCta}
                           <ArrowRight className="size-3.5" />
                         </span>
                       )}
                     </Button>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </motion.div>
