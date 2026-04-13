@@ -698,15 +698,26 @@ export default function Home() {
                   {t("hero.cta")}
                   <ArrowRight className="ml-2 size-4" />
                 </Button>
-                <Button
-                  id="hero-secondary"
-                  variant="outline"
-                  size="lg"
-                  className="h-12 w-full sm:w-auto rounded-full px-8 text-base"
-                  onClick={() => scrollToSection('demo')}
-                >
-                  {t("hero.secondaryCta")}
-                </Button>
+                {process.env.NEXT_PUBLIC_DEMO_COURSE_ID ? (
+                  <Link
+                    href={`/course/${process.env.NEXT_PUBLIC_DEMO_COURSE_ID}`}
+                    id="hero-secondary"
+                    className="inline-flex items-center justify-center h-12 w-full sm:w-auto rounded-full border border-violet-500/30 bg-violet-500/5 px-8 text-base font-medium text-violet-300 hover:bg-violet-500/10 hover:text-violet-200 transition-all"
+                  >
+                    See a real Syllabi course
+                    <ArrowRight className="ml-2 size-4" />
+                  </Link>
+                ) : (
+                  <Button
+                    id="hero-secondary"
+                    variant="outline"
+                    size="lg"
+                    className="h-12 w-full sm:w-auto rounded-full px-8 text-base"
+                    onClick={() => scrollToSection('demo')}
+                  >
+                    {t("hero.secondaryCta")}
+                  </Button>
+                )}
               </motion.div>
 
               <motion.p
