@@ -53,7 +53,7 @@ export default function PrivacyPage() {
               Introduction
             </h2>
             <p className="text-gray-300">
-              Syllabi ("Company," "we," "us," or "our") operates the Syllabi platform (the "Service"). This Privacy Policy explains how we collect, use, disclose, and otherwise process personal information in connection with our Services.
+              Syllabi (&ldquo;Company,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) operates the Syllabi platform (the &ldquo;Service&rdquo;). This Privacy Policy explains how we collect, use, disclose, and otherwise process personal information in connection with our Services.
             </p>
           </section>
 
@@ -155,7 +155,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="border-l-2 border-violet-500/40 pl-4 text-2xl font-semibold text-white mt-8 mb-4">
-              8. Children's Privacy
+              8. Children&apos;s Privacy
             </h2>
             <p className="text-gray-300">
               Our Service is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If we become aware that we have collected personal information from a child under 13, we will take steps to delete such information promptly.

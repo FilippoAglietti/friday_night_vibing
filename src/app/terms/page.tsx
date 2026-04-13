@@ -53,7 +53,7 @@ export default function TermsPage() {
               1. Acceptance of Terms
             </h2>
             <p className="text-gray-300">
-              By accessing and using Syllabi ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this Service.
+              By accessing and using Syllabi (&ldquo;the Service&rdquo;), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this Service.
             </p>
           </section>
 
@@ -68,7 +68,7 @@ export default function TermsPage() {
               <li>• Modifying or copying the materials</li>
               <li>• Using the materials for any commercial purpose or for any public display</li>
               <li>• Attempting to reverse engineer, disassemble, or decompile any software contained on Syllabi</li>
-              <li>• Transferring the materials to another person or "mirroring" the materials on any other server</li>
+              <li>• Transferring the materials to another person or &ldquo;mirroring&rdquo; the materials on any other server</li>
               <li>• Removing any copyright or other proprietary notations from the materials</li>
               <li>• Transmitting the materials over a network</li>
             </ul>
@@ -79,7 +79,7 @@ export default function TermsPage() {
               3. Disclaimer
             </h2>
             <p className="text-gray-300">
-              The materials on Syllabi are provided "as is". Syllabi makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
+              The materials on Syllabi are provided &ldquo;as is&rdquo;. Syllabi makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
             </p>
           </section>
 
@@ -106,7 +106,7 @@ export default function TermsPage() {
               6. Materials and Content
             </h2>
             <p className="text-gray-300">
-              Syllabi has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Syllabi of the site. Use of any such linked website is at the user's own risk.
+              Syllabi has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Syllabi of the site. Use of any such linked website is at the user&apos;s own risk.
             </p>
           </section>
 

@@ -194,7 +194,7 @@ export default function CookiesPage() {
               Do Not Track
             </h2>
             <p className="text-gray-300">
-              Some browsers include a "Do Not Track" feature. Currently, there is no standard for how websites should respond to such signals. Syllabi does not currently change its practices in response to Do Not Track signals.
+              Some browsers include a &ldquo;Do Not Track&rdquo; feature. Currently, there is no standard for how websites should respond to such signals. Syllabi does not currently change its practices in response to Do Not Track signals.
             </p>
           </section>
 
