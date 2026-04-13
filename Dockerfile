@@ -10,6 +10,17 @@ RUN corepack enable pnpm && pnpm install --frozen-lockfile
 FROM node:${NODE_VERSION} AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+# Placeholder envs to satisfy module-load during `next build`.
+# Real values are injected at runtime by Cloud Run via Secret Manager.
+ENV NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder_anon_key
+ENV SUPABASE_SERVICE_ROLE_KEY=placeholder_service_role
+ENV SUPABASE_URL=https://placeholder.supabase.co
+ENV SUPABASE_ANON_KEY=placeholder_anon_key
+ENV ANTHROPIC_API_KEY=placeholder
+ENV NEXT_PUBLIC_APP_URL=https://placeholder.local
+ENV STRIPE_SECRET_KEY=sk_test_placeholder
+ENV INTERNAL_API_SECRET=placeholder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN corepack enable pnpm && pnpm build
