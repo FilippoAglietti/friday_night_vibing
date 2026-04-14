@@ -37,8 +37,8 @@ const plans = [
     id: "pro",
     name: "Pro",
     price: PROMO_ACTIVE ? "€28" : "€35",
-    priceAnnual: "€19",
-    annualBilledLabel: "billed €228/year",
+    priceAnnual: "€17",
+    annualBilledLabel: "billed €204/year",
     originalPrice: "€35/mo",
     period: "/month",
     description: "For creators who ship courses every week.",
@@ -52,7 +52,7 @@ const plans = [
       "Priority AI processing",
     ],
     cta: PROMO_ACTIVE ? "Start Pro — €28/mo" : "Start Pro — €35/mo",
-    ctaAnnual: "Start Pro — €19/mo annually",
+    ctaAnnual: "Start Pro — €17/mo annually",
     // Fallback = canonical EUR Pro price ID (€28/mo) — keeps checkout working
     // even if the NEXT_PUBLIC env var is missing on Vercel.
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "price_1TKBpS3kBvceiBKLANxOEgzs",
@@ -68,8 +68,8 @@ const plans = [
     id: "promax",
     name: "Pro Max",
     price: PROMO_ACTIVE ? "€69" : "€79",
-    priceAnnual: "€49",
-    annualBilledLabel: "billed €588/year",
+    priceAnnual: "€45",
+    annualBilledLabel: "billed €540/year",
     originalPrice: "€79/mo",
     period: "/month",
     description: "The ultimate toolkit to create & sell courses.",
@@ -85,7 +85,7 @@ const plans = [
       "Dedicated AI processing",
     ],
     cta: PROMO_ACTIVE ? "Go Pro Max — €69/mo" : "Go Pro Max — €79/mo",
-    ctaAnnual: "Go Pro Max — €49/mo annually",
+    ctaAnnual: "Go Pro Max — €45/mo annually",
     // Fallback = canonical EUR Pro Max price ID (€69/mo).
     priceId: process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "price_1TKBpU3kBvceiBKLmKdWHeub",
     priceIdAnnual: PROMAX_ANNUAL_PRICE_ID,
@@ -236,7 +236,7 @@ export default function PaywallModal({ open, onClose, currentPlan = "free" }: Pa
                     >
                       Annual
                       <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400">
-                        −30%
+                        −35%
                       </span>
                     </button>
                   </div>

@@ -54,37 +54,45 @@ const EUR_PRICE_IDS = {
   proMax: "price_1TKBpU3kBvceiBKLmKdWHeub", // €69/mo
 } as const;
 
+type ResolvedPlan = "pro" | "5pack" | "promax" | "unknown";
+type BillingInterval = "month" | "year" | "one_time";
+
 /**
- * Maps a Stripe price ID to our internal plan type.
- *
- * Resolution order:
- *   1. Env var match (NEXT_PUBLIC_STRIPE_*_PRICE_ID) — preferred, lets ops
- *      rotate price IDs without a redeploy.
- *   2. Hard-coded EUR price ID match — backstop if env vars are missing.
- *   3. "unknown" — caller decides how to degrade.
- *
- * USD price IDs are intentionally no longer recognized. Any legacy USD
- * subscriber would need to be migrated in Stripe dashboard first.
+ * Annual Pro quota — 15 generations/month × 12 months. Granted upfront on
+ * purchase and on every yearly renewal. Annual Pro Max stays unlimited (-1),
+ * so this only affects the Pro tier.
  */
-function getPlanFromPriceId(priceId: string): "pro" | "5pack" | "promax" | "unknown" {
-  const proPriceId = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "";
-  const proAnnualPriceId = process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || "";
-  const fivePackPriceId = process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "";
-  const proMaxPriceId = process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "";
-  const proMaxAnnualPriceId = process.env.NEXT_PUBLIC_STRIPE_PROMAX_ANNUAL_PRICE_ID || "";
+const PRO_MONTHLY_QUOTA = 15;
+const PRO_ANNUAL_QUOTA = PRO_MONTHLY_QUOTA * 12;
+
+/**
+ * Resolves a Stripe price ID into our internal plan + billing interval.
+ *
+ * Env vars win (ops-rotatable without redeploy); the EUR backstop covers
+ * the monthly tier only. Annual price IDs must always come from env vars
+ * since they're created at launch time — no hard-coded fallback for annual.
+ */
+function resolvePriceId(priceId: string): { plan: ResolvedPlan; interval: BillingInterval } {
+  const proMonthly = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "";
+  const proAnnual = process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || "";
+  const fivePack = process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "";
+  const proMaxMonthly = process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "";
+  const proMaxAnnual = process.env.NEXT_PUBLIC_STRIPE_PROMAX_ANNUAL_PRICE_ID || "";
 
   // ── 1) Env var match (ops-rotatable) ────────────────────────
-  if (priceId === proPriceId || priceId === proAnnualPriceId) return "pro";
-  if (priceId === fivePackPriceId) return "5pack";
-  if (priceId === proMaxPriceId || priceId === proMaxAnnualPriceId) return "promax";
+  if (priceId && priceId === proMonthly) return { plan: "pro", interval: "month" };
+  if (priceId && priceId === proAnnual) return { plan: "pro", interval: "year" };
+  if (priceId && priceId === fivePack) return { plan: "5pack", interval: "one_time" };
+  if (priceId && priceId === proMaxMonthly) return { plan: "promax", interval: "month" };
+  if (priceId && priceId === proMaxAnnual) return { plan: "promax", interval: "year" };
 
-  // ── 2) Hard-coded EUR backstop ──────────────────────────────
-  if (priceId === EUR_PRICE_IDS.pro) return "pro";
-  if (priceId === EUR_PRICE_IDS.fivePack) return "5pack";
-  if (priceId === EUR_PRICE_IDS.proMax) return "promax";
+  // ── 2) Hard-coded EUR backstop (monthly only) ───────────────
+  if (priceId === EUR_PRICE_IDS.pro) return { plan: "pro", interval: "month" };
+  if (priceId === EUR_PRICE_IDS.fivePack) return { plan: "5pack", interval: "one_time" };
+  if (priceId === EUR_PRICE_IDS.proMax) return { plan: "promax", interval: "month" };
 
   // ── 3) Unknown — webhook will log + skip ────────────────────
-  return "unknown";
+  return { plan: "unknown", interval: "month" };
 }
 
 // ─── Route handler ────────────────────────────────────────────
@@ -146,8 +154,10 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      const plan = getPlanFromPriceId(priceId);
-      console.log(`[stripe-webhook] Checkout completed for user ${userId}, price: ${priceId}, plan: ${plan}`);
+      const { plan, interval } = resolvePriceId(priceId);
+      console.log(
+        `[stripe-webhook] Checkout completed for user ${userId}, price: ${priceId}, plan: ${plan}, interval: ${interval}`
+      );
 
       if (plan === "5pack") {
         // ── 5-Pack (Pro Max one-time): adds 5 premium generations and
@@ -194,26 +204,34 @@ export async function POST(req: NextRequest) {
 
         console.log(`[stripe-webhook] Upgraded user ${userId} to Pro Max monthly (unlimited, white_label=true)`);
       } else if (plan === "pro") {
-        // ── Pro monthly subscription: 15 generations/month ──
+        // ── Pro subscription ─────────────────────────────────
+        // Monthly: 15 generations/month, reset each invoice.paid.
+        // Annual:  180 generations/year, granted upfront, reset on
+        //          the yearly invoice.paid. Matches "15/mo" in aggregate
+        //          without forcing us to run a monthly cron for annual
+        //          subscribers.
+        const quota = interval === "year" ? PRO_ANNUAL_QUOTA : PRO_MONTHLY_QUOTA;
         await supabaseAdmin
           .from("profiles")
           .update({
             plan: "pro",
-            generations_limit: 15,
+            generations_limit: quota,
             white_label: false, // Pro keeps Syllabi branding
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
 
-        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro monthly (15 generations, white_label=false)`);
+        console.log(
+          `[stripe-webhook] Upgraded user ${userId} to Pro ${interval === "year" ? "annual" : "monthly"} (${quota} generations, white_label=false)`
+        );
       } else {
-        console.warn(`[stripe-webhook] Unknown plan for price ${priceId}, treating as Pro`);
+        console.warn(`[stripe-webhook] Unknown plan for price ${priceId}, treating as Pro monthly`);
         await supabaseAdmin
           .from("profiles")
           .update({
             plan: "pro",
-            generations_limit: 15,
+            generations_limit: PRO_MONTHLY_QUOTA,
             white_label: false,
             stripe_customer_id: session.customer as string,
             updated_at: new Date().toISOString(),
@@ -243,45 +261,48 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // Figure out which plan the renewal corresponds to so we can
-      // re-confirm the correct tier (pro vs pro_max monthly).
+      // Figure out which plan AND interval the renewal corresponds to.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const renewalPriceId = (invoice.lines?.data?.[0] as any)?.price?.id || "";
-      const renewalPlan = getPlanFromPriceId(renewalPriceId);
+      const { plan: renewalPlan, interval: renewalInterval } = resolvePriceId(renewalPriceId);
 
-      // CRITICAL: reset generations_used on every monthly renewal so the
-      // 15 gen/month budget actually means "per month" and not "per
-      // lifetime of the subscription". Without this reset, a Pro user
-      // hitting 15 in month 1 stays blocked forever despite renewing.
+      // CRITICAL: reset generations_used on every renewal so the budget
+      // actually resets. Without this, a Pro user who hits their quota
+      // in month 1 stays blocked forever despite renewing.
       //
-      // We reset on any non-initial invoice.paid (the initial one is
-      // filtered out above via billing_reason === "subscription_create").
-      // subscription_cycle is the normal monthly renewal.
+      // Monthly cycle  → reset every month → fresh 15
+      // Annual cycle   → reset every year → fresh 180 (= 15 × 12)
+      // Pro Max        → unlimited regardless of interval
       if (renewalPlan === "promax") {
         await supabaseAdmin
           .from("profiles")
           .update({
             plan: "pro_max",
             generations_limit: -1,
-            generations_used: 0, // fresh month → fresh budget
+            generations_used: 0, // fresh cycle → fresh budget
             white_label: true,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
-        console.log(`[stripe-webhook] Invoice paid — confirmed pro_max for user ${userId}, counter reset to 0, white_label=true`);
+        console.log(
+          `[stripe-webhook] Invoice paid — confirmed pro_max ${renewalInterval} for user ${userId}, counter reset`
+        );
       } else {
-        // Default: Pro monthly renewal (€28/mo → 15 generations)
+        // Pro renewal: size quota to interval
+        const quota = renewalInterval === "year" ? PRO_ANNUAL_QUOTA : PRO_MONTHLY_QUOTA;
         await supabaseAdmin
           .from("profiles")
           .update({
             plan: "pro",
-            generations_limit: 15,
-            generations_used: 0, // fresh month → fresh 15 generations
+            generations_limit: quota,
+            generations_used: 0,
             white_label: false,
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
-        console.log(`[stripe-webhook] Invoice paid — confirmed pro for user ${userId}, counter reset to 0, white_label=false`);
+        console.log(
+          `[stripe-webhook] Invoice paid — confirmed pro ${renewalInterval} for user ${userId}, reset to 0/${quota}`
+        );
       }
       break;
     }
@@ -340,15 +361,16 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // Sync the current plan from the subscription's price.
-      // When the tier actually CHANGES (pro <-> pro_max) we also reset
-      // generations_used to 0 so the user gets a fair fresh budget on
-      // their new plan. If the price stays the same (cosmetic update
-      // like payment method change), we leave the counter alone.
+      // Sync the current plan + interval from the subscription's price.
+      // Tier change (pro <-> pro_max) → reset counter to 0.
+      // Interval change on the same tier (monthly <-> annual) → re-size
+      //   the Pro quota (15 ↔ 180) but leave the counter alone so we
+      //   don't accidentally re-grant or revoke budget mid-cycle; the
+      //   next invoice.paid will reset cleanly at the cycle boundary.
+      // Cosmetic update (same tier + interval) → no-op on counter.
       const currentPriceId = subscription.items.data[0]?.price?.id || "";
-      const plan = getPlanFromPriceId(currentPriceId);
+      const { plan, interval } = resolvePriceId(currentPriceId);
 
-      // Read the user's current plan to detect a real tier change
       const { data: currentProfile } = await supabaseAdmin
         .from("profiles")
         .select("plan")
@@ -358,10 +380,11 @@ export async function POST(req: NextRequest) {
 
       if (plan === "pro") {
         const tierChanged = previousPlan !== "pro";
+        const quota = interval === "year" ? PRO_ANNUAL_QUOTA : PRO_MONTHLY_QUOTA;
         const updatePayload: Record<string, unknown> = {
           plan: "pro",
-          generations_limit: 15,
-          white_label: false, // Pro tier = branded exports
+          generations_limit: quota,
+          white_label: false,
           updated_at: new Date().toISOString(),
         };
         if (tierChanged) updatePayload.generations_used = 0;
@@ -369,13 +392,15 @@ export async function POST(req: NextRequest) {
           .from("profiles")
           .update(updatePayload)
           .eq("id", userId);
-        console.log(`[stripe-webhook] Subscription updated — user ${userId} on pro${tierChanged ? " (tier change, counter reset)" : ""}`);
+        console.log(
+          `[stripe-webhook] Subscription updated — user ${userId} on pro ${interval}${tierChanged ? " (tier change, counter reset)" : ""}`
+        );
       } else if (plan === "promax") {
         const tierChanged = previousPlan !== "pro_max";
         const updatePayload: Record<string, unknown> = {
           plan: "pro_max",
           generations_limit: -1,
-          white_label: true, // Pro Max tier = white-label exports
+          white_label: true,
           updated_at: new Date().toISOString(),
         };
         if (tierChanged) updatePayload.generations_used = 0;
@@ -383,7 +408,9 @@ export async function POST(req: NextRequest) {
           .from("profiles")
           .update(updatePayload)
           .eq("id", userId);
-        console.log(`[stripe-webhook] Subscription updated — user ${userId} on pro_max${tierChanged ? " (tier change, counter reset)" : ""}`);
+        console.log(
+          `[stripe-webhook] Subscription updated — user ${userId} on pro_max ${interval}${tierChanged ? " (tier change, counter reset)" : ""}`
+        );
       }
 
       break;

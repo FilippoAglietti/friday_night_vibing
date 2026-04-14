@@ -265,6 +265,12 @@ export default function PricingPage() {
             </span>
             <Flame className="size-4 text-rose-400 shrink-0" />
           </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Prefer annual?{" "}
+            <span className="text-emerald-400 font-semibold">Save 35%+</span>{" "}
+            with yearly billing — Pro from <span className="text-foreground font-semibold">€17/mo</span>, Pro Max from{" "}
+            <span className="text-foreground font-semibold">€45/mo</span>.
+          </p>
         </div>
 
         <div className="grid gap-6 xl:gap-8 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
@@ -435,6 +441,17 @@ export default function PricingPage() {
               <p className="text-sm text-muted-foreground">
                 Yes. You can cancel Pro or Pro Max from your profile at any
                 time. You keep access until the end of the billing period.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-1">
+                Is annual billing cheaper?
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Yes — annual billing is 35%+ cheaper than monthly. Pro drops
+                to €17/mo (€204/year) and Pro Max drops to €45/mo (€540/year).
+                You&apos;re charged once for the full year, and Pro annual
+                includes a yearly bank of 180 course generations.
               </p>
             </div>
             <div>
