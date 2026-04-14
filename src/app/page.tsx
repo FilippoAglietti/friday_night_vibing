@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import CurriculumForm, { type CurriculumFormData } from "@/components/CurriculumForm";
+import CurriculumForm, { type CurriculumFormData, type GenerationProgress } from "@/components/CurriculumForm";
 import CurriculumOutput from "@/components/CurriculumOutput";
-import LoadingSkeleton from "@/components/LoadingSkeleton";
+import CourseAssemblyLoader from "@/components/CourseAssemblyLoader";
 import PaywallModal from "@/components/PaywallModal";
 import AuthModal from "@/components/AuthModal";
 import AuthButton from "@/components/AuthButton";
@@ -436,6 +436,7 @@ export default function Home() {
   const [curriculum, setCurriculum] = useState<Curriculum | null>(null);
   const [curriculumTeachingStyle, setCurriculumTeachingStyle] = useState<TeachingStyle | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [genProgress, setGenProgress] = useState<GenerationProgress | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -498,6 +499,18 @@ export default function Home() {
 
   const handleLoadingChange = useCallback((loading: boolean) => {
     setIsGenerating(loading);
+    if (!loading) setGenProgress(null);
+  }, []);
+
+  const handleProgressUpdate = useCallback((p: GenerationProgress) => {
+    setGenProgress((prev) => ({
+      // Preserve topic across polls — only the initial submit-time update carries it
+      topic: p.topic ?? prev?.topic,
+      status: p.status,
+      progress: p.progress ?? prev?.progress,
+      completedModules: p.completedModules ?? prev?.completedModules,
+      totalModules: p.totalModules ?? prev?.totalModules,
+    }));
   }, []);
 
   const handleGenerated = useCallback((c: Curriculum, meta?: { teachingStyle: TeachingStyle }) => {
@@ -932,7 +945,12 @@ export default function Home() {
 
           <div className="mx-auto w-full max-w-3xl xl:max-w-4xl 2xl:max-w-5xl">
             {isGenerating ? (
-              <LoadingSkeleton />
+              <CourseAssemblyLoader
+                topic={genProgress?.topic}
+                progressMessage={genProgress?.progress}
+                completedModules={genProgress?.completedModules}
+                totalModules={genProgress?.totalModules}
+              />
             ) : curriculum ? (
               <div key="output-view">
                 <CurriculumOutput
@@ -1022,6 +1040,7 @@ export default function Home() {
                         key={selectedTemplate}
                         onGenerated={handleGenerated}
                         onLoadingChange={handleLoadingChange}
+                        onProgressUpdate={handleProgressUpdate}
                         onLimitReached={handleLimitReached}
                         onSubmitAttempt={handleFormSubmitAttempt}
                         initialValues={templateFormValues}

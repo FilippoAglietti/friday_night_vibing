@@ -62,7 +62,8 @@ import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
 import { motion, AnimatePresence } from "framer-motion";
-import CurriculumForm, { CurriculumFormData, CourseLength } from "@/components/CurriculumForm";
+import CurriculumForm, { CurriculumFormData, CourseLength, type GenerationProgress } from "@/components/CurriculumForm";
+import CourseAssemblyLoader from "@/components/CourseAssemblyLoader";
 import CourseEditor from "@/components/CourseEditor";
 import PaywallModal from "@/components/PaywallModal";
 import OnboardingQuiz, { type OnboardingAnswers } from "@/components/OnboardingQuiz";
@@ -339,6 +340,23 @@ export default function ProfilePage() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [editingGenId, setEditingGenId] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [genProgress, setGenProgress] = useState<GenerationProgress | null>(null);
+
+  const handleFormLoadingChange = useCallback((loading: boolean) => {
+    setIsGenerating(loading);
+    if (!loading) setGenProgress(null);
+  }, []);
+
+  const handleFormProgressUpdate = useCallback((p: GenerationProgress) => {
+    setGenProgress((prev) => ({
+      topic: p.topic ?? prev?.topic,
+      status: p.status,
+      progress: p.progress ?? prev?.progress,
+      completedModules: p.completedModules ?? prev?.completedModules,
+      totalModules: p.totalModules ?? prev?.totalModules,
+    }));
+  }, []);
 
   // Read URL params for welcome animation and onboarding quiz
   useEffect(() => {
@@ -1834,44 +1852,59 @@ export default function ProfilePage() {
         ══════════════════════════════════════════════════ */}
         {activeTab === "generate" && (
           <div className="space-y-6">
-            {/* Quick Start Templates */}
-            <div>
-              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                <Sparkles className="size-4 text-violet-500" />
-                Quick Start Templates
-              </h3>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {COURSE_TEMPLATES.map((template) => {
-                  const Icon = template.icon;
-                  return (
-                    <button
-                      key={template.title}
-                      onClick={() => handleSelectTemplate(template.config)}
-                      className="group relative overflow-hidden rounded-lg border border-border/40 bg-gradient-to-br from-card/50 to-card/30 p-4 hover:border-violet-500/40 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300"
-                    >
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                        <div className="absolute -top-8 -right-8 size-32 bg-violet-500/5 rounded-full blur-2xl" />
-                      </div>
-                      <div className="relative flex items-start justify-between gap-2 mb-2">
-                        <Icon className="size-5 text-violet-500 shrink-0 mt-0.5" />
-                        <span className="text-xs font-medium text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">Use template</span>
-                      </div>
-                      <h4 className="font-semibold text-sm text-left group-hover:text-violet-400 transition-colors">{template.title}</h4>
-                      <p className="text-xs text-muted-foreground mt-1 text-left">{template.description}</p>
-                    </button>
-                  );
-                })}
+            {isGenerating ? (
+              <div className="bg-card/40 border border-border/30 rounded-lg p-4 sm:p-6">
+                <CourseAssemblyLoader
+                  topic={genProgress?.topic}
+                  progressMessage={genProgress?.progress}
+                  completedModules={genProgress?.completedModules}
+                  totalModules={genProgress?.totalModules}
+                />
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Quick Start Templates */}
+                <div>
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <Sparkles className="size-4 text-violet-500" />
+                    Quick Start Templates
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {COURSE_TEMPLATES.map((template) => {
+                      const Icon = template.icon;
+                      return (
+                        <button
+                          key={template.title}
+                          onClick={() => handleSelectTemplate(template.config)}
+                          className="group relative overflow-hidden rounded-lg border border-border/40 bg-gradient-to-br from-card/50 to-card/30 p-4 hover:border-violet-500/40 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300"
+                        >
+                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                            <div className="absolute -top-8 -right-8 size-32 bg-violet-500/5 rounded-full blur-2xl" />
+                          </div>
+                          <div className="relative flex items-start justify-between gap-2 mb-2">
+                            <Icon className="size-5 text-violet-500 shrink-0 mt-0.5" />
+                            <span className="text-xs font-medium text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">Use template</span>
+                          </div>
+                          <h4 className="font-semibold text-sm text-left group-hover:text-violet-400 transition-colors">{template.title}</h4>
+                          <p className="text-xs text-muted-foreground mt-1 text-left">{template.description}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
-            {/* Curriculum Form */}
-            <div className="bg-card/40 border border-border/30 rounded-lg p-6">
-              <CurriculumForm
-                onGenerated={handleFormGenerated}
-                isFreeUser={userProfile?.plan === "free"}
-                initialValues={templateConfig || duplicateConfig || undefined}
-              />
-            </div>
+                {/* Curriculum Form */}
+                <div className="bg-card/40 border border-border/30 rounded-lg p-6">
+                  <CurriculumForm
+                    onGenerated={handleFormGenerated}
+                    onLoadingChange={handleFormLoadingChange}
+                    onProgressUpdate={handleFormProgressUpdate}
+                    isFreeUser={userProfile?.plan === "free"}
+                    initialValues={templateConfig || duplicateConfig || undefined}
+                  />
+                </div>
+              </>
+            )}
           </div>
         )}
 

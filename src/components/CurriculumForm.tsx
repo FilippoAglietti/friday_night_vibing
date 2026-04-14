@@ -51,6 +51,8 @@ export interface GenerationProgress {
   progress?: string;
   completedModules?: number;
   totalModules?: number;
+  /** The course topic from the form — surfaced so loaders can personalize copy */
+  topic?: string;
 }
 
 export interface CurriculumFormProps {
@@ -190,6 +192,7 @@ function InfoPanel({ tooltip, open }: { tooltip: string | undefined; open: boole
 export default function CurriculumForm({
   onGenerated,
   onLoadingChange,
+  onProgressUpdate,
   onLimitReached,
   onSubmitAttempt,
   initialValues,
@@ -344,6 +347,14 @@ export default function CurriculumForm({
         setGenerationStatus(data.status);
         setPollError(null);
 
+        // Surface live progress to the parent so it can drive loading UI
+        onProgressUpdate?.({
+          status: data.status,
+          progress: data.generation_progress,
+          completedModules: data.generation_completed_modules,
+          totalModules: data.generation_total_modules,
+        });
+
         // If the course is ready, call the callback with the curriculum
         if (data.status === "ready" && data.curriculum) {
           // Clear the polling interval
@@ -378,7 +389,7 @@ export default function CurriculumForm({
         console.error("[CurriculumForm] Polling error:", message);
       }
     },
-    [onGenerated, onLoadingChange]
+    [onGenerated, onLoadingChange, onProgressUpdate]
   );
 
   /**
@@ -443,6 +454,9 @@ export default function CurriculumForm({
 
       setIsSubmitting(true);
       onLoadingChange?.(true);
+      // Surface the topic immediately so loading UI can personalize copy
+      // before the first status poll returns.
+      onProgressUpdate?.({ status: "submitting", topic: form.topic.trim() });
 
       try {
         // Step 1: Send generation request and get courseId back
@@ -484,7 +498,7 @@ export default function CurriculumForm({
         onLoadingChange?.(false);
       }
     },
-    [form, onLoadingChange, onSubmitAttempt, isFreeUser]
+    [form, onLoadingChange, onProgressUpdate, onSubmitAttempt, isFreeUser]
   );
 
   /* ── Render ────────────────────────────────────────────── */
