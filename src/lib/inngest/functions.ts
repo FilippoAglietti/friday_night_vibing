@@ -45,6 +45,16 @@ import {
   buildSkeletonCurriculumPrompt,
   buildModuleDetailCurriculumPrompt,
 } from "@/lib/prompts/curriculum";
+import {
+  shouldGroundStyle,
+  discoverPaperSources,
+  verifyPapers,
+  validateCitations,
+  decideFailurePolicy,
+  stripInvalidCitations,
+} from "@/lib/generation/grounded";
+import type { VerifiedSource } from "@/lib/generation/grounded";
+import { buildGroundedModuleDetailPrompt } from "@/lib/generation/grounded/academic-prompt";
 import type {
   GenerateRequest,
   Curriculum,
@@ -851,18 +861,93 @@ export const moduleGenerate = inngest.createFunction(
         .eq("module_index", moduleIndex);
     });
 
+    // Grounded pipeline (Phase 1 academic). If the request qualifies,
+    // we run a source-discovery step BEFORE content generation: Claude
+    // uses the web_search tool to find real peer-reviewed papers, then
+    // we verify each DOI against CrossRef and persist the verified set
+    // to generation_sources. The downstream generate step then cites
+    // ONLY from that verified list.
+    //
+    // Non-grounded requests skip this entire block and hit the existing
+    // pipeline unchanged (shouldGroundStyle returns null).
+    const styleConfig = shouldGroundStyle(request);
+    const verifiedSources: VerifiedSource[] | null = styleConfig
+      ? await step.run(`discover-sources-${moduleId}`, async () => {
+          const candidates = await discoverPaperSources({
+            moduleTitle: (skeletonModule as Module).title,
+            moduleObjectives: (skeletonModule as Module).objectives ?? [],
+            courseTopic: skeletonTitle,
+            audience: request.audience,
+            language: request.language ?? "en",
+            styleConfig,
+          });
+          const verified = await verifyPapers(candidates);
+          if (verified.length > 0) {
+            // Cast: generation_sources table was added in migration 015,
+            // Supabase generated Database types do not include it yet.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (supabase as any).from("generation_sources").insert(
+              verified.map((v) => ({
+                course_id: courseId,
+                module_index: moduleIndex,
+                source_type: "paper",
+                title: v.title,
+                authors: v.authors,
+                year: v.year,
+                journal: v.journal ?? null,
+                doi: v.doi ?? null,
+                url: v.url,
+                is_preprint: v.isPreprint,
+                verified_at: v.verifiedAt,
+                verified_by: v.verifiedBy,
+                verified_ok: true,
+              })),
+            );
+          }
+          await recordEvent({
+            courseId,
+            moduleIndex,
+            eventType: "module_success",
+            phase: "module_detail",
+            metadata: {
+              kind: "sources_verified",
+              candidateCount: candidates.length,
+              verifiedCount: verified.length,
+              densityMin: styleConfig.density.min,
+            },
+          });
+          return verified;
+        })
+      : null;
+
     // Call Claude for this module's detail. Wrapped in step.run()
     // so the Claude call is memoized: if the subsequent DB update
     // fails and Inngest retries, we don't re-spend tokens.
     const detail = await step.run(`generate-module-${moduleId}`, async () => {
-      const { system, messages } = buildModuleDetailCurriculumPrompt(
-        request,
-        skeletonTitle,
-        skeletonDescription,
-        skeletonModule as Module,
-        moduleIndex,
-        totalModules,
-      );
+      const useGrounded =
+        !!styleConfig &&
+        !!verifiedSources &&
+        verifiedSources.length >= styleConfig.density.min;
+
+      const { system, messages } = useGrounded
+        ? buildGroundedModuleDetailPrompt({
+            request,
+            courseTitle: skeletonTitle,
+            courseDescription: skeletonDescription,
+            moduleData: skeletonModule as Module,
+            moduleIndex,
+            totalModules,
+            verifiedSources: verifiedSources!,
+            densityTarget: styleConfig!.density,
+          })
+        : buildModuleDetailCurriculumPrompt(
+            request,
+            skeletonTitle,
+            skeletonDescription,
+            skeletonModule as Module,
+            moduleIndex,
+            totalModules,
+          );
       // Length-aware routing: masterclass stays on Haiku 4.5 but gets
       // a larger output cap and longer timeout than standard.
       //
@@ -895,11 +980,35 @@ export const moduleGenerate = inngest.createFunction(
         courseId,
         phase: "module_detail",
       });
-      return parseClaudeJson<{ lessons: Module["lessons"]; quiz: Module["quiz"] }>(
+      const parsed = await parseClaudeJson<{ lessons: Module["lessons"]; quiz: Module["quiz"] }>(
         rawText,
         `module ${moduleId}`,
         courseId,
       );
+
+      // Post-generation citation validation (grounded path only). For each
+      // lesson, check that every [n] inline ref resolves to a verified source.
+      // Policy: invalidRatio ≤ 20% → silently strip bad refs; > 20% → keep
+      // as-is for MVP (LLM repair is a Phase 1.1 follow-up).
+      if (useGrounded && verifiedSources) {
+        parsed.lessons = parsed.lessons.map((lesson) => {
+          if (!lesson.content) return lesson;
+          const result = validateCitations({
+            lessonMarkdown: lesson.content,
+            verifiedSources,
+          });
+          const policy = decideFailurePolicy(result);
+          if (policy.action === "silent_remove") {
+            return {
+              ...lesson,
+              content: stripInvalidCitations(lesson.content, policy.dropIndices),
+            };
+          }
+          return lesson;
+        });
+      }
+
+      return parsed;
     });
 
     // Persist the module result to generation_jobs.
