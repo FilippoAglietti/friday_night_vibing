@@ -411,7 +411,7 @@ export default function CurriculumOutput({
   };
 
   const handleExportNotion = async () => {
-    const ok = await copyNotionHtmlToClipboard(curriculum);
+    const ok = await copyNotionHtmlToClipboard(curriculum, { teachingStyle });
     if (ok) {
       setNotionCopied(true);
       setTimeout(() => setNotionCopied(false), 3000);
@@ -421,7 +421,7 @@ export default function CurriculumOutput({
   const handleExportDocx = async () => {
     try {
       setLoadingExports((prev) => ({ ...prev, docx: true }));
-      const blob = await generateCurriculumDocx(curriculum);
+      const blob = await generateCurriculumDocx(curriculum, { teachingStyle });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -440,7 +440,7 @@ export default function CurriculumOutput({
   const handleExportScorm = async () => {
     try {
       setLoadingExports((prev) => ({ ...prev, scorm: true }));
-      const blob = await generateScormPackage(curriculum);
+      const blob = await generateScormPackage(curriculum, { teachingStyle });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

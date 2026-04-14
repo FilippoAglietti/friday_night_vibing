@@ -11,9 +11,32 @@
  * ---------------------------------------------------------
  */
 
-import type { Curriculum } from "@/types/curriculum";
+import type { Curriculum, TeachingStyle } from "@/types/curriculum";
 
-export function generateNotionHtml(c: Curriculum): string {
+type NotionHtmlCfg = {
+  subtitleIcon: string;
+  moduleWord: string;
+  moduleEmoji: string;
+  lessonEmoji: string;
+  quizEmoji: string;
+  trackerHeader: string;
+  trackerIcon: string;
+};
+
+const NOTION_HTML_STYLE: Record<TeachingStyle, NotionHtmlCfg> = {
+  conversational: { subtitleIcon: "✨", moduleWord: "Module", moduleEmoji: "📕", lessonEmoji: "📖", quizEmoji: "🧪", trackerHeader: "Progress Tracker", trackerIcon: "✅" },
+  academic: { subtitleIcon: "🎓", moduleWord: "Chapter", moduleEmoji: "📜", lessonEmoji: "📖", quizEmoji: "📝", trackerHeader: "Study Log", trackerIcon: "📑" },
+  "hands-on": { subtitleIcon: "🛠️", moduleWord: "Session", moduleEmoji: "🔨", lessonEmoji: "⚙️", quizEmoji: "🎯", trackerHeader: "Build Log", trackerIcon: "📋" },
+  storytelling: { subtitleIcon: "📖", moduleWord: "Chapter", moduleEmoji: "✨", lessonEmoji: "📜", quizEmoji: "💭", trackerHeader: "Reader's Journey", trackerIcon: "📖" },
+};
+
+const MOD_PREFIX_RE = /^(?:module|chapter|session|unit|lesson|scene)\s*\d+\s*[:.\-–—]\s*/i;
+
+export function generateNotionHtml(
+  c: Curriculum,
+  opts?: { teachingStyle?: TeachingStyle | null }
+): string {
+  const cfg = NOTION_HTML_STYLE[opts?.teachingStyle ?? "conversational"] ?? NOTION_HTML_STYLE.conversational;
   const totalLessons = c.modules.reduce((a, m) => a + (m.lessons?.length || 0), 0);
   const totalQuizzes = c.modules.reduce(
     (a, m) => a + (m.quiz?.length || 0) + m.lessons.reduce((b, l) => b + (l.quiz?.length || 0), 0),
@@ -34,14 +57,14 @@ export function generateNotionHtml(c: Curriculum): string {
 
   // ── Header ──
   parts.push(`<h1>${esc(c.title)}</h1>`);
-  parts.push(`<blockquote>✨ ${esc(c.subtitle)}</blockquote>`);
+  parts.push(`<blockquote>${cfg.subtitleIcon} ${esc(c.subtitle)}</blockquote>`);
   parts.push(`<p>${esc(c.description)}</p>`);
   parts.push(`<hr>`);
 
   // ── Quick Stats ──
   parts.push(`<h2>📊 Quick Stats</h2>`);
   parts.push(`<table><thead><tr>
-    <th>Modules</th><th>Lessons</th><th>Quizzes</th><th>Duration</th><th>Level</th>
+    <th>${cfg.moduleWord}s</th><th>Lessons</th><th>Quizzes</th><th>Duration</th><th>Level</th>
   </tr></thead><tbody><tr>
     <td>${c.modules.length}</td>
     <td>${totalLessons}</td>
@@ -59,13 +82,13 @@ export function generateNotionHtml(c: Curriculum): string {
   // ── Course Roadmap ──
   parts.push(`<h2>🗺️ Course Roadmap</h2>`);
   parts.push(`<table><thead><tr>
-    <th>#</th><th>Module</th><th>Lessons</th><th>Duration</th>
+    <th>#</th><th>${cfg.moduleWord}</th><th>Lessons</th><th>Duration</th>
   </tr></thead><tbody>`);
   c.modules.forEach((mod, i) => {
     const modMins = mod.lessons.reduce((a, l) => a + (l.durationMinutes || 0), 0);
     parts.push(`<tr>
       <td>${i + 1}</td>
-      <td><strong>${esc(mod.title)}</strong></td>
+      <td><strong>${esc(mod.title.replace(MOD_PREFIX_RE, ""))}</strong></td>
       <td>${mod.lessons.length}</td>
       <td>${modMins} min</td>
     </tr>`);
@@ -75,16 +98,16 @@ export function generateNotionHtml(c: Curriculum): string {
 
   // ── Modules & Lessons (detailed) ──
   c.modules.forEach((mod, mi) => {
-    parts.push(`<h2>Module ${mi + 1}: ${esc(mod.title)}</h2>`);
+    parts.push(`<h2>${cfg.moduleEmoji} ${cfg.moduleWord} ${mi + 1}: ${esc(mod.title.replace(MOD_PREFIX_RE, ""))}</h2>`);
     parts.push(`<p>${esc(mod.description)}</p>`);
 
     if (mod.objectives && mod.objectives.length > 0) {
-      parts.push(`<h3>🎯 Module Objectives</h3>`);
+      parts.push(`<h3>🎯 ${cfg.moduleWord} Objectives</h3>`);
       parts.push(`<ul>${mod.objectives.map((o) => `<li>${esc(o)}</li>`).join("")}</ul>`);
     }
 
     mod.lessons.forEach((lesson, li) => {
-      parts.push(`<h3>📖 Lesson ${li + 1}: ${esc(lesson.title)}</h3>`);
+      parts.push(`<h3>${cfg.lessonEmoji} Lesson ${li + 1}: ${esc(lesson.title)}</h3>`);
       parts.push(`<p><em>⏱ ${lesson.durationMinutes} minutes</em></p>`);
 
       if (lesson.description) {
@@ -138,7 +161,7 @@ export function generateNotionHtml(c: Curriculum): string {
 
     // Module-level quiz
     if (mod.quiz && mod.quiz.length > 0) {
-      parts.push(`<h3>🧠 Module ${mi + 1} Quiz</h3>`);
+      parts.push(`<h3>${cfg.quizEmoji} ${cfg.moduleWord} ${mi + 1} Quiz</h3>`);
       mod.quiz.forEach((q, qi) => {
         parts.push(`<p><strong>Q${qi + 1}:</strong> ${esc(q.question)}</p>`);
         if (q.options && q.options.length > 0) {
@@ -168,7 +191,7 @@ export function generateNotionHtml(c: Curriculum): string {
   c.modules.forEach((mod, i) => {
     parts.push(`<tr>
       <td>Week ${i + 1}</td>
-      <td>${esc(mod.title)}</td>
+      <td>${esc(mod.title.replace(MOD_PREFIX_RE, ""))}</td>
       <td>${esc(mod.description.slice(0, 80))}${mod.description.length > 80 ? "…" : ""}</td>
     </tr>`);
   });
@@ -176,9 +199,9 @@ export function generateNotionHtml(c: Curriculum): string {
   parts.push(`<hr>`);
 
   // ── Progress Tracker ──
-  parts.push(`<h2>✅ Progress Tracker</h2>`);
+  parts.push(`<h2>${cfg.trackerIcon} ${cfg.trackerHeader}</h2>`);
   c.modules.forEach((mod, mi) => {
-    parts.push(`<p><strong>Module ${mi + 1}: ${esc(mod.title)}</strong></p>`);
+    parts.push(`<p><strong>${cfg.moduleWord} ${mi + 1}: ${esc(mod.title.replace(MOD_PREFIX_RE, ""))}</strong></p>`);
     // Notion converts <li> with [ ] into to-do blocks
     parts.push(`<ul>`);
     mod.lessons.forEach((l) => {
@@ -215,8 +238,11 @@ export function generateNotionHtml(c: Curriculum): string {
  * Copy HTML to clipboard so it pastes into Notion as native blocks.
  * Falls back to plain text clipboard if ClipboardItem is not supported.
  */
-export async function copyNotionHtmlToClipboard(curriculum: Curriculum): Promise<boolean> {
-  const html = generateNotionHtml(curriculum);
+export async function copyNotionHtmlToClipboard(
+  curriculum: Curriculum,
+  opts?: { teachingStyle?: TeachingStyle | null }
+): Promise<boolean> {
+  const html = generateNotionHtml(curriculum, opts);
 
   try {
     // Modern clipboard API — writes HTML that Notion converts to native blocks

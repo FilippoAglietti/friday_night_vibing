@@ -1,17 +1,127 @@
 import JSZip from "jszip";
-import { Curriculum, Module, Lesson, QuizQuestion } from "@/types/curriculum";
+import {
+  Curriculum,
+  Module,
+  Lesson,
+  QuizQuestion,
+  TeachingStyle,
+} from "@/types/curriculum";
+
+/**
+ * Style configuration record keyed by TeachingStyle. Each entry drives the
+ * colors, fonts, and module-vocabulary used throughout the SCORM HTML pages.
+ */
+export interface ScormStyleConfig {
+  primary: string;
+  primaryDark: string;
+  accent: string;
+  bgTint: string;
+  bgTint2: string;
+  gradientFrom: string;
+  gradientTo: string;
+  fontFamily: string;
+  moduleWord: "Module" | "Chapter" | "Session";
+  moduleEmoji: string;
+}
+
+export const SCORM_STYLE_CONFIG: Record<TeachingStyle, ScormStyleConfig> = {
+  conversational: {
+    primary: "#6D28D9",
+    primaryDark: "#4C1D95",
+    accent: "#A78BFA",
+    bgTint: "#f9f8ff",
+    bgTint2: "#f3f0ff",
+    gradientFrom: "#6D28D9",
+    gradientTo: "#7c3aed",
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    moduleWord: "Module",
+    moduleEmoji: "📕",
+  },
+  academic: {
+    primary: "#1E3A8A",
+    primaryDark: "#0F172A",
+    accent: "#94A3B8",
+    bgTint: "#f8fafc",
+    bgTint2: "#f1f5f9",
+    gradientFrom: "#1E3A8A",
+    gradientTo: "#3B82F6",
+    fontFamily: "'Georgia', 'Times New Roman', Cambria, serif",
+    moduleWord: "Chapter",
+    moduleEmoji: "📜",
+  },
+  "hands-on": {
+    primary: "#047857",
+    primaryDark: "#064E3B",
+    accent: "#D97706",
+    bgTint: "#f0fdf4",
+    bgTint2: "#ecfdf5",
+    gradientFrom: "#047857",
+    gradientTo: "#10B981",
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    moduleWord: "Session",
+    moduleEmoji: "🔨",
+  },
+  storytelling: {
+    primary: "#9F1239",
+    primaryDark: "#4C0519",
+    accent: "#F59E0B",
+    bgTint: "#fff1f2",
+    bgTint2: "#ffe4e6",
+    gradientFrom: "#9F1239",
+    gradientTo: "#E11D48",
+    fontFamily: "'Georgia', 'Times New Roman', Cambria, serif",
+    moduleWord: "Chapter",
+    moduleEmoji: "✨",
+  },
+};
+
+const DEFAULT_STYLE: TeachingStyle = "conversational";
+
+/**
+ * Returns a `<style>` block defining CSS custom properties for the selected
+ * teaching style. Injected into every generated HTML page so that class-level
+ * rules in `getGlobalStyles()` can reference `var(--primary)` etc.
+ */
+function getThemeCss(style: TeachingStyle): string {
+  const cfg = SCORM_STYLE_CONFIG[style];
+  return `:root {
+      --primary: ${cfg.primary};
+      --primary-dark: ${cfg.primaryDark};
+      --accent: ${cfg.accent};
+      --bg-tint: ${cfg.bgTint};
+      --bg-tint-2: ${cfg.bgTint2};
+      --gradient-from: ${cfg.gradientFrom};
+      --gradient-to: ${cfg.gradientTo};
+      --font-family: ${cfg.fontFamily};
+    }`;
+}
+
+/**
+ * Strips any stale "Module 1:"/"Chapter 2 -"/"Session 3." prefix from a module
+ * title so the configured moduleWord can be re-applied consistently.
+ */
+function stripModulePrefix(title: string): string {
+  return title.replace(
+    /^(?:module|chapter|session|unit)\s*\d+\s*[:.\-]\s*/i,
+    ""
+  );
+}
 
 /**
  * Generates a SCORM 1.2 package (.zip) from a Curriculum object.
  * Compatible with Moodle, Canvas, and other SCORM-compliant LMS platforms.
  */
 export async function generateScormPackage(
-  curriculum: Curriculum
+  curriculum: Curriculum,
+  opts?: { teachingStyle?: TeachingStyle | null }
 ): Promise<Blob> {
+  const style: TeachingStyle = opts?.teachingStyle ?? DEFAULT_STYLE;
   const zip = new JSZip();
 
   // Generate manifest
-  const manifest = generateManifest(curriculum);
+  const manifest = generateManifest(curriculum, style);
   zip.file("imsmanifest.xml", manifest);
 
   // Generate SCORM API wrapper
@@ -19,14 +129,14 @@ export async function generateScormPackage(
 
   // Generate module overview pages
   for (const module of curriculum.modules) {
-    const moduleHtml = generateModuleOverviewPage(curriculum, module);
+    const moduleHtml = generateModuleOverviewPage(curriculum, module, style);
     zip.file(`module_${module.id}.html`, moduleHtml);
   }
 
   // Generate lesson pages
   for (const module of curriculum.modules) {
     for (const lesson of module.lessons) {
-      const lessonHtml = generateLessonPage(curriculum, module, lesson);
+      const lessonHtml = generateLessonPage(curriculum, module, lesson, style);
       zip.file(`lesson_${lesson.id}.html`, lessonHtml);
     }
   }
@@ -34,7 +144,13 @@ export async function generateScormPackage(
   // Generate quiz pages
   for (const module of curriculum.modules) {
     if (module.quiz && module.quiz.length > 0) {
-      const quizHtml = generateQuizPage(curriculum, module, null, module.quiz);
+      const quizHtml = generateQuizPage(
+        curriculum,
+        module,
+        null,
+        module.quiz,
+        style
+      );
       zip.file(`quiz_module_${module.id}.html`, quizHtml);
     }
 
@@ -44,7 +160,8 @@ export async function generateScormPackage(
           curriculum,
           module,
           lesson,
-          lesson.quiz
+          lesson.quiz,
+          style
         );
         zip.file(`quiz_lesson_${lesson.id}.html`, quizHtml);
       }
@@ -52,7 +169,7 @@ export async function generateScormPackage(
   }
 
   // Generate course overview (index)
-  const courseHtml = generateCourseOverviewPage(curriculum);
+  const courseHtml = generateCourseOverviewPage(curriculum, style);
   zip.file("index.html", courseHtml);
 
   // Generate the blob
@@ -62,7 +179,8 @@ export async function generateScormPackage(
 /**
  * Generates the imsmanifest.xml file that describes the SCORM package structure.
  */
-function generateManifest(curriculum: Curriculum): string {
+function generateManifest(curriculum: Curriculum, style: TeachingStyle): string {
+  const cfg = SCORM_STYLE_CONFIG[style];
   const courseId = sanitizeId(curriculum.id);
   const orgId = `org_${courseId}`;
 
@@ -76,9 +194,11 @@ function generateManifest(curriculum: Curriculum): string {
   // Module items
   for (const module of curriculum.modules) {
     const moduleId = sanitizeId(module.id);
+    const cleanModuleTitle = stripModulePrefix(module.title);
+    const labelledTitle = `${cfg.moduleWord} ${module.order + 1}: ${cleanModuleTitle}`;
     organizationContent += `
       <item identifier="item_module_${moduleId}" identifierref="res_module_${moduleId}">
-        <title>${escapeXml(module.title)}</title>`;
+        <title>${escapeXml(labelledTitle)}</title>`;
 
     // Lesson items
     for (const lesson of module.lessons) {
@@ -93,7 +213,7 @@ function generateManifest(curriculum: Curriculum): string {
     if (module.quiz && module.quiz.length > 0) {
       organizationContent += `
         <item identifier="item_quiz_module_${moduleId}" identifierref="res_quiz_module_${moduleId}">
-          <title>${escapeXml(module.title)} - Quiz</title>
+          <title>${escapeXml(labelledTitle)} - Quiz</title>
         </item>`;
     }
 
@@ -161,7 +281,11 @@ ${resourcesContent}
 /**
  * Generates the course overview/index page.
  */
-function generateCourseOverviewPage(curriculum: Curriculum): string {
+function generateCourseOverviewPage(
+  curriculum: Curriculum,
+  style: TeachingStyle
+): string {
+  const cfg = SCORM_STYLE_CONFIG[style];
   const totalLessons = curriculum.modules.reduce(
     (sum, m) => sum + m.lessons.length,
     0
@@ -173,7 +297,7 @@ function generateCourseOverviewPage(curriculum: Curriculum): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(curriculum.title)}</title>
-  <style>${getGlobalStyles()}</style>
+  <style>${getThemeCss(style)}${getGlobalStyles()}</style>
 </head>
 <body onload="scormInit()">
   <div class="container">
@@ -193,7 +317,7 @@ function generateCourseOverviewPage(curriculum: Curriculum): string {
       <section class="info-grid">
         <div class="info-card">
           <div class="info-number">${curriculum.modules.length}</div>
-          <div class="info-label">Modules</div>
+          <div class="info-label">${cfg.moduleWord}s</div>
         </div>
         <div class="info-card">
           <div class="info-number">${totalLessons}</div>
@@ -233,15 +357,15 @@ function generateCourseOverviewPage(curriculum: Curriculum): string {
         <h2>Course Content</h2>
         <div class="modules-list">
           ${curriculum.modules
-            .map((module) => generateModuleListItem(module))
+            .map((module) => generateModuleListItem(module, style))
             .join("\n          ")}
         </div>
       </section>
 
       <section class="getting-started">
         <h2>Getting Started</h2>
-        <p>Click on any module below to begin learning. Each lesson includes content, key points, and interactive elements. Complete all lessons in a module to mark it as done.</p>
-        <a href="module_${sanitizeId(curriculum.modules[0]?.id || "")}.html" class="cta-button">Start First Module</a>
+        <p>Click on any ${cfg.moduleWord.toLowerCase()} below to begin learning. Each lesson includes content, key points, and interactive elements. Complete all lessons in a ${cfg.moduleWord.toLowerCase()} to mark it as done.</p>
+        <a href="module_${sanitizeId(curriculum.modules[0]?.id || "")}.html" class="cta-button">Start First ${cfg.moduleWord}</a>
       </section>
     </main>
 
@@ -272,30 +396,34 @@ function generateCourseOverviewPage(curriculum: Curriculum): string {
  */
 function generateModuleOverviewPage(
   curriculum: Curriculum,
-  module: Module
+  module: Module,
+  style: TeachingStyle
 ): string {
+  const cfg = SCORM_STYLE_CONFIG[style];
   const moduleId = sanitizeId(module.id);
   const firstLessonId = module.lessons[0]?.id || "";
+  const cleanTitle = stripModulePrefix(module.title);
+  const labelledTitle = `${cfg.moduleWord} ${module.order + 1}: ${cleanTitle}`;
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(module.title)}</title>
-  <style>${getGlobalStyles()}</style>
+  <title>${escapeHtml(labelledTitle)}</title>
+  <style>${getThemeCss(style)}${getGlobalStyles()}</style>
 </head>
 <body onload="scormInit()">
   <div class="container">
     <header class="header">
       <a href="index.html" class="breadcrumb">&larr; ${escapeHtml(curriculum.title)}</a>
-      <h1>${escapeHtml(module.title)}</h1>
+      <h1>${cfg.moduleEmoji} ${escapeHtml(labelledTitle)}</h1>
     </header>
 
     <main class="main">
       <section class="module-overview">
         <p class="module-description">${escapeHtml(module.description)}</p>
-        
+
         <div class="module-meta">
           <span class="meta-item">
             <strong>${module.lessons.length}</strong> lessons
@@ -307,7 +435,7 @@ function generateModuleOverviewPage(
       </section>
 
       <section class="objectives-section">
-        <h2>Module Objectives</h2>
+        <h2>${cfg.moduleWord} Objectives</h2>
         <ul class="objectives-list">
           ${module.objectives.map((obj) => `<li>${escapeHtml(obj)}</li>`).join("\n          ")}
         </ul>
@@ -324,8 +452,8 @@ function generateModuleOverviewPage(
 
       ${module.quiz && module.quiz.length > 0 ? `
       <section class="quiz-section">
-        <h2>Module Assessment</h2>
-        <p>Test your understanding of this module's content.</p>
+        <h2>${cfg.moduleWord} Assessment</h2>
+        <p>Test your understanding of this ${cfg.moduleWord.toLowerCase()}'s content.</p>
         <a href="quiz_module_${moduleId}.html" class="cta-button">Take Quiz</a>
       </section>` : ""}
 
@@ -364,11 +492,18 @@ function generateModuleOverviewPage(
 function generateLessonPage(
   curriculum: Curriculum,
   module: Module,
-  lesson: Lesson
+  lesson: Lesson,
+  style: TeachingStyle
 ): string {
+  const cfg = SCORM_STYLE_CONFIG[style];
   const lessonId = sanitizeId(lesson.id);
   const moduleId = sanitizeId(module.id);
   const nextLesson = module.lessons[lesson.order + 1];
+  const cleanModuleTitle = stripModulePrefix(module.title);
+  const labelledModuleTitle = `${cfg.moduleWord} ${module.order + 1}: ${cleanModuleTitle}`;
+
+  // Avoid unused variable warnings when curriculum is unused here.
+  void curriculum;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -376,12 +511,12 @@ function generateLessonPage(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(lesson.title)}</title>
-  <style>${getGlobalStyles()}</style>
+  <style>${getThemeCss(style)}${getGlobalStyles()}</style>
 </head>
 <body onload="scormInit()">
   <div class="container">
     <header class="header">
-      <a href="module_${moduleId}.html" class="breadcrumb">&larr; ${escapeHtml(module.title)}</a>
+      <a href="module_${moduleId}.html" class="breadcrumb">&larr; ${escapeHtml(labelledModuleTitle)}</a>
       <h1>${escapeHtml(lesson.title)}</h1>
     </header>
 
@@ -430,8 +565,8 @@ function generateLessonPage(
       </section>` : ""}
 
       <section class="navigation">
-        <a href="module_${moduleId}.html" class="btn btn-secondary">Back to Module</a>
-        ${nextLesson ? `<a href="lesson_${sanitizeId(nextLesson.id)}.html" class="btn btn-primary">Next Lesson</a>` : `<a href="module_${moduleId}.html" class="btn btn-primary">Module Complete</a>`}
+        <a href="module_${moduleId}.html" class="btn btn-secondary">Back to ${cfg.moduleWord}</a>
+        ${nextLesson ? `<a href="lesson_${sanitizeId(nextLesson.id)}.html" class="btn btn-primary">Next Lesson</a>` : `<a href="module_${moduleId}.html" class="btn btn-primary">${cfg.moduleWord} Complete</a>`}
       </section>
     </main>
 
@@ -474,12 +609,18 @@ function generateQuizPage(
   curriculum: Curriculum,
   module: Module | null,
   lesson: Lesson | null,
-  questions: QuizQuestion[]
+  questions: QuizQuestion[],
+  style: TeachingStyle
 ): string {
+  const cfg = SCORM_STYLE_CONFIG[style];
+  void curriculum;
+  const moduleLabel = module
+    ? `${cfg.moduleWord} ${module.order + 1}: ${stripModulePrefix(module.title)}`
+    : "";
   const pageTitle = lesson
     ? escapeHtml(lesson.title)
     : module
-      ? escapeHtml(module.title)
+      ? escapeHtml(moduleLabel)
       : "Quiz";
   const backLink =
     lesson && module
@@ -487,7 +628,7 @@ function generateQuizPage(
       : module
         ? `module_${sanitizeId(module.id)}.html`
         : "index.html";
-  const backText = lesson && module ? "Lesson" : module ? "Module" : "Course";
+  const backText = lesson && module ? "Lesson" : module ? cfg.moduleWord : "Course";
 
   const questionsHtml = questions
     .map((q, idx) => generateQuestionElement(q, idx))
@@ -500,14 +641,15 @@ function generateQuizPage(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quiz: ${pageTitle}</title>
   <style>
+    ${getThemeCss(style)}
     ${getGlobalStyles()}
     .quiz-container {
       max-width: 800px;
       margin: 0 auto;
     }
     .question {
-      background: #f9f8ff;
-      border-left: 4px solid #6D28D9;
+      background: var(--bg-tint);
+      border-left: 4px solid var(--primary);
       padding: 24px;
       margin-bottom: 24px;
       border-radius: 8px;
@@ -537,14 +679,14 @@ function generateQuizPage(
       gap: 12px;
       padding: 12px;
       background: white;
-      border: 2px solid #e5e0ff;
+      border: 2px solid var(--bg-tint-2);
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .option:hover {
-      border-color: #6D28D9;
-      background: #fafbff;
+      border-color: var(--primary);
+      background: var(--bg-tint);
     }
     .option input[type="radio"],
     .option input[type="checkbox"] {
@@ -595,7 +737,7 @@ function generateQuizPage(
       font-weight: 600;
     }
     .submit-btn {
-      background-color: #6D28D9;
+      background-color: var(--primary);
       color: white;
       border: none;
       padding: 12px 32px;
@@ -607,7 +749,7 @@ function generateQuizPage(
       margin-top: 24px;
     }
     .submit-btn:hover {
-      background-color: #5b21b6;
+      background-color: var(--primary-dark);
     }
     .quiz-results {
       background: #f0fdf4;
@@ -764,7 +906,7 @@ function generateQuestionElement(question: QuizQuestion, index: number): string 
       )
       .join("\n        ");
   } else if (isShortAnswer) {
-    optionsHtml = `<input type="text" name="${questionId}" placeholder="Enter your answer..." style="padding: 10px; border: 2px solid #e5e0ff; border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box;" />`;
+    optionsHtml = `<input type="text" name="${questionId}" placeholder="Enter your answer..." style="padding: 10px; border: 2px solid var(--bg-tint-2); border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box;" />`;
   }
 
   const explanationHtml = question.explanation
@@ -800,10 +942,13 @@ function generateLessonCard(lesson: Lesson): string {
 /**
  * Helper to generate a module list item for display on the course overview.
  */
-function generateModuleListItem(module: Module): string {
+function generateModuleListItem(module: Module, style: TeachingStyle): string {
+  const cfg = SCORM_STYLE_CONFIG[style];
   const moduleId = sanitizeId(module.id);
+  const cleanTitle = stripModulePrefix(module.title);
+  const labelledTitle = `${cfg.moduleWord} ${module.order + 1}: ${cleanTitle}`;
   return `<a href="module_${moduleId}.html" class="module-item">
-          <h3>${escapeHtml(module.title)}</h3>
+          <h3>${cfg.moduleEmoji} ${escapeHtml(labelledTitle)}</h3>
           <p>${escapeHtml(module.description)}</p>
           <div class="module-stats">
             <span>${module.lessons.length} lessons</span>
@@ -824,7 +969,7 @@ function getGlobalStyles(): string {
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-family);
       color: #1a1a1a;
       background-color: #ffffff;
       line-height: 1.6;
@@ -839,7 +984,7 @@ function getGlobalStyles(): string {
     }
 
     .header {
-      background: linear-gradient(135deg, #6D28D9 0%, #7c3aed 100%);
+      background: linear-gradient(135deg, var(--gradient-from) 0%, var(--gradient-to) 100%);
       color: white;
       padding: 48px 32px;
       text-align: center;
@@ -912,20 +1057,20 @@ function getGlobalStyles(): string {
     }
 
     a {
-      color: #6D28D9;
+      color: var(--primary);
       text-decoration: none;
       transition: color 0.2s ease;
     }
 
     a:hover {
-      color: #5b21b6;
+      color: var(--primary-dark);
     }
 
     .welcome-section {
-      background: #f9f8ff;
+      background: var(--bg-tint);
       padding: 32px;
       border-radius: 12px;
-      border-left: 4px solid #6D28D9;
+      border-left: 4px solid var(--primary);
     }
 
     .info-grid {
@@ -936,17 +1081,17 @@ function getGlobalStyles(): string {
     }
 
     .info-card {
-      background: linear-gradient(135deg, #f9f8ff 0%, #f3f0ff 100%);
+      background: linear-gradient(135deg, var(--bg-tint) 0%, var(--bg-tint-2) 100%);
       padding: 24px;
       border-radius: 12px;
-      border: 1px solid #e9d5ff;
+      border: 1px solid var(--bg-tint-2);
       text-align: center;
     }
 
     .info-number {
       font-size: 36px;
       font-weight: 700;
-      color: #6D28D9;
+      color: var(--primary);
       margin-bottom: 8px;
     }
 
@@ -965,8 +1110,8 @@ function getGlobalStyles(): string {
 
     .objectives-list li {
       padding: 12px 16px;
-      background: #f9f8ff;
-      border-left: 3px solid #6D28D9;
+      background: var(--bg-tint);
+      border-left: 3px solid var(--primary);
       margin-bottom: 12px;
       border-radius: 4px;
     }
@@ -979,7 +1124,7 @@ function getGlobalStyles(): string {
 
     .module-item {
       background: white;
-      border: 2px solid #e9d5ff;
+      border: 2px solid var(--bg-tint-2);
       border-radius: 12px;
       padding: 24px;
       transition: all 0.3s ease;
@@ -987,8 +1132,8 @@ function getGlobalStyles(): string {
     }
 
     .module-item:hover {
-      border-color: #6D28D9;
-      box-shadow: 0 8px 24px rgba(109, 40, 217, 0.1);
+      border-color: var(--primary);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
       transform: translateY(-4px);
     }
 
@@ -1017,7 +1162,7 @@ function getGlobalStyles(): string {
 
     .lesson-card {
       background: white;
-      border: 2px solid #e9d5ff;
+      border: 2px solid var(--bg-tint-2);
       border-radius: 12px;
       padding: 20px;
       transition: all 0.3s ease;
@@ -1026,8 +1171,8 @@ function getGlobalStyles(): string {
     }
 
     .lesson-card:hover {
-      border-color: #6D28D9;
-      box-shadow: 0 8px 24px rgba(109, 40, 217, 0.1);
+      border-color: var(--primary);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
       transform: translateY(-4px);
     }
 
@@ -1051,8 +1196,8 @@ function getGlobalStyles(): string {
     }
 
     .format-badge, .meta-badge {
-      background: #e9d5ff;
-      color: #6D28D9;
+      background: var(--bg-tint-2);
+      color: var(--primary);
       padding: 4px 12px;
       border-radius: 20px;
       font-size: 12px;
@@ -1061,10 +1206,10 @@ function getGlobalStyles(): string {
     }
 
     .module-overview {
-      background: #f9f8ff;
+      background: var(--bg-tint);
       padding: 32px;
       border-radius: 12px;
-      border-left: 4px solid #6D28D9;
+      border-left: 4px solid var(--primary);
       margin-bottom: 32px;
     }
 
@@ -1087,10 +1232,10 @@ function getGlobalStyles(): string {
     }
 
     .lesson-info {
-      background: #f9f8ff;
+      background: var(--bg-tint);
       padding: 24px;
       border-radius: 12px;
-      border-left: 4px solid #6D28D9;
+      border-left: 4px solid var(--primary);
       margin-bottom: 32px;
     }
 
@@ -1103,7 +1248,7 @@ function getGlobalStyles(): string {
       background: white;
       padding: 24px;
       border-radius: 8px;
-      border: 1px solid #e9d5ff;
+      border: 1px solid var(--bg-tint-2);
       margin-bottom: 32px;
       line-height: 1.8;
     }
@@ -1120,12 +1265,12 @@ function getGlobalStyles(): string {
     }
 
     .content-body code {
-      background: #f3f0ff;
+      background: var(--bg-tint-2);
       padding: 2px 8px;
       border-radius: 4px;
       font-family: "Monaco", "Courier New", monospace;
       font-size: 14px;
-      color: #6D28D9;
+      color: var(--primary);
     }
 
     .content-body pre {
@@ -1198,7 +1343,7 @@ function getGlobalStyles(): string {
 
     .cta-button {
       display: inline-block;
-      background-color: #6D28D9;
+      background-color: var(--primary);
       color: white;
       padding: 12px 32px;
       border-radius: 6px;
@@ -1209,7 +1354,7 @@ function getGlobalStyles(): string {
     }
 
     .cta-button:hover {
-      background-color: #5b21b6;
+      background-color: var(--primary-dark);
     }
 
     .navigation {
@@ -1219,7 +1364,7 @@ function getGlobalStyles(): string {
       flex-wrap: wrap;
       margin-top: 48px;
       padding-top: 32px;
-      border-top: 1px solid #e9d5ff;
+      border-top: 1px solid var(--bg-tint-2);
     }
 
     .btn {
@@ -1235,24 +1380,24 @@ function getGlobalStyles(): string {
     }
 
     .btn-primary {
-      background-color: #6D28D9;
+      background-color: var(--primary);
       color: white;
     }
 
     .btn-primary:hover {
-      background-color: #5b21b6;
+      background-color: var(--primary-dark);
       transform: translateY(-2px);
     }
 
     .btn-secondary {
-      background-color: #f3f0ff;
-      color: #6D28D9;
-      border: 2px solid #e9d5ff;
+      background-color: var(--bg-tint-2);
+      color: var(--primary);
+      border: 2px solid var(--bg-tint-2);
     }
 
     .btn-secondary:hover {
-      background-color: #e9d5ff;
-      border-color: #6D28D9;
+      background-color: var(--bg-tint);
+      border-color: var(--primary);
     }
 
     .footer {
@@ -1265,7 +1410,7 @@ function getGlobalStyles(): string {
     }
 
     .getting-started {
-      background: linear-gradient(135deg, #f9f8ff 0%, #f3f0ff 100%);
+      background: linear-gradient(135deg, var(--bg-tint) 0%, var(--bg-tint-2) 100%);
       padding: 32px;
       border-radius: 12px;
       text-align: center;
@@ -1276,10 +1421,10 @@ function getGlobalStyles(): string {
     }
 
     .audience-section, .prerequisites-section {
-      background: #f5f3ff;
+      background: var(--bg-tint);
       padding: 24px;
       border-radius: 8px;
-      border-left: 4px solid #a78bfa;
+      border-left: 4px solid var(--accent);
     }
 
     @media (max-width: 768px) {

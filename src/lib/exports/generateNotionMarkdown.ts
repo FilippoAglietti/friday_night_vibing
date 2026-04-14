@@ -15,9 +15,79 @@
  * ---------------------------------------------------------
  */
 
-import type { Curriculum } from "@/types/curriculum";
+import type { Curriculum, TeachingStyle } from "@/types/curriculum";
 
-export function generateNotionMarkdown(c: Curriculum): string {
+type NotionStyleCfg = {
+  subtitleIcon: string;
+  detailedHeader: string;
+  detailedEmoji: string;
+  moduleEmoji: string;
+  moduleWord: string;
+  quizEmoji: string;
+  checkpointWord: string;
+  trackerHeader: string;
+  trackerIcon: string;
+  objectivesIcon: string;
+};
+
+const NOTION_STYLE: Record<TeachingStyle, NotionStyleCfg> = {
+  conversational: {
+    subtitleIcon: "\u{2728}",
+    detailedHeader: "Detailed Curriculum",
+    detailedEmoji: "\u{1F4DA}",
+    moduleEmoji: "\u{1F4D5}",
+    moduleWord: "Module",
+    quizEmoji: "\u{1F9EA}",
+    checkpointWord: "Knowledge Check",
+    trackerHeader: "Progress Tracker",
+    trackerIcon: "\u{2705}",
+    objectivesIcon: "\u{1F3AF}",
+  },
+  academic: {
+    subtitleIcon: "\u{1F393}",
+    detailedHeader: "Chapters",
+    detailedEmoji: "\u{1F4D6}",
+    moduleEmoji: "\u{1F4DC}",
+    moduleWord: "Chapter",
+    quizEmoji: "\u{1F4DD}",
+    checkpointWord: "Examination",
+    trackerHeader: "Study Log",
+    trackerIcon: "\u{1F4D1}",
+    objectivesIcon: "\u{1F9E0}",
+  },
+  "hands-on": {
+    subtitleIcon: "\u{1F6E0}\u{FE0F}",
+    detailedHeader: "Session Pack",
+    detailedEmoji: "\u{1F527}",
+    moduleEmoji: "\u{1F528}",
+    moduleWord: "Session",
+    quizEmoji: "\u{1F3AF}",
+    checkpointWord: "Skill Check",
+    trackerHeader: "Build Log",
+    trackerIcon: "\u{1F4CB}",
+    objectivesIcon: "\u{1F3AF}",
+  },
+  storytelling: {
+    subtitleIcon: "\u{1F4D6}",
+    detailedHeader: "The Chapters",
+    detailedEmoji: "\u{1F4DC}",
+    moduleEmoji: "\u{2728}",
+    moduleWord: "Chapter",
+    quizEmoji: "\u{1F4AD}",
+    checkpointWord: "Reflection",
+    trackerHeader: "Reader's Journey",
+    trackerIcon: "\u{1F4D6}",
+    objectivesIcon: "\u{1F4AB}",
+  },
+};
+
+const MOD_PREFIX_RE = /^(?:module|chapter|session|unit|lesson|scene)\s*\d+\s*[:.\-–—]\s*/i;
+
+export function generateNotionMarkdown(
+  c: Curriculum,
+  opts?: { teachingStyle?: TeachingStyle | null }
+): string {
+  const cfg = NOTION_STYLE[opts?.teachingStyle ?? "conversational"] ?? NOTION_STYLE.conversational;
   const lines: string[] = [];
   const div = "\n---\n";
   const totalLessons = c.modules.reduce((a, m) => a + (m.lessons?.length || 0), 0);
@@ -32,7 +102,7 @@ export function generateNotionMarkdown(c: Curriculum): string {
   // ═══════════════════════════════════════════════════
   lines.push(`# ${c.title}`);
   lines.push("");
-  lines.push(`> \u{2728} ${c.subtitle}`);
+  lines.push(`> ${cfg.subtitleIcon} ${c.subtitle}`);
   lines.push(div);
 
   // ═══════════════════════════════════════════════════
@@ -43,7 +113,7 @@ export function generateNotionMarkdown(c: Curriculum): string {
   lines.push("| | | | | |");
   lines.push("|:---:|:---:|:---:|:---:|:---:|");
   lines.push(
-    `| **${c.modules.length}** Modules | **${totalLessons}** Lessons | **${c.pacing.totalHours}** Hours | **${totalQuizzes}** Quizzes | ${diffEmoji[c.difficulty] || "\u{1F7E3}"} ${c.difficulty.charAt(0).toUpperCase() + c.difficulty.slice(1)} |`
+    `| **${c.modules.length}** ${cfg.moduleWord}s | **${totalLessons}** Lessons | **${c.pacing.totalHours}** Hours | **${totalQuizzes}** Quizzes | ${diffEmoji[c.difficulty] || "\u{1F7E3}"} ${c.difficulty.charAt(0).toUpperCase() + c.difficulty.slice(1)} |`
   );
   lines.push("");
 
@@ -68,7 +138,7 @@ export function generateNotionMarkdown(c: Curriculum): string {
   // ═══════════════════════════════════════════════════
   //  LEARNING OBJECTIVES — Trackable checklist
   // ═══════════════════════════════════════════════════
-  lines.push("## \u{1F3AF} Learning Objectives");
+  lines.push(`## ${cfg.objectivesIcon} Learning Objectives`);
   lines.push("");
   lines.push("> Track your progress by checking off each objective as you master it.");
   lines.push("");
@@ -89,11 +159,11 @@ export function generateNotionMarkdown(c: Curriculum): string {
   // ═══════════════════════════════════════════════════
   lines.push("## \u{1F5FA}\u{FE0F} Course Roadmap");
   lines.push("");
-  lines.push("| Module | Title | Lessons | Duration | Key Focus |");
+  lines.push(`| ${cfg.moduleWord} | Title | Lessons | Duration | Key Focus |`);
   lines.push("|:---:|---|:---:|:---:|---|");
   c.modules.forEach((mod) => {
     const modNum = (mod.order ?? 0) + 1;
-    const cleanTitle = mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "");
+    const cleanTitle = mod.title.replace(MOD_PREFIX_RE, "");
     const totalMin = mod.durationMinutes || mod.lessons.reduce((a, l) => a + l.durationMinutes, 0);
     const hrs = Math.round(totalMin / 60 * 10) / 10;
     const focus = mod.objectives?.[0] || mod.description.slice(0, 60) + "...";
@@ -104,17 +174,17 @@ export function generateNotionMarkdown(c: Curriculum): string {
   // ═══════════════════════════════════════════════════
   //  MODULES & LESSONS — Detailed breakdown
   // ═══════════════════════════════════════════════════
-  lines.push("## \u{1F4DA} Detailed Curriculum");
+  lines.push(`## ${cfg.detailedEmoji} ${cfg.detailedHeader}`);
   lines.push("");
 
   c.modules.forEach((mod) => {
     const modNum = (mod.order ?? 0) + 1;
-    const cleanTitle = mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "");
+    const cleanTitle = mod.title.replace(MOD_PREFIX_RE, "");
     const totalMin = mod.durationMinutes || mod.lessons.reduce((a, l) => a + l.durationMinutes, 0);
     const hrs = Math.round(totalMin / 60 * 10) / 10;
 
     lines.push(div);
-    lines.push(`### \u{1F4D5} Module ${modNum}: ${cleanTitle}`);
+    lines.push(`### ${cfg.moduleEmoji} ${cfg.moduleWord} ${modNum}: ${cleanTitle}`);
     lines.push("");
     lines.push(`> ${mod.description}`);
     lines.push("");
@@ -124,7 +194,7 @@ export function generateNotionMarkdown(c: Curriculum): string {
     // Module objectives
     if (mod.objectives && mod.objectives.length > 0) {
       lines.push("<details>");
-      lines.push(`<summary>\u{1F3AF} <b>Module Objectives (${mod.objectives.length})</b></summary>`);
+      lines.push(`<summary>${cfg.objectivesIcon} <b>${cfg.moduleWord} Objectives (${mod.objectives.length})</b></summary>`);
       lines.push("");
       mod.objectives.forEach((o) => lines.push(`- \u2713 ${o}`));
       lines.push("");
@@ -212,7 +282,7 @@ export function generateNotionMarkdown(c: Curriculum): string {
 
     // Module quiz
     if (mod.quiz && mod.quiz.length > 0) {
-      lines.push(`#### \u{1F9EA} Module ${modNum} Knowledge Check`);
+      lines.push(`#### ${cfg.quizEmoji} ${cfg.moduleWord} ${modNum} ${cfg.checkpointWord}`);
       lines.push("");
       mod.quiz.forEach((q, i) => {
         lines.push(`**Q${i + 1}.** ${q.question}`);
@@ -258,7 +328,7 @@ export function generateNotionMarkdown(c: Curriculum): string {
       const label = w.label || (w.moduleIds?.length
         ? w.moduleIds.map((id) => {
             const m = c.modules.find((mod) => mod.id === id);
-            return m ? m.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "") : id;
+            return m ? m.title.replace(MOD_PREFIX_RE, "") : id;
           }).join(", ")
         : "Course Content");
       const pctDone = Math.round(((idx + 1) / c.pacing.weeklyPlan!.length) * 100);
@@ -271,14 +341,14 @@ export function generateNotionMarkdown(c: Curriculum): string {
   // ═══════════════════════════════════════════════════
   //  PROGRESS TRACKER — Completion checklist
   // ═══════════════════════════════════════════════════
-  lines.push("## \u{2705} Progress Tracker");
+  lines.push(`## ${cfg.trackerIcon} ${cfg.trackerHeader}`);
   lines.push("");
   lines.push("> Check off each lesson as you complete it. Your goal: 100%!");
   lines.push("");
   c.modules.forEach((mod) => {
     const modNum = (mod.order ?? 0) + 1;
-    const cleanTitle = mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "");
-    lines.push(`### Module ${modNum}: ${cleanTitle}`);
+    const cleanTitle = mod.title.replace(MOD_PREFIX_RE, "");
+    lines.push(`### ${cfg.moduleWord} ${modNum}: ${cleanTitle}`);
     lines.push("");
     mod.lessons.forEach((l) => {
       lines.push(`- [ ] ${l.title} *(${l.durationMinutes}m)*`);

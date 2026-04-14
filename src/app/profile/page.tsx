@@ -377,9 +377,14 @@ export default function ProfilePage() {
     load();
   }, []);
 
-  // Poll for generating courses — refresh every 5s while any course is generating
+  // Poll for generating courses — refresh every 5s while any course is generating.
+  // Depend on `hasGenerating` (a derived boolean) instead of `generations` so the
+  // interval isn't torn down and recreated on every setGenerations call.
+  const hasGenerating = useMemo(
+    () => generations.some((g) => g.status === "generating"),
+    [generations],
+  );
   useEffect(() => {
-    const hasGenerating = generations.some((g) => g.status === "generating");
     if (!hasGenerating || !user) return;
 
     const interval = setInterval(async () => {
@@ -389,7 +394,6 @@ export default function ProfilePage() {
         .order("created_at", { ascending: false });
       if (courses) setGenerations(courses as unknown as Generation[]);
 
-      // Also refresh profile (generations_used may have incremented)
       const { data: profileData } = await supabaseBrowser
         .from("profiles")
         .select("plan, generations_used, generations_limit")
@@ -399,7 +403,7 @@ export default function ProfilePage() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [generations, user]);
+  }, [hasGenerating, user]);
 
   // ── Derived stats ──────────────────────────────────────────
 
@@ -563,14 +567,14 @@ export default function ProfilePage() {
     [],
   );
 
-  const handleExportNotion = useCallback(async (curriculum: Curriculum) => {
-    await copyNotionHtmlToClipboard(curriculum);
+  const handleExportNotion = useCallback(async (curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
+    await copyNotionHtmlToClipboard(curriculum, { teachingStyle });
     // Brief visual feedback — the button text could be updated via state if needed
   }, []);
 
-  const handleExportDocx = useCallback(async (curriculum: Curriculum) => {
+  const handleExportDocx = useCallback(async (curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
     try {
-      const blob = await generateCurriculumDocx(curriculum);
+      const blob = await generateCurriculumDocx(curriculum, { teachingStyle });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -778,7 +782,7 @@ export default function ProfilePage() {
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c, gen.teaching_style); }} title="Download PDF">
                   <Download className="size-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-purple-500/10 hover:text-purple-400" onClick={(e) => { e.stopPropagation(); handleExportNotion(c); }} title="Copy for Notion">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-purple-500/10 hover:text-purple-400" onClick={(e) => { e.stopPropagation(); handleExportNotion(c, gen.teaching_style);}} title="Copy for Notion">
                   <FileText className="size-3.5" />
                 </Button>
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-emerald-500/10 hover:text-emerald-400" onClick={(e) => { e.stopPropagation(); handleShareCourse(gen); }} title="Share">
@@ -868,14 +872,14 @@ export default function ProfilePage() {
                       <Button
                         variant="outline" size="sm"
                         className="h-7 text-[10px] gap-1 border-purple-500/20 hover:bg-purple-500/10 hover:text-purple-400 hover:border-purple-500/30"
-                        onClick={(e) => { e.stopPropagation(); handleExportNotion(c); }}
+                        onClick={(e) => { e.stopPropagation(); handleExportNotion(c, gen.teaching_style);}}
                       >
                         <FileText className="size-3" /> Notion
                       </Button>
                       <Button
                         variant="outline" size="sm"
                         className="h-7 text-[10px] gap-1 border-blue-500/20 hover:bg-blue-500/10 hover:text-blue-400 hover:border-blue-500/30"
-                        onClick={(e) => { e.stopPropagation(); handleExportDocx(c); }}
+                        onClick={(e) => { e.stopPropagation(); handleExportDocx(c, gen.teaching_style); }}
                       >
                         <FileText className="size-3" /> Word
                       </Button>
@@ -1011,13 +1015,25 @@ export default function ProfilePage() {
         )}
 
         {/* ── Tab Navigation ──────────────────────────────── */}
-        <div className="flex gap-0 mb-6 sm:mb-8 border-b border-border/40 overflow-x-auto scrollbar-hide">
+        <div
+          role="tablist"
+          aria-label="Dashboard sections"
+          className="flex gap-0 mb-6 sm:mb-8 border-b border-border/40 overflow-x-auto scrollbar-hide"
+        >
           {TABS.map((tab) => {
             const Icon = tab.icon;
+            const selected = activeTab === tab.id;
             return (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 sm:px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap ${
-                  activeTab === tab.id ? "text-violet-500 border-violet-500" : "text-muted-foreground border-transparent hover:text-foreground"
+              <button
+                key={tab.id}
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={selected}
+                aria-controls={`panel-${tab.id}`}
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/60 focus-visible:ring-offset-1 focus-visible:ring-offset-background ${
+                  selected ? "text-violet-500 border-violet-500" : "text-muted-foreground border-transparent hover:text-foreground"
                 }`}
               >
                 <Icon className="size-3.5" />

@@ -12,7 +12,10 @@ import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ToastProvider";
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Curriculum, TeachingStyle } from "@/types/curriculum";
-import { exampleCurricula as fullExampleCurricula } from "@/data/exampleCurricula";
+import {
+  exampleCurricula as fullExampleCurricula,
+  exampleCurriculaWithStyles,
+} from "@/data/exampleCurricula";
 import { motion, AnimatePresence, useScroll, useTransform, useAnimation, type Variants } from "framer-motion";
 import ScrollProgress from "@/components/ScrollProgress";
 import InteractiveDemo from "@/components/InteractiveDemo";
@@ -142,6 +145,9 @@ const exampleCurricula = [
     hours: 20,
     difficulty: "Intermediate" as const,
     tags: ["Marketing", "AI", "Growth", "Analytics"],
+    styleLabel: "Hands-on Workshop",
+    styleIcon: "🔨",
+    styleAccent: "from-emerald-500/20 to-amber-500/20 border-emerald-500/30 text-emerald-400",
   },
   {
     title: "Product Design Sprint: Problem to Prototype",
@@ -150,6 +156,9 @@ const exampleCurricula = [
     hours: 12,
     difficulty: "Beginner" as const,
     tags: ["Design", "UX", "Product", "Workshop"],
+    styleLabel: "Storytelling Narrative",
+    styleIcon: "📖",
+    styleAccent: "from-rose-500/20 to-amber-500/20 border-rose-500/30 text-rose-400",
   },
   {
     title: "Full-Stack TypeScript Bootcamp",
@@ -158,6 +167,9 @@ const exampleCurricula = [
     hours: 28,
     difficulty: "Advanced" as const,
     tags: ["TypeScript", "React", "Node.js", "Bootcamp"],
+    styleLabel: "Academic Monograph",
+    styleIcon: "📜",
+    styleAccent: "from-blue-500/20 to-slate-500/20 border-blue-500/30 text-blue-400",
   },
 ];
 
@@ -429,11 +441,15 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<unknown>(null);
   const [previewCurriculum, setPreviewCurriculum] = useState<Curriculum | null>(null);
+  const [previewTeachingStyle, setPreviewTeachingStyle] = useState<TeachingStyle | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [templateFormValues, setTemplateFormValues] = useState<Partial<CurriculumFormData> | undefined>(undefined);
   const { toast } = useToast();
   const { t } = useTranslation();
-  const closePreview = useCallback(() => setPreviewCurriculum(null), []);
+  const closePreview = useCallback(() => {
+    setPreviewCurriculum(null);
+    setPreviewTeachingStyle(null);
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -1056,7 +1072,12 @@ export default function Home() {
                 <motion.div key={i} variants={scaleUp} className="group relative">
                   <div
                     className="relative flex flex-col items-center text-center p-5 md:p-8 xl:p-10 2xl:p-12 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60 hover:shadow-xl hover:shadow-violet-500/5 h-full cursor-pointer"
-                    onClick={() => setPreviewCurriculum(fullExampleCurricula[i])}
+                    onClick={() => {
+                      setPreviewCurriculum(fullExampleCurricula[i]);
+                      setPreviewTeachingStyle(
+                        exampleCurriculaWithStyles[i]?.teachingStyle ?? null,
+                      );
+                    }}
                   >
                     {/* Difficulty badge */}
                     <Badge
@@ -1077,6 +1098,14 @@ export default function Home() {
                       <h3 className="text-xl xl:text-2xl 2xl:text-[1.7rem] font-semibold leading-tight">
                         {c.title}
                       </h3>
+                    </div>
+
+                    {/* Teaching-style badge — clicks preview the style's export layout */}
+                    <div
+                      className={`mt-3 inline-flex items-center gap-1.5 rounded-full border bg-gradient-to-r px-3 py-1 text-[11px] font-semibold tracking-wide ${c.styleAccent}`}
+                    >
+                      <span aria-hidden>{c.styleIcon}</span>
+                      <span>{c.styleLabel}</span>
                     </div>
 
                     {/* Stats */}
@@ -1691,6 +1720,7 @@ export default function Home() {
             </button>
             <CurriculumOutput
               curriculum={previewCurriculum}
+              teachingStyle={previewTeachingStyle}
               onGenerateAnother={closePreview}
             />
           </div>

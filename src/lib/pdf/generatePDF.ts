@@ -145,6 +145,26 @@ const THEMES: Record<TeachingStyle, Palette> = {
  */
 let C: Palette = DEFAULT_PALETTE;
 
+/** Small helper — roman numerals for storytelling chapter ornaments. */
+function romanize(n: number): string {
+  const map: Array<[number, string]> = [
+    [10, "X"],
+    [9, "IX"],
+    [5, "V"],
+    [4, "IV"],
+    [1, "I"],
+  ];
+  let out = "";
+  let rem = n;
+  for (const [v, s] of map) {
+    while (rem >= v) {
+      out += s;
+      rem -= v;
+    }
+  }
+  return out;
+}
+
 /** Font sizes in points */
 const F = {
   hero: 32,
@@ -170,19 +190,68 @@ const S = {
 
 // ─── PDFBuilder ───────────────────────────────────────────────
 
+/** Font family used by jsPDF for a given teaching style. */
+type PdfFontFamily = "helvetica" | "times";
+
+interface StyleConfig {
+  /** jsPDF built-in font family */
+  fontFamily: PdfFontFamily;
+  /** Cover treatment variant */
+  coverVariant: "gradient" | "formal" | "editorial" | "workshop";
+  /** Module header variant */
+  moduleHeader: "circle" | "chapter" | "ornament" | "chip";
+  /** Label to stamp in the top-left brand mark on the cover */
+  brandMark: string;
+  /** Headline used on module headers ("Module" / "Chapter" / "Unit" / "Session") */
+  moduleWord: string;
+}
+
+const STYLE_CONFIG: Record<TeachingStyle, StyleConfig> = {
+  conversational: {
+    fontFamily: "helvetica",
+    coverVariant: "gradient",
+    moduleHeader: "circle",
+    brandMark: "S Y L L A B I",
+    moduleWord: "Module",
+  },
+  academic: {
+    fontFamily: "times",
+    coverVariant: "formal",
+    moduleHeader: "chapter",
+    brandMark: "S Y L L A B I  ·  A C A D E M I C",
+    moduleWord: "Chapter",
+  },
+  "hands-on": {
+    fontFamily: "helvetica",
+    coverVariant: "workshop",
+    moduleHeader: "chip",
+    brandMark: "S Y L L A B I  ·  W O R K S H O P",
+    moduleWord: "Session",
+  },
+  storytelling: {
+    fontFamily: "times",
+    coverVariant: "editorial",
+    moduleHeader: "ornament",
+    brandMark: "S Y L L A B I  ·  S T O R I E S",
+    moduleWord: "Chapter",
+  },
+};
+
 class PDFBuilder {
   private doc: jsPDF;
   private y: number;
   private pageNum: number;
   private toc: Array<{ title: string; page: number; level: number }>;
   private totalPages: number;
+  private readonly config: StyleConfig;
 
-  constructor() {
+  constructor(style: TeachingStyle = "conversational") {
     this.doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     this.y = PAGE.mt;
     this.pageNum = 1;
     this.toc = [];
     this.totalPages = 0;
+    this.config = STYLE_CONFIG[style] ?? STYLE_CONFIG.conversational;
   }
 
   // ── Page Management ─────────────────────────────────────────
@@ -218,10 +287,15 @@ class PDFBuilder {
   private font(
     size: number,
     weight: "normal" | "bold" | "italic" = "normal",
-    color: RGB = C.text
+    color: RGB = C.text,
+    family?: PdfFontFamily,
   ) {
     this.doc.setFontSize(size);
-    this.doc.setFont("helvetica", weight);
+    // `times` doesn't ship an italic synthetic under jsPDF built-ins for all
+    // weights — fall back to normal when italic is requested on serif.
+    const fam = family ?? this.config.fontFamily;
+    const w = fam === "times" && weight === "italic" ? "italic" : weight;
+    this.doc.setFont(fam, w);
     this.setColor(color);
   }
 
@@ -344,6 +418,27 @@ class PDFBuilder {
   // ═══════════════════════════════════════════════════════════
 
   buildCover(c: Curriculum): void {
+    switch (this.config.coverVariant) {
+      case "formal":
+        this.buildCoverFormal(c);
+        return;
+      case "editorial":
+        this.buildCoverEditorial(c);
+        return;
+      case "workshop":
+        this.buildCoverWorkshop(c);
+        return;
+      default:
+        this.buildCoverGradient(c);
+        return;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  COVER VARIANT — GRADIENT (conversational, default brand)
+  // ═══════════════════════════════════════════════════════════
+
+  private buildCoverGradient(c: Curriculum): void {
     // ── Full-bleed violet gradient (simulated with bands)
     const steps = 40;
     const bandH = PAGE.height / steps;
@@ -364,10 +459,10 @@ class PDFBuilder {
     this.doc.rect(150, 220, 60, 60, "F");
     this.doc.setGState(new (this.doc as any).GState({ opacity: 1 }));
 
-    // ── "SYLLABI" brand mark top-left
+    // ── Brand mark top-left
     this.y = 28;
     this.font(F.xs, "bold", C.violetMid);
-    this.doc.text("S Y L L A B I", PAGE.ml, this.y);
+    this.doc.text(this.config.brandMark, PAGE.ml, this.y);
 
     // ── Difficulty badge top-right
     const diffColors: Record<string, RGB> = {
@@ -471,6 +566,266 @@ class PDFBuilder {
       PAGE.height - 12,
       { align: "center" }
     );
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  COVER VARIANT — FORMAL (academic monograph)
+  // ═══════════════════════════════════════════════════════════
+
+  private buildCoverFormal(c: Curriculum): void {
+    // Cream paper background
+    this.setFill([252, 251, 247] as RGB);
+    this.doc.rect(0, 0, PAGE.width, PAGE.height, "F");
+
+    // Top and bottom rules — classic monograph feel
+    this.setFill(C.violet);
+    this.doc.rect(PAGE.ml, 24, PAGE.cw, 0.6, "F");
+    this.doc.rect(PAGE.ml, 27, PAGE.cw, 0.2, "F");
+    this.doc.rect(PAGE.ml, PAGE.height - 30, PAGE.cw, 0.2, "F");
+    this.doc.rect(PAGE.ml, PAGE.height - 27, PAGE.cw, 0.6, "F");
+
+    // Brand mark — small caps centered top
+    this.font(F.xs, "bold", C.violet, "helvetica");
+    this.doc.text(this.config.brandMark, PAGE.width / 2, 21, { align: "center" });
+
+    // Eyebrow label — "A COURSE IN"
+    this.y = 90;
+    this.font(F.small, "normal", C.textSec, "helvetica");
+    const eyebrow = `A ${c.difficulty.toUpperCase()} COURSE IN`;
+    this.doc.text(eyebrow, PAGE.width / 2, this.y, { align: "center" });
+    this.y += 16;
+
+    // Title — serif, centered, huge
+    this.font(F.hero + 4, "bold", C.text);
+    const titleLines = this.doc.splitTextToSize(c.title, PAGE.cw - 20) as string[];
+    for (const line of titleLines) {
+      this.doc.text(line, PAGE.width / 2, this.y, { align: "center" });
+      this.y += (F.hero + 4) * 0.48;
+    }
+    this.gap(S.lg);
+
+    // Ornamental separator
+    const ornY = this.y + 4;
+    this.setFill(C.violet);
+    this.doc.rect(PAGE.width / 2 - 25, ornY, 20, 0.4, "F");
+    this.doc.circle(PAGE.width / 2, ornY + 0.2, 1, "F");
+    this.doc.rect(PAGE.width / 2 + 5, ornY, 20, 0.4, "F");
+    this.y += 14;
+
+    // Subtitle — italic serif
+    if (c.subtitle) {
+      this.font(F.h3, "italic", C.textSec);
+      const subLines = this.doc.splitTextToSize(c.subtitle, PAGE.cw - 30) as string[];
+      for (const line of subLines) {
+        this.doc.text(line, PAGE.width / 2, this.y, { align: "center" });
+        this.y += F.h3 * 0.5;
+      }
+    }
+    this.gap(S.xxl);
+
+    // Description — justified body block
+    this.font(F.body, "normal", C.text);
+    const descLines = this.doc.splitTextToSize(c.description, PAGE.cw - 40) as string[];
+    for (const line of descLines) {
+      this.doc.text(line, PAGE.width / 2, this.y, { align: "center" });
+      this.y += F.body * 0.5;
+    }
+
+    // Volume / stats line near bottom — academic-style colophon
+    const totalLessons = c.modules.reduce((a, m) => a + (m.lessons?.length || 0), 0);
+    const colophon = `${c.modules.length} Chapters   ·   ${totalLessons} Lessons   ·   ${c.pacing.totalHours} Hours of Study`;
+    this.font(F.small, "normal", C.textSec, "helvetica");
+    this.doc.text(colophon, PAGE.width / 2, PAGE.height - 40, { align: "center" });
+
+    this.font(F.xxs, "italic", C.textSec);
+    this.doc.text("Published by Syllabi  ·  syllabi.online", PAGE.width / 2, PAGE.height - 18, { align: "center" });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  COVER VARIANT — EDITORIAL (storytelling magazine)
+  // ═══════════════════════════════════════════════════════════
+
+  private buildCoverEditorial(c: Curriculum): void {
+    // Warm paper background
+    this.setFill([254, 252, 249] as RGB);
+    this.doc.rect(0, 0, PAGE.width, PAGE.height, "F");
+
+    // Rose color band across top 40% — magazine-cover vibes
+    const bandTop = 0;
+    const bandH = 120;
+    const steps = 30;
+    const stepH = bandH / steps;
+    for (let i = 0; i < steps; i++) {
+      const t = i / steps;
+      const r = Math.round(C.violetDark[0] + (C.violet[0] - C.violetDark[0]) * t);
+      const g = Math.round(C.violetDark[1] + (C.violet[1] - C.violetDark[1]) * t);
+      const b = Math.round(C.violetDark[2] + (C.violet[2] - C.violetDark[2]) * t);
+      this.setFill([r, g, b] as RGB);
+      this.doc.rect(0, bandTop + i * stepH, PAGE.width, stepH + 0.5, "F");
+    }
+
+    // Masthead — issue number style
+    this.y = 22;
+    this.font(F.xs, "bold", C.white, "helvetica");
+    this.doc.text(this.config.brandMark, PAGE.ml, this.y);
+    const difficulty = c.difficulty.toUpperCase();
+    this.doc.text(`VOL. I   ·   ${difficulty}`, PAGE.width - PAGE.mr, this.y, { align: "right" });
+
+    // Thin white underline across full width
+    this.setFill(C.white);
+    this.doc.rect(PAGE.ml, this.y + 4, PAGE.cw, 0.3, "F");
+
+    // Hero eyebrow tag
+    this.y = 48;
+    this.font(F.small, "italic", [255, 228, 230] as RGB);
+    this.doc.text("A course, told as a story", PAGE.ml, this.y);
+
+    // Hero title — oversized serif, left-aligned
+    this.y += 12;
+    this.font(F.hero + 8, "bold", C.white);
+    const titleLines = this.doc.splitTextToSize(c.title, PAGE.cw - 6) as string[];
+    for (const line of titleLines) {
+      this.doc.text(line, PAGE.ml, this.y);
+      this.y += (F.hero + 8) * 0.46;
+    }
+
+    // Subtitle — large italic white
+    if (c.subtitle) {
+      this.y += 6;
+      this.font(F.h2, "italic", [255, 241, 242] as RGB);
+      const subLines = this.doc.splitTextToSize(c.subtitle, PAGE.cw - 12) as string[];
+      for (const line of subLines) {
+        this.doc.text(line, PAGE.ml, this.y);
+        this.y += F.h2 * 0.5;
+      }
+    }
+
+    // Body description on the cream lower half — reading feel
+    this.y = 160;
+    this.font(F.body + 1, "normal", C.text);
+    const descLines = this.doc.splitTextToSize(c.description, PAGE.cw - 30) as string[];
+    for (const line of descLines.slice(0, 6)) {
+      this.doc.text(line, PAGE.ml + 15, this.y);
+      this.y += (F.body + 1) * 0.5;
+    }
+
+    // Pull-quote style separator
+    const pullY = this.y + 10;
+    this.setFill(C.violet);
+    this.doc.rect(PAGE.ml + 15, pullY, 30, 0.6, "F");
+
+    // Chapter count callout — magazine TOC feel
+    const totalLessons = c.modules.reduce((a, m) => a + (m.lessons?.length || 0), 0);
+    this.font(F.xs, "bold", C.violet, "helvetica");
+    this.doc.text(
+      `${c.modules.length} CHAPTERS   ·   ${totalLessons} LESSONS   ·   ${c.pacing.totalHours} HOURS`,
+      PAGE.ml + 15,
+      pullY + 10,
+    );
+
+    // Footer
+    this.font(F.xxs, "italic", C.textSec);
+    this.doc.text("syllabi.online", PAGE.width / 2, PAGE.height - 14, { align: "center" });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  COVER VARIANT — WORKSHOP (hands-on, maker's manual)
+  // ═══════════════════════════════════════════════════════════
+
+  private buildCoverWorkshop(c: Curriculum): void {
+    // Near-white grid-paper background
+    this.setFill([250, 253, 252] as RGB);
+    this.doc.rect(0, 0, PAGE.width, PAGE.height, "F");
+
+    // Blueprint-style grid — subtle emerald dots
+    this.doc.setGState(new (this.doc as any).GState({ opacity: 0.08 }));
+    this.setFill(C.violet);
+    for (let gx = 15; gx < PAGE.width; gx += 10) {
+      for (let gy = 15; gy < PAGE.height; gy += 10) {
+        this.doc.circle(gx, gy, 0.4, "F");
+      }
+    }
+    this.doc.setGState(new (this.doc as any).GState({ opacity: 1 }));
+
+    // Heavy emerald header bar
+    this.setFill(C.violet);
+    this.doc.rect(0, 0, PAGE.width, 16, "F");
+    this.font(F.xs, "bold", C.white, "helvetica");
+    this.doc.text(this.config.brandMark, PAGE.ml, 10);
+    this.doc.text("HANDS-ON", PAGE.width - PAGE.mr, 10, { align: "right" });
+
+    // Chunky workshop chip
+    this.y = 50;
+    const chipLabel = `${c.difficulty.toUpperCase()} · SESSION PACK`;
+    const chipW = this.doc.getTextWidth(chipLabel) + 10;
+    this.roundedRect(PAGE.ml, this.y, chipW, 9, 2, C.amber);
+    this.font(F.xs, "bold", C.white, "helvetica");
+    this.doc.text(chipLabel, PAGE.ml + 5, this.y + 6);
+    this.y += 22;
+
+    // Title — bold sans, left aligned, heavy
+    this.font(F.hero + 2, "bold", C.text, "helvetica");
+    const titleLines = this.doc.splitTextToSize(c.title, PAGE.cw - 10) as string[];
+    for (const line of titleLines) {
+      this.doc.text(line, PAGE.ml, this.y);
+      this.y += (F.hero + 2) * 0.46;
+    }
+    this.gap(S.md);
+
+    // Accent rule
+    this.setFill(C.violet);
+    this.doc.rect(PAGE.ml, this.y, 60, 1.2, "F");
+    this.gap(S.lg);
+
+    // Subtitle
+    if (c.subtitle) {
+      this.font(F.h3, "normal", C.textSec, "helvetica");
+      const subLines = this.doc.splitTextToSize(c.subtitle, PAGE.cw - 10) as string[];
+      for (const line of subLines) {
+        this.doc.text(line, PAGE.ml, this.y);
+        this.y += F.h3 * 0.5;
+      }
+    }
+    this.gap(S.lg);
+
+    // Description — ragged-right
+    this.font(F.body, "normal", C.text, "helvetica");
+    const descLines = this.doc.splitTextToSize(c.description, PAGE.cw - 10) as string[];
+    for (const line of descLines.slice(0, 6)) {
+      this.doc.text(line, PAGE.ml, this.y);
+      this.y += F.body * 0.5;
+    }
+
+    // Tool-chest stats — 4 bold cards at the bottom
+    const totalLessons = c.modules.reduce((a, m) => a + (m.lessons?.length || 0), 0);
+    const totalQuizzes = c.modules.reduce(
+      (a, m) => a + (m.quiz?.length || 0) + m.lessons.reduce((b, l) => b + (l.quiz?.length || 0), 0),
+      0,
+    );
+    const stats = [
+      { label: "SESSIONS", value: `${c.modules.length}` },
+      { label: "LESSONS", value: `${totalLessons}` },
+      { label: "HOURS", value: `${c.pacing.totalHours}` },
+      { label: "CHECKS", value: `${totalQuizzes}` },
+    ];
+    const cardW = (PAGE.cw - 12) / 4;
+    const cardH = 24;
+    const cardY = PAGE.height - PAGE.mb - cardH - 14;
+    stats.forEach((s, i) => {
+      const cx = PAGE.ml + i * (cardW + 4);
+      this.roundedRect(cx, cardY, cardW, cardH, 2, C.violetBg);
+      this.setDraw(C.violet);
+      this.doc.setLineWidth(0.5);
+      this.doc.roundedRect(cx, cardY, cardW, cardH, 2, 2);
+      this.font(F.h1, "bold", C.violet, "helvetica");
+      this.doc.text(s.value, cx + cardW / 2, cardY + 12, { align: "center" });
+      this.font(F.xxs, "bold", C.textSec, "helvetica");
+      this.doc.text(s.label, cx + cardW / 2, cardY + 18, { align: "center" });
+    });
+
+    // Footer
+    this.font(F.xxs, "normal", C.textSec, "helvetica");
+    this.doc.text("syllabi.online / workshop", PAGE.width / 2, PAGE.height - 6, { align: "center" });
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -625,26 +980,14 @@ class PDFBuilder {
   }
 
   // ═══════════════════════════════════════════════════════════
-  //  MODULE SECTION — Premium layout
+  //  MODULE HEADER VARIANTS
   // ═══════════════════════════════════════════════════════════
 
-  buildModule(mod: Module, curriculum: Curriculum): void {
-    this.newPage();
-    this.drawFooter();
-
-    const cleanTitle = mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "");
-    const modNum = mod.order + 1;
-    const heading = `Module ${modNum}: ${cleanTitle}`;
-
-    // Register in TOC
-    this.toc.push({ title: heading, page: this.pageNum, level: 1 });
-
-    // ── Module header block
-    // Violet accent strip on left
+  /** Default — violet strip + numbered circle (conversational). */
+  private buildModuleHeaderCircle(cleanTitle: string, modNum: number): void {
     this.setFill(C.violet);
     this.doc.rect(PAGE.ml, this.y - 4, 3, 20, "F");
 
-    // Module number circle
     const circleX = PAGE.ml + 14;
     const circleY = this.y + 3;
     this.setFill(C.violet);
@@ -652,7 +995,6 @@ class PDFBuilder {
     this.font(F.h3, "bold", C.white);
     this.doc.text(`${modNum}`, circleX, circleY + 1.5, { align: "center" });
 
-    // Module title
     this.font(F.h2, "bold", C.text);
     const titleLines = this.doc.splitTextToSize(cleanTitle, PAGE.cw - 30) as string[];
     let ty = this.y - 1;
@@ -661,17 +1003,124 @@ class PDFBuilder {
       ty += this.lh(F.h2);
     }
     this.y = ty + S.sm;
+  }
 
-    // Duration badge
+  /** Academic — "CHAPTER N" small-caps eyebrow over serif title. */
+  private buildModuleHeaderChapter(cleanTitle: string, modNum: number): void {
+    // Eyebrow label — small caps sans
+    this.font(F.xs, "bold", C.violet, "helvetica");
+    this.doc.text(`${this.config.moduleWord.toUpperCase()}  ${modNum}`, PAGE.ml, this.y);
+    this.y += 6;
+
+    // Thin rule under the eyebrow
+    this.setFill(C.violet);
+    this.doc.rect(PAGE.ml, this.y, 18, 0.5, "F");
+    this.y += 6;
+
+    // Serif title, large
+    this.font(F.h1, "bold", C.text);
+    const titleLines = this.doc.splitTextToSize(cleanTitle, PAGE.cw - 4) as string[];
+    for (const line of titleLines) {
+      this.doc.text(line, PAGE.ml, this.y);
+      this.y += this.lh(F.h1);
+    }
+    this.y += S.sm;
+  }
+
+  /** Storytelling — ornamental fleuron + italic eyebrow + serif title. */
+  private buildModuleHeaderOrnament(cleanTitle: string, modNum: number): void {
+    // Decorative top ornament
+    const ornY = this.y + 2;
+    this.setFill(C.violet);
+    this.doc.rect(PAGE.ml, ornY, 14, 0.4, "F");
+    this.doc.circle(PAGE.ml + 16, ornY + 0.2, 0.9, "F");
+    this.doc.rect(PAGE.ml + 18, ornY, 14, 0.4, "F");
+    this.y += 10;
+
+    // Italic eyebrow
+    this.font(F.small, "italic", C.textSec);
+    this.doc.text(`${this.config.moduleWord} ${romanize(modNum)}`, PAGE.ml, this.y);
+    this.y += 8;
+
+    // Large serif title
+    this.font(F.h1 + 2, "bold", C.text);
+    const titleLines = this.doc.splitTextToSize(cleanTitle, PAGE.cw - 4) as string[];
+    for (const line of titleLines) {
+      this.doc.text(line, PAGE.ml, this.y);
+      this.y += this.lh(F.h1 + 2);
+    }
+    this.y += S.sm;
+  }
+
+  /** Hands-on — big numbered chip + bold sans title. */
+  private buildModuleHeaderChip(cleanTitle: string, modNum: number): void {
+    // Bold numbered chip
+    const chipLabel = `${this.config.moduleWord.toUpperCase()} ${modNum}`;
+    this.font(F.xs, "bold", C.white, "helvetica");
+    const chipW = this.doc.getTextWidth(chipLabel) + 10;
+    this.roundedRect(PAGE.ml, this.y - 1, chipW, 8, 1.5, C.violet);
+    this.font(F.xs, "bold", C.white, "helvetica");
+    this.doc.text(chipLabel, PAGE.ml + 5, this.y + 4.5);
+    this.y += 14;
+
+    // Title
+    this.font(F.h1, "bold", C.text, "helvetica");
+    const titleLines = this.doc.splitTextToSize(cleanTitle, PAGE.cw - 4) as string[];
+    for (const line of titleLines) {
+      this.doc.text(line, PAGE.ml, this.y);
+      this.y += this.lh(F.h1);
+    }
+
+    // Accent underline
+    this.setFill(C.amber);
+    this.doc.rect(PAGE.ml, this.y + 1, 28, 1.4, "F");
+    this.y += S.md + 2;
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  //  MODULE SECTION — Premium layout
+  // ═══════════════════════════════════════════════════════════
+
+  buildModule(mod: Module, curriculum: Curriculum): void {
+    this.newPage();
+    this.drawFooter();
+
+    const cleanTitle = mod.title
+      .replace(/^(Module|Chapter|Session|Unit)\s*\d+\s*[:\.]\s*/i, "");
+    const modNum = mod.order + 1;
+    const word = this.config.moduleWord;
+    const heading = `${word} ${modNum}: ${cleanTitle}`;
+
+    // Register in TOC
+    this.toc.push({ title: heading, page: this.pageNum, level: 1 });
+
+    // ── Dispatch to the right module header variant
+    switch (this.config.moduleHeader) {
+      case "chapter":
+        this.buildModuleHeaderChapter(cleanTitle, modNum);
+        break;
+      case "ornament":
+        this.buildModuleHeaderOrnament(cleanTitle, modNum);
+        break;
+      case "chip":
+        this.buildModuleHeaderChip(cleanTitle, modNum);
+        break;
+      default:
+        this.buildModuleHeaderCircle(cleanTitle, modNum);
+        break;
+    }
+
+    // Duration + lesson-count badges (shared across variants)
     const totalMin = mod.durationMinutes || mod.lessons.reduce((a, l) => a + l.durationMinutes, 0);
-    const hours = Math.round(totalMin / 60 * 10) / 10;
-    this.badge(`${hours}h`, PAGE.ml + 24, this.y, C.violetLight);
+    const hours = Math.round((totalMin / 60) * 10) / 10;
+    const badgeX = this.config.moduleHeader === "circle" ? PAGE.ml + 24 : PAGE.ml;
+    this.badge(`${hours}h`, badgeX, this.y, C.violetLight);
     this.badge(
       `${mod.lessons.length} LESSONS`,
-      PAGE.ml + 24 + this.doc.getTextWidth(`${hours}h`) + 12,
+      badgeX + this.doc.getTextWidth(`${hours}h`) + 12,
       this.y,
       C.gray300,
-      C.text
+      C.text,
     );
     this.y += S.md;
 
@@ -836,7 +1285,9 @@ class PDFBuilder {
       lesson.keyPoints.slice(0, 3).forEach((kp) => {
         this.ensureSpace(8);
         this.font(F.small, "italic", C.textMuted);
-        this.doc.text("\u25B8", PAGE.ml + 10, this.y);
+        // "\u2022" (•) is in the WinAnsi encoding jsPDF uses for built-in
+        // fonts — the old "\u25B8" (▸) rendered as garbage glyphs.
+        this.doc.text("\u2022", PAGE.ml + 10, this.y);
         const lines = this.doc.splitTextToSize(kp, PAGE.cw - 22) as string[];
         for (const line of lines) {
           this.doc.text(line, PAGE.ml + 15, this.y);
@@ -1138,7 +1589,7 @@ class PDFBuilder {
 
     // Content
     this.y = 55;
-    this.centerText("S Y L L A B I", F.xs, "bold", C.violet);
+    this.centerText(this.config.brandMark, F.xs, "bold", C.violet);
     this.gap(S.xl);
 
     this.centerText("Certificate of Completion", F.h1, "bold", C.text);
@@ -1258,7 +1709,7 @@ export function generateCurriculumPDF(
   C = (style && THEMES[style]) || DEFAULT_PALETTE;
 
   try {
-    const builder = new PDFBuilder();
+    const builder = new PDFBuilder(style ?? "conversational");
 
     // 1. Cover page
     builder.buildCover(curriculum);
