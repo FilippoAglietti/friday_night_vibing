@@ -615,7 +615,7 @@ export const courseGenerate = inngest.createFunction(
         label: `${courseId}/skeleton`,
         courseId,
         phase: "skeleton",
-        timeoutMs: isMasterclass ? 290_000 : 240_000,
+        timeoutMs: isMasterclass ? 900_000 : 240_000,
       });
 
       return parseClaudeJson<Curriculum>(rawText, "skeleton", courseId);
@@ -873,10 +873,11 @@ export const moduleGenerate = inngest.createFunction(
       // expected stream time by ~25%, putting the p95 completion
       // comfortably inside the timeout.
       //
-      // Timeout: 290_000 ms — maxes out Vercel's 300s serverless ceiling
-      // with 10s headroom for step serialization/transport overhead.
-      // Each Inngest step.run is its own Vercel invocation so the whole
-      // budget goes to the Claude stream. Matches the masterclass
+      // Timeout: 900_000 ms (15 min). Previously 290_000 to fit under
+      // Vercel's 300s function cap; now on Cloud Run with a 3600s
+      // service timeout we can give dense masterclass modules enough
+      // headroom. 15 min covers observed p99 Haiku streaming times
+      // (up to ~430s) with generous margin. Matches the masterclass
       // skeleton timeout for consistency.
       //
       // History: Sonnet 4.6 was tried on 2026-04-12 and produced 87.5%
@@ -890,7 +891,7 @@ export const moduleGenerate = inngest.createFunction(
         model: GENERATION_MODEL,
         maxTokens: isMasterclass ? 36_864 : 24_576,
         label: `${courseId}/module-${moduleId}`,
-        timeoutMs: isMasterclass ? 290_000 : 180_000,
+        timeoutMs: isMasterclass ? 900_000 : 180_000,
         courseId,
         phase: "module_detail",
       });
