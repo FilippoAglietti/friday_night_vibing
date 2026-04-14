@@ -51,6 +51,9 @@ import {
   Presentation,
   FileDown,
   Pencil,
+  AlertTriangle,
+  RefreshCw,
+  Trash2,
 } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
@@ -458,6 +461,27 @@ export default function ProfilePage() {
     setActiveTab("generate");
   }, []);
 
+  const handleRetryFailed = useCallback((gen: Generation) => {
+    const config: Partial<CurriculumFormData> = {
+      topic: gen.topic || "",
+      difficulty: (gen.audience || "beginner") as DifficultyLevel,
+      courseLength: (gen.length as CourseLength) || "full",
+      niche: gen.niche || "",
+    };
+    setDuplicateConfig(config);
+    setTemplateConfig(null);
+    setActiveTab("generate");
+  }, []);
+
+  const handleDismissFailed = useCallback(async (genId: string) => {
+    const { error } = await supabaseBrowser.from("courses").delete().eq("id", genId);
+    if (!error) {
+      setGenerations((prev) => prev.filter((g) => g.id !== genId));
+    } else {
+      console.error("Failed to dismiss failed course:", error);
+    }
+  }, []);
+
   const handleFormGenerated = useCallback(async () => {
     // Refresh the generations list from Supabase
     const { data: courses } = await supabaseBrowser
@@ -478,6 +502,12 @@ export default function ProfilePage() {
   // Courses still being generated — shown as loading cards in dashboard
   const generatingCourses = useMemo(
     () => generations.filter((g) => g.status === "generating"),
+    [generations]
+  );
+
+  // Courses that failed generation — shown with retry / dismiss affordance
+  const failedGenerations = useMemo(
+    () => generations.filter((g) => g.status === "failed" || g.status === "error"),
     [generations]
   );
 
@@ -690,6 +720,55 @@ export default function ProfilePage() {
   // ═══════════════════════════════════════════════════════════
   // RICH COURSE CARD
   // ═══════════════════════════════════════════════════════════
+
+  function FailedCourseCard({
+    gen,
+    onRetry,
+    onDismiss,
+  }: {
+    gen: Generation;
+    onRetry: () => void;
+    onDismiss: () => void;
+  }) {
+    return (
+      <Card className="relative border-rose-500/30 bg-gradient-to-br from-rose-500/5 via-rose-500/3 to-rose-500/5 overflow-hidden">
+        <div className="h-[2px] bg-gradient-to-r from-rose-500 via-rose-400 to-rose-500" />
+        <CardHeader className="relative pb-2 pt-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm leading-snug text-rose-400 truncate">{gen.topic}</h3>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Generation failed — retry or dismiss</p>
+            </div>
+            <Badge variant="outline" className="text-[10px] shrink-0 bg-rose-500/10 text-rose-400 border-rose-500/20">
+              <AlertTriangle className="size-2.5 mr-1" />
+              Failed
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="relative pt-0">
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              onClick={onRetry}
+              className="h-8 text-[11px] bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full px-3 min-h-[32px]"
+            >
+              <RefreshCw className="size-3 mr-1.5" />
+              Retry
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onDismiss}
+              className="h-8 text-[11px] text-muted-foreground hover:text-rose-400 min-h-[32px]"
+            >
+              <Trash2 className="size-3 mr-1.5" />
+              Dismiss
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   function CourseCard({ gen, index }: { gen: Generation; index: number }) {
     const c = gen.curriculum;
@@ -1523,7 +1602,7 @@ export default function ProfilePage() {
                     </Card>
                   ))}
                 </div>
-              ) : readyGenerations.length === 0 && generatingCourses.length === 0 ? (
+              ) : readyGenerations.length === 0 && generatingCourses.length === 0 && failedGenerations.length === 0 ? (
                 <Card className="text-center py-12 border-dashed border-border/40">
                   <CardContent>
                     <div className="relative mx-auto mb-5 w-fit">
@@ -1592,11 +1671,25 @@ export default function ProfilePage() {
                       })}
                     </div>
                   )}
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {readyGenerations.slice(0, 4).map((gen, i) => (
-                      <CourseCard key={gen.id} gen={gen} index={i} />
-                    ))}
-                  </div>
+                  {failedGenerations.length > 0 && (
+                    <div className="grid gap-4 sm:grid-cols-2 mb-4">
+                      {failedGenerations.map((gen) => (
+                        <FailedCourseCard
+                          key={gen.id}
+                          gen={gen}
+                          onRetry={() => handleRetryFailed(gen)}
+                          onDismiss={() => handleDismissFailed(gen.id)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {readyGenerations.length > 0 && (
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {readyGenerations.slice(0, 4).map((gen, i) => (
+                        <CourseCard key={gen.id} gen={gen} index={i} />
+                      ))}
+                    </div>
+                  )}
                 </>
               )}
             </motion.div>
@@ -1622,7 +1715,7 @@ export default function ProfilePage() {
                   </Card>
                 ))}
               </div>
-            ) : filteredGenerations.length === 0 ? (
+            ) : filteredGenerations.length === 0 && generatingCourses.length === 0 && failedGenerations.length === 0 ? (
               <Card className="text-center py-16 border-dashed border-border/40">
                 <CardContent>
                   {searchQuery ? (
@@ -1712,6 +1805,18 @@ export default function ProfilePage() {
                         </Card>
                       );
                     })}
+                  </div>
+                )}
+                {failedGenerations.length > 0 && (
+                  <div className="grid gap-4 sm:grid-cols-2 mb-4">
+                    {failedGenerations.map((gen) => (
+                      <FailedCourseCard
+                        key={gen.id}
+                        gen={gen}
+                        onRetry={() => handleRetryFailed(gen)}
+                        onDismiss={() => handleDismissFailed(gen.id)}
+                      />
+                    ))}
                   </div>
                 )}
                 <div className="grid gap-4 sm:grid-cols-2">
