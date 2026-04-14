@@ -134,7 +134,11 @@ You MUST use EVERY entry below at least once across the lessons of this module u
 ${sourcesListing}
 ──────────────────────────────────────────────
 
-CITATION DENSITY: aim for ${densityTarget.min}–${densityTarget.max} inline citations per lesson content block. Some lessons may exceed this if the topic genuinely demands it; none should fall below ${densityTarget.min} unless you've already exhausted the verified pool earlier in the module.
+CITATION DENSITY: aim for ${densityTarget.min}–${densityTarget.max} inline citations per lesson content block.
+
+If the verified pool above has FEWER than ${densityTarget.min} sources, you may and should cite the SAME source multiple times across the lesson — especially for canonical books, which are dense reference works that legitimately cover many points. Citing Goodfellow Deep Learning [3] in 5 separate paragraphs of an ML lesson is appropriate, not redundant. Do not fabricate citations to hit the density target; use what you have, well.
+
+If the pool is large (≥${densityTarget.max}), each source should typically appear no more than 3 times to keep variety high.
 
 For EACH lesson above, produce:
 - "keyPoints": 4–6 string takeaways. Citations optional here.

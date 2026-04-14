@@ -924,10 +924,15 @@ export const moduleGenerate = inngest.createFunction(
     // so the Claude call is memoized: if the subsequent DB update
     // fails and Inngest retries, we don't re-spend tokens.
     const detail = await step.run(`generate-module-${moduleId}`, async () => {
+      // Phase 1.2: ground-if-any. Previously we required pool ≥ density.min,
+      // which left CS/humanities modules in the un-grounded fallback even when
+      // we had legitimate canonical sources (Goodfellow textbook, etc.). Now
+      // any non-empty verified pool activates the grounded prompt; the density
+      // target becomes a soft guidance instead of a hard gate.
       const useGrounded =
         !!styleConfig &&
         !!verifiedSources &&
-        verifiedSources.length >= styleConfig.density.min;
+        verifiedSources.length >= 1;
 
       const { system, messages } = useGrounded
         ? buildGroundedModuleDetailPrompt({
