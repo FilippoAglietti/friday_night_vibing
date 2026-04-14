@@ -616,7 +616,16 @@ export const courseGenerate = inngest.createFunction(
       // and were observed timing out at exactly 240002ms on the
       // 2026-04-12 smoke run — bumping to 290s gives tail-case
       // headroom while staying 10s under Vercel's 300s function max.
-      const isMasterclass = request.length === "masterclass";
+      // Per-length skeleton timeout. Phase 1.3 (2026-04-14): previously
+      // binary (masterclass 900s else 240s). Full hit rising timeout
+      // pressure with grounded prompt — 450s covers the observed p95 on
+      // dense academic full skeletons.
+      const skeletonTimeout = {
+        crash: 180_000,
+        short: 240_000,
+        full: 450_000,
+        masterclass: 900_000,
+      }[request.length] ?? 240_000;
       const rawText = await callClaude({
         system,
         messages,
@@ -625,7 +634,7 @@ export const courseGenerate = inngest.createFunction(
         label: `${courseId}/skeleton`,
         courseId,
         phase: "skeleton",
-        timeoutMs: isMasterclass ? 900_000 : 240_000,
+        timeoutMs: skeletonTimeout,
       });
 
       return parseClaudeJson<Curriculum>(rawText, "skeleton", courseId);
@@ -974,14 +983,23 @@ export const moduleGenerate = inngest.createFunction(
       // 429 rate_limit_error under parallel fan-out (org Tier 1 cap is
       // 8k output tokens/min on Sonnet). Reverted to Haiku; restore
       // Sonnet once the Anthropic tier upgrade lands.
+      // Per-length module timeout. Phase 1.3 (2026-04-14): full bumped
+      // from 180s to 450s after Test 6 M5 timed out repeatedly under the
+      // grounded force-cite-all prompt (content is denser, longer).
       const isMasterclass = request.length === "masterclass";
+      const moduleTimeout = {
+        crash: 120_000,
+        short: 180_000,
+        full: 450_000,
+        masterclass: 900_000,
+      }[request.length] ?? 180_000;
       const rawText = await callClaude({
         system,
         messages,
         model: GENERATION_MODEL,
         maxTokens: isMasterclass ? 36_864 : 24_576,
         label: `${courseId}/module-${moduleId}`,
-        timeoutMs: isMasterclass ? 900_000 : 180_000,
+        timeoutMs: moduleTimeout,
         courseId,
         phase: "module_detail",
       });
