@@ -57,7 +57,6 @@ import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
-import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
 import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength } from "@/components/CurriculumForm";
@@ -581,22 +580,6 @@ export default function ProfilePage() {
     }
   }, []);
 
-  const handleExportPptx = useCallback(async (curriculum: Curriculum) => {
-    try {
-      const blob = await generateCurriculumPptx(curriculum);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_slides.pptx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("Failed to export PPTX:", e);
-    }
-  }, []);
-
   const handleShareCourse = useCallback((gen: Generation) => {
     if (!gen.curriculum) return;
     const url = generateShareableUrl(gen.curriculum);
@@ -891,13 +874,6 @@ export default function ProfilePage() {
                         onClick={(e) => { e.stopPropagation(); handleExportDocx(c); }}
                       >
                         <FileText className="size-3" /> Word
-                      </Button>
-                      <Button
-                        variant="outline" size="sm"
-                        className="h-7 text-[10px] gap-1 border-orange-500/20 hover:bg-orange-500/10 hover:text-orange-400 hover:border-orange-500/30"
-                        onClick={(e) => { e.stopPropagation(); handleExportPptx(c); }}
-                      >
-                        <Presentation className="size-3" /> Slides
                       </Button>
                     </div>
                   </div>

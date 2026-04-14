@@ -160,7 +160,7 @@ const jsonLd = {
       "@type": "SoftwareApplication",
       "@id": `${BASE_URL}/#app`,
       name: "Syllabi — AI Course Generator",
-      description: "Generate complete online courses with AI-powered audio narration, modules, lessons, quizzes, pacing schedules, and export to PDF, Notion, PPTX, and DOCX.",
+      description: "Generate complete online courses with AI-powered audio narration, modules, lessons, quizzes, pacing schedules, and export to PDF, Notion, DOCX, and SCORM.",
       url: BASE_URL,
       applicationCategory: "EducationalApplication",
       operatingSystem: "Web",
@@ -205,7 +205,7 @@ const jsonLd = {
           description: "Unlimited generations, AI audio narration, white-label, shareable links",
         },
       ],
-      featureList: "AI Course Generation, Audio Narration, PDF Export, Notion Export, PPTX Export, Quizzes, Pacing Schedules, 16 Languages, Shareable Links",
+      featureList: "AI Course Generation, Audio Narration, PDF Export, Notion Export, DOCX Export, SCORM Export, Quizzes, Pacing Schedules, 16 Languages, Shareable Links",
       screenshot: `${BASE_URL}/og.png`,
     },
     // ── HowTo (for "how to create a course" rich snippets) ──
@@ -254,7 +254,7 @@ const jsonLd = {
           "@type": "HowToStep",
           position: 6,
           name: "Export and Share",
-          text: "Download as PDF, Notion, PPTX, or DOCX. Share via a beautiful public link with email capture for lead generation.",
+          text: "Download as PDF, Notion, DOCX, or SCORM. Share via a beautiful public link with email capture for lead generation.",
         },
       ],
     },
@@ -284,7 +284,7 @@ const jsonLd = {
           name: "What export formats does Syllabi support?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Syllabi supports JSON, Markdown, PDF, Notion, PPTX, and DOCX export formats. Free users get JSON export. Pro and Pro Max users get all formats plus shareable course links.",
+            text: "Syllabi supports JSON, Markdown, PDF, Notion, DOCX, and SCORM export formats. Free users get JSON export. Pro and Pro Max users get all formats plus shareable course links.",
           },
         },
         {
@@ -338,7 +338,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} h-full antialiased dark`} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://gmxseuttpurnxbluvcwx.supabase.co" />
         <link rel="dns-prefetch" href="https://gmxseuttpurnxbluvcwx.supabase.co" />
@@ -355,7 +355,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         <LanguageProvider>
           <ToastProvider>{children}</ToastProvider>
         </LanguageProvider>

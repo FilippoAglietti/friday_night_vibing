@@ -101,7 +101,7 @@ const sections = [
       },
       {
         heading: "Pro Max (€69/month)",
-        body: "Unlimited generations with AI-generated audio narration, full chapter content generation, premium Notion and PDF export, PPTX and DOCX export, white-label branding, and dedicated AI processing.",
+        body: "Unlimited generations with AI-generated audio narration, full chapter content generation, premium Notion and PDF export, DOCX and SCORM export, white-label branding, and dedicated AI processing.",
       },
       {
         heading: "5-Pack (€33 one-time)",

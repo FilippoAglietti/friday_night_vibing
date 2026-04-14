@@ -21,7 +21,6 @@ import {
   GraduationCap,
   Headphones,
   HelpCircle,
-  LayoutGrid,
   Lightbulb,
   Lock,
   Mail,
@@ -38,7 +37,6 @@ import { useState, useMemo, useCallback } from "react";
 import AudioPlayer, { type AudioTrack } from "@/components/AudioPlayer";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
-import { generateCurriculumPptx } from "@/lib/exports/generatePptx";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
 import { generateShareableUrl, type LeadMagnetSettings } from "@/lib/exports/generateShareUrl";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
@@ -434,25 +432,6 @@ export default function CurriculumOutput({
       console.error("Failed to generate Word document:", e);
     } finally {
       setLoadingExports((prev) => ({ ...prev, docx: false }));
-    }
-  };
-
-  const handleExportPptx = async () => {
-    try {
-      setLoadingExports((prev) => ({ ...prev, pptx: true }));
-      const blob = await generateCurriculumPptx(curriculum);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${sanitizeFilename(curriculum.title)}_slides.pptx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("Failed to generate presentation:", e);
-    } finally {
-      setLoadingExports((prev) => ({ ...prev, pptx: false }));
     }
   };
 
@@ -925,15 +904,6 @@ export default function CurriculumOutput({
           >
             <FileText className="h-4 w-4" />
             {loadingExports.docx ? "Generating..." : "Word"}
-          </Button>
-          <Button
-            onClick={handleExportPptx}
-            disabled={loadingExports.pptx}
-            className="flex-1 gap-2 min-w-[140px] bg-orange-600 hover:bg-orange-700 text-white border-0"
-            size="lg"
-          >
-            <LayoutGrid className="h-4 w-4" />
-            {loadingExports.pptx ? "Generating..." : "Slides"}
           </Button>
           <Button
             onClick={handleExportScorm}

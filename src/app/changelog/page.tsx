@@ -40,7 +40,7 @@ const releases: Release[] = [
       { type: "new", text: "AI-powered audio narration for every lesson — choose from multiple voices and generate podcast-style content." },
       { type: "new", text: "Inngest background processing pipeline for faster, more reliable course generation." },
       { type: "new", text: "Shareable course links — one-click sharing with a beautiful public course view." },
-      { type: "new", text: "PPTX and DOCX export formats alongside existing PDF and Notion exports." },
+      { type: "new", text: "DOCX and SCORM export formats alongside existing PDF and Notion exports." },
       { type: "improvement", text: "Rewritten generation prompts — courses are now topic-aware and audience-calibrated for better output." },
       { type: "improvement", text: "Tutorial page completely redesigned with interactive 6-step timeline." },
       { type: "improvement", text: "Rate limiting via Upstash for fair usage across all plans." },

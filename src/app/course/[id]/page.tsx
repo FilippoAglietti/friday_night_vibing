@@ -15,6 +15,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { Curriculum } from "@/types/curriculum";
 import CourseContent from "./course-content";
+import GeneratingView from "./generating-view";
 
 // ─── Supabase admin client (server-side only) ────────────────
 
@@ -28,17 +29,6 @@ function getSupabase() {
 
 // ─── Types ───────────────────────────────────────────────────
 
-interface CourseRow {
-  id: string;
-  title: string;
-  topic: string;
-  audience: string;
-  length: string;
-  niche: string | null;
-  curriculum: Curriculum | null;
-  status: string;
-  created_at: string;
-}
 
 // ─── Dynamic metadata for SEO / social sharing ──────────────
 
@@ -86,15 +76,39 @@ export default async function CoursePage({
   const { id } = await params;
   const supabase = getSupabase();
 
-  // Fetch the course by ID
   const { data: course, error } = await supabase
     .from("courses")
-    .select("id, title, topic, audience, length, niche, curriculum, status, created_at")
+    .select(
+      "id, title, topic, curriculum, status, created_at, generation_progress, generation_total_modules, generation_completed_modules",
+    )
     .eq("id", id)
     .single();
 
-  // Return 404 if course doesn't exist, is still generating, or has no curriculum
-  if (error || !course || course.status !== "ready" || !course.curriculum) {
+  if (error || !course) {
+    notFound();
+  }
+
+  // Still being built (or freshly queued) → live progress view.
+  if (course.status === "pending" || course.status === "generating") {
+    return (
+      <GeneratingView
+        courseId={course.id}
+        topic={course.title || course.topic || "Your course"}
+        initialProgress={course.generation_progress ?? null}
+        initialTotal={course.generation_total_modules ?? 0}
+        initialCompleted={course.generation_completed_modules ?? 0}
+        initialStatus={course.status as "pending" | "generating"}
+      />
+    );
+  }
+
+  // Terminal states without curriculum are unrecoverable.
+  if (!course.curriculum) {
+    notFound();
+  }
+
+  // "partial" courses are viewable — finalize wrote whatever it had.
+  if (course.status !== "ready" && course.status !== "partial") {
     notFound();
   }
 

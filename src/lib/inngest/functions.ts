@@ -868,6 +868,20 @@ export const moduleGenerate = inngest.createFunction(
         })
         .eq("course_id", courseId)
         .eq("module_index", moduleIndex);
+
+      // Surface a human-readable progress message with the module title
+      // so the /course/[id] live view can narrate "Writing Module 3: X".
+      // Concurrent modules may race on this write; last-writer-wins is fine
+      // for UX. Truncate long titles so the line stays readable in the UI.
+      const moduleTitle = ((skeletonModule as Module).title || "").slice(0, 80);
+      await supabase
+        .from("courses")
+        .update({
+          generation_progress: moduleTitle
+            ? `Writing module ${moduleIndex + 1} of ${totalModules}: ${moduleTitle}`
+            : `Writing module ${moduleIndex + 1} of ${totalModules}...`,
+        })
+        .eq("id", courseId);
     });
 
     // Grounded pipeline (Phase 1 academic). If the request qualifies,
