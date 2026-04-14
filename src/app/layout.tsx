@@ -103,8 +103,10 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // Add your Google Search Console verification code here
-    // google: "your-google-verification-code",
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+      : undefined,
   },
   category: "education",
   other: {
@@ -170,6 +172,8 @@ const jsonLd = {
           name: "Free",
           price: "0",
           priceCurrency: "EUR",
+          availability: "https://schema.org/InStock",
+          url: `${BASE_URL}/pricing`,
           description: "3 free mini-course generations with JSON export",
         },
         {
@@ -177,7 +181,8 @@ const jsonLd = {
           name: "Pro",
           price: "28",
           priceCurrency: "EUR",
-          billingIncrement: "P1M",
+          availability: "https://schema.org/InStock",
+          url: `${BASE_URL}/pricing`,
           description: "15 generations/month, all export formats, custom pacing, priority AI",
         },
         {
@@ -185,6 +190,8 @@ const jsonLd = {
           name: "5-Pack",
           price: "33",
           priceCurrency: "EUR",
+          availability: "https://schema.org/InStock",
+          url: `${BASE_URL}/pricing`,
           description: "5 full course generations with all features, one-time purchase",
         },
         {
@@ -192,19 +199,13 @@ const jsonLd = {
           name: "Pro Max",
           price: "69",
           priceCurrency: "EUR",
-          billingIncrement: "P1M",
+          availability: "https://schema.org/InStock",
+          url: `${BASE_URL}/pricing`,
           description: "Unlimited generations, AI audio narration, white-label, shareable links",
         },
       ],
       featureList: "AI Course Generation, Audio Narration, PDF Export, Notion Export, PPTX Export, Quizzes, Pacing Schedules, 16 Languages, Shareable Links",
       screenshot: `${BASE_URL}/og.png`,
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: "4.8",
-        ratingCount: "127",
-        bestRating: "5",
-        worstRating: "1",
-      },
     },
     // ── HowTo (for "how to create a course" rich snippets) ──
     {

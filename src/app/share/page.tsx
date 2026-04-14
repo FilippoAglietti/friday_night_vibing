@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import SharePageContent from "./share-content";
+
+export const metadata: Metadata = {
+  title: "Shared Course | Syllabi",
+  robots: { index: false, follow: true },
+};
 
 export default function SharePage() {
   return (

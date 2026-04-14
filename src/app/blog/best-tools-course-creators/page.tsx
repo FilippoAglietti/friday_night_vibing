@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GraduationCap, ArrowLeft, Clock, Calendar, User } from "lucide-react";
-import { JsonLd } from "@/lib/seo";
+import { JsonLd, breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Best Tools for Course Creators in 2026 — The Complete Stack",
@@ -63,18 +63,40 @@ export default function Article() {
   return (
     <div className="min-h-screen bg-background text-foreground dark">
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          headline: "Best Tools for Course Creators in 2026 — The Complete Stack",
-          description:
-            "The essential tool stack for course creators in 2026.",
-          datePublished: "2026-04-06",
-          dateModified: "2026-04-06",
-          author: { "@type": "Organization", name: "Syllabi", url: "https://www.syllabi.online" },
-          publisher: { "@type": "Organization", name: "Syllabi", url: "https://www.syllabi.online" },
-          url: "https://www.syllabi.online/blog/best-tools-course-creators",
-        }}
+        data={[
+          {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: "Best Tools for Course Creators in 2026 — The Complete Stack",
+            description:
+              "The essential tool stack for course creators in 2026.",
+            datePublished: "2026-04-06",
+            dateModified: "2026-04-06",
+            author: {
+              "@type": "Organization",
+              name: "Syllabi",
+              url: "https://www.syllabi.online",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "Syllabi",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://www.syllabi.online/favicon.svg",
+              },
+            },
+            image: "https://www.syllabi.online/og.png",
+            url: "https://www.syllabi.online/blog/best-tools-course-creators",
+            mainEntityOfPage:
+              "https://www.syllabi.online/blog/best-tools-course-creators",
+            inLanguage: "en-US",
+          },
+          breadcrumbJsonLd([
+            { name: "Home", url: "/" },
+            { name: "Blog", url: "/blog" },
+            { name: "Best Tools for Course Creators in 2026", url: "/blog/best-tools-course-creators" },
+          ]),
+        ]}
       />
 
       <div className="absolute inset-0 h-[500px] bg-gradient-to-b from-violet-500/5 via-indigo-500/3 to-transparent pointer-events-none" />

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GraduationCap, ArrowLeft, Clock, Calendar, User } from "lucide-react";
-import { JsonLd } from "@/lib/seo";
+import { JsonLd, breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "How to Create an Online Course in 2026 — Complete Guide",
@@ -29,19 +29,41 @@ export default function Article() {
   return (
     <div className="min-h-screen bg-background text-foreground dark">
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          headline: "How to Create an Online Course in 2026 — Complete Guide",
-          description:
-            "Step-by-step guide to creating a professional online course in 2026 using AI-powered tools.",
-          datePublished: "2026-04-10",
-          dateModified: "2026-04-10",
-          author: { "@type": "Organization", name: "Syllabi", url: "https://www.syllabi.online" },
-          publisher: { "@type": "Organization", name: "Syllabi", url: "https://www.syllabi.online" },
-          url: "https://www.syllabi.online/blog/how-to-create-online-course-2026",
-          mainEntityOfPage: "https://www.syllabi.online/blog/how-to-create-online-course-2026",
-        }}
+        data={[
+          {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: "How to Create an Online Course in 2026 — Complete Guide",
+            description:
+              "Step-by-step guide to creating a professional online course in 2026 using AI-powered tools.",
+            datePublished: "2026-04-10",
+            dateModified: "2026-04-10",
+            author: {
+              "@type": "Organization",
+              name: "Syllabi",
+              url: "https://www.syllabi.online",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "Syllabi",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://www.syllabi.online/favicon.svg",
+              },
+            },
+            image: "https://www.syllabi.online/og.png",
+            url: "https://www.syllabi.online/blog/how-to-create-online-course-2026",
+            mainEntityOfPage:
+              "https://www.syllabi.online/blog/how-to-create-online-course-2026",
+            inLanguage: "en-US",
+            wordCount: 2400,
+          },
+          breadcrumbJsonLd([
+            { name: "Home", url: "/" },
+            { name: "Blog", url: "/blog" },
+            { name: "How to Create an Online Course in 2026", url: "/blog/how-to-create-online-course-2026" },
+          ]),
+        ]}
       />
 
       {/* Gradient background */}

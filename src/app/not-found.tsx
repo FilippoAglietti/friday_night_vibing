@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import { GraduationCap, ArrowRight, BookOpen, Sparkles, Users, Code } from "lucide-react";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Page Not Found (404) | Syllabi",
+  description: "The page you're looking for doesn't exist. Explore Syllabi's AI course generator instead.",
+  robots: { index: false, follow: true },
+};
 
 const POPULAR_GENERATORS = [
   { slug: "teachers", emoji: "📚", label: "Teachers" },

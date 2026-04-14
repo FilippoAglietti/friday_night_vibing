@@ -56,13 +56,17 @@ export async function generateMetadata({
     .single();
 
   if (!data?.curriculum) {
-    return { title: "Course Not Found | Syllabi" };
+    return {
+      title: "Course Not Found | Syllabi",
+      robots: { index: false, follow: false },
+    };
   }
 
   const c = data.curriculum as Curriculum;
   return {
     title: `${c.title} | Syllabi`,
     description: c.subtitle || c.description || "AI-generated course on Syllabi",
+    robots: { index: false, follow: false },
     openGraph: {
       title: c.title,
       description: c.subtitle || c.description || "",
