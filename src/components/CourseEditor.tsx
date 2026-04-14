@@ -47,6 +47,12 @@ export default function CourseEditor({ curriculum, onSave, onClose }: CourseEdit
   // ── Module edits ──
   const updateModuleTitle = (mi: number, val: string) => update((d) => { d.modules[mi].title = val; });
   const updateModuleDesc = (mi: number, val: string) => update((d) => { d.modules[mi].description = val; });
+  const updateModuleObjective = (mi: number, oi: number, val: string) =>
+    update((d) => { d.modules[mi].objectives[oi] = val; });
+  const removeModuleObjective = (mi: number, oi: number) =>
+    update((d) => { d.modules[mi].objectives.splice(oi, 1); });
+  const addModuleObjective = (mi: number) =>
+    update((d) => { d.modules[mi].objectives.push("New objective"); });
   const moveModule = (mi: number, dir: -1 | 1) => {
     const ni = mi + dir;
     if (ni < 0 || ni >= draft.modules.length) return;
@@ -100,6 +106,30 @@ export default function CourseEditor({ curriculum, onSave, onClose }: CourseEdit
     update((d) => { d.modules[mi].lessons[li].content = val; });
   const updateLessonDuration = (mi: number, li: number, val: number) =>
     update((d) => { d.modules[mi].lessons[li].durationMinutes = val; });
+  const updateLessonObjective = (mi: number, li: number, oi: number, val: string) =>
+    update((d) => {
+      if (!d.modules[mi].lessons[li].objectives) d.modules[mi].lessons[li].objectives = [];
+      d.modules[mi].lessons[li].objectives![oi] = val;
+    });
+  const removeLessonObjective = (mi: number, li: number, oi: number) =>
+    update((d) => { d.modules[mi].lessons[li].objectives?.splice(oi, 1); });
+  const addLessonObjective = (mi: number, li: number) =>
+    update((d) => {
+      if (!d.modules[mi].lessons[li].objectives) d.modules[mi].lessons[li].objectives = [];
+      d.modules[mi].lessons[li].objectives!.push("New objective");
+    });
+  const updateLessonKeyPoint = (mi: number, li: number, ki: number, val: string) =>
+    update((d) => {
+      if (!d.modules[mi].lessons[li].keyPoints) d.modules[mi].lessons[li].keyPoints = [];
+      d.modules[mi].lessons[li].keyPoints![ki] = val;
+    });
+  const removeLessonKeyPoint = (mi: number, li: number, ki: number) =>
+    update((d) => { d.modules[mi].lessons[li].keyPoints?.splice(ki, 1); });
+  const addLessonKeyPoint = (mi: number, li: number) =>
+    update((d) => {
+      if (!d.modules[mi].lessons[li].keyPoints) d.modules[mi].lessons[li].keyPoints = [];
+      d.modules[mi].lessons[li].keyPoints!.push("New key point");
+    });
   const removeLesson = (mi: number, li: number) => {
     if (draft.modules[mi].lessons.length <= 1) return;
     update((d) => {
@@ -287,12 +317,41 @@ export default function CourseEditor({ curriculum, onSave, onClose }: CourseEdit
 
             {activeModule === mi && (
               <CardContent className="pt-0 space-y-3">
-                <textarea
-                  className="w-full rounded-lg border border-border/40 bg-muted/10 px-3 py-2 text-xs resize-none h-16 focus:outline-none focus:ring-1 focus:ring-violet-500/30"
-                  value={mod.description}
-                  onChange={(e) => updateModuleDesc(mi, e.target.value)}
-                  placeholder="Module description..."
-                />
+                <div>
+                  <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">Description</label>
+                  <textarea
+                    className="w-full mt-1 rounded-lg border border-border/40 bg-muted/10 px-3 py-2 text-xs resize-y min-h-[4rem] focus:outline-none focus:ring-1 focus:ring-violet-500/30"
+                    value={mod.description}
+                    onChange={(e) => updateModuleDesc(mi, e.target.value)}
+                    placeholder="Module description..."
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">Module Objectives</label>
+                  <div className="mt-1 space-y-1.5">
+                    {(mod.objectives || []).map((obj, oi) => (
+                      <div key={oi} className="flex items-center gap-2">
+                        <Check className="size-3 text-emerald-500 shrink-0" />
+                        <input
+                          className="flex-1 rounded-md border border-border/40 bg-muted/10 px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-violet-500/30"
+                          value={obj}
+                          onChange={(e) => updateModuleObjective(mi, oi, e.target.value)}
+                        />
+                        <button
+                          onClick={() => removeModuleObjective(mi, oi)}
+                          aria-label="Remove objective"
+                          className="text-muted-foreground/40 hover:text-rose-400 transition-colors p-0.5"
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </div>
+                    ))}
+                    <Button variant="ghost" size="sm" className="w-full text-[10px] gap-1.5 text-muted-foreground hover:text-violet-400" onClick={() => addModuleObjective(mi)}>
+                      <Plus className="size-3" /> Add Objective
+                    </Button>
+                  </div>
+                </div>
 
                 <Separator className="border-border/20" />
 
@@ -348,12 +407,66 @@ export default function CourseEditor({ curriculum, onSave, onClose }: CourseEdit
                             />
                           </div>
                           <div>
-                            <label className="text-[9px] font-medium text-muted-foreground uppercase">Content</label>
+                            <label className="text-[9px] font-medium text-muted-foreground uppercase">Your Content</label>
+                            <p className="text-[9px] text-muted-foreground/70 mt-0.5 mb-1">
+                              Replace AI content with your own teaching material — it flows into every export (PDF, DOCX, Notion, SCORM).
+                            </p>
                             <textarea
-                              className="w-full mt-0.5 rounded-md border border-border/40 bg-muted/10 px-2.5 py-1.5 text-xs resize-none h-24 focus:outline-none focus:ring-1 focus:ring-violet-500/30 font-mono"
+                              className="w-full mt-0.5 rounded-md border border-border/40 bg-muted/10 px-2.5 py-2 text-xs leading-relaxed resize-y min-h-[10rem] focus:outline-none focus:ring-1 focus:ring-violet-500/30"
                               value={les.content || ""}
                               onChange={(e) => updateLessonContent(mi, li, e.target.value)}
+                              placeholder="Write or paste your lesson content here..."
                             />
+                          </div>
+                          <div>
+                            <label className="text-[9px] font-medium text-muted-foreground uppercase">Lesson Objectives</label>
+                            <div className="mt-1 space-y-1.5">
+                              {(les.objectives || []).map((obj, oi) => (
+                                <div key={oi} className="flex items-center gap-2">
+                                  <Check className="size-3 text-emerald-500 shrink-0" />
+                                  <input
+                                    className="flex-1 rounded-md border border-border/40 bg-muted/10 px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-violet-500/30"
+                                    value={obj}
+                                    onChange={(e) => updateLessonObjective(mi, li, oi, e.target.value)}
+                                  />
+                                  <button
+                                    onClick={() => removeLessonObjective(mi, li, oi)}
+                                    aria-label="Remove objective"
+                                    className="text-muted-foreground/40 hover:text-rose-400 transition-colors p-0.5"
+                                  >
+                                    <X className="size-3" />
+                                  </button>
+                                </div>
+                              ))}
+                              <Button variant="ghost" size="sm" className="w-full text-[10px] gap-1.5 text-muted-foreground hover:text-violet-400 h-6" onClick={() => addLessonObjective(mi, li)}>
+                                <Plus className="size-3" /> Add Objective
+                              </Button>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-[9px] font-medium text-muted-foreground uppercase">Key Points</label>
+                            <div className="mt-1 space-y-1.5">
+                              {(les.keyPoints || []).map((kp, ki) => (
+                                <div key={ki} className="flex items-center gap-2">
+                                  <span className="text-amber-500 shrink-0 text-xs">•</span>
+                                  <input
+                                    className="flex-1 rounded-md border border-border/40 bg-muted/10 px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-violet-500/30"
+                                    value={kp}
+                                    onChange={(e) => updateLessonKeyPoint(mi, li, ki, e.target.value)}
+                                  />
+                                  <button
+                                    onClick={() => removeLessonKeyPoint(mi, li, ki)}
+                                    aria-label="Remove key point"
+                                    className="text-muted-foreground/40 hover:text-rose-400 transition-colors p-0.5"
+                                  >
+                                    <X className="size-3" />
+                                  </button>
+                                </div>
+                              ))}
+                              <Button variant="ghost" size="sm" className="w-full text-[10px] gap-1.5 text-muted-foreground hover:text-violet-400 h-6" onClick={() => addLessonKeyPoint(mi, li)}>
+                                <Plus className="size-3" /> Add Key Point
+                              </Button>
+                            </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <label className="text-[9px] font-medium text-muted-foreground uppercase shrink-0">Duration (min)</label>

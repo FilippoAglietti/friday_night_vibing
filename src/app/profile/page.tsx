@@ -855,7 +855,7 @@ export default function ProfilePage() {
             <div className="flex items-center justify-between pt-2 border-t border-border/20">
               <span className="text-[10px] text-muted-foreground">{timeAgo(gen.created_at)}</span>
               <div className="flex gap-0.5">
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-indigo-500/10 hover:text-indigo-400" onClick={(e) => { e.stopPropagation(); setEditingGenId(gen.id); }} title="Edit Course">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-indigo-500/10 hover:text-indigo-400" onClick={(e) => { e.stopPropagation(); setEditingGenId(gen.id); setActiveTab("courses"); }} title="Edit Course">
                   <Pencil className="size-3.5" />
                 </Button>
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c, gen.teaching_style); }} title="Download PDF">

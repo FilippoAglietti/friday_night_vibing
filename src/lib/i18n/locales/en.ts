@@ -10,12 +10,12 @@ const en: Translations = {
     getStartedFree: "Get Started Free",
   },
   hero: {
-    badge: "Audio Narration · Beautiful Design · 16 Languages",
-    title1: "AI Courses",
-    titleConnector: "Your Students",
-    title2: "Actually Finish",
+    badge: "Audio Courses · Shareable Links · Stunning Design",
+    title1: "The AI Course Generator",
+    titleConnector: "that",
+    title2: "Sounds as Good as It Looks",
     subtitle:
-      "Other AI generators give you a text dump. Syllabi creates audio-narrated, beautifully designed courses learners actually want to complete — ready in 60 seconds.",
+      "AI creates complete courses with audio narration, beautiful design, and shareable links — ready to teach, sell, or share in seconds.",
     cta: "Generate Your First Course Free",
     secondaryCta: "See a Sample Course",
     tagline: "No credit card required · Your first course is free",
