@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "How to Create an Online Course in 2026 — Complete Guide",
   description:
     "Step-by-step guide to creating a professional online course in 2026. Learn how to plan, structure, and launch your course using AI tools, from topic selection to student engagement.",
+  authors: [{ name: "Syllabi Team", url: "https://www.syllabi.online" }],
   alternates: { canonical: "/blog/how-to-create-online-course-2026" },
   openGraph: {
     title: "How to Create an Online Course in 2026 — Complete Guide",
@@ -16,6 +17,9 @@ export const metadata: Metadata = {
     siteName: "Syllabi",
     type: "article",
     publishedTime: "2026-04-10T08:00:00Z",
+    authors: ["Syllabi Team"],
+    tags: ["AI Course Creation", "Online Course", "Course Design", "2026"],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Syllabi — How to create an online course in 2026" }],
   },
   twitter: {
     card: "summary_large_image",

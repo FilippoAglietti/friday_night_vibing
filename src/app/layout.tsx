@@ -85,6 +85,7 @@ export const metadata: Metadata = {
     description:
       "Generate complete courses with AI — audio narration, quizzes, modules & PDF export. Free to start.",
     images: ["/og.png"],
+    site: "@syllabi_online",
     creator: "@syllabi_online",
   },
   icons: {

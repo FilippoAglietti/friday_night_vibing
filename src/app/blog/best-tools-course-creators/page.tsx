@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Best Tools for Course Creators in 2026 — The Complete Stack",
   description:
     "The essential tool stack for course creators in 2026. From AI course generators to email marketing, design, and distribution — every tool you need to create, launch, and sell online courses.",
+  authors: [{ name: "Syllabi Team", url: "https://www.syllabi.online" }],
   alternates: { canonical: "/blog/best-tools-course-creators" },
   openGraph: {
     title: "Best Tools for Course Creators in 2026",
@@ -16,6 +17,9 @@ export const metadata: Metadata = {
     siteName: "Syllabi",
     type: "article",
     publishedTime: "2026-04-06T08:00:00Z",
+    authors: ["Syllabi Team"],
+    tags: ["Course Creator Tools", "AI Tools", "Course Creation", "2026"],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Syllabi — Best tools for course creators in 2026" }],
   },
   twitter: {
     card: "summary_large_image",

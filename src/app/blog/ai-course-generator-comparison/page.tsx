@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "AI Course Generator Comparison 2026 — Syllabi vs CourseAI vs Coursebox",
   description:
     "Honest comparison of the top AI course generators in 2026. We break down Syllabi, CourseAI, Coursebox, and others by features, pricing, output quality, and ease of use.",
+  authors: [{ name: "Syllabi Team", url: "https://www.syllabi.online" }],
   alternates: { canonical: "/blog/ai-course-generator-comparison" },
   openGraph: {
     title: "AI Course Generator Comparison 2026",
@@ -16,6 +17,9 @@ export const metadata: Metadata = {
     siteName: "Syllabi",
     type: "article",
     publishedTime: "2026-04-08T08:00:00Z",
+    authors: ["Syllabi Team"],
+    tags: ["AI Course Generator", "Comparison", "Syllabi", "CourseAI", "Coursebox"],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Syllabi — AI Course Generator Comparison 2026" }],
   },
   twitter: {
     card: "summary_large_image",

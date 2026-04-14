@@ -454,6 +454,16 @@ export default function Home() {
     return () => window.removeEventListener("syllabi:open-auth", handler);
   }, []);
 
+  // Prefill topic from ?topic= query param (powers the JSON-LD SearchAction
+  // and lets other sites deep-link into the generator with a starting prompt)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const topic = params.get("topic");
+    if (topic && topic.trim().length >= 3) {
+      setTemplateFormValues((prev) => ({ ...prev, topic: topic.trim() }));
+    }
+  }, []);
+
   // Check for checkout success/error in URL params
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
