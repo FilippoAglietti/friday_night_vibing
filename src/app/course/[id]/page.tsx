@@ -13,7 +13,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import type { Curriculum } from "@/types/curriculum";
+import type { Curriculum, TeachingStyle } from "@/types/curriculum";
 import CourseContent from "./course-content";
 import GeneratingView from "./generating-view";
 
@@ -79,7 +79,7 @@ export default async function CoursePage({
   const { data: course, error } = await supabase
     .from("courses")
     .select(
-      "id, title, topic, curriculum, status, created_at, generation_progress, generation_total_modules, generation_completed_modules",
+      "id, title, topic, curriculum, status, created_at, teaching_style, generation_progress, generation_total_modules, generation_completed_modules",
     )
     .eq("id", id)
     .single();
@@ -117,6 +117,7 @@ export default async function CoursePage({
       curriculum={course.curriculum as Curriculum}
       courseId={course.id}
       createdAt={course.created_at}
+      teachingStyle={(course.teaching_style as TeachingStyle | null) ?? null}
     />
   );
 }

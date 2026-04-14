@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { supabaseBrowser } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
-import type { Curriculum, DifficultyLevel } from "@/types/curriculum";
+import type { Curriculum, DifficultyLevel, TeachingStyle } from "@/types/curriculum";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -77,6 +77,7 @@ interface Generation {
   curriculum: Curriculum | null;
   status: string;
   created_at: string;
+  teaching_style?: TeachingStyle | null;
   /** Progress fields for chunked generation */
   generation_progress?: string | null;
   generation_total_modules?: number | null;
@@ -363,7 +364,7 @@ export default function ProfilePage() {
       setUser(user);
       if (user) {
         const [{ data: courses }, { data: profileData }] = await Promise.all([
-          supabaseBrowser.from("courses").select("id, topic, audience, length, niche, curriculum, status, created_at, generation_progress, generation_total_modules, generation_completed_modules").order("created_at", { ascending: false }),
+          supabaseBrowser.from("courses").select("id, topic, audience, length, niche, curriculum, status, created_at, teaching_style, generation_progress, generation_total_modules, generation_completed_modules").order("created_at", { ascending: false }),
           supabaseBrowser.from("profiles").select("plan, generations_used, generations_limit").eq("id", user.id).single(),
         ]);
         if (courses) setGenerations(courses as unknown as Generation[]);
@@ -384,7 +385,7 @@ export default function ProfilePage() {
     const interval = setInterval(async () => {
       const { data: courses } = await supabaseBrowser
         .from("courses")
-        .select("id, topic, audience, length, niche, curriculum, status, created_at, generation_progress, generation_total_modules, generation_completed_modules")
+        .select("id, topic, audience, length, niche, curriculum, status, created_at, teaching_style, generation_progress, generation_total_modules, generation_completed_modules")
         .order("created_at", { ascending: false });
       if (courses) setGenerations(courses as unknown as Generation[]);
 
@@ -550,14 +551,17 @@ export default function ProfilePage() {
 
   // ── Handlers ───────────────────────────────────────────────
 
-  const handleDownloadPDF = useCallback((curriculum: Curriculum) => {
-    try {
-      const pdf = generateCurriculumPDF(curriculum);
-      pdf.save(`${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_syllabus.pdf`);
-    } catch (e) {
-      console.error("Failed to generate PDF:", e);
-    }
-  }, []);
+  const handleDownloadPDF = useCallback(
+    (curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
+      try {
+        const pdf = generateCurriculumPDF(curriculum, { teachingStyle });
+        pdf.save(`${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_syllabus.pdf`);
+      } catch (e) {
+        console.error("Failed to generate PDF:", e);
+      }
+    },
+    [],
+  );
 
   const handleExportNotion = useCallback(async (curriculum: Curriculum) => {
     await copyNotionHtmlToClipboard(curriculum);
@@ -771,7 +775,7 @@ export default function ProfilePage() {
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-indigo-500/10 hover:text-indigo-400" onClick={(e) => { e.stopPropagation(); setEditingGenId(gen.id); }} title="Edit Course">
                   <Pencil className="size-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c); }} title="Download PDF">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c, gen.teaching_style); }} title="Download PDF">
                   <Download className="size-3.5" />
                 </Button>
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-purple-500/10 hover:text-purple-400" onClick={(e) => { e.stopPropagation(); handleExportNotion(c); }} title="Copy for Notion">
@@ -857,7 +861,7 @@ export default function ProfilePage() {
                       <Button
                         variant="outline" size="sm"
                         className="h-7 text-[10px] gap-1 border-violet-500/20 hover:bg-violet-500/10 hover:text-violet-400 hover:border-violet-500/30"
-                        onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c); }}
+                        onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c, gen.teaching_style); }}
                       >
                         <FileDown className="size-3" /> PDF
                       </Button>
@@ -1092,7 +1096,7 @@ export default function ProfilePage() {
                       <button
                         onClick={() => {
                           const latest = readyGenerations[0];
-                          if (latest?.curriculum) handleDownloadPDF(latest.curriculum);
+                          if (latest?.curriculum) handleDownloadPDF(latest.curriculum, latest.teaching_style);
                         }}
                         className="group flex flex-col items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 sm:p-4 hover:bg-amber-500/10 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-200"
                       >
@@ -1362,7 +1366,7 @@ export default function ProfilePage() {
 
                                     {/* Inline actions on hover */}
                                     <div className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                      <Button variant="ghost" size="sm" className="h-6 px-2 text-[9px] gap-1 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c); }}>
+                                      <Button variant="ghost" size="sm" className="h-6 px-2 text-[9px] gap-1 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c, gen.teaching_style); }}>
                                         <Download className="size-2.5" />PDF
                                       </Button>
                                       <Button variant="ghost" size="sm" className="h-6 px-2 text-[9px] gap-1 hover:bg-cyan-500/10 hover:text-cyan-400" onClick={(e) => { e.stopPropagation(); handleShareCourse(gen); }}>

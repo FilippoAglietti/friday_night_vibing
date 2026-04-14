@@ -54,8 +54,8 @@ export interface GenerationProgress {
 }
 
 export interface CurriculumFormProps {
-  /** Called with the generated curriculum on success */
-  onGenerated?: (curriculum: Curriculum) => void;
+  /** Called with the generated curriculum on success, plus the teaching style used so downstream exports can theme themselves. */
+  onGenerated?: (curriculum: Curriculum, meta?: { teachingStyle: TeachingStyle }) => void;
   /** Called when generation starts */
   onLoadingChange?: (loading: boolean) => void;
   /** Called with real-time generation progress from polling */
@@ -197,6 +197,13 @@ export default function CurriculumForm({
 }: CurriculumFormProps) {
   const [form, setForm] = useState<CurriculumFormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
+
+  // Kept in a ref so the long-lived polling callback can read the
+  // latest teachingStyle without being recreated on every keystroke.
+  const teachingStyleRef = useRef<TeachingStyle>(INITIAL_FORM.teachingStyle);
+  useEffect(() => {
+    teachingStyleRef.current = form.teachingStyle;
+  }, [form.teachingStyle]);
 
   // Sync form with initialValues when they change
   useEffect(() => {
@@ -344,7 +351,7 @@ export default function CurriculumForm({
             clearInterval(pollIntervalRef.current);
             pollIntervalRef.current = null;
           }
-          onGenerated?.(data.curriculum);
+          onGenerated?.(data.curriculum, { teachingStyle: teachingStyleRef.current });
           setIsSubmitting(false);
           onLoadingChange?.(false);
           // Reset form and state

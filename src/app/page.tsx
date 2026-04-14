@@ -11,7 +11,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/components/ToastProvider";
 import { useState, useEffect, useCallback, useRef } from "react";
-import type { Curriculum } from "@/types/curriculum";
+import type { Curriculum, TeachingStyle } from "@/types/curriculum";
 import { exampleCurricula as fullExampleCurricula } from "@/data/exampleCurricula";
 import { motion, AnimatePresence, useScroll, useTransform, useAnimation, type Variants } from "framer-motion";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -422,6 +422,7 @@ export default function Home() {
   }, []);
 
   const [curriculum, setCurriculum] = useState<Curriculum | null>(null);
+  const [curriculumTeachingStyle, setCurriculumTeachingStyle] = useState<TeachingStyle | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -483,8 +484,9 @@ export default function Home() {
     setIsGenerating(loading);
   }, []);
 
-  const handleGenerated = useCallback((c: Curriculum) => {
+  const handleGenerated = useCallback((c: Curriculum, meta?: { teachingStyle: TeachingStyle }) => {
     setCurriculum(c);
+    setCurriculumTeachingStyle(meta?.teachingStyle ?? null);
     toast(t("toast.courseGenerated"), "success");
   }, [toast, t]);
 
@@ -919,7 +921,8 @@ export default function Home() {
               <div key="output-view">
                 <CurriculumOutput
                   curriculum={curriculum}
-                  onGenerateAnother={() => setCurriculum(null)}
+                  onGenerateAnother={() => { setCurriculum(null); setCurriculumTeachingStyle(null); }}
+                  teachingStyle={curriculumTeachingStyle}
                 />
               </div>
             ) : (

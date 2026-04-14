@@ -24,6 +24,7 @@ import type {
   Lesson,
   QuizQuestion,
   BonusResource,
+  TeachingStyle,
 } from "@/types/curriculum";
 
 // ─── Constants ────────────────────────────────────────────────
@@ -43,35 +44,106 @@ const PAGE = {
   }, // content height
 } as const;
 
-/** Brand palette — violet-forward with warm neutrals */
-const C = {
-  // Primary brand
-  violet: [109, 40, 217] as RGB, // violet-600
-  violetLight: [139, 92, 246] as RGB, // violet-500
-  violetDark: [76, 29, 149] as RGB, // violet-900
-  violetBg: [245, 243, 255] as RGB, // violet-50
-  violetBg2: [237, 233, 254] as RGB, // violet-100
-  violetMid: [196, 181, 253] as RGB, // violet-300
-
-  // Accents
-  amber: [245, 158, 11] as RGB,
-  emerald: [16, 185, 129] as RGB,
-  rose: [244, 63, 94] as RGB,
-  sky: [14, 165, 233] as RGB,
-
-  // Neutrals
-  text: [15, 23, 42] as RGB, // slate-900
-  textSec: [71, 85, 105] as RGB, // slate-500
-  textMuted: [148, 163, 184] as RGB, // slate-400
-  white: [255, 255, 255] as RGB,
-  offWhite: [248, 250, 252] as RGB, // slate-50
-  gray50: [248, 250, 252] as RGB,
-  gray100: [241, 245, 249] as RGB, // slate-100
-  gray200: [226, 232, 240] as RGB, // slate-200
-  gray300: [203, 213, 225] as RGB, // slate-300
-} as const;
-
 type RGB = [number, number, number];
+
+interface Palette {
+  violet: RGB;
+  violetLight: RGB;
+  violetDark: RGB;
+  violetBg: RGB;
+  violetBg2: RGB;
+  violetMid: RGB;
+  amber: RGB;
+  emerald: RGB;
+  rose: RGB;
+  sky: RGB;
+  text: RGB;
+  textSec: RGB;
+  textMuted: RGB;
+  white: RGB;
+  offWhite: RGB;
+  gray50: RGB;
+  gray100: RGB;
+  gray200: RGB;
+  gray300: RGB;
+}
+
+/**
+ * Default brand palette — violet-forward with warm neutrals.
+ * Used for conversational / unknown teaching styles.
+ */
+const DEFAULT_PALETTE: Palette = {
+  violet: [109, 40, 217], // violet-600
+  violetLight: [139, 92, 246], // violet-500
+  violetDark: [76, 29, 149], // violet-900
+  violetBg: [245, 243, 255], // violet-50
+  violetBg2: [237, 233, 254], // violet-100
+  violetMid: [196, 181, 253], // violet-300
+  amber: [245, 158, 11],
+  emerald: [16, 185, 129],
+  rose: [244, 63, 94],
+  sky: [14, 165, 233],
+  text: [15, 23, 42],
+  textSec: [71, 85, 105],
+  textMuted: [148, 163, 184],
+  white: [255, 255, 255],
+  offWhite: [248, 250, 252],
+  gray50: [248, 250, 252],
+  gray100: [241, 245, 249],
+  gray200: [226, 232, 240],
+  gray300: [203, 213, 225],
+};
+
+/**
+ * Theme variants — each teaching style gets a distinct primary palette
+ * so a printed academic paper looks like an academic paper, a hands-on
+ * guide looks industrial, and a story-driven course feels warm.
+ * Neutrals are shared; only the primary brand family shifts.
+ */
+const THEMES: Record<TeachingStyle, Palette> = {
+  conversational: DEFAULT_PALETTE,
+
+  // Academic — navy + gold. Serious, scholarly.
+  academic: {
+    ...DEFAULT_PALETTE,
+    violet: [30, 58, 138], // indigo-900 (navy)
+    violetLight: [59, 130, 246], // blue-500
+    violetDark: [15, 23, 42], // slate-900
+    violetBg: [239, 246, 255], // blue-50
+    violetBg2: [219, 234, 254], // blue-100
+    violetMid: [147, 197, 253], // blue-300
+    amber: [202, 138, 4], // amber-600 (gold)
+  },
+
+  // Hands-on — emerald + amber. Industrial, maker-style.
+  "hands-on": {
+    ...DEFAULT_PALETTE,
+    violet: [4, 120, 87], // emerald-700
+    violetLight: [16, 185, 129], // emerald-500
+    violetDark: [6, 78, 59], // emerald-900
+    violetBg: [236, 253, 245], // emerald-50
+    violetBg2: [209, 250, 229], // emerald-100
+    violetMid: [110, 231, 183], // emerald-300
+  },
+
+  // Storytelling — rose + plum. Warm, narrative, editorial.
+  storytelling: {
+    ...DEFAULT_PALETTE,
+    violet: [159, 18, 57], // rose-800
+    violetLight: [244, 63, 94], // rose-500
+    violetDark: [76, 5, 25], // rose-950
+    violetBg: [255, 241, 242], // rose-50
+    violetBg2: [255, 228, 230], // rose-100
+    violetMid: [253, 164, 175], // rose-300
+  },
+};
+
+/**
+ * Active palette — mutated at the entry of generateCurriculumPDF and
+ * restored in a `finally` block. PDF generation is synchronous and
+ * single-threaded on the client, so module-level mutation is safe.
+ */
+let C: Palette = DEFAULT_PALETTE;
 
 /** Font sizes in points */
 const F = {
@@ -1175,36 +1247,49 @@ class PDFBuilder {
 
 // ─── Public API ───────────────────────────────────────────────
 
-export function generateCurriculumPDF(curriculum: Curriculum): jsPDF {
-  const builder = new PDFBuilder();
+export function generateCurriculumPDF(
+  curriculum: Curriculum,
+  opts?: { teachingStyle?: TeachingStyle | null },
+): jsPDF {
+  // Pick the theme for this render and mutate the module-level palette.
+  // Restored in `finally` so nested/subsequent calls get a clean slate.
+  const previousPalette = C;
+  const style = opts?.teachingStyle ?? null;
+  C = (style && THEMES[style]) || DEFAULT_PALETTE;
 
-  // 1. Cover page
-  builder.buildCover(curriculum);
+  try {
+    const builder = new PDFBuilder();
 
-  // 2. Course overview
-  builder.buildOverviewPage(curriculum);
+    // 1. Cover page
+    builder.buildCover(curriculum);
 
-  // 3. Module sections
-  for (const mod of curriculum.modules) {
-    builder.buildModule(mod, curriculum);
+    // 2. Course overview
+    builder.buildOverviewPage(curriculum);
+
+    // 3. Module sections
+    for (const mod of curriculum.modules) {
+      builder.buildModule(mod, curriculum);
+    }
+
+    // 4. Pacing schedule
+    builder.buildPacing(curriculum);
+
+    // 5. Bonus resources
+    if (curriculum.bonusResources && curriculum.bonusResources.length > 0) {
+      builder.buildResources(curriculum.bonusResources);
+    }
+
+    // 6. Learning checklist (printable progress tracker)
+    builder.buildChecklist(curriculum);
+
+    // 7. Certificate of completion
+    builder.buildCertificate(curriculum);
+
+    // 8. Table of contents (appended last so page numbers are correct)
+    builder.buildTOC();
+
+    return builder.getDocument();
+  } finally {
+    C = previousPalette;
   }
-
-  // 4. Pacing schedule
-  builder.buildPacing(curriculum);
-
-  // 5. Bonus resources
-  if (curriculum.bonusResources && curriculum.bonusResources.length > 0) {
-    builder.buildResources(curriculum.bonusResources);
-  }
-
-  // 6. Learning checklist (printable progress tracker)
-  builder.buildChecklist(curriculum);
-
-  // 7. Certificate of completion
-  builder.buildCertificate(curriculum);
-
-  // 8. Table of contents (appended last so page numbers are correct)
-  builder.buildTOC();
-
-  return builder.getDocument();
 }

@@ -35,7 +35,7 @@ import {
   Share2,
 } from "lucide-react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
-import type { Curriculum, Module, Lesson, QuizQuestion } from "@/types/curriculum";
+import type { Curriculum, Module, Lesson, QuizQuestion, TeachingStyle } from "@/types/curriculum";
 
 // ─── Props ───────────────────────────────────────────────────
 
@@ -43,6 +43,7 @@ interface CourseContentProps {
   curriculum: Curriculum;
   courseId: string;
   createdAt: string;
+  teachingStyle?: TeachingStyle | null;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -489,6 +490,7 @@ export default function CourseContent({
   curriculum: c,
   courseId,
   createdAt,
+  teachingStyle,
 }: CourseContentProps) {
   const totalLessons = getTotalLessons(c);
   const totalQuizzes = getTotalQuizzes(c);
@@ -497,7 +499,7 @@ export default function CourseContent({
 
   const handleDownloadPDF = async () => {
     try {
-      await generateCurriculumPDF(c);
+      await generateCurriculumPDF(c, { teachingStyle });
     } catch (err) {
       console.error("PDF generation failed:", err);
     }

@@ -41,11 +41,12 @@ import { generateScormPackage } from "@/lib/exports/generateScorm";
 import { generateShareableUrl, type LeadMagnetSettings } from "@/lib/exports/generateShareUrl";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
-import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource } from "@/types/curriculum";
+import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource, TeachingStyle } from "@/types/curriculum";
 
 interface CurriculumOutputProps {
   curriculum: Curriculum;
   onGenerateAnother: () => void;
+  teachingStyle?: TeachingStyle | null;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -297,6 +298,7 @@ function QuizCard({ question, index }: { question: QuizQuestion; index: number }
 export default function CurriculumOutput({
   curriculum,
   onGenerateAnother,
+  teachingStyle,
 }: CurriculumOutputProps) {
   const [copied, setCopied] = useState(false);
   const [notionCopied, setNotionCopied] = useState(false);
@@ -401,7 +403,7 @@ export default function CurriculumOutput({
 
   const handleDownloadPDF = () => {
     try {
-      const pdf = generateCurriculumPDF(curriculum);
+      const pdf = generateCurriculumPDF(curriculum, { teachingStyle });
       pdf.save(`${sanitizeFilename(curriculum.title)}_syllabus.pdf`);
     } catch (e) {
       console.error("Failed to generate PDF:", e);
