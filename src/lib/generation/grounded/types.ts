@@ -1,9 +1,9 @@
 /**
  * Shared types for the grounded-content pipeline.
  *
- * Phase 1 ships PaperSource + the StyleConfig shape. Later phases extend
- * the GroundedSource union with VideoSource, RepoSource, WebArticleSource
- * — same StyleConfig, different source_type and validator choice.
+ * Phase 1.1 broadens VerifiedSource beyond papers: books (verified via
+ * Google Books) and arXiv preprints (verified via arXiv API) are now
+ * first-class citizens. Claude picks the appropriate mix per topic.
  */
 
 import type {
@@ -12,67 +12,59 @@ import type {
   TeachingStyle,
 } from "@/types/curriculum";
 
-// ─── Source types ────────────────────────────────────────────
+// ─── Source kinds ────────────────────────────────────────────
 
-export interface PaperSource {
-  type: "paper";
+export type SourceKind = "paper" | "book" | "arxiv";
+
+export type ValidatorKind =
+  | "crossref"
+  | "google_books"
+  | "arxiv"
+  | "http_head"
+  | "youtube_api";
+
+/**
+ * Candidate returned by Call 1 (web_search). Type-specific fields are
+ * optional at parse time; the validator promotes them to VerifiedSource
+ * once the registry confirms existence.
+ */
+export interface SourceCandidate {
+  type: SourceKind;
   title: string;
   authors: string;
   year: number;
+  url: string;
+
+  // paper-specific
   journal?: string;
   doi?: string;
-  url: string;
-  isPreprint: boolean;
+
+  // book-specific
+  publisher?: string;
+  isbn?: string;
+
+  // arxiv-specific
+  arxivId?: string;
+
+  // common metadata
+  isPreprint?: boolean;
 }
 
-// Placeholders for later phases — not used in Phase 1 but kept in the union
-// so the discriminator is stable from day 1.
-export interface VideoSource {
-  type: "video";
-  title: string;
-  channel: string;
-  year?: number;
-  url: string;
-  durationSeconds?: number;
+/** A SourceCandidate that has been confirmed against an authoritative registry. */
+export interface VerifiedSource extends SourceCandidate {
+  verified: true;
+  verifiedAt: string; // ISO
+  verifiedBy: ValidatorKind;
 }
-
-export interface RepoSource {
-  type: "repo";
-  title: string;
-  owner: string;
-  version?: string;
-  url: string;
-}
-
-export interface WebArticleSource {
-  type: "web_article";
-  title: string;
-  publisher: string;
-  year?: number;
-  url: string;
-}
-
-export type GroundedSource =
-  | PaperSource
-  | VideoSource
-  | RepoSource
-  | WebArticleSource;
 
 // ─── Style config (per-style routing rules) ──────────────────
 
-export type ValidatorKind = "crossref" | "http_head" | "youtube_api";
-
 export interface StyleConfig {
-  /** Whether this style should ground content at all */
   enabled: boolean;
-  /** Which source type this style produces */
-  sourceType: GroundedSource["type"];
+  /** Which kinds of sources this style accepts; first item is the preferred kind */
+  sourceKinds: SourceKind[];
   /** Citation count target per lesson — inclusive range */
   density: { min: number; max: number };
-  /** How to validate discovered sources */
-  validator: ValidatorKind;
-  /** Optional domain allowlist (Phase 2+); Phase 1 academic leaves empty */
-  allowedDomains?: string[];
 }
 
 // ─── Routing input/output ────────────────────────────────────
@@ -81,12 +73,4 @@ export interface StyleRoutingInput {
   teachingStyle?: TeachingStyle;
   audience: AudienceLevel;
   length: CourseLength;
-}
-
-// ─── Verified source after DOI/URL check ─────────────────────
-
-export interface VerifiedSource extends PaperSource {
-  verified: true;
-  verifiedAt: string; // ISO
-  verifiedBy: ValidatorKind;
 }

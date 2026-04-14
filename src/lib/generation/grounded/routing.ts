@@ -1,7 +1,7 @@
 /**
  * Decides whether a generation request should run through the grounded
  * pipeline and, if so, what StyleConfig to use. Pure function — no I/O,
- * no Anthropic, no Supabase. Called both by skeleton and module steps.
+ * no Anthropic, no Supabase.
  */
 
 import type { GenerateRequest } from "@/types/curriculum";
@@ -14,9 +14,6 @@ export function isGroundedGenerationEnabled(): boolean {
 /**
  * Returns a StyleConfig if the request qualifies for the grounded
  * pipeline, or null to fall through to the current (un-grounded) path.
- *
- * Phase 1 gates on teachingStyle === "academic". Phases 2–4 will add
- * cases for hands-on / storytelling / conversational styles.
  */
 export function shouldGroundStyle(request: GenerateRequest): StyleConfig | null {
   if (!isGroundedGenerationEnabled()) return null;
@@ -26,7 +23,6 @@ export function shouldGroundStyle(request: GenerateRequest): StyleConfig | null 
   switch (style) {
     case "academic":
       return academicStyleConfig(request);
-    // Phase 2+ cases: hands-on, storytelling, conversational
     default:
       return null;
   }
@@ -34,17 +30,13 @@ export function shouldGroundStyle(request: GenerateRequest): StyleConfig | null 
 
 // ─── Academic (Phase 1) ──────────────────────────────────────
 
-/**
- * Citation density targets per lesson — beginner few, advanced many.
- * Length scales the base density. Values chosen in the 2026-04-14 spec.
- */
 function academicStyleConfig(request: GenerateRequest): StyleConfig {
-  const density = academicDensity(request);
   return {
     enabled: true,
-    sourceType: "paper",
-    density,
-    validator: "crossref",
+    // Order matters: paper is preferred but books and arXiv are first-class.
+    // The discovery prompt picks the right mix per topic.
+    sourceKinds: ["paper", "book", "arxiv"],
+    density: academicDensity(request),
   };
 }
 

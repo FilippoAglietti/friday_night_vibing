@@ -47,8 +47,8 @@ import {
 } from "@/lib/prompts/curriculum";
 import {
   shouldGroundStyle,
-  discoverPaperSources,
-  verifyPapers,
+  discoverSources,
+  verifySources,
   validateCitations,
   decideFailurePolicy,
   stripInvalidCitations,
@@ -873,7 +873,7 @@ export const moduleGenerate = inngest.createFunction(
     const styleConfig = shouldGroundStyle(request);
     const verifiedSources: VerifiedSource[] | null = styleConfig
       ? await step.run(`discover-sources-${moduleId}`, async () => {
-          const candidates = await discoverPaperSources({
+          const candidates = await discoverSources({
             moduleTitle: (skeletonModule as Module).title,
             moduleObjectives: (skeletonModule as Module).objectives ?? [],
             courseTopic: skeletonTitle,
@@ -881,7 +881,7 @@ export const moduleGenerate = inngest.createFunction(
             language: request.language ?? "en",
             styleConfig,
           });
-          const verified = await verifyPapers(candidates);
+          const verified = await verifySources(candidates);
           if (verified.length > 0) {
             // Cast: generation_sources table was added in migration 015,
             // Supabase generated Database types do not include it yet.
@@ -890,14 +890,14 @@ export const moduleGenerate = inngest.createFunction(
               verified.map((v) => ({
                 course_id: courseId,
                 module_index: moduleIndex,
-                source_type: "paper",
+                source_type: v.type,
                 title: v.title,
                 authors: v.authors,
                 year: v.year,
                 journal: v.journal ?? null,
-                doi: v.doi ?? null,
+                doi: v.doi ?? v.arxivId ?? v.isbn ?? null,
                 url: v.url,
-                is_preprint: v.isPreprint,
+                is_preprint: v.isPreprint ?? false,
                 verified_at: v.verifiedAt,
                 verified_by: v.verifiedBy,
                 verified_ok: true,

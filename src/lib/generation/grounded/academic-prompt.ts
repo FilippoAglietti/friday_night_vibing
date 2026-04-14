@@ -1,12 +1,12 @@
 /**
  * Grounded module-detail prompt for the academic style.
  *
- * Produces the same JSON output shape as the standard module-detail
- * prompt so downstream parsing stays unchanged. The difference is in
- * the system instructions and the injected verified-sources context:
- * Claude is forced to cite ONLY from the provided list using inline
- * [n] brackets, and to end each lesson with a numbered References
- * block.
+ * Phase 1.1 changes:
+ *   • Multi-type source list (papers + books + arXiv preprints).
+ *   • Force-cite-all rule: Claude MUST use every verified source at least
+ *     once unless it is genuinely irrelevant to all lessons.
+ *   • Per-type bibliography formatting (DOI for papers, ISBN for books,
+ *     arXiv id for preprints).
  */
 
 import type { GenerateRequest, Module } from "@/types/curriculum";
@@ -16,13 +16,19 @@ const GROUNDED_SYSTEM_PROMPT =
   "You are generating an academic, citation-rigorous module for an online course. " +
   "You MUST cite every non-trivial factual claim using numeric brackets like [1], [2], " +
   "drawing ONLY from the VERIFIED SOURCES list supplied in the user message. " +
-  "Never invent citations, never cite sources not in the list. Never use [n] for a source you did not consult in that specific sentence. " +
+  "Never invent citations, never cite sources not in the list. " +
+  "\n\n" +
+  "MANDATORY: Across the whole module you MUST use EVERY verified source at least once, " +
+  "unless a source is genuinely irrelevant to all lessons in this module. If you skip a " +
+  "source, you are silently signalling it should not appear in the lesson's References. " +
+  "When in doubt, cite. " +
   "\n\n" +
   "Each lesson's `content` field MUST end with a References section formatted as:\n" +
   "\n" +
   "## References\n" +
-  "[1] Full bibliographic entry: Authors. Title. Journal, Year. doi:...\n" +
-  "[2] ...\n" +
+  "[1] (paper) Authors. Title. Journal, Year. doi:...\n" +
+  "[2] (book) Authors. Title. Publisher, Year. ISBN: ...\n" +
+  "[3] (arXiv) Authors. Title. arXiv:..., Year.\n" +
   "\n" +
   "Number references in the order they are cited in the lesson (restart numbering per lesson). " +
   "Only include References that are actually cited inline. " +
@@ -74,9 +80,23 @@ export function buildGroundedModuleDetailPrompt(
   const sourcesListing = verifiedSources
     .map((s, i) => {
       const n = i + 1;
-      const doi = s.doi ? `, doi:${s.doi}` : "";
-      const journal = s.journal ? `, ${s.journal}` : "";
-      return `[${n}] ${s.authors}. ${s.title}${journal}, ${s.year}${doi}`;
+      switch (s.type) {
+        case "paper": {
+          const journal = s.journal ? `, ${s.journal}` : "";
+          const doi = s.doi ? `, doi:${s.doi}` : "";
+          return `[${n}] (paper) ${s.authors}. ${s.title}${journal}, ${s.year}${doi}`;
+        }
+        case "book": {
+          const pub = s.publisher ? `, ${s.publisher}` : "";
+          const isbn = s.isbn ? `, ISBN ${s.isbn}` : "";
+          return `[${n}] (book) ${s.authors}. ${s.title}${pub}, ${s.year}${isbn}`;
+        }
+        case "arxiv": {
+          return `[${n}] (arXiv) ${s.authors}. ${s.title}. arXiv:${s.arxivId}, ${s.year}`;
+        }
+        default:
+          return `[${n}] ${(s as VerifiedSource).authors}. ${(s as VerifiedSource).title}, ${(s as VerifiedSource).year}`;
+      }
     })
     .join("\n");
 
@@ -108,16 +128,18 @@ LESSON STUBS:
 ${JSON.stringify(moduleData.lessons, null, 2)}
 
 ──────────────────────────────────────────────
-VERIFIED SOURCES (cite ONLY from this list, using [n] by the bracketed number):
+VERIFIED SOURCES (${verifiedSources.length} total — cite ONLY from this list, using [n] by the bracketed number).
+You MUST use EVERY entry below at least once across the lessons of this module unless an entry is genuinely irrelevant.
+──────────────────────────────────────────────
 ${sourcesListing}
 ──────────────────────────────────────────────
 
-CITATION DENSITY: aim for ${densityTarget.min}–${densityTarget.max} inline citations per lesson content block. Some lessons may exceed this if the topic genuinely demands it; none should fall below ${densityTarget.min}.
+CITATION DENSITY: aim for ${densityTarget.min}–${densityTarget.max} inline citations per lesson content block. Some lessons may exceed this if the topic genuinely demands it; none should fall below ${densityTarget.min} unless you've already exhausted the verified pool earlier in the module.
 
 For EACH lesson above, produce:
 - "keyPoints": 4–6 string takeaways. Citations optional here.
-- "content": dense markdown body (${length} length) with inline [n] citations and a trailing "## References" block listing only the [n] actually used in this lesson, numbered from 1 in the order of first citation.
-- "suggestedResources": 2–3 objects { title, url, type } pointing to real resources (may include the papers you already cite).
+- "content": dense markdown body (${length} length) with inline [n] citations and a trailing "## References" block listing only the [n] actually used in this lesson, numbered from 1 in the order of first citation. Use the per-type formatting shown in the system prompt.
+- "suggestedResources": 2–3 objects { title, url, type } pointing to real resources (may include the sources you already cite).
 ${quizBlock}
 
 SIZE DISCIPLINE: Your entire response must be COMPLETE, VALID JSON. If you are running long, compress later lessons rather than cutting mid-JSON.

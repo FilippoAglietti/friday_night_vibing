@@ -111,9 +111,11 @@ function findVerifiedMatch(
   verified: VerifiedSource[],
 ): VerifiedSource | undefined {
   const normalized = bibEntry.toLowerCase();
-  // Prefer DOI match
+  // Prefer identifier match (DOI for papers, arXiv id, ISBN for books)
   for (const src of verified) {
     if (src.doi && normalized.includes(src.doi.toLowerCase())) return src;
+    if (src.arxivId && normalized.includes(src.arxivId.toLowerCase())) return src;
+    if (src.isbn && normalized.includes(src.isbn.toLowerCase())) return src;
   }
   // Fall back to title contains (tolerant of citation-format variations)
   for (const src of verified) {
