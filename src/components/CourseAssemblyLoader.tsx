@@ -331,7 +331,7 @@ export default function CourseAssemblyLoader({
   const subline = interpolate(phaseCopy[copyIdx], safeTopic);
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto">
+    <div role="status" className="relative w-full max-w-3xl mx-auto">
       {/* Glow backdrop */}
       <div
         aria-hidden
@@ -355,7 +355,7 @@ export default function CourseAssemblyLoader({
         {/* Headline + rotating subline */}
         <div className="mt-5 text-center space-y-1.5 min-h-[56px]">
           <p className="text-base sm:text-lg font-semibold text-violet-300">{headline}</p>
-          <div className="relative h-6 overflow-hidden">
+          <div aria-live="polite" aria-atomic="true" className="relative h-6 overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.p
                 key={`${phase}-${copyIdx}`}
