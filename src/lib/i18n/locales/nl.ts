@@ -15,7 +15,7 @@ const nl: Translations = {
     titleConnector: "die",
     title2: "Zo Goed Klinkt als Hij Eruitziet",
     subtitle:
-      "AI maakt complete cursussen met audiovertelling, prachtig design en deelbare links — klaar om te onderwijzen, verkopen of delen in seconden.",
+      "AI maakt complete cursussen met audiovertelling, prachtig design en deelbare links — klaar om te onderwijzen, verkopen of delen.",
     cta: "Genereer Gratis Je Eerste Cursus",
     secondaryCta: "Bekijk een Voorbeeldcursus",
     tagline: "Geen creditcard vereist · Je eerste cursus is gratis",
@@ -42,7 +42,7 @@ const nl: Translations = {
     step1Desc: "Voer je onderwerp in, kies een stijl en diepgang.",
     step2Title: "AI bouwt je cursus",
     step2Desc:
-      "In seconden krijg je modules, lessen, quizzen, audiovertelling en een deelbare link — allemaal bewerkbaar.",
+      "Je krijgt modules, lessen, quizzen, audiovertelling en een deelbare link — allemaal bewerkbaar.",
     step3Title: "Deel, onderwijs of verkoop",
     step3Desc:
       "Stuur een link, exporteer naar Notion of PDF, of maak er een lead magnet van. Jouw cursus, op jouw manier.",
@@ -72,7 +72,7 @@ const nl: Translations = {
     eyebrow: "Echte Voorbeelden",
     heading: "Beluister het. Bekijk het. Deel het.",
     subheading:
-      "Elke cursus hieronder werd in seconden gegenereerd — compleet met audiovertelling, gestructureerde lessen, quizzen en een deelbare link.",
+      "Elke cursus hieronder werd gegenereerd met Syllabi — compleet met audiovertelling, gestructureerde lessen, quizzen en een deelbare link.",
     modules: "Modules",
     lessons: "Lessen",
     total: "Totaal",
@@ -138,7 +138,7 @@ const nl: Translations = {
   finalCta: {
     heading: "Klaar om het verschil te horen?",
     subheading:
-      "Maak een cursus met audio, design en een deelbare link — allemaal in minder dan 60 seconden. Je eerste generatie is gratis.",
+      "Maak een cursus met audio, design en een deelbare link. Je eerste generatie is gratis.",
     cta: "Genereer Gratis Je Eerste Cursus",
   },
   footer: {
@@ -214,7 +214,7 @@ const nl: Translations = {
     heading: "Van Nul",
     headingConnector: "naar",
     heading2: "Gepubliceerde Cursus",
-    subheading: "Alles wat je nodig hebt om van lege pagina naar deelbare link te gaan — in minder dan 60 seconden.",
+    subheading: "Alles wat je nodig hebt om van lege pagina naar deelbare link te gaan.",
     stepLabel: "STAP",
     step1Title: "Kies Je Startpunt",
     step1Desc: "Kies een template dat past bij jouw situatie — coaching, onboarding, workshops, of ga volledig custom. Templates vullen het formulier alvast in zodat je nog sneller kunt genereren.",
@@ -223,8 +223,8 @@ const nl: Translations = {
     step2Desc: "Voer je onderwerp, doelgroep, diepteniveau en gewenste stijl in. Hoe specifieker je bent, hoe scherper het resultaat.",
     step2Detail: "Probeer: \"Geavanceerde React Hooks voor Senior Engineers\" of \"Yoga voor Beginners voor Kantoormedewerkers\".",
     step3Title: "Kijk Naar de Magie",
-    step3Desc: "Klik op Genereren. AI bouwt een complete cursusstructuur met modules, lessen, quizzes en leerdoelen — alles in seconden.",
-    step3Detail: "Volledige cursussen met 8+ modules worden in minder dan 60 seconden gegenereerd.",
+    step3Desc: "Klik op Genereren. AI bouwt een complete cursusstructuur met modules, lessen, quizzes en leerdoelen.",
+    step3Detail: "Volledige cursussen met 8+ modules zijn in enkele minuten klaar — voortgang wordt live getoond.",
     step4Title: "Maak Het Je Eigen",
     step4Desc: "Open de Cursus Editor om titels te herschrijven, inhoud aan te passen, quizvragen toe te voegen, modules te herordenen of alles te verwijderen dat niet past.",
     step4Detail: "Elk element is bewerkbaar — niets is vergrendeld.",

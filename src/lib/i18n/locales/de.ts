@@ -15,7 +15,7 @@ const de: Translations = {
     titleConnector: "der",
     title2: "So Gut Klingt Wie Er Aussieht",
     subtitle:
-      "KI erstellt vollständige Kurse mit Audio-Narration, ansprechendem Design und teilbaren Links — in Sekunden bereit zum Lehren, Verkaufen oder Teilen.",
+      "KI erstellt vollständige Kurse mit Audio-Narration, ansprechendem Design und teilbaren Links — bereit zum Lehren, Verkaufen oder Teilen.",
     cta: "Ihren ersten Kurs kostenlos erstellen",
     secondaryCta: "Beispielkurs ansehen",
     tagline: "Keine Kreditkarte erforderlich · Ihr erster Kurs ist kostenlos",
@@ -43,7 +43,7 @@ const de: Translations = {
       'Geben Sie Ihr Thema ein, wählen Sie Stil und Tiefe — von „Python für Data Science" bis „Sauerteigbrot backen 101".',
     step2Title: "KI baut Ihren Kurs",
     step2Desc:
-      "In Sekunden erhalten Sie Module, Lektionen, Quizzes, Audio-Narration und einen teilbaren Link — alles bearbeitbar.",
+      "Sie erhalten Module, Lektionen, Quizzes, Audio-Narration und einen teilbaren Link — alles bearbeitbar.",
     step3Title: "Teilen, lehren oder verkaufen",
     step3Desc:
       "Senden Sie einen Link, exportieren Sie nach Notion oder PDF, oder verwandeln Sie ihn in einen Lead-Magneten. Ihr Kurs, Ihr Weg.",
@@ -73,7 +73,7 @@ const de: Translations = {
     eyebrow: "Echte Beispiele",
     heading: "Hören. Sehen. Teilen.",
     subheading:
-      "Jeder Kurs unten wurde in Sekunden erstellt — komplett mit Audio-Narration, strukturierten Lektionen, Quizzes und einem teilbaren Link.",
+      "Jeder Kurs unten wurde mit Syllabi erstellt — komplett mit Audio-Narration, strukturierten Lektionen, Quizzes und einem teilbaren Link.",
     modules: "Module",
     lessons: "Lektionen",
     total: "Gesamt",
@@ -139,7 +139,7 @@ const de: Translations = {
   finalCta: {
     heading: "Bereit, den Unterschied zu hören?",
     subheading:
-      "Erstellen Sie einen Kurs mit Audio, Design und teilbarem Link — alles in unter 60 Sekunden. Ihre erste Generierung ist kostenlos.",
+      "Erstellen Sie einen Kurs mit Audio, Design und teilbarem Link. Ihre erste Generierung ist kostenlos.",
     cta: "Ihren ersten Kurs kostenlos erstellen",
   },
   footer: {
@@ -216,7 +216,7 @@ const de: Translations = {
     heading: "Von Null",
     headingConnector: "zum",
     heading2: "Veröffentlichten Kurs",
-    subheading: "Alles was du brauchst, um von der leeren Seite zum teilbaren Link zu kommen — in unter 60 Sekunden.",
+    subheading: "Alles was du brauchst, um von der leeren Seite zum teilbaren Link zu kommen.",
     stepLabel: "SCHRITT",
     step1Title: "Wähle Deinen Startpunkt",
     step1Desc: "Wähle ein Template für deinen Anwendungsfall — Coaching, Onboarding, Workshops, oder gehe voll individuell. Templates füllen das Formular vor, damit du noch schneller generieren kannst.",
@@ -225,8 +225,8 @@ const de: Translations = {
     step2Desc: "Gib dein Thema, Zielgruppe, Tiefe und bevorzugten Stil ein. Je spezifischer du bist, desto schärfer das Ergebnis.",
     step2Detail: "Probiere: \"Fortgeschrittene React Hooks für Senior Engineers\" oder \"Anfänger-Yoga für Büroarbeiter\".",
     step3Title: "Schau Der Magie Zu",
-    step3Desc: "Drücke Generieren. KI erstellt eine komplette Kursstruktur mit Modulen, Lektionen, Quizzes und Lernzielen — alles in Sekunden.",
-    step3Detail: "Komplette Kurse mit 8+ Modulen werden in unter 60 Sekunden generiert.",
+    step3Desc: "Drücke Generieren. KI erstellt eine komplette Kursstruktur mit Modulen, Lektionen, Quizzes und Lernzielen.",
+    step3Detail: "Komplette Kurse mit 8+ Modulen sind in wenigen Minuten fertig — Fortschritt wird live angezeigt.",
     step4Title: "Mach Ihn Zu Deinem",
     step4Desc: "Öffne den Kurs-Editor, um Titel umzuschreiben, Inhalte anzupassen, Quizfragen hinzuzufügen, Module umzuordnen oder alles zu entfernen, was nicht passt.",
     step4Detail: "Jedes einzelne Element ist bearbeitbar — nichts ist gesperrt.",
