@@ -21,6 +21,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useAnimation, type Va
 import ScrollProgress from "@/components/ScrollProgress";
 import InteractiveDemo from "@/components/InteractiveDemo";
 import HowItWorksAnimation from "@/components/HowItWorksAnimation";
+import PainPointAnimation from "@/components/PainPointAnimation";
 import { Button } from "@/components/ui/button";
 import { supabaseBrowser } from "@/lib/supabase";
 import {
@@ -447,6 +448,16 @@ export default function Home() {
   const [previewTeachingStyle, setPreviewTeachingStyle] = useState<TeachingStyle | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [templateFormValues, setTemplateFormValues] = useState<Partial<CurriculumFormData> | undefined>(undefined);
+  const [spotlightIdx, setSpotlightIdx] = useState(0);
+  const [spotlightPaused, setSpotlightPaused] = useState(false);
+
+  useEffect(() => {
+    if (spotlightPaused || selectedTemplate) return;
+    const id = setInterval(() => {
+      setSpotlightIdx((i) => (i + 1) % courseTemplates.length);
+    }, 2000);
+    return () => clearInterval(id);
+  }, [spotlightPaused, selectedTemplate]);
   const { toast } = useToast();
   const { t } = useTranslation();
   const closePreview = useCallback(() => {
@@ -829,10 +840,10 @@ export default function Home() {
             <AnimateInView containerRef={containerRef} amount={0.15} variants={stagger} className="grid gap-4 md:gap-8 md:grid-cols-3 xl:gap-10 2xl:gap-14">
               {painPoints.map((p, i) => (
                 <motion.div key={i} variants={scaleUp} className="group relative">
-                  <div className="relative flex flex-col items-center text-center p-5 md:p-8 xl:p-10 2xl:p-12 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60 hover:shadow-xl hover:shadow-violet-500/5 h-full">
-                    {/* Icon */}
-                    <div className="mb-3 md:mb-5 flex size-12 md:size-14 xl:size-16 2xl:size-20 items-center justify-center rounded-2xl bg-violet-500/10">
-                      <p.icon className="size-5 md:size-6 xl:size-7 2xl:size-9 text-violet-500" />
+                  <div className="relative flex flex-col items-center text-center p-5 md:p-8 xl:p-10 2xl:p-12 rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-rose-500/30 hover:bg-card/60 hover:shadow-xl hover:shadow-rose-500/5 h-full">
+                    {/* Animation */}
+                    <div className="mb-3 md:mb-4 w-full">
+                      <PainPointAnimation step={(i + 1) as 1 | 2 | 3} />
                     </div>
                     {/* Title */}
                     <h3 className="text-lg xl:text-xl 2xl:text-2xl font-semibold">{t(`problem.pain${i + 1}Problem`)}</h3>
@@ -1015,9 +1026,14 @@ export default function Home() {
                       transition={{ duration: 0.25 }}
                       className="mx-auto w-full max-w-3xl"
                     >
-                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-                        {courseTemplates.map((tmpl) => {
+                      <div
+                        className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4"
+                        onMouseEnter={() => setSpotlightPaused(true)}
+                        onMouseLeave={() => setSpotlightPaused(false)}
+                      >
+                        {courseTemplates.map((tmpl, i) => {
                           const Icon = tmpl.icon;
+                          const isSpotlit = i === spotlightIdx && !spotlightPaused;
                           return (
                             <button
                               key={tmpl.id}
@@ -1026,7 +1042,11 @@ export default function Home() {
                                 setSelectedTemplate(tmpl.id);
                                 setTemplateFormValues(tmpl.preset);
                               }}
-                              className="group relative flex flex-col items-center gap-2 rounded-2xl border border-border/40 bg-card/30 p-5 sm:p-6 text-center backdrop-blur-sm transition-all duration-300 hover:border-violet-500/30 hover:bg-card/60 hover:shadow-xl hover:shadow-violet-500/5 hover:scale-[1.02] active:scale-[0.98]"
+                              className={`group relative flex flex-col items-center gap-2 rounded-2xl border p-5 sm:p-6 text-center backdrop-blur-sm transition-all duration-700 ease-out hover:border-violet-500/30 hover:bg-card/60 hover:shadow-xl hover:shadow-violet-500/5 hover:scale-[1.02] active:scale-[0.98] ${
+                                isSpotlit
+                                  ? "border-violet-500/40 bg-card/60 shadow-xl shadow-violet-500/15 scale-[1.02]"
+                                  : "border-border/40 bg-card/30"
+                              }`}
                             >
                               <div className={`flex size-10 sm:size-12 items-center justify-center rounded-xl bg-gradient-to-br ${tmpl.gradient} text-white shadow-lg`}>
                                 <Icon className="size-5 sm:size-6" />
