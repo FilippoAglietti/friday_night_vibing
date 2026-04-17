@@ -216,7 +216,7 @@
 
 /* ─── Scroll Container ────────────────────────────────── */
 .snap-scroll-container {
-  height: 100svh;
+  height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
@@ -231,6 +231,10 @@
     height: auto;
     overflow: visible;
     scroll-snap-type: none;
+  }
+  /* Anchor jumps land below the fixed nav on mobile */
+  .snap-section {
+    scroll-margin-top: 3.5rem;
   }
 }
 

@@ -611,10 +611,10 @@ export default function Home() {
           <Link
             href="/"
             id="nav-logo"
-            className="flex items-center gap-2 text-lg font-bold tracking-tight"
+            className="flex items-center gap-2 text-base sm:text-lg font-bold tracking-tight min-w-0"
           >
-            <GraduationCap className="size-5 text-violet-500" />
-            <span>
+            <GraduationCap className="size-5 text-violet-500 shrink-0" />
+            <span className="truncate">
               syllabi<span className="text-violet-500">.online</span>
             </span>
           </Link>
@@ -650,7 +650,7 @@ export default function Home() {
               {t("nav.contactUs")}
             </a>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <LanguageSwitcher />
             <Button
               id="theme-toggle"
