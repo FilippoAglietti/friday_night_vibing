@@ -18,11 +18,11 @@ const BASE_URL = "https://www.syllabi.online";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Syllabi — #1 AI Course Generator | Create Full Courses in Seconds",
+    default: "Syllabi — The AI Course Generator Worth Listening To",
     template: "%s | Syllabi",
   },
   description:
-    "The AI course generator that builds complete courses with audio narration, modules, lessons, quizzes, and PDF export. Create professional online courses in 60 seconds — free to start.",
+    "The AI course generator that builds complete courses with audio narration, beautiful design, quizzes, and PDF export. Free to start — no credit card required.",
   keywords: [
     "AI course generator",
     "AI course creator",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Syllabi — #1 AI Course Generator | Full Courses in 60 Seconds",
+    title: "Syllabi — The AI Course Generator Worth Listening To",
     description:
       "Generate complete online courses with AI — modules, lessons, quizzes, audio narration & PDF export. Used by educators, coaches, and course creators worldwide.",
     type: "website",
@@ -75,13 +75,13 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Syllabi — AI Course Generator: Create full courses with audio, quizzes, and beautiful design in seconds",
+        alt: "Syllabi — AI Course Generator: Create full courses with audio narration, quizzes, and beautiful design",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Syllabi — AI Course Generator | Full Courses in 60 Seconds",
+    title: "Syllabi — The AI Course Generator Worth Listening To",
     description:
       "Generate complete courses with AI — audio narration, quizzes, modules & PDF export. Free to start.",
     images: ["/og.png"],
@@ -151,7 +151,7 @@ const jsonLd = {
       "@id": `${BASE_URL}/#website`,
       url: BASE_URL,
       name: "Syllabi",
-      description: "AI-powered course generator — create full online courses with audio, quizzes, and PDF export in seconds.",
+      description: "AI-powered course generator — create full online courses with audio narration, quizzes, and PDF export.",
       publisher: { "@id": `${BASE_URL}/#organization` },
       potentialAction: {
         "@type": "SearchAction",
@@ -220,8 +220,7 @@ const jsonLd = {
       "@type": "HowTo",
       "@id": `${BASE_URL}/#howto`,
       name: "How to Create an Online Course with AI",
-      description: "Generate a complete, professional online course in under 60 seconds using Syllabi's AI course generator.",
-      totalTime: "PT1M",
+      description: "Generate a complete, professional online course with Syllabi's AI course generator — modules, lessons, quizzes, audio narration, and a shareable link.",
       tool: { "@type": "HowToTool", name: "Syllabi AI Course Generator" },
       step: [
         {
@@ -242,7 +241,7 @@ const jsonLd = {
           "@type": "HowToStep",
           position: 3,
           name: "Generate with AI",
-          text: "Click Generate and Syllabi's AI creates a full course: modules, lessons, quizzes, learning objectives, and pacing schedules in 15–60 seconds.",
+          text: "Click Generate and Syllabi's AI creates a full course: modules, lessons, quizzes, learning objectives, and pacing schedules — with a live progress loader throughout.",
           url: `${BASE_URL}/#form`,
         },
         {
@@ -275,7 +274,7 @@ const jsonLd = {
           name: "What is Syllabi?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Syllabi is an AI-powered course generator that creates complete online courses — including modules, lessons, quizzes, audio narration, and pacing schedules — from a single topic in under 60 seconds. It's used by educators, coaches, and course creators worldwide.",
+            text: "Syllabi is an AI-powered course generator that creates complete online courses — including modules, lessons, quizzes, audio narration, and pacing schedules — from a single topic. It's used by educators, coaches, and course creators worldwide.",
           },
         },
         {
@@ -315,7 +314,7 @@ const jsonLd = {
           name: "How long does course generation take?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Most courses generate in 15–60 seconds depending on length. Mini courses are ready in under 15 seconds, while full courses with 8+ modules take up to 60 seconds.",
+            text: "Generation time depends on course length. Short courses are ready in a few minutes; masterclass courses can take around ten minutes. A live progress loader runs throughout so you always know where you stand.",
           },
         },
         {
