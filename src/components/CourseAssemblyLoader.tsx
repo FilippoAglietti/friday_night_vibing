@@ -229,80 +229,167 @@ function useTypewriter(text: string, typingMs: number, holdMs: number, onDone: (
 
 /* ─── Orbital progress ring ───────────────────────────────── */
 
+/**
+ * Brand-anchored progress ring. Colors mirror the site's primary CTA gradient
+ * (violet-500 → violet-600 → indigo-600 → indigo-500), so the loader feels
+ * like a continuation of the marketing surface, not a separate visual island.
+ *
+ * Layered for depth:
+ *   1. A wide blurred halo behind the ring (the "glow under the glass").
+ *   2. A faint inner decorative track (slowly rotating dotted dashes).
+ *   3. The base track ring (subtle white stroke).
+ *   4. The progress arc (gradient stroke + drop-shadow glow).
+ *   5. A small orb riding the head of the progress arc.
+ *   6. A center plate with the % readout and a phase chip beneath it.
+ */
 function OrbitalRing({
   percent,
   phase,
   size,
+  reduced,
 }: {
   percent: number;
   phase: Phase;
   size: number;
+  reduced: boolean;
 }) {
-  const stroke = Math.round(size * 0.06);
+  const stroke = Math.max(6, Math.round(size * 0.055));
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (Math.min(100, Math.max(0, percent)) / 100) * circumference;
+  const clamped = Math.min(100, Math.max(0, percent));
+  const offset = circumference - (clamped / 100) * circumference;
   const PhaseIcon = PHASE_TRACK.find((p) => p.key === phase)?.Icon ?? Layers;
+  const PhaseLabel = PHASE_TRACK.find((p) => p.key === phase)?.label ?? "Working";
+
+  // Position of the orb that rides the head of the progress arc.
+  // SVG starts the arc at 12 o'clock (because we rotate -90deg), so angle θ is
+  // measured from the top, going clockwise.
+  const theta = (clamped / 100) * 2 * Math.PI;
+  const cx = size / 2 + radius * Math.sin(theta);
+  const cy = size / 2 - radius * Math.cos(theta);
+
+  // Inner decorative ring radius
+  const innerR = radius - stroke * 1.6;
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
-      {/* Outer glow halo */}
+      {/* Outer glow halo — brand violet→indigo, no fuchsia */}
       <div
         aria-hidden
-        className="absolute inset-0 rounded-full blur-2xl bg-gradient-to-br from-violet-500/30 via-fuchsia-500/15 to-indigo-500/20 pointer-events-none"
+        className="absolute inset-0 rounded-full blur-3xl bg-gradient-to-br from-violet-500/35 via-violet-600/25 to-indigo-500/30 pointer-events-none"
+      />
+      {/* Tighter inner glow for depth */}
+      <div
+        aria-hidden
+        className="absolute inset-[12%] rounded-full blur-2xl bg-gradient-to-br from-violet-500/20 to-indigo-500/15 pointer-events-none"
       />
 
       <svg
         width={size}
         height={size}
-        className="-rotate-90 relative"
+        className="relative"
         aria-hidden
+        viewBox={`0 0 ${size} ${size}`}
       >
         <defs>
+          {/* Brand gradient: violet-500 → violet-600 → indigo-600 → indigo-500 */}
           <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#a78bfa" />
-            <stop offset="55%" stopColor="#d946ef" />
-            <stop offset="100%" stopColor="#818cf8" />
+            <stop offset="0%" stopColor="#8b5cf6" />
+            <stop offset="50%" stopColor="#7c3aed" />
+            <stop offset="100%" stopColor="#4f46e5" />
           </linearGradient>
+          <radialGradient id="ring-plate" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(139,92,246,0.10)" />
+            <stop offset="60%" stopColor="rgba(139,92,246,0.04)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+          </radialGradient>
         </defs>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="rgba(255,255,255,0.06)"
-          strokeWidth={stroke}
-        />
+
+        {/* Center plate fill (subtle violet wash) */}
+        <circle cx={size / 2} cy={size / 2} r={innerR} fill="url(#ring-plate)" />
+
+        {/* Inner decorative dashed ring — slow counter-rotation */}
         <motion.circle
           cx={size / 2}
           cy={size / 2}
-          r={radius}
+          r={innerR}
           fill="none"
-          stroke="url(#ring-grad)"
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            filter: "drop-shadow(0 0 12px rgba(167,139,250,0.55))",
-          }}
+          stroke="rgba(167,139,250,0.20)"
+          strokeWidth={1}
+          strokeDasharray="2 6"
+          style={{ transformOrigin: "center" }}
+          animate={reduced ? undefined : { rotate: -360 }}
+          transition={reduced ? undefined : { duration: 24, repeat: Infinity, ease: "linear" }}
         />
+
+        {/* Base track ring (rotated -90 so progress starts at 12 o'clock) */}
+        <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="rgba(255,255,255,0.05)"
+            strokeWidth={stroke}
+          />
+          {/* Progress arc */}
+          <motion.circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="url(#ring-grad)"
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            animate={{ strokeDashoffset: offset }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            style={{ filter: "drop-shadow(0 0 14px rgba(124,58,237,0.65))" }}
+          />
+        </g>
+
+        {/* Orb at the head of the progress arc */}
+        {clamped > 1 && (
+          <g style={{ filter: "drop-shadow(0 0 8px rgba(139,92,246,0.9))" }}>
+            <circle cx={cx} cy={cy} r={stroke * 0.55} fill="#ede9fe" />
+            <circle cx={cx} cy={cy} r={stroke * 0.32} fill="#c4b5fd" />
+          </g>
+        )}
       </svg>
 
-      {/* Center icon, slow pulse */}
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center"
-        animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
-        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <div className="flex flex-col items-center gap-0.5">
-          <PhaseIcon className="size-7 sm:size-8 text-violet-200" strokeWidth={1.6} />
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-violet-300/80 tabular-nums">
-            {Math.round(percent)}%
-          </span>
-        </div>
-      </motion.div>
+      {/* Center plate content: % + phase chip */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <motion.div
+          className="flex flex-col items-center gap-1.5"
+          animate={reduced ? undefined : { scale: [1, 1.03, 1], opacity: [0.92, 1, 0.92] }}
+          transition={reduced ? undefined : { duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="flex items-baseline gap-0.5">
+            <span
+              className="font-bold tabular-nums bg-gradient-to-br from-white via-violet-100 to-indigo-200 bg-clip-text text-transparent leading-none"
+              style={{ fontSize: Math.round(size * 0.22) }}
+            >
+              {Math.round(percent)}
+            </span>
+            <span
+              className="font-semibold text-violet-300/80 leading-none"
+              style={{ fontSize: Math.round(size * 0.085) }}
+            >
+              %
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-500/10 border border-violet-500/25 backdrop-blur-sm">
+            <PhaseIcon
+              className="text-violet-200"
+              strokeWidth={1.8}
+              style={{ width: Math.round(size * 0.06), height: Math.round(size * 0.06) }}
+            />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-violet-200/90">
+              {PhaseLabel}
+            </span>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }
@@ -411,7 +498,7 @@ function ModuleCards({
                 {/* Progress sweeper */}
                 {isActive && !reduced ? (
                   <motion.div
-                    className="h-1 rounded-full bg-gradient-to-r from-violet-400/70 via-fuchsia-400/60 to-violet-400/70"
+                    className="h-1 rounded-full bg-gradient-to-r from-violet-500 via-violet-400 to-indigo-500"
                     style={{ width: "70%", transformOrigin: "left center" }}
                     animate={{ scaleX: [0, 1, 1, 0] }}
                     transition={{
@@ -446,13 +533,13 @@ const PARTICLES = Array.from({ length: 22 }, (_, i) => ({
   size: 2 + ((i * 7) % 4),
   duration: 4 + ((i * 11) % 30) / 10,
   delay: (i * 0.18) % 4,
-  hue: i % 3, // 0 violet, 1 fuchsia, 2 indigo
+  hue: i % 3, // 0 violet, 1 violet-deep, 2 indigo
 }));
 
 const PARTICLE_COLORS = [
-  "rgba(196,181,253,0.8)", // violet-300
-  "rgba(240,171,252,0.75)", // fuchsia-300
-  "rgba(165,180,252,0.7)", // indigo-300
+  "rgba(196,181,253,0.85)", // violet-300
+  "rgba(167,139,250,0.75)", // violet-400
+  "rgba(165,180,252,0.7)",  // indigo-300
 ];
 
 function EmberParticles({ density }: { density: number }) {
@@ -734,7 +821,8 @@ export default function CourseAssemblyLoader({
               <OrbitalRing
                 percent={displayPercent}
                 phase={phase}
-                size={isDesktop ? 184 : 144}
+                size={isDesktop ? 200 : 156}
+                reduced={reduced}
               />
               <div className="mt-3 text-center text-[11px] text-muted-foreground/80 tabular-nums">
                 <span>
