@@ -366,13 +366,13 @@ function OrbitalRing({
         >
           <div className="flex items-baseline gap-0.5">
             <span
-              className="font-bold tabular-nums bg-gradient-to-br from-white via-violet-100 to-indigo-200 bg-clip-text text-transparent leading-none"
+              className="font-bold tabular-nums bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent leading-none"
               style={{ fontSize: Math.round(size * 0.22) }}
             >
               {Math.round(percent)}
             </span>
             <span
-              className="font-semibold text-violet-300/80 leading-none"
+              className="font-semibold text-violet-400 leading-none"
               style={{ fontSize: Math.round(size * 0.085) }}
             >
               %
@@ -789,25 +789,30 @@ export default function CourseAssemblyLoader({
   const activeModuleIdx = parsedModule?.index ?? Math.min(completedModules + 1, totalModules || 0);
 
   return (
-    <div role="status" className="relative w-full max-w-4xl mx-auto">
-      {/* Glow backdrop */}
+    <div
+      role="status"
+      className="relative w-full max-w-4xl mx-auto rounded-2xl border border-border/40 bg-card/30 backdrop-blur-sm overflow-hidden"
+    >
+      {/* Soft inner glow — sits inside the card so it never bleeds onto the page */}
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 h-[420px] bg-gradient-radial from-violet-500/20 via-indigo-500/5 to-transparent blur-3xl pointer-events-none"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[320px] bg-gradient-radial from-violet-500/[0.10] via-indigo-500/[0.04] to-transparent blur-2xl"
       />
 
-      <div className="relative px-4 py-8 sm:py-10">
-        {/* Status pill */}
+      <div className="relative px-4 py-8 sm:px-8 sm:py-10">
+        {/* Status pill — matches the hero badge pattern */}
         <div className="flex justify-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/30 text-xs font-medium text-violet-200 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400 backdrop-blur-sm">
             <Sparkles className="size-3.5 animate-pulse" />
             Live generation
           </div>
         </div>
 
-        {/* Topic heading */}
-        <h2 className="mt-4 text-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight bg-gradient-to-r from-white via-violet-100 to-violet-200 bg-clip-text text-transparent">
-          {safeTopic}
+        {/* Topic heading — site brand gradient (matches hero title2) */}
+        <h2 className="mt-4 text-center text-2xl sm:text-3xl md:text-4xl font-bold leading-tight tracking-tight">
+          <span className="bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500 bg-clip-text text-transparent">
+            {safeTopic}
+          </span>
         </h2>
 
         {/* Hero region: ring + headline/typewriter side-by-side on tablet+ */}
@@ -824,7 +829,7 @@ export default function CourseAssemblyLoader({
                 size={isDesktop ? 200 : 156}
                 reduced={reduced}
               />
-              <div className="mt-3 text-center text-[11px] text-muted-foreground/80 tabular-nums">
+              <div className="mt-3 text-center text-[11px] text-muted-foreground tabular-nums">
                 <span>
                   {hasReal
                     ? `${Math.min(completedModules, totalModules)} of ${totalModules} modules`
@@ -837,7 +842,7 @@ export default function CourseAssemblyLoader({
 
             {/* Headline + typewriter */}
             <div className="flex-1 min-w-0 max-w-md text-center sm:text-left">
-              <p className="text-sm font-semibold uppercase tracking-widest text-violet-300/90">
+              <p className="text-sm font-semibold uppercase tracking-widest text-violet-500">
                 {headline}
               </p>
               <div
@@ -845,11 +850,11 @@ export default function CourseAssemblyLoader({
                 aria-atomic="true"
                 className="mt-2 min-h-[60px] sm:min-h-[72px]"
               >
-                <p className="text-base sm:text-lg leading-snug text-violet-50/90 italic">
+                <p className="text-base sm:text-lg leading-snug text-foreground/90">
                   {typedLine}
                   <span
                     className={`ml-0.5 inline-block w-[2px] align-baseline -translate-y-[1px] ${
-                      cursorOn ? "bg-violet-300" : "bg-transparent"
+                      cursorOn ? "bg-violet-500" : "bg-transparent"
                     }`}
                     style={{ height: "1em" }}
                     aria-hidden

@@ -1947,14 +1947,12 @@ export default function ProfilePage() {
         {activeTab === "generate" && (
           <div className="space-y-6">
             {isGenerating ? (
-              <div className="bg-card/40 border border-border/30 rounded-lg p-4 sm:p-6">
-                <CourseAssemblyLoader
-                  topic={genProgress?.topic}
-                  progressMessage={genProgress?.progress}
-                  completedModules={genProgress?.completedModules}
-                  totalModules={genProgress?.totalModules}
-                />
-              </div>
+              <CourseAssemblyLoader
+                topic={genProgress?.topic}
+                progressMessage={genProgress?.progress}
+                completedModules={genProgress?.completedModules}
+                totalModules={genProgress?.totalModules}
+              />
             ) : (
               <>
                 {/* Quick Start Templates */}
