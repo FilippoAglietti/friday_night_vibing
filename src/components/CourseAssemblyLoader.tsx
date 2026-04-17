@@ -194,6 +194,7 @@ function useTypewriter(text: string, typingMs: number, holdMs: number, onDone: (
     if (!text) return;
     const start = performance.now();
     let raf = 0;
+    let holdTimer: number | null = null;
 
     const tick = (now: number) => {
       const elapsed = now - start;
@@ -204,17 +205,14 @@ function useTypewriter(text: string, typingMs: number, holdMs: number, onDone: (
         raf = requestAnimationFrame(tick);
       } else {
         setShown(text);
-        const id = window.setTimeout(() => onDoneRef.current(), holdMs);
-        return () => window.clearTimeout(id);
+        holdTimer = window.setTimeout(() => onDoneRef.current(), holdMs);
       }
     };
     raf = requestAnimationFrame(tick);
 
-    // Cleanup on text/timing change
-    const holdTimer = window.setTimeout(() => onDoneRef.current(), typingMs + holdMs);
     return () => {
       cancelAnimationFrame(raf);
-      window.clearTimeout(holdTimer);
+      if (holdTimer !== null) window.clearTimeout(holdTimer);
     };
   }, [text, typingMs, holdMs]);
 
