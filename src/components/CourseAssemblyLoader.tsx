@@ -66,51 +66,51 @@ function derivePhase(
 
 const COPY_BY_PHASE: Record<Phase, string[]> = {
   skeleton: [
-    "Cooking up {topic}. Big pot, low heat…",
-    "Sketching the shape of {topic} on the back of a napkin…",
-    "Deciding what Module 1 should make you feel. No pressure.",
-    "Reading three textbooks about {topic} at once. Don't tell my boss.",
-    "Easy start or thrown in the deep end? Flipping a coin…",
+    "Sketching the shape of {topic}…",
+    "Deciding what Module 1 should make you feel…",
+    "Reading three textbooks about {topic} at once…",
+    "Wait — should this start easy or throw you in the deep end?",
     "Figuring out what a beginner actually needs to hear first…",
-    "Pretending I know what I'm doing. (I do. Mostly.)",
-    "Outlining {topic} like it's a Netflix series — cliffhangers included.",
-    "Six modules? Twelve? Fourteen?? Doing the math…",
-    "Mapping out {topic} so it actually clicks in your brain…",
-    "Making {topic} sound exciting from the very first line…",
-    "Plotting this so nobody ghosts us at Module 3…",
-    "Assembling the skeleton — the bones that hold the whole thing up.",
-    "Staring at a blank outline. Thinking hard. Give me a sec…",
+    "Pretending I know what I'm doing (I kind of do)…",
+    "Outlining {topic} like it's a Netflix series…",
+    "Debating whether 6 modules is too few or 12 is too many…",
+    "Mapping out {topic} so it actually makes sense…",
+    "Trying to make {topic} sound exciting from the first line…",
+    "Structuring this so nobody drops off at Module 3…",
+    "Building the skeleton — the one that holds everything together…",
+    "Deciding the order you'll learn {topic} in. It matters more than you'd think…",
+    "Staring at a blank outline. Give me a second…",
   ],
   modules: [
-    "Writing this one — honestly, it's coming out fun…",
-    "Allergic to the word 'basically'. Rewriting.",
-    "Hunting for an example that isn't boring…",
-    "Arguing with myself about whether quiz 3 is too easy. I'm winning.",
+    "Writing this one — I think it's actually fun…",
+    "Trying not to overuse the word 'basically'…",
+    "Looking for a better example than the one I just wrote…",
+    "Arguing with myself about whether quiz 3 is too easy…",
     "Making sure Module 2 doesn't repeat Module 1. Again.",
-    "Torched that paragraph. Rewriting it better.",
-    "Convincing myself this metaphor works. It works.",
+    "Rewriting that paragraph because I didn't like it either.",
+    "Convincing myself this metaphor works…",
     "Teaching {topic} the way I wish someone taught me…",
     "Writing a quiz question I actually want to answer…",
-    "Sneaking in one more great example because you deserve it…",
-    "This chapter on {topic} is turning out way better than expected…",
-    "Adding a practical exercise that isn't a snoozefest…",
-    "Trimming the fluff. Your time is expensive.",
-    "Covering the part about {topic} that most courses fumble…",
-    "Double-checking the examples don't all sound like cousins.",
+    "Sneaking in one more good example…",
+    "This module on {topic} is turning out better than expected…",
+    "Adding a practical exercise that isn't boring…",
+    "Cutting the fluff. Nobody needs filler.",
+    "Writing the part about {topic} that most courses get wrong…",
+    "Double-checking that the examples don't all sound the same…",
   ],
   polish: [
-    "Polishing the edges until they shine. Almost there…",
-    "Running a final pass so nobody naps in Module 5…",
-    "Making sure the audio narrator sounds hyped, not bored…",
-    "Tidying up the roadmap. Straightening the picture frames…",
-    "One last pass — genuinely the fun part…",
-    "Putting the finishing touches on {topic}. The gloss coat.",
-    "Reading the whole thing back. Yeah, this one's good…",
-    "Checking the quizzes actually test what we taught…",
-    "Making {topic} look like it took weeks. (It didn't.)",
-    "Almost done. This one's a keeper…",
-    "Smoothing the transitions between modules like butter…",
-    "Last sanity check. Tightening the bolts. Stand by…",
+    "Polishing the edges. Almost there…",
+    "Double-checking nobody will fall asleep in Module 5…",
+    "Making sure the audio narrator doesn't sound bored…",
+    "Tidying up the roadmap…",
+    "One last pass — this is the fun part…",
+    "Putting the finishing touches on {topic}…",
+    "Reading the whole thing back. Looking good…",
+    "Checking that the quizzes actually test what we taught…",
+    "Making {topic} look like it took weeks to write…",
+    "Almost done. This one's actually good…",
+    "Smoothing out the transitions between modules…",
+    "Last sanity check. Stand by…",
   ],
 };
 
@@ -137,12 +137,11 @@ function parseModule(progressMessage?: string): { index: number; total: number; 
 
 /* Lines that get mixed into the rotation when a module title is known. */
 const MODULE_DYNAMIC_COPY = [
-  "Deep into '{moduleTitle}'. This one's meaty…",
-  "'{moduleTitle}' is the chapter you'll remember next year…",
-  "Wrapping up '{moduleTitle}'. On to the next…",
-  "Hand-crafting the lessons inside '{moduleTitle}'…",
-  "Stress-testing every example in '{moduleTitle}'…",
-  "Dropping a little bonus knowledge into '{moduleTitle}'…",
+  "Deep into '{moduleTitle}' — this one's meaty…",
+  "'{moduleTitle}' is the chapter everyone will remember…",
+  "Almost done with '{moduleTitle}'. Moving on…",
+  "Handcrafting the lessons inside '{moduleTitle}'…",
+  "Stress-testing the examples in '{moduleTitle}'…",
 ];
 
 /* ─── Phase chip definitions ──────────────────────────────── */
@@ -228,227 +227,82 @@ function useTypewriter(text: string, typingMs: number, holdMs: number, onDone: (
   return { shown, cursorOn };
 }
 
-/* ─── Twin Gears progress ─────────────────────────────────── */
+/* ─── Orbital progress ring ───────────────────────────────── */
 
-/**
- * Two interlocking gears rotating in opposite directions — a watch-movement
- * aesthetic that reads as "precision machinery at work." The large gear carries
- * the % readout; the small gear carries the phase icon. Rotation speed nudges
- * slightly per phase so the tempo matches what's happening (modules phase is
- * the fastest — that's when real work is firing).
- */
-function Gear({
-  teeth,
-  outerR,
-  innerR,
-  toothHeight,
-  toothWidthDeg,
-}: {
-  teeth: number;
-  outerR: number;
-  innerR: number;
-  toothHeight: number;
-  toothWidthDeg: number;
-}) {
-  // Build a path for a gear: a polygon that alternates between outerR+toothHeight
-  // and outerR, with toothWidthDeg wide teeth. Closed, then an inner circle hole.
-  const path = useMemo(() => {
-    const step = 360 / teeth;
-    const half = toothWidthDeg / 2;
-    const segs: string[] = [];
-    const tipR = outerR + toothHeight;
-    for (let i = 0; i < teeth; i++) {
-      const center = i * step;
-      // Tooth: rising edge, flat top, falling edge
-      const a1 = (center - half) * (Math.PI / 180);
-      const a2 = (center + half) * (Math.PI / 180);
-      const aStart = (center - step / 2) * (Math.PI / 180);
-      const aEnd = (center + step / 2) * (Math.PI / 180);
-
-      if (i === 0) segs.push(`M ${Math.cos(aStart) * outerR} ${Math.sin(aStart) * outerR}`);
-      segs.push(`L ${Math.cos(a1) * outerR} ${Math.sin(a1) * outerR}`);
-      segs.push(`L ${Math.cos(a1) * tipR} ${Math.sin(a1) * tipR}`);
-      segs.push(`L ${Math.cos(a2) * tipR} ${Math.sin(a2) * tipR}`);
-      segs.push(`L ${Math.cos(a2) * outerR} ${Math.sin(a2) * outerR}`);
-      segs.push(`L ${Math.cos(aEnd) * outerR} ${Math.sin(aEnd) * outerR}`);
-    }
-    segs.push("Z");
-    return segs.join(" ");
-  }, [teeth, outerR, toothHeight, toothWidthDeg]);
-
-  return (
-    <>
-      <path d={path} fill="url(#gear-grad)" />
-      <circle cx={0} cy={0} r={innerR} fill="#0f0b1f" />
-      <circle cx={0} cy={0} r={innerR} fill="none" stroke="rgba(167,139,250,0.35)" strokeWidth={1.2} />
-      {/* Spoke detail */}
-      {Array.from({ length: 6 }).map((_, i) => {
-        const a = (i * 60) * (Math.PI / 180);
-        return (
-          <line
-            key={i}
-            x1={Math.cos(a) * (innerR * 0.25)}
-            y1={Math.sin(a) * (innerR * 0.25)}
-            x2={Math.cos(a) * (innerR * 0.85)}
-            y2={Math.sin(a) * (innerR * 0.85)}
-            stroke="rgba(167,139,250,0.18)"
-            strokeWidth={1}
-            strokeLinecap="round"
-          />
-        );
-      })}
-      <circle cx={0} cy={0} r={innerR * 0.18} fill="rgba(217,70,239,0.6)" />
-    </>
-  );
-}
-
-function TwinGears({
+function OrbitalRing({
   percent,
   phase,
   size,
-  reduced,
 }: {
   percent: number;
   phase: Phase;
   size: number;
-  reduced: boolean;
 }) {
+  const stroke = Math.round(size * 0.06);
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (Math.min(100, Math.max(0, percent)) / 100) * circumference;
   const PhaseIcon = PHASE_TRACK.find((p) => p.key === phase)?.Icon ?? Layers;
-
-  // Rotation duration (seconds) — smaller = faster. Modules phase fastest.
-  const bigDur = reduced ? 0 : phase === "modules" ? 10 : phase === "polish" ? 14 : 18;
-  // Small gear meshes with the big one; its angular speed must be inverse to
-  // the tooth ratio. Big=16 teeth, Small=10 teeth → small rotates 16/10 faster.
-  const bigTeeth = 16;
-  const smallTeeth = 10;
-  const smallDur = bigDur * (smallTeeth / bigTeeth);
-
-  // Gear geometry (fractions of size)
-  const bigR = size * 0.28;
-  const bigToothH = size * 0.05;
-  const bigInnerR = size * 0.18;
-  const smallR = bigR * (smallTeeth / bigTeeth);
-  const smallToothH = bigToothH;
-  const smallInnerR = smallR * 0.6;
-
-  // Position: gears meshing. Distance between centers = bigR + smallR + tiny gap.
-  // Big gear center-left, small gear center-right.
-  const gap = size * 0.006;
-  const meshDist = bigR + smallR + bigToothH + gap;
-  // Offset the pair so both gears fit inside the viewbox with a little breathing room.
-  const bigCx = size / 2 - meshDist * 0.35;
-  const smallCx = bigCx + meshDist;
-  const cy = size / 2;
-
-  // Phase tint for the gradient (subtle — hue only shifts mid-stop)
-  const midStop =
-    phase === "skeleton" ? "#a78bfa" : phase === "modules" ? "#d946ef" : "#f0abfc";
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
       {/* Outer glow halo */}
       <div
         aria-hidden
-        className="absolute inset-0 rounded-full blur-3xl bg-gradient-to-br from-violet-500/30 via-fuchsia-500/20 to-indigo-500/25 pointer-events-none"
+        className="absolute inset-0 rounded-full blur-2xl bg-gradient-to-br from-violet-500/30 via-fuchsia-500/15 to-indigo-500/20 pointer-events-none"
       />
 
-      <svg width={size} height={size} className="relative" aria-hidden>
+      <svg
+        width={size}
+        height={size}
+        className="-rotate-90 relative"
+        aria-hidden
+      >
         <defs>
-          <linearGradient id="gear-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#c4b5fd" />
-            <stop offset="55%" stopColor={midStop} />
+          <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#a78bfa" />
+            <stop offset="55%" stopColor="#d946ef" />
             <stop offset="100%" stopColor="#818cf8" />
           </linearGradient>
-          <filter id="gear-glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="3" result="b" />
-            <feMerge>
-              <feMergeNode in="b" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
-
-        {/* Big gear (clockwise) */}
-        <motion.g
-          transform={`translate(${bigCx} ${cy})`}
-          style={{ filter: "drop-shadow(0 0 14px rgba(167,139,250,0.55))" }}
-          animate={reduced ? undefined : { rotate: 360 }}
-          transition={reduced ? undefined : { duration: bigDur, repeat: Infinity, ease: "linear" }}
-        >
-          <Gear
-            teeth={bigTeeth}
-            outerR={bigR}
-            innerR={bigInnerR}
-            toothHeight={bigToothH}
-            toothWidthDeg={360 / bigTeeth / 2.2}
-          />
-        </motion.g>
-
-        {/* Small gear (counter-clockwise, meshed) */}
-        <motion.g
-          transform={`translate(${smallCx} ${cy})`}
-          style={{ filter: "drop-shadow(0 0 10px rgba(217,70,239,0.55))" }}
-          animate={reduced ? undefined : { rotate: -360 }}
-          transition={reduced ? undefined : { duration: smallDur, repeat: Infinity, ease: "linear" }}
-        >
-          <Gear
-            teeth={smallTeeth}
-            outerR={smallR}
-            innerR={smallInnerR}
-            toothHeight={smallToothH}
-            toothWidthDeg={360 / smallTeeth / 2.2}
-          />
-        </motion.g>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth={stroke}
+        />
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="url(#ring-grad)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            filter: "drop-shadow(0 0 12px rgba(167,139,250,0.55))",
+          }}
+        />
       </svg>
 
-      {/* Percent overlay on big gear (counter-rotated so it stays readable) */}
-      <div
-        className="absolute flex items-center justify-center pointer-events-none"
-        style={{
-          left: bigCx - bigInnerR,
-          top: cy - bigInnerR,
-          width: bigInnerR * 2,
-          height: bigInnerR * 2,
-        }}
+      {/* Center icon, slow pulse */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
+        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
       >
-        <motion.div
-          className="flex flex-col items-center gap-0.5"
-          animate={{ scale: [1, 1.05, 1], opacity: [0.9, 1, 0.9] }}
-          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <span
-            className="font-bold tabular-nums bg-gradient-to-br from-white via-violet-100 to-fuchsia-200 bg-clip-text text-transparent"
-            style={{ fontSize: Math.round(size * 0.12), lineHeight: 1 }}
-          >
-            {Math.round(percent)}
+        <div className="flex flex-col items-center gap-0.5">
+          <PhaseIcon className="size-7 sm:size-8 text-violet-200" strokeWidth={1.6} />
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-violet-300/80 tabular-nums">
+            {Math.round(percent)}%
           </span>
-          <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-violet-300/90">
-            percent
-          </span>
-        </motion.div>
-      </div>
-
-      {/* Phase icon overlay on small gear (counter-rotated too) */}
-      <div
-        className="absolute flex items-center justify-center pointer-events-none"
-        style={{
-          left: smallCx - smallInnerR,
-          top: cy - smallInnerR,
-          width: smallInnerR * 2,
-          height: smallInnerR * 2,
-        }}
-      >
-        <motion.div
-          animate={{ scale: [1, 1.12, 1] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <PhaseIcon
-            className="text-violet-100"
-            strokeWidth={1.8}
-            style={{ width: smallInnerR * 1.1, height: smallInnerR * 1.1 }}
-          />
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
@@ -875,13 +729,12 @@ export default function CourseAssemblyLoader({
           <PhaseBurst trigger={burstTrigger} />
 
           <div className="relative flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
-            {/* Twin gears */}
+            {/* Ring */}
             <div className="shrink-0">
-              <TwinGears
+              <OrbitalRing
                 percent={displayPercent}
                 phase={phase}
-                size={isDesktop ? 220 : 176}
-                reduced={reduced}
+                size={isDesktop ? 184 : 144}
               />
               <div className="mt-3 text-center text-[11px] text-muted-foreground/80 tabular-nums">
                 <span>
