@@ -130,7 +130,7 @@ const steps = [
     num: "02",
     icon: Sparkles,
     title: "AI builds your course",
-    desc: "In seconds you get modules, lessons, quizzes, audio narration, and a shareable link — all editable.",
+    desc: "You get modules, lessons, quizzes, audio narration, and a shareable link — all editable.",
   },
   {
     num: "03",

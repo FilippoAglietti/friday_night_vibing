@@ -531,7 +531,7 @@ export default function CurriculumForm({
           Generate Course
         </CardTitle>
         <CardDescription>
-          Describe your course and we&apos;ll build it in seconds.
+          Describe your course and we&apos;ll build it for you.
         </CardDescription>
       </CardHeader>
 

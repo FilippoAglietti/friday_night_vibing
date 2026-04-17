@@ -217,7 +217,7 @@ export function generateWelcomeEmail({ userName, email }: WelcomeEmailProps): st
                         <span style="font-size: 22px;">&#x26A1;</span>
                       </div>
                       <p style="margin: 0 0 6px; font-size: 15px; font-weight: 700; color: #1E1B4B;">AI-Generated Courses</p>
-                      <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.5;">Full courses with modules, lessons, quizzes &amp; pacing in seconds.</p>
+                      <p style="margin: 0; font-size: 13px; color: #6B7280; line-height: 1.5;">Full courses with modules, lessons, quizzes &amp; pacing — audio, design, and a shareable link included.</p>
                     </div>
                   </td>
                   <td width="50%" style="padding: 0 0 16px 8px; vertical-align: top;">

@@ -531,7 +531,7 @@ export default function SharePageContent() {
             Want to create courses like this?
           </h2>
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Syllabi generates complete courses with audio narration, stunning design, and shareable links — in seconds.
+            Syllabi generates complete courses with audio narration, stunning design, and shareable links.
           </p>
           <a
             href="https://syllabi.online"
