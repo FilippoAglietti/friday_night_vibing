@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import CurriculumForm, { type CurriculumFormData, type GenerationProgress } from "@/components/CurriculumForm";
 import CurriculumOutput from "@/components/CurriculumOutput";
 import CourseAssemblyLoader from "@/components/CourseAssemblyLoader";
@@ -533,6 +534,24 @@ export default function Home() {
     return true;
   }, [user]);
 
+  const router = useRouter();
+
+  // Hand off generation to the dashboard the moment we have a courseId.
+  // The dashboard picks up polling via ?tab=generate&courseId=&topic=, so the
+  // user finishes their wait inside their account context (where the course
+  // also lands when ready).
+  const handleCourseCreated = useCallback(
+    (courseId: string, topic: string) => {
+      const qs = new URLSearchParams({
+        tab: "generate",
+        courseId,
+        topic,
+      });
+      router.push(`/profile?${qs.toString()}`);
+    },
+    [router],
+  );
+
   // Snap scroll container — drives both snap behaviour and parallax
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -1043,6 +1062,7 @@ export default function Home() {
                         onProgressUpdate={handleProgressUpdate}
                         onLimitReached={handleLimitReached}
                         onSubmitAttempt={handleFormSubmitAttempt}
+                        onCourseCreated={handleCourseCreated}
                         initialValues={templateFormValues}
                         isFreeUser={!user}
                       />

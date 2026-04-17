@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import { supabaseBrowser } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
-import type { Curriculum, DifficultyLevel, TeachingStyle } from "@/types/curriculum";
+import type { Curriculum, DifficultyLevel, TeachingStyle, CourseStatusResponse } from "@/types/curriculum";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -358,7 +358,14 @@ export default function ProfilePage() {
     }));
   }, []);
 
-  // Read URL params for welcome animation and onboarding quiz
+  // ─── Inflight handoff from the landing page ───────────────────
+  // When the landing-page form posts /api/generate, it hands the courseId off
+  // here via ?tab=generate&courseId=&topic=. We pick up the in-flight job and
+  // resume polling locally so the user finishes the wait inside the dashboard.
+  const [externalCourseId, setExternalCourseId] = useState<string | null>(null);
+  const externalPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Read URL params for welcome animation, onboarding, AND inflight handoff
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("welcome") === "true") {
@@ -373,7 +380,94 @@ export default function ProfilePage() {
       // Will show after welcome animation completes
       setShowOnboarding(true);
     }
+
+    // Inflight generation handoff from the landing page
+    const tab = params.get("tab");
+    const cid = params.get("courseId");
+    const topic = params.get("topic");
+    if (tab === "generate" && cid) {
+      setActiveTab("generate");
+      setExternalCourseId(cid);
+      setIsGenerating(true);
+      setGenProgress({
+        status: "pending",
+        topic: topic ?? undefined,
+      });
+      // Strip the handoff params so a refresh doesn't replay the takeover.
+      const url = new URL(window.location.href);
+      url.searchParams.delete("tab");
+      url.searchParams.delete("courseId");
+      url.searchParams.delete("topic");
+      window.history.replaceState({}, "", url.pathname + (url.search ? url.search : ""));
+    }
   }, []);
+
+  // ─── External polling loop ────────────────────────────────────
+  // Drives the loader when the courseId came from a URL handoff (not from a
+  // form submit inside the profile). Stops the moment the course is ready or
+  // failed, then refreshes the dashboard generations list.
+  useEffect(() => {
+    if (!externalCourseId) return;
+
+    let cancelled = false;
+
+    const poll = async () => {
+      try {
+        const res = await fetch(`/api/courses/${externalCourseId}/status`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) return;
+        const data: CourseStatusResponse = await res.json();
+        if (cancelled) return;
+
+        setGenProgress((prev) => ({
+          status: data.status,
+          topic: prev?.topic,
+          progress: data.generation_progress ?? prev?.progress,
+          completedModules: data.generation_completed_modules ?? prev?.completedModules,
+          totalModules: data.generation_total_modules ?? prev?.totalModules,
+        }));
+
+        if (data.status === "ready" || data.status === "failed") {
+          if (externalPollRef.current) {
+            clearInterval(externalPollRef.current);
+            externalPollRef.current = null;
+          }
+          setExternalCourseId(null);
+          setIsGenerating(false);
+          // Refresh the dashboard list and slide the user into "courses" so
+          // they can open the freshly-built course (or see the error card).
+          const { data: courses } = await supabaseBrowser
+            .from("courses")
+            .select("id, topic, audience, length, niche, curriculum, status, created_at, teaching_style, generation_progress, generation_total_modules, generation_completed_modules")
+            .order("created_at", { ascending: false });
+          if (courses && !cancelled) {
+            setGenerations(courses as unknown as Generation[]);
+          }
+          if (!cancelled) {
+            setActiveTab("courses");
+            setGenProgress(null);
+          }
+        }
+      } catch (err) {
+        // Network blips are fine — the next tick will retry.
+        console.warn("[profile] inflight poll error:", err);
+      }
+    };
+
+    // Fire immediately, then every 3s
+    poll();
+    externalPollRef.current = setInterval(poll, 3000);
+
+    return () => {
+      cancelled = true;
+      if (externalPollRef.current) {
+        clearInterval(externalPollRef.current);
+        externalPollRef.current = null;
+      }
+    };
+  }, [externalCourseId]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);

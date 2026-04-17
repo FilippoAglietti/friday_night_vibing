@@ -338,7 +338,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased dark`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} h-full antialiased dark`}
+      style={{ background: "#1a1a1a" }}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="preconnect" href="https://gmxseuttpurnxbluvcwx.supabase.co" />
         <link rel="dns-prefetch" href="https://gmxseuttpurnxbluvcwx.supabase.co" />

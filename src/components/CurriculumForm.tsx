@@ -66,6 +66,13 @@ export interface CurriculumFormProps {
   onLimitReached?: () => void;
   /** Called before submit — return false to block (e.g. for auth gate) */
   onSubmitAttempt?: () => boolean;
+  /**
+   * Called the moment the backend returns a courseId, **before** the form
+   * starts polling. When provided, the form skips its own polling loop —
+   * the parent takes ownership of the generation lifecycle (used by the
+   * landing page to navigate the user into the dashboard).
+   */
+  onCourseCreated?: (courseId: string, topic: string) => void;
   /** Optional initial form values to pre-fill the form (for templates, duplicates, etc.) */
   initialValues?: Partial<CurriculumFormData>;
   /** When true, restrict to mini course + beginner/intermediate only */
@@ -195,6 +202,7 @@ export default function CurriculumForm({
   onProgressUpdate,
   onLimitReached,
   onSubmitAttempt,
+  onCourseCreated,
   initialValues,
   isFreeUser = true,
 }: CurriculumFormProps) {
@@ -487,7 +495,17 @@ export default function CurriculumForm({
 
         const { courseId: newCourseId } = await res.json();
 
-        // Step 2: Store courseId and start polling
+        // Step 2: If the parent claimed ownership of the generation lifecycle
+        // (e.g. landing page wants to redirect into the dashboard), hand off
+        // the courseId and stop here — do NOT start our own polling loop.
+        if (onCourseCreated) {
+          onCourseCreated(newCourseId, form.topic.trim());
+          // Keep isSubmitting true so the button stays disabled for the brief
+          // moment between handoff and the parent's navigation.
+          return;
+        }
+
+        // Otherwise, store courseId and start polling
         setCourseId(newCourseId);
         setGenerationStatus("pending");
       } catch (err) {
@@ -498,7 +516,7 @@ export default function CurriculumForm({
         onLoadingChange?.(false);
       }
     },
-    [form, onLoadingChange, onProgressUpdate, onSubmitAttempt, isFreeUser]
+    [form, onLoadingChange, onProgressUpdate, onSubmitAttempt, onCourseCreated, isFreeUser, pdfFile]
   );
 
   /* ── Render ────────────────────────────────────────────── */
