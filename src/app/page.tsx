@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CurriculumForm, { type CurriculumFormData, type GenerationProgress } from "@/components/CurriculumForm";
 import CurriculumOutput from "@/components/CurriculumOutput";
-import CourseAssemblyLoader from "@/components/CourseAssemblyLoader";
 import PaywallModal from "@/components/PaywallModal";
 import AuthModal from "@/components/AuthModal";
 import AuthButton from "@/components/AuthButton";
@@ -537,17 +536,13 @@ export default function Home() {
   const router = useRouter();
 
   // Hand off generation to the dashboard the moment we have a courseId.
-  // The dashboard picks up polling via ?tab=generate&courseId=&topic=, so the
-  // user finishes their wait inside their account context (where the course
-  // also lands when ready).
+  // Hand the generation off to /generating/[courseId] — a dedicated
+  // full-screen loader route shared between landing + dashboard entry points,
+  // so there's exactly one premium loader surface.
   const handleCourseCreated = useCallback(
     (courseId: string, topic: string) => {
-      const qs = new URLSearchParams({
-        tab: "generate",
-        courseId,
-        topic,
-      });
-      router.push(`/profile?${qs.toString()}`);
+      const qs = new URLSearchParams({ topic });
+      router.push(`/generating/${courseId}?${qs.toString()}`);
     },
     [router],
   );
@@ -964,12 +959,12 @@ export default function Home() {
 
           <div className="mx-auto w-full max-w-3xl xl:max-w-4xl 2xl:max-w-5xl">
             {isGenerating ? (
-              <CourseAssemblyLoader
-                topic={genProgress?.topic}
-                progressMessage={genProgress?.progress}
-                completedModules={genProgress?.completedModules}
-                totalModules={genProgress?.totalModules}
-              />
+              <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
+                <div className="size-10 rounded-full border-2 border-violet-500/30 border-t-violet-400 animate-spin" />
+                <p className="text-sm text-violet-200/90 font-medium">
+                  Starting generation — taking you to your course stage…
+                </p>
+              </div>
             ) : curriculum ? (
               <div key="output-view">
                 <CurriculumOutput
