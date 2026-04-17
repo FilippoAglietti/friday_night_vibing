@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence, useScroll, useTransform, useAnimation, type Variants } from "framer-motion";
 import ScrollProgress from "@/components/ScrollProgress";
 import InteractiveDemo from "@/components/InteractiveDemo";
+import HowItWorksAnimation from "@/components/HowItWorksAnimation";
 import { Button } from "@/components/ui/button";
 import { supabaseBrowser } from "@/lib/supabase";
 import {
@@ -890,8 +891,8 @@ export default function Home() {
                       {s.num}
                     </span>
 
-                    <div className="mt-4 mb-3 md:mb-5 flex size-12 md:size-14 xl:size-16 2xl:size-20 items-center justify-center rounded-2xl bg-violet-500/10">
-                      <s.icon className="size-5 md:size-6 xl:size-7 2xl:size-9 text-violet-500" />
+                    <div className="mt-4 mb-4 md:mb-5 w-full">
+                      <HowItWorksAnimation step={(i + 1) as 1 | 2 | 3} />
                     </div>
                     <h3 className="text-lg xl:text-xl 2xl:text-2xl font-semibold">{t(`howItWorks.step${i + 1}Title`)}</h3>
                     <p className="mt-2 text-sm xl:text-base leading-relaxed text-muted-foreground">
