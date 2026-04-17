@@ -15,7 +15,7 @@ const en: Translations = {
     titleConnector: "that",
     title2: "Sounds as Good as It Looks",
     subtitle:
-      "AI creates complete courses with audio narration, beautiful design, and shareable links — ready to teach, sell, or share in seconds.",
+      "AI creates complete courses with audio narration, beautiful design, and shareable links — ready to teach, sell, or share.",
     cta: "Generate Your First Course Free",
     secondaryCta: "See a Sample Course",
     tagline: "No credit card required · Your first course is free",
@@ -43,7 +43,7 @@ const en: Translations = {
       'Enter your topic, pick a style and depth — from "Python for data science" to "Sourdough baking 101".',
     step2Title: "AI builds your course",
     step2Desc:
-      "In seconds you get modules, lessons, quizzes, audio narration, and a shareable link — all editable.",
+      "You get modules, lessons, quizzes, audio narration, and a shareable link — all editable.",
     step3Title: "Share, teach, or sell",
     step3Desc:
       "Send a link, export to Notion or PDF, or turn it into a lead magnet. Your course, your way.",
@@ -73,7 +73,7 @@ const en: Translations = {
     eyebrow: "Real Examples",
     heading: "Hear it. See it. Share it.",
     subheading:
-      "Every course below was generated in seconds — complete with audio narration, structured lessons, quizzes, and a shareable link.",
+      "Every course below was generated with Syllabi — complete with audio narration, structured lessons, quizzes, and a shareable link.",
     modules: "Modules",
     lessons: "Lessons",
     total: "Total",
@@ -139,7 +139,7 @@ const en: Translations = {
   finalCta: {
     heading: "Ready to hear the difference?",
     subheading:
-      "Create a course with audio, design, and a shareable link — all in under 60 seconds. Your first generation is free.",
+      "Create a course with audio, design, and a shareable link. Your first generation is free.",
     cta: "Generate Your First Course Free",
   },
   footer: {
@@ -216,7 +216,7 @@ const en: Translations = {
     heading: "From Zero",
     headingConnector: "to",
     heading2: "Published Course",
-    subheading: "Everything you need to go from blank page to shareable link — in under 60 seconds.",
+    subheading: "Everything you need to go from blank page to shareable link.",
     stepLabel: "STEP",
     step1Title: "Pick Your Starting Point",
     step1Desc: "Choose a template that fits your use case — coaching, onboarding, workshops, or go fully custom. Templates pre-fill the form so you can generate even faster.",
@@ -225,8 +225,8 @@ const en: Translations = {
     step2Desc: "Enter your topic, target audience, depth level, and preferred style. The more specific you are, the sharper the output.",
     step2Detail: "Try: \"Advanced React Hooks for Senior Engineers\" or \"Beginner Yoga for Desk Workers\".",
     step3Title: "Watch the Magic Happen",
-    step3Desc: "Hit Generate. AI builds a complete course structure with modules, lessons, quizzes, and learning objectives — all in seconds.",
-    step3Detail: "Full courses with 8+ modules generate in under 60 seconds.",
+    step3Desc: "Hit Generate. AI builds a complete course structure with modules, lessons, quizzes, and learning objectives.",
+    step3Detail: "Full courses with 8+ modules are ready in minutes — progress shown live.",
     step4Title: "Make It Yours",
     step4Desc: "Open the Course Editor to rewrite titles, tweak content, add quiz questions, reorder modules, or remove anything that doesn't fit.",
     step4Detail: "Every single element is editable — nothing is locked.",
