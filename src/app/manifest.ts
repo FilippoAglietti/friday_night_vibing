@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Syllabi - AI-Powered Course Generator",
     short_name: "Syllabi",
     description:
-      "Turn any topic into a complete course with audio narration, design, and a shareable link. AI-generated modules, lessons, quizzes & PDF export.",
+      "Turn any topic into a complete course with NotebookLM-ready podcast export, design, and a shareable link. AI-generated modules, lessons, quizzes & PDF export.",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

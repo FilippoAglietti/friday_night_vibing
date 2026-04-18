@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 export const alt =
-  "Syllabi — The AI Course Generator Worth Listening To. Complete courses with audio narration, design, and a shareable link.";
+  "Syllabi — The AI Course Generator Worth Listening To. Complete courses with NotebookLM podcast export, design, and a shareable link.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -138,15 +138,15 @@ export default function OGImage() {
               display: "flex",
             }}
           >
-            Complete courses with audio narration, design, and a shareable
-            link.
+            Complete courses with NotebookLM podcast export, design, and a
+            shareable link.
           </p>
         </div>
 
         {/* Feature pills */}
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           {[
-            "Audio Narration",
+            "NotebookLM Podcast Export",
             "PDF & Notion Export",
             "AI Quizzes",
             "16 Languages",

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | Syllabi",
   },
   description:
-    "The AI course generator that builds complete courses with audio narration, beautiful design, quizzes, and PDF export. Free to start — no credit card required.",
+    "The AI course generator that builds complete courses with NotebookLM podcast export, beautiful design, quizzes, and PDF export. Free to start — no credit card required.",
   keywords: [
     "AI course generator",
     "AI course creator",
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Syllabi — The AI Course Generator Worth Listening To",
     description:
-      "Generate complete online courses with AI — modules, lessons, quizzes, audio narration & PDF export. Used by educators, coaches, and course creators worldwide.",
+      "Generate complete online courses with AI — modules, lessons, quizzes, NotebookLM podcast export & PDF. Used by educators, coaches, and course creators worldwide.",
     type: "website",
     url: BASE_URL,
     siteName: "Syllabi",
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "Syllabi — AI Course Generator: Create full courses with audio narration, quizzes, and beautiful design",
+        alt: "Syllabi — AI Course Generator: Create full courses with NotebookLM podcast export, quizzes, and beautiful design",
       },
     ],
   },
@@ -83,7 +83,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Syllabi — The AI Course Generator Worth Listening To",
     description:
-      "Generate complete courses with AI — audio narration, quizzes, modules & PDF export. Free to start.",
+      "Generate complete courses with AI — NotebookLM podcast export, quizzes, modules & PDF. Free to start.",
     images: ["/og.png"],
     site: "@syllabi_online",
     creator: "@syllabi_online",
@@ -151,7 +151,7 @@ const jsonLd = {
       "@id": `${BASE_URL}/#website`,
       url: BASE_URL,
       name: "Syllabi",
-      description: "AI-powered course generator — create full online courses with audio narration, quizzes, and PDF export.",
+      description: "AI-powered course generator — create full online courses with NotebookLM podcast export, quizzes, and PDF export.",
       publisher: { "@id": `${BASE_URL}/#organization` },
       potentialAction: {
         "@type": "SearchAction",
@@ -167,7 +167,7 @@ const jsonLd = {
       "@type": "SoftwareApplication",
       "@id": `${BASE_URL}/#app`,
       name: "Syllabi — AI Course Generator",
-      description: "Generate complete online courses with AI-powered audio narration, modules, lessons, quizzes, pacing schedules, and export to PDF, Notion, DOCX, and SCORM.",
+      description: "Generate complete online courses with AI — modules, lessons, quizzes, pacing schedules, NotebookLM-ready podcast export, and output to PDF, Notion, DOCX, and SCORM.",
       url: BASE_URL,
       applicationCategory: "EducationalApplication",
       operatingSystem: "Web",
@@ -209,10 +209,10 @@ const jsonLd = {
           priceCurrency: "EUR",
           availability: "https://schema.org/InStock",
           url: `${BASE_URL}/pricing`,
-          description: "20 full courses/month, AI audio narration, white-label, polish + review",
+          description: "20 full courses/month, NotebookLM podcast export, white-label, polish + review",
         },
       ],
-      featureList: "AI Course Generation, Audio Narration, PDF Export, Notion Export, DOCX Export, SCORM Export, Quizzes, Pacing Schedules, 16 Languages, Shareable Links",
+      featureList: "AI Course Generation, NotebookLM Podcast Export, PDF Export, Notion Export, DOCX Export, SCORM Export, Quizzes, Pacing Schedules, 16 Languages, Shareable Links",
       screenshot: `${BASE_URL}/og.png`,
     },
     // ── HowTo (for "how to create a course" rich snippets) ──
@@ -220,7 +220,7 @@ const jsonLd = {
       "@type": "HowTo",
       "@id": `${BASE_URL}/#howto`,
       name: "How to Create an Online Course with AI",
-      description: "Generate a complete, professional online course with Syllabi's AI course generator — modules, lessons, quizzes, audio narration, and a shareable link.",
+      description: "Generate a complete, professional online course with Syllabi's AI course generator — modules, lessons, quizzes, NotebookLM podcast export, and a shareable link.",
       tool: { "@type": "HowToTool", name: "Syllabi AI Course Generator" },
       step: [
         {
@@ -253,8 +253,8 @@ const jsonLd = {
         {
           "@type": "HowToStep",
           position: 5,
-          name: "Add Audio Narration",
-          text: "Masterclass subscribers can generate professional AI voice narration for every lesson, turning the course into podcast-style content.",
+          name: "Export for NotebookLM",
+          text: "Masterclass subscribers can export any course as NotebookLM-ready Markdown. Drop it into Google NotebookLM to generate a two-host conversational podcast on demand.",
         },
         {
           "@type": "HowToStep",
@@ -274,7 +274,7 @@ const jsonLd = {
           name: "What is Syllabi?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Syllabi is an AI-powered course generator that creates complete online courses — including modules, lessons, quizzes, audio narration, and pacing schedules — from a single topic. It's used by educators, coaches, and course creators worldwide.",
+            text: "Syllabi is an AI-powered course generator that creates complete online courses — including modules, lessons, quizzes, NotebookLM-ready podcast export, and pacing schedules — from a single topic. It's used by educators, coaches, and course creators worldwide.",
           },
         },
         {
@@ -282,7 +282,7 @@ const jsonLd = {
           name: "Is Syllabi free to use?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes. Syllabi offers 1 free course skeleton per month with no credit card required. Paid plans start at €29/month for Planner (15 reviewed skeletons, all export formats) and €99/month for Masterclass (20 full courses/month, AI audio narration, polish + white-label).",
+            text: "Yes. Syllabi offers 1 free course skeleton per month with no credit card required. Paid plans start at €29/month for Planner (15 reviewed skeletons, all export formats) and €99/month for Masterclass (20 full courses/month, NotebookLM podcast export, polish + white-label).",
           },
         },
         {
@@ -327,10 +327,10 @@ const jsonLd = {
         },
         {
           "@type": "Question",
-          name: "Can I generate courses with audio narration?",
+          name: "Can I export my course as a podcast?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes. Masterclass subscribers can generate professional AI voice narration for every lesson in their courses, effectively turning each course into podcast-style content that students can listen to on the go.",
+            text: "Yes — Masterclass tier includes a one-click NotebookLM-ready Markdown export. Drop the file into Google NotebookLM to generate a two-host conversational podcast of your course on demand. No TTS bills, better output than per-lesson narration.",
           },
         },
       ],
