@@ -714,7 +714,7 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section
           id="hero"
-          className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 pt-20 pb-10 md:pt-16 md:pb-16"
+          className="snap-section relative flex md:min-h-[100dvh] flex-col items-center justify-center px-4 pt-20 pb-10 md:pt-16 md:pb-16"
         >
           {/* Hero radial spotlight */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -807,7 +807,7 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section
           id="problem-solution"
-          className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20"
+          className="snap-section relative flex md:min-h-[100dvh] flex-col items-center justify-center px-4 py-12 md:py-20"
         >
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -861,7 +861,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             HOW IT WORKS
         ═══════════════════════════════════════════════════ */}
-        <section id="how-it-works" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
+        <section id="how-it-works" className="snap-section relative flex md:min-h-[100dvh] flex-col items-center justify-center px-4 py-12 md:py-20">
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute top-[5%] right-[0%] h-[55vh] w-[45vh] rounded-full bg-indigo-500/[0.06] blur-[100px] dark:bg-indigo-400/[0.11]" />
@@ -921,7 +921,7 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section
           id="demo"
-          className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20"
+          className="snap-section relative flex md:min-h-[100dvh] flex-col items-center justify-center px-4 py-12 md:py-20"
         >
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute top-[10%] left-[10%] h-[45vh] w-[45vh] rounded-full bg-violet-500/[0.06] blur-[100px] dark:bg-violet-400/[0.11]" />
@@ -963,7 +963,7 @@ export default function Home() {
         ═══════════════════════════════════════════════════ */}
         <section
           id="generate"
-          className={`${curriculum || isGenerating ? "" : "snap-section"} relative min-h-screen flex flex-col px-4 py-8 md:py-16 ${
+          className={`${curriculum || isGenerating ? "" : "snap-section"} relative md:min-h-[100dvh] flex flex-col px-4 py-8 md:py-16 ${
             curriculum || isGenerating
               ? "items-start justify-start pt-20"
               : "items-center justify-center"
@@ -1098,7 +1098,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             EXAMPLE CURRICULA (SOCIAL PROOF)
         ═══════════════════════════════════════════════════ */}
-        <section id="examples" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
+        <section id="examples" className="snap-section relative flex md:min-h-[100dvh] flex-col items-center justify-center px-4 py-12 md:py-20">
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute top-[8%] left-[3%] h-[45vh] w-[45vh] rounded-full bg-violet-500/[0.06] blur-[100px] dark:bg-violet-400/[0.11]" />
@@ -1209,7 +1209,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             PRICING
         ═══════════════════════════════════════════════════ */}
-        <section id="pricing" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
+        <section id="pricing" className="snap-section relative flex md:min-h-[100dvh] flex-col items-center justify-center px-4 py-12 md:py-20">
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[30vh] w-[80%] rounded-full bg-violet-500/[0.05] blur-[100px] dark:bg-violet-500/[0.10]" />
@@ -1609,7 +1609,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════
             FINAL CTA
         ═══════════════════════════════════════════════════ */}
-        <section id="final-cta" className="snap-section relative flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
+        <section id="final-cta" className="snap-section relative flex md:min-h-[100dvh] flex-col items-center justify-center px-4 py-12 md:py-20">
           {/* Section-specific accent */}
           <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute left-1/2 top-1/2 h-[70vh] w-[70vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/[0.06] blur-[100px] dark:bg-violet-500/[0.11]" />
