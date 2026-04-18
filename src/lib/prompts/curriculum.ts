@@ -517,6 +517,7 @@ STRUCTURE RULES:
 - weeklyPlan must cover ALL module IDs
 - lesson format must be one of: video, reading, interactive, discussion, project, live-session
 - Include 3-5 bonusResources with REAL, working URLs to authoritative sources in this specific domain
+- BONUS RESOURCE INTEGRITY (CRITICAL — caught in production): the title must match what the URL actually points to. If you cannot name the exact canonical URL for a specific paper, book, or article, title the resource after the CONCEPT (e.g. "CAP theorem — overview", "Dynamo-style storage systems — reference") and link the Wikipedia article or a domain root. NEVER pair a specific-paper title like "Amazon's Dynamo Paper — DeCandia et al. (SOSP 2007)" with a generic Wikipedia URL — either cite the real paper URL with confidence, or re-title the resource to match the URL. This failure mode is a trust killer.
 - NEVER use generic module names like "Introduction", "Basics", "Advanced Topics", "Conclusion" — name the CONTENT
 `.trim();
 }

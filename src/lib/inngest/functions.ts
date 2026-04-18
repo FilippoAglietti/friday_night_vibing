@@ -467,6 +467,63 @@ function classifySkeletonError(message: string): SkeletonErrorCategory {
   return "unknown";
 }
 
+// Deterministic pacing normalisation. Claude treats totalHours,
+// hoursPerWeek, totalWeeks, and weeklyPlan as four independent
+// numbers and routinely produces inconsistent sets (e.g. modules
+// summing to 10.5h while totalHours=10 and hoursPerWeek×totalWeeks=12).
+// Reviewer flagged this on the 2026-04-18 Distributed Systems test.
+// This helper rebuilds the math from the authoritative source —
+// module durations — so the numbers agree without another LLM call.
+function normalizeSkeletonPacing(skeleton: Curriculum): Curriculum {
+  const modules = skeleton.modules ?? [];
+  const totalMinutes = modules.reduce((sum, m) => sum + (m.durationMinutes || 0), 0);
+  if (totalMinutes === 0) return skeleton;
+
+  const totalHours = Math.max(1, Math.round(totalMinutes / 60));
+  const hoursPerWeek = Math.max(1, Math.min(10, skeleton.pacing?.hoursPerWeek ?? 3));
+  const totalWeeks = Math.max(1, Math.ceil(totalHours / hoursPerWeek));
+
+  const existingPlan = skeleton.pacing?.weeklyPlan ?? [];
+  const planHasAllModules =
+    existingPlan.length > 0 &&
+    new Set(existingPlan.flatMap((w) => w.moduleIds)).size === modules.length;
+
+  let weeklyPlan = existingPlan;
+  if (!planHasAllModules) {
+    const minutesPerWeek = totalMinutes / totalWeeks;
+    weeklyPlan = [];
+    let weekIdx = 0;
+    let weekMinutes = 0;
+    let currentWeek: { week: number; label?: string; moduleIds: string[] } = {
+      week: 1,
+      moduleIds: [],
+    };
+    for (const m of modules) {
+      if (weekMinutes + (m.durationMinutes || 0) > minutesPerWeek * 1.3 && currentWeek.moduleIds.length > 0) {
+        weeklyPlan.push(currentWeek);
+        weekIdx += 1;
+        currentWeek = { week: weekIdx + 1, moduleIds: [] };
+        weekMinutes = 0;
+      }
+      currentWeek.moduleIds.push(m.id);
+      weekMinutes += m.durationMinutes || 0;
+    }
+    if (currentWeek.moduleIds.length > 0) weeklyPlan.push(currentWeek);
+  }
+
+  return {
+    ...skeleton,
+    pacing: {
+      ...skeleton.pacing,
+      style: skeleton.pacing?.style ?? "self-paced",
+      totalHours,
+      hoursPerWeek,
+      totalWeeks,
+      weeklyPlan,
+    },
+  };
+}
+
 // ─── Function 1: course.generate (skeleton + fan-out) ────────
 
 /**
@@ -640,7 +697,8 @@ export const courseGenerate = inngest.createFunction(
         timeoutMs: skeletonTimeout,
       });
 
-      return parseClaudeJson<Curriculum>(rawText, "skeleton", courseId);
+      const parsed = await parseClaudeJson<Curriculum>(rawText, "skeleton", courseId);
+      return normalizeSkeletonPacing(parsed);
     });
 
     // Step 2: persist skeleton to courses.curriculum so the
