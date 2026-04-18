@@ -10,10 +10,12 @@ const REVIEWER_MODEL = "claude-opus-4-7";
  * Gated by OPUS_REVIEWER_ENABLED env var. If flag off, returns
  * 'approved' without making a call (cost = 0).
  *
- * IMPORTANT: Per AGENTS.md, recordEvent() must be called OUTSIDE
- * step.run() blocks. This helper is always invoked OUTSIDE step.run,
- * via a plain async call in the orchestrator body. The caller is
- * responsible for awaiting it.
+ * MUST be called inside step.run() by the orchestrator. Inngest
+ * replays the function body on every subsequent step completion;
+ * without memoisation the Opus API gets re-hit once per replay.
+ * The helper catches its own errors (soft-degrades to 'approved')
+ * and emits recordEvent internally, so a single step.run wrapper
+ * fires telemetry exactly once per actual API call.
  */
 export async function reviewSkeleton(params: {
   courseId: string;

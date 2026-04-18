@@ -658,8 +658,11 @@ export const courseGenerate = inngest.createFunction(
 
     // Opus reviewer quality gate (flag-gated + tier-gated). Per spec
     // §5.3, reviewer feedback never blocks publish — we only annotate
-    // courses.quality_warnings so the UI can surface it. Called OUTSIDE
-    // step.run per AGENTS.md guidance for recordEvent().
+    // courses.quality_warnings so the UI can surface it. Wrapped in
+    // step.run so Inngest memoises the verdict — otherwise every
+    // later step's replay would re-invoke the Opus API (~$0.12/call).
+    // The helper catches its own errors and records telemetry inside,
+    // so step.run always resolves and fires exactly once.
     if (thisCourse?.user_id) {
       const { data: reviewerProfile } = await supabase
         .from("profiles")
@@ -668,7 +671,9 @@ export const courseGenerate = inngest.createFunction(
         .single();
       const reviewerTier = tierOrFallback(reviewerProfile?.plan ?? "free");
       if (TIERS[reviewerTier].hasReviewer) {
-        const review = await reviewSkeleton({ courseId, skeleton });
+        const review = await step.run("reviewer-skeleton", () =>
+          reviewSkeleton({ courseId, skeleton }),
+        );
         if (review.verdict === "needs_revision") {
           console.warn(
             `[courseGenerate] skeleton reviewer flagged ${courseId}: ${review.feedback.join("; ")}`,
@@ -1281,18 +1286,24 @@ export const courseFinalize = inngest.createFunction(
           })),
         );
         const selectedIds = new Set(selected.map((l) => l.id));
+        // Each polishLesson is wrapped in its own step.run so Inngest
+        // memoises results per-lesson. Without this, every subsequent
+        // step replay would re-invoke the Opus API for each selected
+        // lesson (~$0.10–$0.30 each × up to 15 lessons = painful).
         const polishJobs: Array<Promise<void>> = [];
         for (const m of merged.modules) {
           for (const l of m.lessons ?? []) {
             if (!l.id || !selectedIds.has(l.id)) continue;
+            const lessonId = l.id;
+            const body = l.content ?? "";
             polishJobs.push(
-              polishLesson({
-                courseId,
-                lessonId: l.id,
-                body: l.content ?? "",
-              }).then((polished) => {
-                if (polished) l.content = polished;
-              }),
+              step
+                .run(`polish-lesson-${lessonId}`, () =>
+                  polishLesson({ courseId, lessonId, body }),
+                )
+                .then((polished) => {
+                  if (polished) l.content = polished;
+                }),
             );
           }
         }

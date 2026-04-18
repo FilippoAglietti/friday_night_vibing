@@ -72,6 +72,11 @@ export function selectLessonsToPolish(modules: ModuleLike[]): LessonLike[] {
  * Polish a single lesson via Opus. On failure, returns null (caller
  * keeps the original Sonnet version — soft degradation).
  * Gated by MASTERCLASS_STRATEGIC_POLISH_ENABLED env var.
+ *
+ * MUST be called inside step.run() by the orchestrator. Inngest
+ * replays the function body on every subsequent step completion;
+ * without memoisation the Opus API gets re-hit once per replay for
+ * every selected lesson (up to 15 lessons × repeated cost).
  */
 export async function polishLesson(params: {
   courseId: string;
