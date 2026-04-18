@@ -31,7 +31,6 @@ export async function reviewSkeleton(params: {
     const resp = await client.messages.create({
       model: REVIEWER_MODEL,
       max_tokens: 2048,
-      temperature: 0,
       system: REVIEWER_SYSTEM,
       messages: [
         {

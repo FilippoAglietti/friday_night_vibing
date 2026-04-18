@@ -87,7 +87,6 @@ export async function polishLesson(params: {
     const resp = await client.messages.create({
       model: POLISH_MODEL,
       max_tokens: 4096,
-      temperature: 0.3,
       system:
         "You are a senior instructor polishing a lesson to masterclass quality. Improve clarity, pedagogy, and flow. Preserve all facts; NEVER introduce new references or URLs. Return only the polished lesson body in Markdown.",
       messages: [{ role: "user", content: `LESSON BODY:\n\n${params.body}` }],
