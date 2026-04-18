@@ -41,7 +41,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { question: "Can I customize the generated course for my grade level?", answer: "Yes. When generating a course, you specify the target audience (e.g., 'Grade 8 students' or 'AP History class'). Syllabi tailors the depth, vocabulary, and pacing to match." },
       { question: "What export formats work best for teachers?", answer: "Most teachers use PDF export for printed handouts or Notion export for digital classrooms. You can also export to PPTX for slide-based lectures or DOCX for editable documents." },
-      { question: "Is there a free plan for educators?", answer: "Yes. The free tier gives you 3 full course generations with JSON export. Paid plans start at €28/month with all export formats and up to 15 generations." },
+      { question: "Is there a free plan for educators?", answer: "Yes. The free tier gives you 3 full course generations with JSON export. Paid plans start at €29/month with all export formats and up to 15 generations." },
     ],
     keywords: ["course generator for teachers", "AI lesson plan generator", "course builder for educators", "teacher course creator"],
     emoji: "📚",
@@ -302,7 +302,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { question: "Can I create customer-facing courses?", answer: "Yes. Generate product training, certification programs, or educational content for customers. Export with shareable links so customers can access courses directly." },
       { question: "How does this help with investor conversations?", answer: "Having structured training materials signals operational maturity to investors. Generate an onboarding program or customer academy in minutes for due diligence." },
-      { question: "Is it cost-effective for a small team?", answer: "The free tier gives you 3 courses. Paid plans start at €28/month — less than an hour of a consultant's time. The 5-Pack at €33 is ideal for startups needing a few key training programs." },
+      { question: "Is it cost-effective for a small team?", answer: "The free tier gives you 3 courses. Paid plans start at €29/month — less than an hour of a consultant's time. The 5-Pack at €39 is ideal for startups needing a few key training programs." },
     ],
     keywords: ["startup training course generator", "startup onboarding builder", "course generator for small teams", "startup customer education AI"],
     emoji: "🚀",
@@ -382,7 +382,7 @@ export const NICHES: Niche[] = [
     blurb: "Nonprofits need to do more with less. Syllabi generates structured training programs for volunteer onboarding, community education, and grant-funded initiatives — so your team spends time on impact, not course design.",
     useCases: ["Volunteer training and onboarding", "Community education programs", "Grant-funded training deliverables", "Board member orientation"],
     faqs: [
-      { question: "Is there nonprofit pricing?", answer: "The free tier provides 3 course generations. For nonprofits needing more, the 5-Pack at €33 is a cost-effective option. Contact us for special nonprofit pricing on larger needs." },
+      { question: "Is there nonprofit pricing?", answer: "The free tier provides 3 course generations. For nonprofits needing more, the 5-Pack at €39 is a cost-effective option. Contact us for special nonprofit pricing on larger needs." },
       { question: "Can I demonstrate training deliverables for grants?", answer: "Yes. Generate complete training courses and export as professionally formatted PDFs. These serve as excellent deliverables for grant applications and reporting." },
       { question: "Does it work for community education?", answer: "Absolutely. Generate courses targeted at community members with accessible language and practical content. Specify the community's needs and literacy level for tailored output." },
     ],

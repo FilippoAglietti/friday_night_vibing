@@ -1340,7 +1340,7 @@ export default function Home() {
                       Planner
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      €28
+                      €29
                       <span className="text-base font-normal text-muted-foreground">
                         {t("pricing.month")}
                       </span>
@@ -1390,13 +1390,13 @@ export default function Home() {
                       Masterclass · 5-Pack
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      €33
+                      €39
                       <span className="text-base font-normal text-muted-foreground">
                         {" "}{t("pricing.oneTimeLabel")}
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm line-through text-muted-foreground/60">€42</span>
+                      <span className="text-sm line-through text-muted-foreground/60">€49</span>
                       <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />{t("pricing.save21")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -1443,13 +1443,13 @@ export default function Home() {
                       Masterclass
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      €69
+                      €99
                       <span className="text-base font-normal text-muted-foreground">
                         {t("pricing.month")}
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm line-through text-muted-foreground/60">€79/mo</span>
+                      <span className="text-sm line-through text-muted-foreground/60">€119/mo</span>
                       <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />{t("pricing.save13")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -1529,10 +1529,10 @@ export default function Home() {
                     </div>
                     <CardHeader className="pt-7 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Planner</CardDescription>
-                      <CardTitle className="text-2xl font-bold">€28<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€29<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">€35/mo</span>
-                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-20%</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-17%</span>
                       </div>
                       <p className="text-xs text-muted-foreground">{t("pricing.proDesc")}</p>
                     </CardHeader>
@@ -1561,10 +1561,10 @@ export default function Home() {
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
                         <Crown className="size-3" />Masterclass · 5-Pack
                       </CardDescription>
-                      <CardTitle className="text-2xl font-bold">€33<span className="text-sm font-normal text-muted-foreground"> {t("pricing.oneTimeLabel")}</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€39<span className="text-sm font-normal text-muted-foreground"> {t("pricing.oneTimeLabel")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-xs line-through text-muted-foreground/60">€42</span>
-                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-21%</span>
+                        <span className="text-xs line-through text-muted-foreground/60">€49</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-20%</span>
                       </div>
                       <p className="text-xs text-muted-foreground">{t("pricing.fivePackDesc")}</p>
                     </CardHeader>
@@ -1599,10 +1599,10 @@ export default function Home() {
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1">
                         <Crown className="size-3" />Masterclass
                       </CardDescription>
-                      <CardTitle className="text-2xl font-bold">€69<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€99<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-xs line-through text-muted-foreground/60">€79/mo</span>
-                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-13%</span>
+                        <span className="text-xs line-through text-muted-foreground/60">€119/mo</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-17%</span>
                       </div>
                       <p className="text-xs text-muted-foreground">{t("pricing.proMaxDesc")}</p>
                     </CardHeader>

@@ -90,7 +90,7 @@ const releases: Release[] = [
     highlight: "Planner Subscription & 5-Pack",
     changes: [
       { type: "new", text: "Planner subscription (€29/month) — 15 reviewed skeletons/month and all export formats." },
-      { type: "new", text: "5-Pack one-time purchase (€33) — 5 full generations, no subscription." },
+      { type: "new", text: "5-Pack one-time purchase (€39) — 5 full generations, no subscription." },
       { type: "new", text: "Stripe integration for secure payment processing." },
       { type: "new", text: "Paywall modal with clear plan comparison and one-click checkout." },
       { type: "improvement", text: "Bonus resources section added to all generated courses." },
