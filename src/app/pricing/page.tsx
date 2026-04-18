@@ -1,140 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, X, Flame, Crown, Headphones, ArrowRight } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { ArrowRight } from "lucide-react";
+import PricingCards from "./PricingCards";
 
 const BASE_URL = "https://www.syllabi.online";
 
 export const metadata: Metadata = {
-  title: "Pricing — Free, Pro, Pro Max | Syllabi AI Course Generator",
+  title: "Pricing — Free, Planner, Masterclass, Enterprise | Syllabi AI Course Generator",
   description:
-    "Simple pricing for the AI course generator. Free to start (3 courses), Pro at €28/mo, Pro Max at €69/mo with AI audio narration, and a one-time 5-pack. No trial required.",
+    "Simple pricing for the AI course generator. Free skeleton to start, Planner at €29/mo for 15 reviewed skeletons, Masterclass at €99/mo with polish + audio + white-label, Enterprise on request.",
   alternates: { canonical: "/pricing" },
   openGraph: {
-    title: "Syllabi Pricing — Free, Pro, Pro Max",
+    title: "Syllabi Pricing — Free / Planner / Masterclass / Enterprise",
     description:
-      "Free to start, €28/mo Pro, €69/mo Pro Max with AI audio narration, plus a one-time 5-pack.",
+      "Free skeleton to start. €29/mo Planner. €99/mo Masterclass with audio + polish + white-label. Enterprise contact us.",
     url: `${BASE_URL}/pricing`,
     type: "website",
   },
 };
-
-type Plan = {
-  id: string;
-  name: string;
-  eyebrow: string;
-  price: string;
-  unit: string;
-  strikethrough?: string;
-  saveLabel?: string;
-  description: string;
-  features: { included: boolean; label: string }[];
-  cta: string;
-  ctaHref: string;
-  highlight?: "popular" | "best" | "onetime";
-  accent: "muted" | "violet" | "amber";
-  icon?: "crown" | null;
-  audioHighlight?: boolean;
-};
-
-const PLANS: Plan[] = [
-  {
-    id: "free",
-    name: "Free",
-    eyebrow: "Free",
-    price: "€0",
-    unit: "forever",
-    description: "Create 3 mini-courses free. No card required.",
-    features: [
-      { included: true, label: "3 courses total" },
-      { included: true, label: "Up to 4 modules per course" },
-      { included: true, label: "Text lessons + basic quizzes" },
-      { included: true, label: "PDF export (watermarked)" },
-      { included: false, label: "AI audio narration" },
-      { included: false, label: "Unlimited courses" },
-    ],
-    cta: "Get started free",
-    ctaHref: "/#generate",
-    accent: "muted",
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    eyebrow: "Pro",
-    price: "€28",
-    unit: "/month",
-    strikethrough: "€35/mo",
-    saveLabel: "Save 20%",
-    description: "For creators and educators shipping real courses.",
-    features: [
-      { included: true, label: "Unlimited courses" },
-      { included: true, label: "Up to 10 modules per course" },
-      { included: true, label: "Full quizzes + flashcards" },
-      { included: true, label: "Clean PDF export (no watermark)" },
-      { included: true, label: "Priority generation" },
-      { included: true, label: "Email support" },
-    ],
-    cta: "Start Pro",
-    ctaHref: "/#pricing",
-    highlight: "popular",
-    accent: "violet",
-  },
-  {
-    id: "5pack",
-    name: "Pro Max · 5-Pack",
-    eyebrow: "Pro Max · 5-Pack",
-    price: "€33",
-    unit: " one-time",
-    strikethrough: "€42",
-    saveLabel: "Save 21%",
-    description: "Five Pro Max courses, no subscription.",
-    features: [
-      { included: true, label: "5 Pro Max courses" },
-      { included: true, label: "AI audio narration included" },
-      { included: true, label: "Up to 15 modules per course" },
-      { included: true, label: "Full quizzes + flashcards" },
-      { included: true, label: "Clean PDF export" },
-      { included: true, label: "Courses never expire" },
-    ],
-    cta: "Try Pro Max",
-    ctaHref: "/#pricing",
-    highlight: "onetime",
-    accent: "amber",
-    icon: "crown",
-  },
-  {
-    id: "promax",
-    name: "Pro Max",
-    eyebrow: "Pro Max",
-    price: "€69",
-    unit: "/month",
-    strikethrough: "€79/mo",
-    saveLabel: "Save 13%",
-    description: "The full Syllabi experience — audio, depth, priority.",
-    features: [
-      { included: true, label: "Everything in Pro" },
-      { included: true, label: "AI audio narration on every lesson" },
-      { included: true, label: "Up to 15 modules per course" },
-      { included: true, label: "Priority queue" },
-      { included: true, label: "Priority email support" },
-      { included: true, label: "Early access to new features" },
-    ],
-    cta: "Go Pro Max",
-    ctaHref: "/#pricing",
-    highlight: "best",
-    accent: "amber",
-    icon: "crown",
-    audioHighlight: true,
-  },
-];
 
 function buildJsonLd() {
   return {
@@ -174,24 +57,24 @@ function buildJsonLd() {
           },
           {
             "@type": "Offer",
-            name: "Pro",
-            price: "28",
+            name: "Planner",
+            price: "29",
             priceCurrency: "EUR",
             url: `${BASE_URL}/pricing`,
             availability: "https://schema.org/InStock",
           },
           {
             "@type": "Offer",
-            name: "Pro Max 5-Pack",
-            price: "33",
+            name: "Masterclass",
+            price: "99",
             priceCurrency: "EUR",
             url: `${BASE_URL}/pricing`,
             availability: "https://schema.org/InStock",
           },
           {
             "@type": "Offer",
-            name: "Pro Max",
-            price: "69",
+            name: "Masterclass 5-Pack",
+            price: "39",
             priceCurrency: "EUR",
             url: `${BASE_URL}/pricing`,
             availability: "https://schema.org/InStock",
@@ -258,169 +141,10 @@ export default function PricingPage() {
             Start free, upgrade when you&apos;re ready. No trial, no credit card to
             get started.
           </p>
-          <div className="mt-5 inline-flex items-center gap-3 rounded-full border border-rose-500/25 bg-gradient-to-r from-rose-500/10 via-violet-500/5 to-amber-500/10 px-5 py-2.5 backdrop-blur-sm shadow-lg shadow-rose-500/5">
-            <Flame className="size-4 text-rose-400 shrink-0" />
-            <span className="text-xs font-bold uppercase tracking-widest bg-gradient-to-r from-rose-400 via-violet-400 to-amber-400 bg-clip-text text-transparent">
-              Launch special — save up to 21%
-            </span>
-            <Flame className="size-4 text-rose-400 shrink-0" />
-          </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Prefer annual?{" "}
-            <span className="text-emerald-400 font-semibold">Save 35%+</span>{" "}
-            with yearly billing — Pro from <span className="text-foreground font-semibold">€17/mo</span>, Pro Max from{" "}
-            <span className="text-foreground font-semibold">€45/mo</span>.
-          </p>
         </div>
 
-        <div className="grid gap-6 xl:gap-8 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
-          {PLANS.map((plan) => {
-            const borderClass =
-              plan.accent === "violet"
-                ? "border-violet-500/30 shadow-xl shadow-violet-500/5"
-                : plan.accent === "amber"
-                ? plan.highlight === "best"
-                  ? "border-amber-500/30 shadow-xl shadow-amber-500/5 bg-gradient-to-b from-amber-500/5 via-card/50 to-card/50"
-                  : "border-amber-500/20 bg-gradient-to-b from-amber-500/[0.03] via-card/50 to-card/50"
-                : "border-border/50";
-            const eyebrowClass =
-              plan.accent === "violet"
-                ? "text-violet-500"
-                : plan.accent === "amber"
-                ? "text-amber-500"
-                : "text-muted-foreground";
-            const checkClass =
-              plan.accent === "violet"
-                ? "text-violet-500"
-                : plan.accent === "amber"
-                ? plan.highlight === "onetime"
-                  ? "text-amber-400"
-                  : "text-amber-500"
-                : "text-emerald-500";
-            const ctaClass =
-              plan.accent === "violet"
-                ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40"
-                : plan.accent === "amber"
-                ? plan.highlight === "onetime"
-                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40"
-                  : "bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40"
-                : "border border-border/60 hover:bg-muted/30";
-
-            return (
-              <Card
-                key={plan.id}
-                className={`relative flex flex-col w-full overflow-visible bg-card/50 backdrop-blur-sm ${borderClass}`}
-              >
-                {plan.highlight === "popular" && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">
-                      Most popular
-                    </Badge>
-                  </div>
-                )}
-                {plan.highlight === "best" && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-3.5 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-amber-500/30 flex items-center gap-1.5">
-                      <Crown className="size-3" />
-                      Best value
-                    </Badge>
-                  </div>
-                )}
-                {plan.highlight === "onetime" && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="rounded-full bg-gradient-to-r from-amber-600 to-orange-600 px-3.5 py-1.5 text-xs font-semibold text-white border-0 shadow-lg shadow-amber-500/30">
-                      One-time
-                    </Badge>
-                  </div>
-                )}
-
-                <CardHeader className="pt-8">
-                  <CardDescription
-                    className={`text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 ${eyebrowClass}`}
-                  >
-                    {plan.icon === "crown" && <Crown className="size-3.5" />}
-                    {plan.eyebrow}
-                  </CardDescription>
-                  <CardTitle className="text-3xl font-bold">
-                    {plan.price}
-                    <span className="text-base font-normal text-muted-foreground">
-                      {plan.unit}
-                    </span>
-                  </CardTitle>
-                  {plan.strikethrough && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm line-through text-muted-foreground/60">
-                        {plan.strikethrough}
-                      </span>
-                      {plan.saveLabel && (
-                        <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10">
-                          <Flame className="size-3" />
-                          {plan.saveLabel}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  <p className="text-sm text-muted-foreground">
-                    {plan.description}
-                  </p>
-                </CardHeader>
-
-                <CardContent className="flex-1">
-                  {plan.audioHighlight && (
-                    <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center gap-3">
-                      <div className="flex items-center justify-center size-9 shrink-0 rounded-lg bg-amber-500/10">
-                        <Headphones className="size-5 text-amber-500" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold text-amber-500">
-                          AI audio narration
-                        </p>
-                        <p className="text-[11px] text-muted-foreground">
-                          Every lesson read aloud in natural voice.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  <ul className="space-y-3">
-                    {plan.features.map((f, i) => (
-                      <li
-                        key={i}
-                        className="flex items-center gap-2.5 text-sm"
-                      >
-                        {f.included ? (
-                          <Check
-                            className={`size-4 shrink-0 ${checkClass}`}
-                          />
-                        ) : (
-                          <X className="size-4 text-muted-foreground/40 shrink-0" />
-                        )}
-                        <span
-                          className={
-                            f.included ? "" : "text-muted-foreground/50"
-                          }
-                        >
-                          {f.label}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-
-                <CardFooter className="mt-auto pt-0">
-                  <Link
-                    href={plan.ctaHref}
-                    className={`w-full inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium transition-all hover:scale-[1.02] ${ctaClass}`}
-                  >
-                    {plan.cta}
-                    {plan.highlight === "best" && (
-                      <ArrowRight className="ml-2 size-4" />
-                    )}
-                  </Link>
-                </CardFooter>
-              </Card>
-            );
-          })}
-        </div>
+        {/* Interactive cards with billing toggle — client component */}
+        <PricingCards />
 
         <section className="mt-16 md:mt-24 max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold tracking-tight text-center mb-8">
@@ -430,7 +154,7 @@ export default function PricingPage() {
             <div>
               <h3 className="font-semibold mb-1">Is there a free trial?</h3>
               <p className="text-sm text-muted-foreground">
-                No trial needed — the Free plan lets you create up to 3 courses
+                No trial needed — the Free plan gives you 1 course skeleton per month
                 with no credit card required.
               </p>
             </div>
@@ -439,7 +163,7 @@ export default function PricingPage() {
                 Can I cancel my subscription anytime?
               </h3>
               <p className="text-sm text-muted-foreground">
-                Yes. You can cancel Pro or Pro Max from your profile at any
+                Yes. You can cancel Planner or Masterclass from your profile at any
                 time. You keep access until the end of the billing period.
               </p>
             </div>
@@ -448,10 +172,20 @@ export default function PricingPage() {
                 Is annual billing cheaper?
               </h3>
               <p className="text-sm text-muted-foreground">
-                Yes — annual billing is 35%+ cheaper than monthly. Pro drops
-                to €17/mo (€204/year) and Pro Max drops to €45/mo (€540/year).
-                You&apos;re charged once for the full year, and Pro annual
-                includes a yearly bank of 180 course generations.
+                Yes — annual billing saves you 2 months. Planner drops to €24/mo
+                (€290/year) and Masterclass drops to €82/mo (€990/year). You&apos;re
+                charged once for the full year.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-1">
+                What&apos;s the difference between a skeleton and a full course?
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                A skeleton includes lesson titles, learning objectives, pacing, and
+                structure — but not full lesson bodies. Planner gives you best-in-class
+                skeletons; Masterclass generates the complete lesson content too.
+                Planner users can unlock bodies for any skeleton at €5 on demand.
               </p>
             </div>
             <div>
@@ -459,9 +193,10 @@ export default function PricingPage() {
                 What&apos;s the 5-Pack and when should I pick it?
               </h3>
               <p className="text-sm text-muted-foreground">
-                The 5-Pack is a one-time purchase of 5 Pro Max courses — ideal
-                if you have a short list of courses to build and don&apos;t
-                want a monthly subscription.
+                The 5-Pack is a one-time purchase of 5 Masterclass generations — ideal
+                if you have a short list of courses to build and don&apos;t want a
+                subscription. You have 90 days to use them, and get €20 off a
+                Masterclass subscription if you upgrade within 30 days.
               </p>
             </div>
             <div>
@@ -469,8 +204,8 @@ export default function PricingPage() {
                 What does AI audio narration include?
               </h3>
               <p className="text-sm text-muted-foreground">
-                Pro Max generates natural-sounding narration for every lesson
-                in your course, so you can listen while you learn or share
+                Masterclass uses ElevenLabs to generate natural-sounding narration for
+                every lesson in your course, so you can listen while you learn or share
                 audio-first experiences.
               </p>
             </div>
