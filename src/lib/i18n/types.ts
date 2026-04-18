@@ -120,6 +120,7 @@ export interface Translations {
   pricing: {
     eyebrow: string;
     heading: string;
+    subheading: string;
     launchSpecial: string;
     endsIn: string;
     mostPopular: string;
@@ -167,6 +168,21 @@ export interface Translations {
     pack4: string;
     pack5: string;
     pack6: string;
+    toggle: { monthly: string; annual: string; savePitch: string };
+    tiers: {
+      free: { name: string; eyebrow: string; pitch: string; cap: string; cta: string };
+      planner: { name: string; eyebrow: string; pitch: string; cap: string; bodyUnlock: string; cta: string };
+      masterclass: { name: string; eyebrow: string; pitch: string; cap: string; cta: string };
+      enterprise: { name: string; eyebrow: string; pitch: string; cta: string };
+    };
+    fivePack: { heading: string; pitch: string; cta: string; conversionCredit: string };
+    bodyUnlock: { cta: string; modalTitle: string; modalBody: string };
+  };
+  paywall: {
+    fromFree: { title: string; body: string; primaryCta: string };
+    fromPlannerCap: { title: string; body: string; primaryCta: string };
+    fromPlannerMasterclassBody: { title: string; body: string; primaryCta: string; secondaryCta: string };
+    fromMasterclassCap: { title: string; body: string; primaryCta: string };
   };
   finalCta: {
     heading: string;

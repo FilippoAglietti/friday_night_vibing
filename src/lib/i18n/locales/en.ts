@@ -87,7 +87,8 @@ const en: Translations = {
   },
   pricing: {
     eyebrow: "Pricing",
-    heading: "Start free. Upgrade when you're ready.",
+    heading: "Pricing that matches what you ship",
+    subheading: "Start free. Upgrade when your students do.",
     launchSpecial: "Launch Special",
     endsIn: "Ends in",
     mostPopular: "Most Popular",
@@ -135,6 +136,71 @@ const en: Translations = {
     pack4: "Premium Notion & PDF export",
     pack5: "White-label branding",
     pack6: "No recurring charges",
+    toggle: { monthly: "Monthly", annual: "Annual", savePitch: "Save 2 months" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Start free",
+        pitch: "Try Syllabi with a free skeleton — see exactly what you'd ship.",
+        cap: "1 course skeleton per month",
+        cta: "Get started free",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Plan, then build",
+        pitch: "The best course structures in the market. Skeletons on demand.",
+        cap: "15 reviewed skeletons per month",
+        bodyUnlock: "€5 on-demand body unlock per skeleton",
+        cta: "Start Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Ready to teach from",
+        pitch: "Reviewed, polished, narrated — every course ready for your audience.",
+        cap: "20 full courses per month",
+        cta: "Start Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "For teams",
+        pitch: "White-label, done-for-you courses, dedicated learning designer.",
+        cta: "Contact sales",
+      },
+    },
+    fivePack: {
+      heading: "Try Masterclass without committing",
+      pitch: "5 full Masterclass generations · 90 days to use",
+      cta: "Buy the 5-Pack — €39",
+      conversionCredit: "€20 off if you upgrade to Masterclass within 30 days",
+    },
+    bodyUnlock: {
+      cta: "Unlock full course body — €5",
+      modalTitle: "Unlock body for this skeleton",
+      modalBody: "One-time €5. Generates the full module bodies (~2 min).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "You've used your free skeleton this month",
+      body: "Unlock 15 reviewed skeletons and on-demand bodies with Planner.",
+      primaryCta: "Upgrade to Planner",
+    },
+    fromPlannerCap: {
+      title: "You've used all 15 skeletons this month",
+      body: "Upgrade to Masterclass for 20 full courses per month, or wait until the 1st.",
+      primaryCta: "Upgrade to Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Masterclass-length bodies need Masterclass tier",
+      body: "Upgrade to Masterclass, or try 5 Masterclasses with the 5-Pack.",
+      primaryCta: "Upgrade to Masterclass",
+      secondaryCta: "Buy the 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "You've hit the 20-generation cap",
+      body: "Contact us for Enterprise if your team needs more.",
+      primaryCta: "Contact sales",
+    },
   },
   finalCta: {
     heading: "Ready to hear the difference?",
