@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Check, X, Flame, Crown, Headphones, ArrowRight } from "lucide-react";
+import { EnterpriseMailtoCta } from "@/components/EnterpriseMailtoCta";
 import {
   Card,
   CardContent,
@@ -277,15 +278,19 @@ export default function PricingCards() {
               </CardContent>
 
               <CardFooter className="mt-auto pt-0">
-                <Link
-                  href={plan.ctaHref}
-                  className={`w-full inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium transition-all hover:scale-[1.02] ${ctaClass}`}
-                >
-                  {plan.cta}
-                  {plan.highlight === "best" && (
-                    <ArrowRight className="ml-2 size-4" />
-                  )}
-                </Link>
+                {plan.id === "enterprise" ? (
+                  <EnterpriseMailtoCta label={plan.cta} />
+                ) : (
+                  <Link
+                    href={plan.ctaHref}
+                    className={`w-full inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium transition-all hover:scale-[1.02] ${ctaClass}`}
+                  >
+                    {plan.cta}
+                    {plan.highlight === "best" && (
+                      <ArrowRight className="ml-2 size-4" />
+                    )}
+                  </Link>
+                )}
               </CardFooter>
             </Card>
           );
