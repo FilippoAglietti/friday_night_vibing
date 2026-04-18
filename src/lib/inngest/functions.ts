@@ -1313,9 +1313,12 @@ export const courseFinalize = inngest.createFunction(
  * this array and passes it to `serve()`. Adding a new function
  * means appending it here and nothing else.
  */
+import { bodyUnlock } from "@/lib/inngest/body-unlock";
+
 export const inngestFunctions = [
   courseGenerate,
   moduleGenerate,
   courseFinalize,
   validateCourseUrls,
+  bodyUnlock,
 ];
