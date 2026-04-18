@@ -124,8 +124,7 @@ export async function POST(req: NextRequest) {
           .eq("user_id", userId);
 
         const { inngest } = await import("@/lib/inngest/client");
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (inngest as any).send({
+        await inngest.send({
           name: "course/body-unlock.requested",
           data: { courseId, userId },
         });

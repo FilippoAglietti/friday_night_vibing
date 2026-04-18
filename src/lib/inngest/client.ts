@@ -93,6 +93,12 @@ type Events = {
   "module/generate.requested": { data: ModuleGenerateRequestedData };
   "course/finalize.requested": { data: CourseFinalizeRequestedData };
   "course/validate.requested": { data: CourseValidateRequestedData };
+  "course/body-unlock.requested": {
+    data: { courseId: string; userId: string };
+  };
+  "course/polish.requested": {
+    data: { courseId: string };
+  };
 };
 
 /**
