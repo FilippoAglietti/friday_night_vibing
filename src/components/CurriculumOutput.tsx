@@ -41,6 +41,10 @@ import { generateScormPackage } from "@/lib/exports/generateScorm";
 import { generateShareableUrl, type LeadMagnetSettings } from "@/lib/exports/generateShareUrl";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
+import {
+  generateNotebookLMMarkdown,
+  notebookLMFilename,
+} from "@/lib/exports/generateNotebookLMMarkdown";
 import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource, TeachingStyle } from "@/types/curriculum";
 
 interface CurriculumOutputProps {
@@ -454,6 +458,19 @@ export default function CurriculumOutput({
     } finally {
       setLoadingExports((prev) => ({ ...prev, scorm: false }));
     }
+  };
+
+  const handleExportNotebookLM = () => {
+    const md = generateNotebookLMMarkdown(curriculum);
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = notebookLMFilename(curriculum);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const handleShareLink = async () => {
@@ -915,6 +932,15 @@ export default function CurriculumOutput({
           >
             <GraduationCap className="h-4 w-4" />
             {loadingExports.scorm ? "Generating..." : "SCORM"}
+          </Button>
+          <Button
+            onClick={handleExportNotebookLM}
+            title="Download a Markdown file and drop it into Google NotebookLM to generate a conversational podcast of your course."
+            className="flex-1 gap-2 min-w-[140px] bg-orange-600 hover:bg-orange-700 text-white border-0"
+            size="lg"
+          >
+            <Headphones className="h-4 w-4" />
+            Download for NotebookLM
           </Button>
           <Button
             onClick={handleShareLink}

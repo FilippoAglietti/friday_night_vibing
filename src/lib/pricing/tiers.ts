@@ -10,6 +10,7 @@ export const TIERS: Record<Tier, TierConfig> = {
     hasModuleBodies: false,
     hasPolish: false,
     hasAudio: false,
+    hasNotebookLMExport: false,
     hasWhiteLabel: false,
   },
   planner: {
@@ -21,6 +22,7 @@ export const TIERS: Record<Tier, TierConfig> = {
     hasModuleBodies: false,
     hasPolish: false,
     hasAudio: false,
+    hasNotebookLMExport: false,
     hasWhiteLabel: false,
   },
   masterclass: {
@@ -32,6 +34,7 @@ export const TIERS: Record<Tier, TierConfig> = {
     hasModuleBodies: true,
     hasPolish: true,
     hasAudio: true,
+    hasNotebookLMExport: true,
     hasWhiteLabel: true,
   },
   enterprise: {
@@ -43,6 +46,7 @@ export const TIERS: Record<Tier, TierConfig> = {
     hasModuleBodies: true,
     hasPolish: true,
     hasAudio: true,
+    hasNotebookLMExport: true,
     hasWhiteLabel: true,
   },
 };

@@ -15,7 +15,15 @@ describe("TIERS config", () => {
     expect(TIERS.masterclass.hasModuleBodies).toBe(true);
     expect(TIERS.masterclass.hasPolish).toBe(true);
     expect(TIERS.masterclass.hasAudio).toBe(true);
+    expect(TIERS.masterclass.hasNotebookLMExport).toBe(true);
     expect(TIERS.masterclass.hasWhiteLabel).toBe(true);
+  });
+
+  it("notebooklm export is masterclass+ only", () => {
+    expect(TIERS.free.hasNotebookLMExport).toBe(false);
+    expect(TIERS.planner.hasNotebookLMExport).toBe(false);
+    expect(TIERS.masterclass.hasNotebookLMExport).toBe(true);
+    expect(TIERS.enterprise.hasNotebookLMExport).toBe(true);
   });
 
   it("masterclass cap is 20 (not unlimited)", () => {
