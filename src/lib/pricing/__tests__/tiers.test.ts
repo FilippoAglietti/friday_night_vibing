@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { TIERS, tierOrFallback } from "@/lib/pricing/tiers";
+import { TIERS, tierOrFallback, SINGLE_MASTERCLASS_PRICE_EUR } from "@/lib/pricing/tiers";
 
 describe("TIERS config", () => {
   it("has exactly four tiers", () => {
@@ -52,5 +52,11 @@ describe("tierOrFallback", () => {
     expect(tierOrFallback(null)).toBe("free");
     expect(tierOrFallback("team")).toBe("free");
     expect(tierOrFallback(undefined)).toBe("free");
+  });
+});
+
+describe("SINGLE_MASTERCLASS_PRICE_EUR", () => {
+  it("is 10 euros (Planner on-demand upsell)", () => {
+    expect(SINGLE_MASTERCLASS_PRICE_EUR).toBe(10);
   });
 });

@@ -48,6 +48,7 @@ export const TIERS: Record<Tier, TierConfig> = {
 };
 
 export const BODY_UNLOCK_PRICE_EUR = 5;
+export const SINGLE_MASTERCLASS_PRICE_EUR = 10;
 export const FIVE_PACK_PRICE_EUR = 39;
 export const FIVE_PACK_CREDIT_EUR = 20;
 export const FIVE_PACK_CREDIT_WINDOW_DAYS = 30;
