@@ -15,7 +15,7 @@ const es: Translations = {
     titleConnector: "que",
     title2: "Suena Tan Bien Como Se Ve",
     subtitle:
-      "La IA crea cursos completos con narración de audio, diseño hermoso y links compartibles — listos para enseñar, vender o compartir en segundos.",
+      "La IA crea cursos completos con narración de audio, diseño hermoso y links compartibles — listos para enseñar, vender o compartir.",
     cta: "Genera Tu Primer Curso Gratis",
     secondaryCta: "Ver un Curso de Ejemplo",
     tagline: "Sin tarjeta de crédito · Tu primer curso es gratis",
@@ -43,7 +43,7 @@ const es: Translations = {
       'Ingresa tu tema, elige un estilo y profundidad — desde "Python para ciencia de datos" hasta "Panadería sourdough 101".',
     step2Title: "La IA construye tu curso",
     step2Desc:
-      "En segundos obtienes módulos, lecciones, cuestionarios, narración de audio y un link compartible — todo editable.",
+      "Obtienes módulos, lecciones, cuestionarios, narración de audio y un link compartible — todo editable.",
     step3Title: "Comparte, enseña o vende",
     step3Desc:
       "Envía un link, exporta a Notion o PDF, o conviértelo en lead magnet. Tu curso, a tu manera.",
@@ -73,7 +73,7 @@ const es: Translations = {
     eyebrow: "Ejemplos Reales",
     heading: "Escúchalo. Míralo. Compártelo.",
     subheading:
-      "Cada curso a continuación fue generado en segundos — con narración de audio, lecciones estructuradas, cuestionarios y un link compartible.",
+      "Cada curso a continuación fue generado con Syllabi — con narración de audio, lecciones estructuradas, cuestionarios y un link compartible.",
     modules: "Módulos",
     lessons: "Lecciones",
     total: "Total",
@@ -139,7 +139,7 @@ const es: Translations = {
   finalCta: {
     heading: "¿Listo para escuchar la diferencia?",
     subheading:
-      "Crea un curso con audio, diseño y un link compartible — todo en menos de 60 segundos. Tu primera generación es gratis.",
+      "Crea un curso con audio, diseño y un link compartible. Tu primera generación es gratis.",
     cta: "Genera Tu Primer Curso Gratis",
   },
   footer: {
@@ -214,7 +214,7 @@ const es: Translations = {
     heading: "De Cero",
     headingConnector: "a",
     heading2: "Curso Publicado",
-    subheading: "Todo lo que necesitas para pasar de página en blanco a enlace compartible — en menos de 60 segundos.",
+    subheading: "Todo lo que necesitas para pasar de página en blanco a enlace compartible.",
     stepLabel: "PASO",
     step1Title: "Elige Tu Punto de Partida",
     step1Desc: "Elige una plantilla que se ajuste a tu caso — coaching, onboarding, talleres, o ve totalmente personalizado. Las plantillas prerellenan el formulario para generar aún más rápido.",
@@ -223,8 +223,8 @@ const es: Translations = {
     step2Desc: "Ingresa tu tema, audiencia objetivo, nivel de profundidad y estilo preferido. Cuanto más específico seas, más preciso será el resultado.",
     step2Detail: "Prueba: \"React Hooks Avanzado para Ingenieros Senior\" o \"Yoga Principiante para Trabajadores de Oficina\".",
     step3Title: "Mira la Magia",
-    step3Desc: "Pulsa Generar. La IA construye un curso completo con módulos, lecciones, quizzes y objetivos de aprendizaje — todo en segundos.",
-    step3Detail: "Cursos completos con 8+ módulos generados en menos de 60 segundos.",
+    step3Desc: "Pulsa Generar. La IA construye un curso completo con módulos, lecciones, quizzes y objetivos de aprendizaje.",
+    step3Detail: "Cursos completos con 8+ módulos listos en minutos — progreso mostrado en vivo.",
     step4Title: "Hazlo Tuyo",
     step4Desc: "Abre el Editor de Cursos para reescribir títulos, ajustar contenido, agregar preguntas de quiz, reordenar módulos o eliminar lo que no encaje.",
     step4Detail: "Cada elemento es editable — nada está bloqueado.",

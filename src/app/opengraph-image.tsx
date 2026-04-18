@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 export const alt =
-  "Syllabi — The #1 AI Course Generator. Create full courses with audio, quizzes, and PDF export in 60 seconds.";
+  "Syllabi — The AI Course Generator Worth Listening To. Complete courses with audio narration, design, and a shareable link.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -138,8 +138,8 @@ export default function OGImage() {
               display: "flex",
             }}
           >
-            Full courses with audio narration, quizzes, and PDF export — ready
-            in 60 seconds.
+            Complete courses with audio narration, design, and a shareable
+            link.
           </p>
         </div>
 

@@ -15,7 +15,7 @@ const sv: Translations = {
     titleConnector: "som",
     title2: "låter lika bra som den ser ut",
     subtitle:
-      "AI skapar kompletta kurser med ljudberättande, vacker design och delbara länkar — redo att lära ut, sälja eller dela på sekunder.",
+      "AI skapar kompletta kurser med ljudberättande, vacker design och delbara länkar — redo att lära ut, sälja eller dela.",
     cta: "Skapa din första kurs gratis",
     secondaryCta: "Se en exempelkurs",
     tagline: "Inget kreditkort krävs · Din första kurs är gratis",
@@ -42,7 +42,7 @@ const sv: Translations = {
     step1Desc: "Ange ditt ämne, välj en stil och djupnivå.",
     step2Title: "AI bygger din kurs",
     step2Desc:
-      "På sekunder får du moduler, lektioner, frågesporter, ljudberättande och en delbar länk — allt redigerbart.",
+      "Du får moduler, lektioner, frågesporter, ljudberättande och en delbar länk — allt redigerbart.",
     step3Title: "Dela, lär ut eller sälj",
     step3Desc:
       "Skicka en länk, exportera till Notion eller PDF, eller gör det till en leadmagnet. Din kurs, ditt sätt.",
@@ -72,7 +72,7 @@ const sv: Translations = {
     eyebrow: "Riktiga exempel",
     heading: "Lyssna. Se. Dela.",
     subheading:
-      "Varje kurs nedan genererades på sekunder — komplett med ljudberättande, strukturerade lektioner, frågesporter och en delbar länk.",
+      "Varje kurs nedan genererades med Syllabi — komplett med ljudberättande, strukturerade lektioner, frågesporter och en delbar länk.",
     modules: "Moduler",
     lessons: "Lektioner",
     total: "Totalt",
@@ -138,7 +138,7 @@ const sv: Translations = {
   finalCta: {
     heading: "Redo att höra skillnaden?",
     subheading:
-      "Skapa en kurs med ljud, design och en delbar länk — allt på under 60 sekunder. Din första generering är gratis.",
+      "Skapa en kurs med ljud, design och en delbar länk. Din första generering är gratis.",
     cta: "Skapa din första kurs gratis",
   },
   footer: {
@@ -214,7 +214,7 @@ const sv: Translations = {
     heading: "Skapa din första kurs",
     headingConnector: "till",
     heading2: "Publicerad Kurs",
-    subheading: "Från idé till delbar länk på under 60 sekunder.",
+    subheading: "Från idé till delbar länk — allt du behöver.",
     stepLabel: "STEG",
     step1Title: "Välj en mall",
     step1Desc: "Börja med en mall som passar ditt användningsfall.",
@@ -223,8 +223,8 @@ const sv: Translations = {
     step2Desc: "Ange ditt ämne, din målgrupp och önskad stil.",
     step2Detail: "Ge vår AI mer kontext så får du bättre resultat.",
     step3Title: "Generera och granska",
-    step3Desc: "Klicka på Generera. På sekunder har du en komplett kurs.",
-    step3Detail: "Vår AI skapar en fullständig kurs med lektioner, quiz och resurser.",
+    step3Desc: "Klicka på Generera. AI bygger en komplett kursstruktur.",
+    step3Detail: "Kompletta kurser med 8+ moduler är klara på några minuter — förloppet visas i realtid.",
     step4Title: "Redigera och anpassa",
     step4Desc: "Använd kursredigeraren för att justera vilket avsnitt som helst.",
     step4Detail: "Lägg till dina egna exempel, bilder och videor för att göra det personligt.",

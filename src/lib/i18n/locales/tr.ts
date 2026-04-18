@@ -15,7 +15,7 @@ const tr: Translations = {
     titleConnector: "hem",
     title2: "kulağa da göründüğü kadar güzel",
     subtitle:
-      "Yapay zeka, sesli anlatım, güzel tasarım ve paylaşılabilir bağlantılarla eksiksiz kurslar oluşturur — saniyeler içinde öğretmeye, satmaya veya paylaşmaya hazır.",
+      "Yapay zeka, sesli anlatım, güzel tasarım ve paylaşılabilir bağlantılarla eksiksiz kurslar oluşturur — öğretmeye, satmaya veya paylaşmaya hazır.",
     cta: "İlk Kursunuzu Ücretsiz Oluşturun",
     secondaryCta: "Örnek Kursu Gör",
     tagline: "Kredi kartı gerekmez · İlk kursunuz ücretsiz",
@@ -42,7 +42,7 @@ const tr: Translations = {
     step1Desc: "Konunuzu girin, bir stil ve derinlik seçin.",
     step2Title: "Yapay zeka kursunuzu oluşturur",
     step2Desc:
-      "Saniyeler içinde modüller, dersler, quizler, sesli anlatım ve paylaşılabilir bir bağlantı alırsınız — hepsi düzenlenebilir.",
+      "Modüller, dersler, quizler, sesli anlatım ve paylaşılabilir bir bağlantı alırsınız — hepsi düzenlenebilir.",
     step3Title: "Paylaşın, öğretin veya satın",
     step3Desc:
       "Bir bağlantı gönderin, Notion veya PDF'ye aktarın ya da potansiyel müşteri mıknatısına dönüştürün. Sizin kursunuz, sizin tarzınız.",
@@ -72,7 +72,7 @@ const tr: Translations = {
     eyebrow: "Gerçek Örnekler",
     heading: "Dinle. Gör. Paylaş.",
     subheading:
-      "Aşağıdaki her kurs saniyeler içinde oluşturuldu — sesli anlatım, yapılandırılmış dersler, quizler ve paylaşılabilir bağlantıyla eksiksiz.",
+      "Aşağıdaki her kurs Syllabi ile oluşturuldu — sesli anlatım, yapılandırılmış dersler, quizler ve paylaşılabilir bağlantıyla eksiksiz.",
     modules: "Modüller",
     lessons: "Dersler",
     total: "Toplam",
@@ -138,7 +138,7 @@ const tr: Translations = {
   finalCta: {
     heading: "Farkı duymaya hazır mısınız?",
     subheading:
-      "Ses, tasarım ve paylaşılabilir bağlantıyla bir kurs oluşturun — hepsi 60 saniyeden kısa sürede. İlk oluşturmanız ücretsiz.",
+      "Ses, tasarım ve paylaşılabilir bağlantıyla bir kurs oluşturun. İlk oluşturmanız ücretsiz.",
     cta: "İlk Kursunuzu Ücretsiz Oluşturun",
   },
   footer: {
@@ -214,7 +214,7 @@ const tr: Translations = {
     heading: "Sıfırdan",
     headingConnector: "",
     heading2: "Yayınlanmış Kursa",
-    subheading: "Boş sayfadan paylaşılabilir bağlantıya — 60 saniyeden kısa sürede.",
+    subheading: "Boş sayfadan paylaşılabilir bağlantıya gitmek için ihtiyacınız olan her şey.",
     stepLabel: "ADIM",
     step1Title: "Başlangıç Noktanızı Seçin",
     step1Desc: "Kullanım durumunuza uygun bir şablon seçin — koçluk, oryantasyon, atölye çalışmaları veya tamamen özel oluşturun. Şablonlar formu önceden doldurarak daha hızlı oluşturmanızı sağlar.",
@@ -223,8 +223,8 @@ const tr: Translations = {
     step2Desc: "Konunuzu, hedef kitlenizi, derinlik seviyenizi ve tercih ettiğiniz stili girin. Ne kadar spesifik olursanız, sonuç o kadar keskin olur.",
     step2Detail: "Deneyin: \"Kıdemli Mühendisler için İleri React Hooks\" veya \"Masa Başı Çalışanlar için Başlangıç Yogası\".",
     step3Title: "Sihri İzleyin",
-    step3Desc: "Oluştur'a basın. Yapay zeka modüller, dersler, sınavlar ve öğrenme hedefleri ile eksiksiz bir kurs yapısı oluşturur — hepsi saniyeler içinde.",
-    step3Detail: "8+ modüllü tam kurslar 60 saniyeden kısa sürede oluşturulur.",
+    step3Desc: "Oluştur'a basın. Yapay zeka modüller, dersler, sınavlar ve öğrenme hedefleri ile eksiksiz bir kurs yapısı oluşturur.",
+    step3Detail: "8+ modüllü tam kurslar birkaç dakika içinde hazır olur — ilerleme canlı gösterilir.",
     step4Title: "Kendinize Ait Yapın",
     step4Desc: "Kurs Düzenleyiciyi açarak başlıkları yeniden yazın, içeriği düzenleyin, sınav soruları ekleyin, modülleri yeniden sıralayın veya uymayanları kaldırın.",
     step4Detail: "Her eleman düzenlenebilir — hiçbir şey kilitli değil.",
