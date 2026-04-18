@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check, X, Crown, Headphones, ArrowRight } from "lucide-react";
 import { EnterpriseMailtoCta } from "@/components/EnterpriseMailtoCta";
+import { CheckoutButton } from "@/components/CheckoutButton";
+import { SINGLE_MASTERCLASS_PRICE_EUR } from "@/lib/pricing/tiers";
 import {
   Card,
   CardContent,
@@ -31,7 +33,7 @@ type Plan = {
   highlight?: "popular" | "best" | "onetime";
   accent: "muted" | "violet" | "amber";
   icon?: "crown" | null;
-  audioHighlight?: boolean;
+  notebookLMHighlight?: boolean;
 };
 
 const PLANS: Plan[] = [
@@ -47,7 +49,7 @@ const PLANS: Plan[] = [
       { included: true, label: "Lesson titles, learning objectives, pacing" },
       { included: true, label: "PDF / Notion / Markdown export" },
       { included: false, label: "Module bodies" },
-      { included: false, label: "Audio narration" },
+      { included: false, label: "NotebookLM podcast export" },
       { included: false, label: "White-label exports" },
     ],
     cta: "Get started free",
@@ -69,8 +71,9 @@ const PLANS: Plan[] = [
       { included: true, label: "Opus-quality skeleton review (hallucination catcher)" },
       { included: true, label: "All lengths (Crash / Short / Full / Masterclass)" },
       { included: true, label: "€5 on-demand body unlock per skeleton" },
+      { included: true, label: `€${SINGLE_MASTERCLASS_PRICE_EUR} Single Masterclass upgrade, on-demand` },
       { included: false, label: "Module bodies by default" },
-      { included: false, label: "Audio narration" },
+      { included: false, label: "NotebookLM podcast export" },
     ],
     cta: "Start Planner",
     ctaHref: "/api/checkout?tier=planner",
@@ -86,12 +89,12 @@ const PLANS: Plan[] = [
     unit: "/month",
     unitAnnual: "/mo · billed €990/yr",
     strikethrough: "€990/year · save 2 months",
-    description: "Reviewed, polished, narrated — every course ready for your audience.",
+    description: "Reviewed, polished, ready for your audience — with podcast export baked in.",
     features: [
       { included: true, label: "20 full courses per month" },
       { included: true, label: "Opus strategic polish on key lessons" },
       { included: true, label: "Masterclass-length courses included" },
-      { included: true, label: "ElevenLabs audio narration" },
+      { included: true, label: "NotebookLM-ready export → two-host podcast" },
       { included: true, label: "White-label exports (no Syllabi branding)" },
       { included: true, label: "Priority queue" },
     ],
@@ -100,7 +103,7 @@ const PLANS: Plan[] = [
     accent: "amber",
     highlight: "best",
     icon: "crown",
-    audioHighlight: true,
+    notebookLMHighlight: true,
   },
   {
     id: "enterprise",
@@ -113,7 +116,7 @@ const PLANS: Plan[] = [
       { included: true, label: "Custom subdomain (learn.yourcompany.com)" },
       { included: true, label: "Done-for-you course creation" },
       { included: true, label: "Curated source library + citation allowlist" },
-      { included: true, label: "Executive voice cloning (ElevenLabs)" },
+      { included: true, label: "Custom NotebookLM export formatting" },
       { included: true, label: "Dedicated Slack/Teams channel · 24h SLA" },
       { included: true, label: "EU data residency · GDPR · DPA on request" },
     ],
@@ -198,6 +201,8 @@ export default function PricingCards() {
               : plan.accent === "amber"
               ? "bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40"
               : "border border-border/60 hover:bg-muted/30";
+          const disabledCtaClass =
+            "bg-muted text-muted-foreground cursor-not-allowed opacity-60";
 
           return (
             <Card
@@ -246,17 +251,17 @@ export default function PricingCards() {
               </CardHeader>
 
               <CardContent className="flex-1">
-                {plan.audioHighlight && (
+                {plan.notebookLMHighlight && (
                   <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center gap-3">
                     <div className="flex items-center justify-center size-9 shrink-0 rounded-lg bg-amber-500/10">
                       <Headphones className="size-5 text-amber-500" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-semibold text-amber-500">
-                        AI audio narration
+                        One-click NotebookLM podcast
                       </p>
                       <p className="text-[11px] text-muted-foreground">
-                        Every lesson read aloud in natural voice.
+                        Drop the file into Google NotebookLM — get a two-host conversational podcast on demand.
                       </p>
                     </div>
                   </div>
@@ -280,16 +285,25 @@ export default function PricingCards() {
               <CardFooter className="mt-auto pt-0">
                 {plan.id === "enterprise" ? (
                   <EnterpriseMailtoCta label={plan.cta} />
-                ) : (
+                ) : plan.id === "free" ? (
                   <Link
                     href={plan.ctaHref}
                     className={`w-full inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium transition-all hover:scale-[1.02] ${ctaClass}`}
                   >
                     {plan.cta}
+                  </Link>
+                ) : (
+                  <CheckoutButton
+                    href={plan.ctaHref}
+                    className={`w-full inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium transition-all hover:scale-[1.02] ${ctaClass}`}
+                    disabledClassName={`w-full inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium ${disabledCtaClass}`}
+                    launchingLabel={`${plan.name} — launching tomorrow`}
+                  >
+                    {plan.cta}
                     {plan.highlight === "best" && (
                       <ArrowRight className="ml-2 size-4" />
                     )}
-                  </Link>
+                  </CheckoutButton>
                 )}
               </CardFooter>
             </Card>
@@ -297,18 +311,36 @@ export default function PricingCards() {
         })}
       </div>
 
+      {/* Single Masterclass sub-card — Planner upsell (violet/indigo to associate with Planner tier) */}
+      <div className="mt-12 rounded-2xl border border-violet-200/30 bg-violet-50/5 dark:bg-violet-500/5 dark:border-violet-500/20 p-6 text-center">
+        <h3 className="text-lg font-semibold">One Masterclass, no subscription</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Keep your Planner plan — generate a single Masterclass-quality course on demand. One-time €{SINGLE_MASTERCLASS_PRICE_EUR}.
+        </p>
+        <CheckoutButton
+          href="/api/checkout?tier=single_masterclass"
+          className="mt-4 inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all hover:scale-[1.02]"
+          disabledClassName="mt-4 inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium bg-muted text-muted-foreground cursor-not-allowed opacity-60"
+          launchingLabel="Single Masterclass — launching tomorrow"
+        >
+          Unlock one Masterclass — €{SINGLE_MASTERCLASS_PRICE_EUR}
+        </CheckoutButton>
+      </div>
+
       {/* 5-Pack sub-card */}
-      <div className="mt-12 rounded-2xl border border-amber-200/30 bg-amber-50/5 dark:bg-amber-500/5 dark:border-amber-500/20 p-6 text-center">
+      <div className="mt-6 rounded-2xl border border-amber-200/30 bg-amber-50/5 dark:bg-amber-500/5 dark:border-amber-500/20 p-6 text-center">
         <h3 className="text-lg font-semibold">Try Masterclass without committing</h3>
         <p className="mt-2 text-sm text-muted-foreground">
           5 full Masterclass generations · 90 days to use · €20 off if you upgrade within 30 days.
         </p>
-        <Link
+        <CheckoutButton
           href="/api/checkout?tier=5pack"
           className="mt-4 inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:scale-[1.02]"
+          disabledClassName="mt-4 inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium bg-muted text-muted-foreground cursor-not-allowed opacity-60"
+          launchingLabel="5-Pack — launching tomorrow"
         >
           Buy the 5-Pack — €39
-        </Link>
+        </CheckoutButton>
       </div>
     </>
   );
