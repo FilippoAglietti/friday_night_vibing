@@ -2144,7 +2144,7 @@ export default function ProfilePage() {
       </main>
 
       {/* Paywall Modal for Upgrade buttons */}
-      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} currentPlan={(userProfile?.plan as "free" | "pro" | "pro_max") || "free"} />
+      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} currentPlan={(userProfile?.plan as "free" | "planner" | "masterclass" | "enterprise") || "free"} />
 
       {/* Welcome Animation — plays on login */}
       <WelcomeAnimation
