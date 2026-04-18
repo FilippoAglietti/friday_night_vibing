@@ -135,31 +135,48 @@ export interface Translations {
     save21: string;
     save13: string;
     freeDesc: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     proDesc: string;
     fivePackDesc: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     proMaxDesc: string;
     notebookLMExportTitle: string;
     notebookLMExportDesc: string;
     swipePlans: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     startProBtn: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     tryProMaxBtn: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     goProMaxBtn: string;
     free1: string;
     free2: string;
     free3: string;
     free4: string;
     free6: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro1: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro2: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro3: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro4: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro5: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm1: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm2: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm3: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm4: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm5: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm6: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm7: string;
     pack1: string;
     pack2: string;
