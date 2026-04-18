@@ -1,7 +1,7 @@
 // ============================================================
 // SUPABASE DATABASE TYPES - AUTO-GENERATED
 // Progetto: syllabi-ai (gmxseuttpurnxbluvcwx)
-// Generato il: 2026-04-12 (post migration 014)
+// Generato il: 2026-04-18 (post migration 017 pricing redesign)
 // NON modificare manualmente — rigenera con: supabase gen types
 // ============================================================
 
@@ -21,9 +21,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      conversion_credits: {
+        Row: {
+          amount_eur: number
+          expires_at: string
+          id: string
+          purchased_at: string
+          redeemed: boolean
+          redeemed_at: string | null
+          redeemed_stripe_invoice_id: string | null
+          source_purchase_stripe_session_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_eur?: number
+          expires_at: string
+          id?: string
+          purchased_at?: string
+          redeemed?: boolean
+          redeemed_at?: string | null
+          redeemed_stripe_invoice_id?: string | null
+          source_purchase_stripe_session_id: string
+          user_id: string
+        }
+        Update: {
+          amount_eur?: number
+          expires_at?: string
+          id?: string
+          purchased_at?: string
+          redeemed?: boolean
+          redeemed_at?: string | null
+          redeemed_stripe_invoice_id?: string | null
+          source_purchase_stripe_session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           audience: string
+          body_unlock_purchased: boolean
+          body_unlock_purchased_at: string | null
+          body_unlock_stripe_session_id: string | null
           content_type: Database["public"]["Enums"]["content_type"]
           course_abstract: string | null
           created_at: string
@@ -56,6 +95,9 @@ export type Database = {
         }
         Insert: {
           audience: string
+          body_unlock_purchased?: boolean
+          body_unlock_purchased_at?: string | null
+          body_unlock_stripe_session_id?: string | null
           content_type?: Database["public"]["Enums"]["content_type"]
           course_abstract?: string | null
           created_at?: string
@@ -88,6 +130,9 @@ export type Database = {
         }
         Update: {
           audience?: string
+          body_unlock_purchased?: boolean
+          body_unlock_purchased_at?: string | null
+          body_unlock_stripe_session_id?: string | null
           content_type?: Database["public"]["Enums"]["content_type"]
           course_abstract?: string | null
           created_at?: string
@@ -228,6 +273,68 @@ export type Database = {
           },
         ]
       }
+      generation_sources: {
+        Row: {
+          authors: string | null
+          course_id: string
+          created_at: string
+          doi: string | null
+          id: string
+          is_preprint: boolean | null
+          journal: string | null
+          module_index: number
+          source_type: string
+          title: string
+          url: string
+          verified_at: string | null
+          verified_by: string | null
+          verified_ok: boolean | null
+          year: number | null
+        }
+        Insert: {
+          authors?: string | null
+          course_id: string
+          created_at?: string
+          doi?: string | null
+          id?: string
+          is_preprint?: boolean | null
+          journal?: string | null
+          module_index: number
+          source_type: string
+          title: string
+          url: string
+          verified_at?: string | null
+          verified_by?: string | null
+          verified_ok?: boolean | null
+          year?: number | null
+        }
+        Update: {
+          authors?: string | null
+          course_id?: string
+          created_at?: string
+          doi?: string | null
+          id?: string
+          is_preprint?: boolean | null
+          journal?: string | null
+          module_index?: number
+          source_type?: string
+          title?: string
+          url?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          verified_ok?: boolean | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generation_sources_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           consent_marketing: boolean
@@ -341,8 +448,10 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          billing_period: string | null
           created_at: string
           email: string | null
+          enterprise_gen_cap: number | null
           full_name: string | null
           generations_limit: number
           generations_used: number
@@ -358,8 +467,10 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          billing_period?: string | null
           created_at?: string
           email?: string | null
+          enterprise_gen_cap?: number | null
           full_name?: string | null
           generations_limit?: number
           generations_used?: number
@@ -375,8 +486,10 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          billing_period?: string | null
           created_at?: string
           email?: string | null
+          enterprise_gen_cap?: number | null
           full_name?: string | null
           generations_limit?: number
           generations_used?: number
@@ -688,7 +801,14 @@ export type Database = {
         | "ready"
         | "failed"
         | "partial"
-      plan_type: "free" | "pro" | "team" | "pro_max"
+      plan_type:
+        | "free"
+        | "pro"
+        | "team"
+        | "pro_max"
+        | "planner"
+        | "masterclass"
+        | "enterprise"
       subscription_status:
         | "active"
         | "canceled"
@@ -831,7 +951,15 @@ export const Constants = {
         "failed",
         "partial",
       ],
-      plan_type: ["free", "pro", "team", "pro_max"],
+      plan_type: [
+        "free",
+        "pro",
+        "team",
+        "pro_max",
+        "planner",
+        "masterclass",
+        "enterprise",
+      ],
       subscription_status: [
         "active",
         "canceled",
