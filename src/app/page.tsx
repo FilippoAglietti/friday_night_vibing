@@ -182,7 +182,7 @@ const freePlanFeatures = [
   { text: "PDF & Notion export", included: true },
   { text: "Shareable course links", included: true },
   { text: "Audio narration", included: false },
-  { text: "15 generations/month (Pro)", included: false },
+  { text: "15 skeletons/month (Planner)", included: false },
 ];
 
 const proPlanFeatures = [
@@ -194,7 +194,7 @@ const proPlanFeatures = [
 ];
 
 const proMaxFeatures = [
-  { text: "Everything in Pro", included: true },
+  { text: "Everything in Planner", included: true },
   { text: "AI-generated audio lessons", included: true },
   { text: "Commercial license for sold courses", included: true },
   { text: "Premium Notion & PDF export", included: true },
@@ -1305,7 +1305,7 @@ export default function Home() {
                   </div>
                   <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">
-                      Pro
+                      Planner
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
                       €28
@@ -1355,7 +1355,7 @@ export default function Home() {
                   <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
                       <Crown className="size-3.5" />
-                      Pro Max · 5-Pack
+                      Masterclass · 5-Pack
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
                       €33
@@ -1408,7 +1408,7 @@ export default function Home() {
                   <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
                       <Crown className="size-3.5" />
-                      Pro Max
+                      Masterclass
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
                       €69
@@ -1496,7 +1496,7 @@ export default function Home() {
                       <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">{t("pricing.mostPopular")}</Badge>
                     </div>
                     <CardHeader className="pt-7 pb-3">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Pro</CardDescription>
+                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Planner</CardDescription>
                       <CardTitle className="text-2xl font-bold">€28<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">€35/mo</span>
@@ -1527,7 +1527,7 @@ export default function Home() {
                   <Card className="relative flex flex-col h-full overflow-visible border-amber-500/20 bg-gradient-to-b from-amber-500/[0.03] via-card/50 to-card/50 backdrop-blur-sm">
                     <CardHeader className="pt-6 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
-                        <Crown className="size-3" />Pro Max · 5-Pack
+                        <Crown className="size-3" />Masterclass · 5-Pack
                       </CardDescription>
                       <CardTitle className="text-2xl font-bold">€33<span className="text-sm font-normal text-muted-foreground"> {t("pricing.oneTimeLabel")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
@@ -1565,7 +1565,7 @@ export default function Home() {
                     </div>
                     <CardHeader className="pt-7 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1">
-                        <Crown className="size-3" />Pro Max
+                        <Crown className="size-3" />Masterclass
                       </CardDescription>
                       <CardTitle className="text-2xl font-bold">€69<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">

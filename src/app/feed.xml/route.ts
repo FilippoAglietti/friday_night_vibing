@@ -4,7 +4,7 @@ const blogPosts = [
   {
     title: "AI Audio Lessons Are Here — Turn Your Course into a Podcast",
     description:
-      "Pro Max users can now generate professional voice narration for every lesson. Choose from multiple AI voices and let your students learn on the go.",
+      "Masterclass users can now generate professional voice narration for every lesson. Choose from multiple AI voices and let your students learn on the go.",
     date: "2026-04-08",
     category: "Product",
   },

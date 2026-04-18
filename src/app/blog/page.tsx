@@ -62,7 +62,7 @@ const posts = [
     readTime: "3 min read",
     title: "AI Audio Lessons Are Here — Turn Your Course into a Podcast",
     excerpt:
-      "Pro Max users can now generate professional voice narration for every lesson. Choose from multiple AI voices and let your students learn on the go.",
+      "Masterclass users can now generate professional voice narration for every lesson. Choose from multiple AI voices and let your students learn on the go.",
     accent: "text-rose-400",
   },
   {

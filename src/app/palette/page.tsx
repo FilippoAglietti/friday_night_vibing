@@ -321,8 +321,8 @@ function FullPreview({ p }: { p: typeof palettes[PaletteKey] }) {
         <div className="grid grid-cols-3 gap-3">
           {[
             { name: "Free", price: "€0", features: ["3 mini-courses", "PDF export", "Shareable links"], highlighted: false },
-            { name: "Pro", price: "€28/mo", features: ["15 generations/mo", "All export formats", "Priority AI"], highlighted: true },
-            { name: "Pro Max", price: "€69/mo", features: ["Unlimited", "Audio narration", "White-label"], highlighted: false },
+            { name: "Planner", price: "€29/mo", features: ["15 skeletons/mo", "All export formats", "Priority AI"], highlighted: true },
+            { name: "Masterclass", price: "€99/mo", features: ["20 full courses", "Audio narration", "White-label"], highlighted: false },
           ].map((plan, i) => (
             <div
               key={i}
@@ -355,7 +355,7 @@ function FullPreview({ p }: { p: typeof palettes[PaletteKey] }) {
                   border: plan.highlighted ? "1px solid rgba(255,255,255,0.3)" : `1px solid ${p.accentBorder}`,
                 }}
               >
-                {plan.highlighted ? "Start Pro" : "Get Started"}
+                {plan.highlighted ? "Start Planner" : "Get Started"}
               </button>
             </div>
           ))}

@@ -193,7 +193,7 @@ export default function Article() {
           </p>
           <p>
             In 2026, AI voice generation has reached the point where synthetic narration is nearly
-            indistinguishable from human recording. Syllabi&apos;s Pro Max plan generates professional audio
+            indistinguishable from human recording. Syllabi&apos;s Masterclass plan generates professional audio
             for every lesson automatically &mdash; no microphone, no editing, no post-production.
           </p>
 

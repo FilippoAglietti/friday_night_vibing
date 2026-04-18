@@ -96,16 +96,16 @@ const sections = [
         body: "3 free mini-course generations. Includes modules, lessons, quizzes, and all export formats (JSON, Markdown, PDF, Notion). Shareable course links included. No credit card required.",
       },
       {
-        heading: "Pro (€28/month)",
-        body: "15 course generations/month. All course lengths and styles (crash to masterclass). Full content including quizzes, pacing schedules, and all export formats. Custom pacing and priority AI processing.",
+        heading: "Planner (€29/month)",
+        body: "15 reviewed course skeletons/month. All course lengths and styles (crash to masterclass). Lesson titles, objectives, pacing schedules, and all export formats. €5 on-demand body unlock per skeleton.",
       },
       {
-        heading: "Pro Max (€69/month)",
-        body: "Unlimited generations with AI-generated audio narration, full chapter content generation, premium Notion and PDF export, DOCX and SCORM export, white-label branding, and dedicated AI processing.",
+        heading: "Masterclass (€99/month)",
+        body: "20 full courses/month with Opus-quality review, strategic polish on key lessons, AI-generated audio narration, DOCX and SCORM export, white-label branding, and dedicated AI processing.",
       },
       {
-        heading: "5-Pack (€33 one-time)",
-        body: "5 Pro Max generations with audio, chapter content, and all export formats. No subscription required. Perfect for one-time projects.",
+        heading: "5-Pack (€39 one-time)",
+        body: "5 Masterclass generations with audio, full lesson bodies, and all export formats. No subscription required. Perfect for one-time projects.",
       },
     ],
   },

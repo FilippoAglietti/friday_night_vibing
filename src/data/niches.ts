@@ -88,7 +88,7 @@ export const NICHES: Niche[] = [
     useCases: ["Multi-session tutoring programs", "Test prep courses (SAT, ACT, GRE)", "Skill-gap remediation plans", "Summer learning programs"],
     faqs: [
       { question: "Can I create short tutoring programs, not full courses?", answer: "Yes. You control the course length — from a 4-session mini-course to a 20-week deep dive. Syllabi scales the content to match." },
-      { question: "How can I share courses with my students' parents?", answer: "Export to PDF for a professional-looking program overview, or use the shareable link feature (Pro Max) so parents can view the full course online." },
+      { question: "How can I share courses with my students' parents?", answer: "Export to PDF for a professional-looking program overview, or use the shareable link feature (Masterclass) so parents can view the full course online." },
       { question: "Does it generate practice problems?", answer: "Syllabi generates multiple-choice quizzes for each module. For math and science tutoring, these serve as excellent practice problem sets with explanations." },
     ],
     keywords: ["tutoring course generator", "AI tutor planner", "tutoring program builder", "tutor course creator"],
@@ -138,7 +138,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { question: "Can I create product-specific training?", answer: "Yes. Provide your product details and target market in the context field, and Syllabi generates training modules specific to your product's features, benefits, and competitive positioning." },
       { question: "How do I assess rep knowledge?", answer: "Every generated course includes per-module quizzes with answer explanations. Use these as knowledge checks during onboarding or as ongoing certification tests." },
-      { question: "Can I share training materials with the team?", answer: "Export to PDF for team distribution, use Notion export for a shared workspace, or generate shareable links (Pro Max) so reps can access training on any device." },
+      { question: "Can I share training materials with the team?", answer: "Export to PDF for team distribution, use Notion export for a shared workspace, or generate shareable links (Masterclass) so reps can access training on any device." },
     ],
     keywords: ["sales training course generator", "AI sales enablement", "sales onboarding program", "sales team training builder"],
     emoji: "📈",
@@ -236,7 +236,7 @@ export const NICHES: Niche[] = [
     faqs: [
       { question: "Can I include coaching exercises and reflections?", answer: "Yes. Syllabi generates lesson types including interactive, discussion, and project formats. Add 'include reflection exercises' in your context for coaching-specific content." },
       { question: "How do I build a certification program?", answer: "Generate a comprehensive course with assessment milestones. Each module includes quizzes that serve as certification checkpoints. Export the full program as your official certification course." },
-      { question: "Can I white-label the courses?", answer: "Pro Max plan includes white-label exports without Syllabi branding. Perfect for delivering branded coaching programs to your clients." },
+      { question: "Can I white-label the courses?", answer: "Masterclass plan includes white-label exports without Syllabi branding. Perfect for delivering branded coaching programs to your clients." },
     ],
     keywords: ["course generator for coaches", "coaching program builder", "consultant course creator", "online coaching course AI"],
     emoji: "🎯",
