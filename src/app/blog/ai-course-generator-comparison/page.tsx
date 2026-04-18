@@ -112,7 +112,7 @@ export default function Article() {
           </h1>
           <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
             We tested every major AI course generator on the market and compared them across the
-            features that actually matter: output quality, audio support, export options, and pricing.
+            features that actually matter: output quality, NotebookLM podcast export, export options, and pricing.
           </p>
           <div className="mt-6 flex items-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
@@ -142,10 +142,10 @@ export default function Article() {
           <p>
             AI course generators have exploded in the last 18 months. What started as simple outline
             generators have evolved into comprehensive platforms that produce structured courses with
-            quizzes, audio narration, and export capabilities. Here are the major players:
+            quizzes, NotebookLM podcast export, and rich export capabilities. Here are the major players:
           </p>
           <ul>
-            <li><strong>Syllabi</strong> &mdash; Full-stack course generator with audio narration, multilingual support, and rich export options</li>
+            <li><strong>Syllabi</strong> &mdash; Full-stack course generator with NotebookLM podcast export, multilingual support, and rich export options</li>
             <li><strong>CourseAI</strong> &mdash; Established player focused on video-based course creation</li>
             <li><strong>Coursebox</strong> &mdash; AI-powered LMS with built-in course creation</li>
             <li><strong>MindSmith</strong> &mdash; Microlearning-focused platform for corporate training</li>
@@ -169,7 +169,7 @@ export default function Article() {
             </thead>
             <tbody>
               <FeatureRow feature="AI course generation" values={[true, true, true, true]} />
-              <FeatureRow feature="AI audio narration" values={[true, false, false, false]} />
+              <FeatureRow feature="NotebookLM podcast export" values={[true, false, false, false]} />
               <FeatureRow feature="Quiz generation" values={[true, true, true, true]} />
               <FeatureRow feature="PDF export" values={[true, true, true, false]} />
               <FeatureRow feature="Notion export" values={[true, false, false, false]} />
@@ -190,12 +190,13 @@ export default function Article() {
 
           <h2>Where Syllabi stands out</h2>
 
-          <h3>AI audio narration</h3>
+          <h3>NotebookLM-ready podcast export</h3>
           <p>
-            Syllabi is currently the only AI course generator that produces professional audio narration
-            for every lesson. This isn&apos;t text-to-speech bolted on &mdash; it&apos;s integrated into the
-            generation pipeline. Students get podcast-style audio they can listen to on the go, which
-            dramatically improves completion rates.
+            Syllabi is currently the only AI course generator that ships a one-click Markdown export
+            formatted for Google NotebookLM. Drop the file into a NotebookLM notebook and get a
+            two-host conversational podcast of your course on demand — better output than per-lesson
+            single-voice narration, with zero TTS bills. Students get a podcast companion they can
+            listen to on the go, which dramatically improves completion rates.
           </p>
 
           <h3>Export versatility</h3>

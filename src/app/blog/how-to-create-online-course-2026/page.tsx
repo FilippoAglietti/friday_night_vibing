@@ -99,8 +99,8 @@ export default function Article() {
           </h1>
           <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
             The landscape of online education has shifted. AI-powered tools have made it possible to
-            go from idea to a fully structured course with audio narration in under an hour. Here is
-            exactly how to do it.
+            go from idea to a fully structured course with a NotebookLM-ready podcast export in under
+            an hour. Here is exactly how to do it.
           </p>
           <div className="mt-6 flex items-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
@@ -132,7 +132,7 @@ export default function Article() {
           <p>
             Course creators who adopt AI-first workflows report 3&ndash;5x faster production cycles without
             sacrificing quality. The bar for &quot;professional&quot; has risen (students expect structured modules,
-            quizzes, and audio), but the tools to meet that bar have gotten dramatically more accessible.
+            quizzes, and podcast companions), but the tools to meet that bar have gotten dramatically more accessible.
           </p>
 
           <h2>Step 1: Choose a topic that solves a real problem</h2>
@@ -185,16 +185,18 @@ export default function Article() {
             perspective, real stories, and hard-won insights that no AI can replicate.
           </p>
 
-          <h2>Step 4: Add audio narration</h2>
+          <h2>Step 4: Export for NotebookLM podcast generation</h2>
           <p>
-            Audio is the most underrated differentiator in online courses. Students can listen during
-            commutes, workouts, or cooking. Courses with audio narration see 2&ndash;3x higher completion
-            rates compared to text-only formats.
+            Audio is still the most underrated differentiator in online courses — students listen during
+            commutes, workouts, or cooking, and courses with a podcast companion see 2&ndash;3x higher
+            completion rates compared to text-only formats. The efficient way to get there in 2026 is to
+            export your course for Google NotebookLM rather than pay per-lesson TTS bills.
           </p>
           <p>
-            In 2026, AI voice generation has reached the point where synthetic narration is nearly
-            indistinguishable from human recording. Syllabi&apos;s Masterclass plan generates professional audio
-            for every lesson automatically &mdash; no microphone, no editing, no post-production.
+            Syllabi&apos;s Masterclass plan gives you a one-click Markdown export formatted for Google
+            NotebookLM. Drop the file into a new NotebookLM notebook — it generates a two-host
+            conversational podcast of your course on demand. The output is conversational, context-aware,
+            and updated automatically when you re-run the generation. No microphone, no editing, no TTS bill.
           </p>
 
           <h2>Step 5: Package and distribute</h2>
