@@ -134,6 +134,72 @@ const hi: Translations = {
     pack4: "प्रीमियम Notion और PDF एक्सपोर्ट",
     pack5: "व्हाइट-लेबल ब्रांडिंग",
     pack6: "कोई आवर्ती शुल्क नहीं",
+    subheading: "मुफ़्त में शुरू करें। जब आपके छात्र आगे बढ़ें, तब अपग्रेड करें।",
+    toggle: { monthly: "मासिक", annual: "वार्षिक", savePitch: "2 महीने बचाएं" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "मुफ़्त में शुरू करें",
+        pitch: "Syllabi को एक मुफ़्त स्केलेटन के साथ आज़माएं — देखें कि आप क्या प्रकाशित करेंगे।",
+        cap: "प्रति माह 1 कोर्स स्केलेटन",
+        cta: "मुफ़्त शुरू करें",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "योजना बनाएं, फिर बनाएं",
+        pitch: "बाज़ार में सर्वोत्तम कोर्स संरचनाएं। मांग पर स्केलेटन।",
+        cap: "प्रति माह 15 समीक्षित स्केलेटन",
+        bodyUnlock: "प्रति स्केलेटन €5 में ऑन-डिमांड कंटेंट अनलॉक",
+        cta: "Planner शुरू करें",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "पढ़ाने के लिए तैयार",
+        pitch: "समीक्षित, परिष्कृत, वर्णित — हर कोर्स आपके दर्शकों के लिए तैयार।",
+        cap: "प्रति माह 20 पूर्ण कोर्स",
+        cta: "Masterclass शुरू करें",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "टीमों के लिए",
+        pitch: "White-label, आपके लिए तैयार कोर्स, समर्पित लर्निंग डिज़ाइनर।",
+        cta: "सेल्स से संपर्क करें",
+      },
+    },
+    fivePack: {
+      heading: "बिना प्रतिबद्धता के Masterclass आज़माएं",
+      pitch: "5 पूर्ण Masterclass जनरेशन · उपयोग के लिए 90 दिन",
+      cta: "5-Pack खरीदें — €39",
+      conversionCredit: "30 दिनों में Masterclass में अपग्रेड करने पर €20 की छूट",
+    },
+    bodyUnlock: {
+      cta: "पूरा कोर्स कंटेंट अनलॉक करें — €5",
+      modalTitle: "इस स्केलेटन का कंटेंट अनलॉक करें",
+      modalBody: "एकमुश्त €5। पूर्ण मॉड्यूल कंटेंट जनरेट करता है (~2 मिनट)।",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "आपने इस महीने अपना मुफ़्त स्केलेटन उपयोग कर लिया है",
+      body: "Planner के साथ 15 समीक्षित स्केलेटन और ऑन-डिमांड कंटेंट अनलॉक करें।",
+      primaryCta: "Planner में अपग्रेड करें",
+    },
+    fromPlannerCap: {
+      title: "आपने इस महीने सभी 15 स्केलेटन उपयोग कर लिए हैं",
+      body: "प्रति माह 20 पूर्ण कोर्स के लिए Masterclass में अपग्रेड करें, या 1 तारीख तक प्रतीक्षा करें।",
+      primaryCta: "Masterclass में अपग्रेड करें",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Masterclass-लंबाई के कंटेंट के लिए Masterclass टियर चाहिए",
+      body: "Masterclass में अपग्रेड करें, या 5-Pack के साथ 5 Masterclass आज़माएं।",
+      primaryCta: "Masterclass में अपग्रेड करें",
+      secondaryCta: "5-Pack खरीदें",
+    },
+    fromMasterclassCap: {
+      title: "आप 20-जनरेशन की सीमा तक पहुंच गए हैं",
+      body: "यदि आपकी टीम को और चाहिए तो Enterprise के लिए हमसे संपर्क करें।",
+      primaryCta: "सेल्स से संपर्क करें",
+    },
   },
   finalCta: {
     heading: "अंतर सुनने के लिए तैयार हैं?",

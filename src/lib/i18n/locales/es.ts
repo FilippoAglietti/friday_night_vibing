@@ -135,6 +135,72 @@ const es: Translations = {
     pack4: "Exportación premium a Notion y PDF",
     pack5: "Marca blanca",
     pack6: "Sin cargos recurrentes",
+    subheading: "Empieza gratis. Sube de plan cuando lo hagan tus estudiantes.",
+    toggle: { monthly: "Mensual", annual: "Anual", savePitch: "Ahorra 2 meses" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Empieza gratis",
+        pitch: "Prueba Syllabi con un esqueleto gratuito — ve exactamente lo que publicarías.",
+        cap: "1 esqueleto de curso al mes",
+        cta: "Empezar gratis",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Planifica y construye",
+        pitch: "Las mejores estructuras de cursos del mercado. Esqueletos bajo demanda.",
+        cap: "15 esqueletos revisados al mes",
+        bodyUnlock: "Desbloqueo de contenido a €5 por esqueleto",
+        cta: "Comenzar Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Listo para enseñar",
+        pitch: "Revisado, pulido, narrado — cada curso listo para tu audiencia.",
+        cap: "20 cursos completos al mes",
+        cta: "Comenzar Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "Para equipos",
+        pitch: "White-label, cursos listos para usar, diseñador de aprendizaje dedicado.",
+        cta: "Contactar ventas",
+      },
+    },
+    fivePack: {
+      heading: "Prueba Masterclass sin compromiso",
+      pitch: "5 generaciones Masterclass completas · 90 días para usar",
+      cta: "Comprar el 5-Pack — €39",
+      conversionCredit: "€20 de descuento al pasarte a Masterclass en 30 días",
+    },
+    bodyUnlock: {
+      cta: "Desbloquear curso completo — €5",
+      modalTitle: "Desbloquear contenido de este esqueleto",
+      modalBody: "€5 único pago. Genera los cuerpos completos de los módulos (~2 min).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Has usado tu esqueleto gratuito este mes",
+      body: "Desbloquea 15 esqueletos revisados y contenido bajo demanda con Planner.",
+      primaryCta: "Pasar a Planner",
+    },
+    fromPlannerCap: {
+      title: "Has usado los 15 esqueletos este mes",
+      body: "Pasa a Masterclass para 20 cursos completos al mes, o espera al día 1.",
+      primaryCta: "Pasar a Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Los contenidos Masterclass requieren el plan Masterclass",
+      body: "Pasa a Masterclass o prueba 5 Masterclasses con el 5-Pack.",
+      primaryCta: "Pasar a Masterclass",
+      secondaryCta: "Comprar el 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "Has alcanzado el límite de 20 generaciones",
+      body: "Contáctanos para Enterprise si tu equipo necesita más.",
+      primaryCta: "Contactar ventas",
+    },
   },
   finalCta: {
     heading: "¿Listo para escuchar la diferencia?",

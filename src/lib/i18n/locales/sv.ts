@@ -134,6 +134,72 @@ const sv: Translations = {
     pack4: "Premium Notion och PDF-export",
     pack5: "White-label-varumärkning",
     pack6: "Inga återkommande avgifter",
+    subheading: "Börja gratis. Uppgradera när dina studenter gör det.",
+    toggle: { monthly: "Månadsvis", annual: "Årsvis", savePitch: "Spara 2 månader" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Börja gratis",
+        pitch: "Prova Syllabi med ett gratis skelett — se exakt vad du skulle publicera.",
+        cap: "1 kursskelett per månad",
+        cta: "Kom igång gratis",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Planera, sedan bygg",
+        pitch: "Marknadens bästa kursstrukturer. Skelett på begäran.",
+        cap: "15 granskade skelett per månad",
+        bodyUnlock: "€5 innehållsupplåsning per skelett på begäran",
+        cta: "Starta Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Redo att undervisa",
+        pitch: "Granskat, polerat, berättat — varje kurs redo för din publik.",
+        cap: "20 fullständiga kurser per månad",
+        cta: "Starta Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "För team",
+        pitch: "White-label, kurser gjorda för dig, dedikerad lärdesigner.",
+        cta: "Kontakta sälj",
+      },
+    },
+    fivePack: {
+      heading: "Prova Masterclass utan åtagande",
+      pitch: "5 fullständiga Masterclass-generationer · 90 dagar att använda",
+      cta: "Köp 5-Pack — €39",
+      conversionCredit: "€20 rabatt vid uppgradering till Masterclass inom 30 dagar",
+    },
+    bodyUnlock: {
+      cta: "Lås upp fullständigt kursinnehåll — €5",
+      modalTitle: "Lås upp innehåll för detta skelett",
+      modalBody: "Engångs €5. Genererar de fullständiga modulinnehållen (~2 min).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Du har använt ditt gratis skelett denna månad",
+      body: "Lås upp 15 granskade skelett och innehåll på begäran med Planner.",
+      primaryCta: "Uppgradera till Planner",
+    },
+    fromPlannerCap: {
+      title: "Du har använt alla 15 skelett denna månad",
+      body: "Uppgradera till Masterclass för 20 fullständiga kurser per månad, eller vänta till den 1:a.",
+      primaryCta: "Uppgradera till Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Masterclass-längd kräver Masterclass-planen",
+      body: "Uppgradera till Masterclass eller prova 5 Masterclasses med 5-Pack.",
+      primaryCta: "Uppgradera till Masterclass",
+      secondaryCta: "Köp 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "Du har nått gränsen på 20 generationer",
+      body: "Kontakta oss om Enterprise om ditt team behöver mer.",
+      primaryCta: "Kontakta sälj",
+    },
   },
   finalCta: {
     heading: "Redo att höra skillnaden?",

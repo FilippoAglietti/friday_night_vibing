@@ -134,6 +134,72 @@ const nl: Translations = {
     pack4: "Premium Notion en PDF export",
     pack5: "White-label branding",
     pack6: "Geen terugkerende kosten",
+    subheading: "Begin gratis. Upgrade wanneer jouw studenten dat doen.",
+    toggle: { monthly: "Maandelijks", annual: "Jaarlijks", savePitch: "Bespaar 2 maanden" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Gratis starten",
+        pitch: "Probeer Syllabi met een gratis skelet — zie precies wat je zou publiceren.",
+        cap: "1 cursusskeleton per maand",
+        cta: "Gratis aan de slag",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Plan, dan bouwen",
+        pitch: "De beste cursusstructuren op de markt. Skeletten op aanvraag.",
+        cap: "15 beoordeelde skeletten per maand",
+        bodyUnlock: "€5 inhoud ontgrendelen per skelet op aanvraag",
+        cta: "Planner starten",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Klaar om te onderwijzen",
+        pitch: "Beoordeeld, gepolijst, verteld — elke cursus klaar voor jouw publiek.",
+        cap: "20 volledige cursussen per maand",
+        cta: "Masterclass starten",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "Voor teams",
+        pitch: "White-label, kant-en-klare cursussen, toegewijde leerdesigner.",
+        cta: "Contact sales",
+      },
+    },
+    fivePack: {
+      heading: "Probeer Masterclass zonder verplichting",
+      pitch: "5 volledige Masterclass-generaties · 90 dagen te gebruiken",
+      cta: "Koop het 5-Pack — €39",
+      conversionCredit: "€20 korting bij upgrade naar Masterclass binnen 30 dagen",
+    },
+    bodyUnlock: {
+      cta: "Volledige cursusinhoud ontgrendelen — €5",
+      modalTitle: "Inhoud ontgrendelen voor dit skelet",
+      modalBody: "Eenmalig €5. Genereert de volledige moduleinhoud (~2 min).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Je hebt je gratis skelet deze maand gebruikt",
+      body: "Ontgrendel 15 beoordeelde skeletten en inhoud op aanvraag met Planner.",
+      primaryCta: "Upgraden naar Planner",
+    },
+    fromPlannerCap: {
+      title: "Je hebt alle 15 skeletten deze maand gebruikt",
+      body: "Upgrade naar Masterclass voor 20 volledige cursussen per maand, of wacht tot de 1e.",
+      primaryCta: "Upgraden naar Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Masterclass-inhoud vereist het Masterclass-abonnement",
+      body: "Upgrade naar Masterclass of probeer 5 Masterclasses met het 5-Pack.",
+      primaryCta: "Upgraden naar Masterclass",
+      secondaryCta: "5-Pack kopen",
+    },
+    fromMasterclassCap: {
+      title: "Je hebt de limiet van 20 generaties bereikt",
+      body: "Neem contact op voor Enterprise als jouw team meer nodig heeft.",
+      primaryCta: "Contact sales",
+    },
   },
   finalCta: {
     heading: "Klaar om het verschil te horen?",

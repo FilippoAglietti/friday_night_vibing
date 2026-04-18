@@ -118,6 +118,72 @@ const ko: Translations = {
     pack4: "프리미엄 Notion & PDF 내보내기",
     pack5: "화이트 라벨 브랜딩",
     pack6: "반복 청구 없음",
+    subheading: "무료로 시작하세요. 수강생이 성장할 때 업그레이드하세요.",
+    toggle: { monthly: "월간", annual: "연간", savePitch: "2개월 절약" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "무료로 시작",
+        pitch: "무료 스켈레톤으로 Syllabi를 체험해보세요 — 실제로 출시할 내용을 미리 확인하세요.",
+        cap: "월 1개 코스 스켈레톤",
+        cta: "무료로 시작하기",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "계획 후 제작",
+        pitch: "시장 최고의 코스 구조. 원할 때 스켈레톤 생성.",
+        cap: "월 15개 검토된 스켈레톤",
+        bodyUnlock: "스켈레톤당 €5 온디맨드 콘텐츠 잠금 해제",
+        cta: "Planner 시작하기",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "바로 가르칠 수 있는",
+        pitch: "검토되고 다듬어지고 내레이션이 추가된 — 모든 코스가 수강생에게 바로 제공됩니다.",
+        cap: "월 20개 완성 코스",
+        cta: "Masterclass 시작하기",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "팀을 위한",
+        pitch: "화이트 라벨, 맞춤 제작 코스, 전담 러닝 디자이너.",
+        cta: "영업 문의",
+      },
+    },
+    fivePack: {
+      heading: "약정 없이 Masterclass 체험하기",
+      pitch: "Masterclass 완전 생성 5회 · 90일 이내 사용",
+      cta: "5-Pack 구매 — €39",
+      conversionCredit: "30일 이내 Masterclass 업그레이드 시 €20 할인",
+    },
+    bodyUnlock: {
+      cta: "전체 코스 본문 잠금 해제 — €5",
+      modalTitle: "이 스켈레톤의 본문 잠금 해제",
+      modalBody: "일회 결제 €5. 전체 모듈 본문을 생성합니다 (~2분).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "이번 달 무료 스켈레톤을 모두 사용했습니다",
+      body: "Planner로 15개의 검토된 스켈레톤과 온디맨드 콘텐츠를 이용하세요.",
+      primaryCta: "Planner로 업그레이드",
+    },
+    fromPlannerCap: {
+      title: "이번 달 15개 스켈레톤을 모두 사용했습니다",
+      body: "월 20개의 완성 코스를 위해 Masterclass로 업그레이드하거나 1일까지 기다리세요.",
+      primaryCta: "Masterclass로 업그레이드",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Masterclass 길이의 본문에는 Masterclass 플랜이 필요합니다",
+      body: "Masterclass로 업그레이드하거나 5-Pack으로 5개의 Masterclass를 체험하세요.",
+      primaryCta: "Masterclass로 업그레이드",
+      secondaryCta: "5-Pack 구매",
+    },
+    fromMasterclassCap: {
+      title: "20회 생성 한도에 도달했습니다",
+      body: "팀에 더 많은 생성이 필요하다면 Enterprise에 대해 문의하세요.",
+      primaryCta: "영업 문의",
+    },
   },
   finalCta: {
     heading: "차이를 들을 준비가 되셨나요?",

@@ -135,6 +135,72 @@ const de: Translations = {
     pack4: "Premium-Notion- & PDF-Export",
     pack5: "White-Label-Branding",
     pack6: "Keine wiederkehrenden Kosten",
+    subheading: "Starte kostenlos. Upgrade, wenn deine Studierenden es tun.",
+    toggle: { monthly: "Monatlich", annual: "Jährlich", savePitch: "2 Monate sparen" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Kostenlos starten",
+        pitch: "Teste Syllabi mit einem kostenlosen Kursgerüst — sieh genau, was du veröffentlichen würdest.",
+        cap: "1 Kursgerüst pro Monat",
+        cta: "Kostenlos starten",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Planen, dann umsetzen",
+        pitch: "Die besten Kursstrukturen auf dem Markt. Gerüste auf Abruf.",
+        cap: "15 geprüfte Gerüste pro Monat",
+        bodyUnlock: "€5 Inhaltsfreischaltung pro Gerüst auf Abruf",
+        cta: "Planner starten",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Lehrbereit",
+        pitch: "Geprüft, verfeinert, vertont — jeder Kurs bereit für dein Publikum.",
+        cap: "20 vollständige Kurse pro Monat",
+        cta: "Masterclass starten",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "Für Teams",
+        pitch: "White-Label, fertige Kurse, dedizierter Learning Designer.",
+        cta: "Vertrieb kontaktieren",
+      },
+    },
+    fivePack: {
+      heading: "Masterclass unverbindlich testen",
+      pitch: "5 vollständige Masterclass-Generierungen · 90 Tage zur Nutzung",
+      cta: "5-Pack kaufen — €39",
+      conversionCredit: "€20 Rabatt bei Upgrade auf Masterclass innerhalb von 30 Tagen",
+    },
+    bodyUnlock: {
+      cta: "Vollständigen Kursinhalt freischalten — €5",
+      modalTitle: "Inhalt für dieses Gerüst freischalten",
+      modalBody: "Einmalig €5. Generiert die vollständigen Modulinhalte (~2 Min.).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Du hast dein kostenloses Gerüst diesen Monat genutzt",
+      body: "Schalte 15 geprüfte Gerüste und Inhalte auf Abruf mit Planner frei.",
+      primaryCta: "Auf Planner upgraden",
+    },
+    fromPlannerCap: {
+      title: "Du hast alle 15 Gerüste diesen Monat genutzt",
+      body: "Upgrade auf Masterclass für 20 vollständige Kurse pro Monat oder warte bis zum 1.",
+      primaryCta: "Auf Masterclass upgraden",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Masterclass-Inhalte erfordern den Masterclass-Tarif",
+      body: "Upgrade auf Masterclass oder teste 5 Masterclasses mit dem 5-Pack.",
+      primaryCta: "Auf Masterclass upgraden",
+      secondaryCta: "5-Pack kaufen",
+    },
+    fromMasterclassCap: {
+      title: "Du hast das Limit von 20 Generierungen erreicht",
+      body: "Kontaktiere uns für Enterprise, wenn dein Team mehr benötigt.",
+      primaryCta: "Vertrieb kontaktieren",
+    },
   },
   finalCta: {
     heading: "Bereit, den Unterschied zu hören?",

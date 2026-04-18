@@ -118,6 +118,72 @@ const zh: Translations = {
     pack4: "高级 Notion 和 PDF 导出",
     pack5: "白标品牌",
     pack6: "无循环费用",
+    subheading: "免费开始。当你的学员成长时再升级。",
+    toggle: { monthly: "按月", annual: "按年", savePitch: "省下2个月" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "免费开始",
+        pitch: "用一个免费骨架体验 Syllabi — 亲眼看看你会发布什么。",
+        cap: "每月1个课程骨架",
+        cta: "免费开始",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "先规划，再创建",
+        pitch: "市场上最佳课程结构。按需生成骨架。",
+        cap: "每月15个经过审核的骨架",
+        bodyUnlock: "每个骨架€5按需解锁内容",
+        cta: "开始使用 Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "随时可教",
+        pitch: "经过审核、打磨、配音——每门课程都为你的学员准备就绪。",
+        cap: "每月20门完整课程",
+        cta: "开始使用 Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "适合团队",
+        pitch: "白标、一键交付课程、专属学习设计师。",
+        cta: "联系销售",
+      },
+    },
+    fivePack: {
+      heading: "无需承诺，体验 Masterclass",
+      pitch: "5次完整 Masterclass 生成 · 90天内使用",
+      cta: "购买 5-Pack — €39",
+      conversionCredit: "30天内升级至 Masterclass 可享€20优惠",
+    },
+    bodyUnlock: {
+      cta: "解锁完整课程内容 — €5",
+      modalTitle: "解锁此骨架的内容",
+      modalBody: "一次性€5。生成完整模块内容（约2分钟）。",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "你已使用本月的免费骨架",
+      body: "使用 Planner 解锁15个经过审核的骨架及按需内容。",
+      primaryCta: "升级至 Planner",
+    },
+    fromPlannerCap: {
+      title: "你已使用本月全部15个骨架",
+      body: "升级至 Masterclass 获得每月20门完整课程，或等到1号重置。",
+      primaryCta: "升级至 Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Masterclass 长度的内容需要 Masterclass 套餐",
+      body: "升级至 Masterclass，或用 5-Pack 体验5次 Masterclass。",
+      primaryCta: "升级至 Masterclass",
+      secondaryCta: "购买 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "你已达到20次生成上限",
+      body: "如果你的团队需要更多，请联系我们了解 Enterprise。",
+      primaryCta: "联系销售",
+    },
   },
   finalCta: {
     heading: "准备好感受差异了吗？",

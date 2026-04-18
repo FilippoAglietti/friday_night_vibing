@@ -134,6 +134,72 @@ const ja: Translations = {
     pack4: "プレミアム Notion & PDF エクスポート",
     pack5: "ホワイトラベルブランディング",
     pack6: "定期課金なし",
+    subheading: "無料で始めよう。受講者が伸びたらアップグレード。",
+    toggle: { monthly: "月払い", annual: "年払い", savePitch: "2ヶ月分お得" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "無料ではじめる",
+        pitch: "無料のスケルトンでSyllabiを試す — 何を公開できるか実際に確認しよう。",
+        cap: "月1件のコーススケルトン",
+        cta: "無料ではじめる",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "計画してから作る",
+        pitch: "市場最高のコース構成。スケルトンをオンデマンドで。",
+        cap: "月15件のレビュー済みスケルトン",
+        bodyUnlock: "スケルトン1件あたり€5でコンテンツをアンロック",
+        cta: "Plannerをはじめる",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "教えられる状態で納品",
+        pitch: "レビュー済み、磨き上げ、ナレーション付き — すべてのコースが受講者に届く状態で。",
+        cap: "月20件のフルコース",
+        cta: "Masterclassをはじめる",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "チーム向け",
+        pitch: "ホワイトラベル、制作代行、専任ラーニングデザイナー。",
+        cta: "営業に問い合わせる",
+      },
+    },
+    fivePack: {
+      heading: "コミットなしでMasterclassを試す",
+      pitch: "Masterclass完全生成×5件 · 90日間有効",
+      cta: "5-Packを購入 — €39",
+      conversionCredit: "30日以内にMasterclassへアップグレードで€20割引",
+    },
+    bodyUnlock: {
+      cta: "コース本文をアンロック — €5",
+      modalTitle: "このスケルトンの本文をアンロック",
+      modalBody: "€5の一回払い。モジュール本文を生成します（約2分）。",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "今月の無料スケルトンを使い切りました",
+      body: "Plannerで月15件のレビュー済みスケルトンとオンデマンドコンテンツを解放しよう。",
+      primaryCta: "Plannerにアップグレード",
+    },
+    fromPlannerCap: {
+      title: "今月の15件分のスケルトンを使い切りました",
+      body: "月20件のフルコースのためにMasterclassへアップグレードするか、1日まで待ちましょう。",
+      primaryCta: "Masterclassにアップグレード",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Masterclass長のコンテンツにはMasterclassプランが必要です",
+      body: "Masterclassにアップグレードするか、5-Packで5件のMasterclassを試しましょう。",
+      primaryCta: "Masterclassにアップグレード",
+      secondaryCta: "5-Packを購入",
+    },
+    fromMasterclassCap: {
+      title: "20件の生成上限に達しました",
+      body: "チームがさらに必要な場合はEnterpriseについてお問い合わせください。",
+      primaryCta: "営業に問い合わせる",
+    },
   },
   finalCta: {
     heading: "その違いを聴く準備はできていますか？",

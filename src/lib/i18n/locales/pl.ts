@@ -118,6 +118,72 @@ const pl: Translations = {
     pack4: "Premium eksport do Notion i PDF",
     pack5: "Branding white-label",
     pack6: "Brak cyklicznych opłat",
+    subheading: "Zacznij za darmo. Przejdź wyżej, gdy zrobią to Twoi studenci.",
+    toggle: { monthly: "Miesięczny", annual: "Roczny", savePitch: "Zaoszczędź 2 miesiące" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Zacznij za darmo",
+        pitch: "Wypróbuj Syllabi z bezpłatnym szkieletem — sprawdź dokładnie, co opublikujesz.",
+        cap: "1 szkielet kursu miesięcznie",
+        cta: "Zacznij za darmo",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Zaplanuj, potem twórz",
+        pitch: "Najlepsze struktury kursów na rynku. Szkielety na żądanie.",
+        cap: "15 zrecenzowanych szkieletów miesięcznie",
+        bodyUnlock: "Odblokowanie treści za €5 na każdy szkielet",
+        cta: "Uruchom Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Gotowy do nauczania",
+        pitch: "Zrecenzowany, dopracowany, znarrowany — każdy kurs gotowy dla Twoich odbiorców.",
+        cap: "20 pełnych kursów miesięcznie",
+        cta: "Uruchom Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "Dla zespołów",
+        pitch: "White-label, kursy gotowe dla Ciebie, dedykowany designer nauki.",
+        cta: "Skontaktuj się ze sprzedażą",
+      },
+    },
+    fivePack: {
+      heading: "Wypróbuj Masterclass bez zobowiązań",
+      pitch: "5 pełnych generacji Masterclass · 90 dni na wykorzystanie",
+      cta: "Kup 5-Pack — €39",
+      conversionCredit: "€20 zniżki przy przejściu na Masterclass w ciągu 30 dni",
+    },
+    bodyUnlock: {
+      cta: "Odblokuj pełną treść kursu — €5",
+      modalTitle: "Odblokuj treść tego szkieletu",
+      modalBody: "Jednorazowe €5. Generuje pełne treści modułów (~2 min).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Wykorzystałeś swój bezpłatny szkielet w tym miesiącu",
+      body: "Odblokuj 15 zrecenzowanych szkieletów i treści na żądanie w Planner.",
+      primaryCta: "Przejdź na Planner",
+    },
+    fromPlannerCap: {
+      title: "Wykorzystałeś wszystkie 15 szkieletów w tym miesiącu",
+      body: "Przejdź na Masterclass dla 20 pełnych kursów miesięcznie lub poczekaj do 1. dnia.",
+      primaryCta: "Przejdź na Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Treść o długości Masterclass wymaga planu Masterclass",
+      body: "Przejdź na Masterclass lub wypróbuj 5 Masterclass z 5-Pack.",
+      primaryCta: "Przejdź na Masterclass",
+      secondaryCta: "Kup 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "Osiągnąłeś limit 20 generacji",
+      body: "Skontaktuj się z nami w sprawie Enterprise, jeśli Twój zespół potrzebuje więcej.",
+      primaryCta: "Skontaktuj się ze sprzedażą",
+    },
   },
   finalCta: {
     heading: "Gotowy, aby usłyszeć różnicę?",

@@ -134,6 +134,72 @@ const it: Translations = {
     pack4: "Esportazione premium Notion e PDF",
     pack5: "White-label branding",
     pack6: "Nessun addebito ricorrente",
+    subheading: "Inizia gratis. Passa al piano superiore quando i tuoi studenti lo faranno.",
+    toggle: { monthly: "Mensile", annual: "Annuale", savePitch: "Risparmi 2 mesi" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Inizia gratis",
+        pitch: "Prova Syllabi con uno scheletro gratuito — vedi esattamente cosa pubblicheresti.",
+        cap: "1 scheletro di corso al mese",
+        cta: "Inizia gratis",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Pianifica, poi costruisci",
+        pitch: "Le migliori strutture per corsi sul mercato. Scheletri su richiesta.",
+        cap: "15 scheletri revisionati al mese",
+        bodyUnlock: "Sblocco contenuti a €5 per ogni scheletro",
+        cta: "Inizia Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Pronto per insegnare",
+        pitch: "Revisionati, rifiniti, narrati — ogni corso pronto per i tuoi studenti.",
+        cap: "20 corsi completi al mese",
+        cta: "Inizia Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "Per team",
+        pitch: "White-label, corsi fatti per te, learning designer dedicato.",
+        cta: "Contatta le vendite",
+      },
+    },
+    fivePack: {
+      heading: "Prova Masterclass senza impegno",
+      pitch: "5 generazioni Masterclass complete · 90 giorni per usarle",
+      cta: "Compra il 5-Pack — €39",
+      conversionCredit: "€20 di sconto se passi a Masterclass entro 30 giorni",
+    },
+    bodyUnlock: {
+      cta: "Sblocca il corso completo — €5",
+      modalTitle: "Sblocca i contenuti di questo scheletro",
+      modalBody: "€5 una tantum. Genera i moduli completi (~2 min).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Hai usato lo scheletro gratuito di questo mese",
+      body: "Sblocca 15 scheletri revisionati e contenuti on-demand con Planner.",
+      primaryCta: "Passa a Planner",
+    },
+    fromPlannerCap: {
+      title: "Hai usato tutti i 15 scheletri questo mese",
+      body: "Passa a Masterclass per 20 corsi completi al mese, oppure aspetta il 1° del mese.",
+      primaryCta: "Passa a Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "I corsi Masterclass richiedono il piano Masterclass",
+      body: "Passa a Masterclass, oppure prova il 5-Pack.",
+      primaryCta: "Passa a Masterclass",
+      secondaryCta: "Compra il 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "Hai raggiunto il limite di 20 generazioni",
+      body: "Contattaci per Enterprise se il tuo team ne ha bisogno di più.",
+      primaryCta: "Contatta le vendite",
+    },
   },
   finalCta: {
     heading: "Pronto ad ascoltare la differenza?",

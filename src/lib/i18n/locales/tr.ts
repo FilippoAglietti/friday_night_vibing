@@ -134,6 +134,72 @@ const tr: Translations = {
     pack4: "Premium Notion ve PDF dışa aktarma",
     pack5: "Beyaz etiket markalama",
     pack6: "Tekrarlayan ücret yok",
+    subheading: "Ücretsiz başlayın. Öğrencileriniz ilerlediğinde yükseltin.",
+    toggle: { monthly: "Aylık", annual: "Yıllık", savePitch: "2 ay tasarruf edin" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Ücretsiz başlayın",
+        pitch: "Syllabi'yi ücretsiz bir iskeletle deneyin — tam olarak ne yayınlayacağınızı görün.",
+        cap: "Ayda 1 kurs iskeleti",
+        cta: "Ücretsiz başlayın",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Planla, sonra oluştur",
+        pitch: "Piyasadaki en iyi kurs yapıları. İstek üzerine iskeleter.",
+        cap: "Ayda 15 incelenmiş iskelet",
+        bodyUnlock: "İskelet başına talep üzerine €5 içerik kilidini açma",
+        cta: "Planner'ı başlat",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Öğretmeye hazır",
+        pitch: "İncelenmiş, cilalanmış, anlatılmış — her kurs kitleniz için hazır.",
+        cap: "Ayda 20 tam kurs",
+        cta: "Masterclass'ı başlat",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "Ekipler için",
+        pitch: "White-label, sizin için hazırlanmış kurslar, özel öğrenme tasarımcısı.",
+        cta: "Satış ekibiyle iletişime geçin",
+      },
+    },
+    fivePack: {
+      heading: "Taahhüt olmadan Masterclass'ı deneyin",
+      pitch: "5 tam Masterclass üretimi · Kullanmak için 90 gün",
+      cta: "5-Pack satın alın — €39",
+      conversionCredit: "30 gün içinde Masterclass'a geçerseniz €20 indirim",
+    },
+    bodyUnlock: {
+      cta: "Tam kurs içeriğini kilidi aç — €5",
+      modalTitle: "Bu iskeletin içeriğinin kilidini aç",
+      modalBody: "Tek seferlik €5. Tam modül içeriklerini oluşturur (~2 dk).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Bu ay ücretsiz iskeletinizi kullandınız",
+      body: "Planner ile 15 incelenmiş iskelet ve talep üzerine içeriklerin kilidini açın.",
+      primaryCta: "Planner'a geçin",
+    },
+    fromPlannerCap: {
+      title: "Bu ay 15 iskeletin tamamını kullandınız",
+      body: "Ayda 20 tam kurs için Masterclass'a geçin ya da 1'ini bekleyin.",
+      primaryCta: "Masterclass'a geçin",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Masterclass uzunluğundaki içerikler Masterclass katmanı gerektirir",
+      body: "Masterclass'a geçin ya da 5-Pack ile 5 Masterclass deneyin.",
+      primaryCta: "Masterclass'a geçin",
+      secondaryCta: "5-Pack satın alın",
+    },
+    fromMasterclassCap: {
+      title: "20 üretim sınırına ulaştınız",
+      body: "Ekibinizin daha fazlasına ihtiyacı varsa Enterprise için bizimle iletişime geçin.",
+      primaryCta: "Satış ekibiyle iletişime geçin",
+    },
   },
   finalCta: {
     heading: "Farkı duymaya hazır mısınız?",

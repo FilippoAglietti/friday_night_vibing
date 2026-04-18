@@ -134,6 +134,72 @@ const ar: Translations = {
     pack4: "تصدير Notion و PDF المتميز",
     pack5: "علامة تجارية بيضاء",
     pack6: "بدون رسوم متكررة",
+    subheading: "ابدأ مجاناً. ارتقِ عندما يرتقي طلابك.",
+    toggle: { monthly: "شهري", annual: "سنوي", savePitch: "وفّر شهرين" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "ابدأ مجاناً",
+        pitch: "جرّب Syllabi بهيكل مجاني — شاهد ما ستنشره بالضبط.",
+        cap: "هيكل دورة واحد في الشهر",
+        cta: "ابدأ مجاناً",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "خطّط ثم أنشئ",
+        pitch: "أفضل هياكل الدورات في السوق. هياكل عند الطلب.",
+        cap: "15 هيكلاً مراجَعاً في الشهر",
+        bodyUnlock: "فتح المحتوى مقابل €5 لكل هيكل",
+        cta: "ابدأ Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "جاهز للتدريس",
+        pitch: "مراجَع ومصقول ومسروّد — كل دورة جاهزة لجمهورك.",
+        cap: "20 دورة كاملة في الشهر",
+        cta: "ابدأ Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "للفِرق",
+        pitch: "علامة بيضاء، دورات مُعدَّة لك، مصمم تعلّم مخصص.",
+        cta: "تواصل مع المبيعات",
+      },
+    },
+    fivePack: {
+      heading: "جرّب Masterclass بلا التزام",
+      pitch: "5 توليدات Masterclass كاملة · 90 يوماً للاستخدام",
+      cta: "اشترِ الـ 5-Pack — €39",
+      conversionCredit: "€20 خصم عند الترقية إلى Masterclass خلال 30 يوماً",
+    },
+    bodyUnlock: {
+      cta: "فتح محتوى الدورة الكامل — €5",
+      modalTitle: "فتح المحتوى لهذا الهيكل",
+      modalBody: "€5 لمرة واحدة. يُنشئ محتويات الوحدات الكاملة (~2 دقيقة).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "لقد استخدمت هيكلك المجاني هذا الشهر",
+      body: "افتح 15 هيكلاً مراجَعاً ومحتوى عند الطلب مع Planner.",
+      primaryCta: "الترقية إلى Planner",
+    },
+    fromPlannerCap: {
+      title: "لقد استخدمت جميع الـ 15 هيكلاً هذا الشهر",
+      body: "رقّ إلى Masterclass للحصول على 20 دورة كاملة شهرياً، أو انتظر حتى الأول.",
+      primaryCta: "الترقية إلى Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "محتوى Masterclass يتطلب مستوى Masterclass",
+      body: "رقّ إلى Masterclass، أو جرّب 5 دورات مع الـ 5-Pack.",
+      primaryCta: "الترقية إلى Masterclass",
+      secondaryCta: "شراء الـ 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "لقد بلغت حد الـ 20 توليداً",
+      body: "تواصل معنا بشأن Enterprise إذا كان فريقك بحاجة إلى المزيد.",
+      primaryCta: "تواصل مع المبيعات",
+    },
   },
   finalCta: {
     heading: "هل أنت مستعد لسماع الفرق؟",

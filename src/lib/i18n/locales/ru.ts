@@ -134,6 +134,72 @@ const ru: Translations = {
     pack4: "Премиум-экспорт в Notion и PDF",
     pack5: "Брендирование white-label",
     pack6: "Без регулярных платежей",
+    subheading: "Начните бесплатно. Переходите выше, когда будут расти ваши студенты.",
+    toggle: { monthly: "Ежемесячно", annual: "Ежегодно", savePitch: "Экономия 2 месяца" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Начать бесплатно",
+        pitch: "Попробуйте Syllabi с бесплатным скелетом — посмотрите, что именно вы опубликуете.",
+        cap: "1 скелет курса в месяц",
+        cta: "Начать бесплатно",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Планируй, потом создавай",
+        pitch: "Лучшие структуры курсов на рынке. Скелеты по запросу.",
+        cap: "15 проверенных скелетов в месяц",
+        bodyUnlock: "Разблокировка контента за €5 на каждый скелет",
+        cta: "Начать Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Готово к преподаванию",
+        pitch: "Проверено, отполировано, озвучено — каждый курс готов для вашей аудитории.",
+        cap: "20 полных курсов в месяц",
+        cta: "Начать Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "Для команд",
+        pitch: "White-label, курсы под ключ, выделенный дизайнер обучения.",
+        cta: "Связаться с отделом продаж",
+      },
+    },
+    fivePack: {
+      heading: "Попробуйте Masterclass без обязательств",
+      pitch: "5 полных генераций Masterclass · 90 дней на использование",
+      cta: "Купить 5-Pack — €39",
+      conversionCredit: "€20 скидки при переходе на Masterclass в течение 30 дней",
+    },
+    bodyUnlock: {
+      cta: "Разблокировать полный курс — €5",
+      modalTitle: "Разблокировать контент этого скелета",
+      modalBody: "Единоразово €5. Генерирует полные тела модулей (~2 мин).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Вы использовали свой бесплатный скелет в этом месяце",
+      body: "Разблокируйте 15 проверенных скелетов и контент по запросу с Planner.",
+      primaryCta: "Перейти на Planner",
+    },
+    fromPlannerCap: {
+      title: "Вы использовали все 15 скелетов в этом месяце",
+      body: "Перейдите на Masterclass для 20 полных курсов в месяц или подождите до 1-го числа.",
+      primaryCta: "Перейти на Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Контент длиной Masterclass требует тарифа Masterclass",
+      body: "Перейдите на Masterclass или попробуйте 5 Masterclass с 5-Pack.",
+      primaryCta: "Перейти на Masterclass",
+      secondaryCta: "Купить 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "Вы достигли лимита в 20 генераций",
+      body: "Свяжитесь с нами по поводу Enterprise, если вашей команде нужно больше.",
+      primaryCta: "Связаться с отделом продаж",
+    },
   },
   finalCta: {
     heading: "Готовы услышать разницу?",

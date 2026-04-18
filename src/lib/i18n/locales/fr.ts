@@ -135,6 +135,72 @@ const fr: Translations = {
     pack4: "Export premium Notion et PDF",
     pack5: "Marque white-label",
     pack6: "Aucun frais récurrents",
+    subheading: "Commencez gratuitement. Passez au niveau supérieur quand vos étudiants le feront.",
+    toggle: { monthly: "Mensuel", annual: "Annuel", savePitch: "Économisez 2 mois" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Commencer gratuitement",
+        pitch: "Essayez Syllabi avec un squelette gratuit — voyez exactement ce que vous publieriez.",
+        cap: "1 squelette de cours par mois",
+        cta: "Commencer gratuitement",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Planifiez, puis créez",
+        pitch: "Les meilleures structures de cours du marché. Des squelettes à la demande.",
+        cap: "15 squelettes vérifiés par mois",
+        bodyUnlock: "Déblocage de contenu à €5 par squelette",
+        cta: "Démarrer Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Prêt à enseigner",
+        pitch: "Vérifié, peaufiné, narré — chaque cours prêt pour votre audience.",
+        cap: "20 cours complets par mois",
+        cta: "Démarrer Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "Pour les équipes",
+        pitch: "White-label, cours clé en main, learning designer dédié.",
+        cta: "Contacter les ventes",
+      },
+    },
+    fivePack: {
+      heading: "Essayez Masterclass sans engagement",
+      pitch: "5 générations Masterclass complètes · 90 jours pour les utiliser",
+      cta: "Acheter le 5-Pack — €39",
+      conversionCredit: "€20 de réduction si vous passez à Masterclass dans les 30 jours",
+    },
+    bodyUnlock: {
+      cta: "Débloquer le cours complet — €5",
+      modalTitle: "Débloquer le contenu de ce squelette",
+      modalBody: "€5 unique. Génère les contenus complets des modules (~2 min).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Vous avez utilisé votre squelette gratuit ce mois-ci",
+      body: "Débloquez 15 squelettes vérifiés et des contenus à la demande avec Planner.",
+      primaryCta: "Passer à Planner",
+    },
+    fromPlannerCap: {
+      title: "Vous avez utilisé les 15 squelettes ce mois-ci",
+      body: "Passez à Masterclass pour 20 cours complets par mois, ou attendez le 1er.",
+      primaryCta: "Passer à Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Les contenus Masterclass nécessitent le plan Masterclass",
+      body: "Passez à Masterclass ou essayez 5 Masterclasses avec le 5-Pack.",
+      primaryCta: "Passer à Masterclass",
+      secondaryCta: "Acheter le 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "Vous avez atteint la limite de 20 générations",
+      body: "Contactez-nous pour Enterprise si votre équipe en a besoin de plus.",
+      primaryCta: "Contacter les ventes",
+    },
   },
   finalCta: {
     heading: "Prêt à entendre la différence ?",

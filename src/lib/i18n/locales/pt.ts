@@ -135,6 +135,72 @@ const pt: Translations = {
     pack4: "Exportação premium para Notion e PDF",
     pack5: "Marca white-label",
     pack6: "Sem cobranças recorrentes",
+    subheading: "Comece grátis. Faça upgrade quando seus alunos evoluírem.",
+    toggle: { monthly: "Mensal", annual: "Anual", savePitch: "Economize 2 meses" },
+    tiers: {
+      free: {
+        name: "Free",
+        eyebrow: "Comece grátis",
+        pitch: "Experimente o Syllabi com um esqueleto gratuito — veja exatamente o que você publicaria.",
+        cap: "1 esqueleto de curso por mês",
+        cta: "Começar grátis",
+      },
+      planner: {
+        name: "Planner",
+        eyebrow: "Planeje, depois construa",
+        pitch: "As melhores estruturas de cursos do mercado. Esqueletos sob demanda.",
+        cap: "15 esqueletos revisados por mês",
+        bodyUnlock: "Desbloqueio de conteúdo a €5 por esqueleto",
+        cta: "Iniciar Planner",
+      },
+      masterclass: {
+        name: "Masterclass",
+        eyebrow: "Pronto para ensinar",
+        pitch: "Revisado, polido, narrado — cada curso pronto para o seu público.",
+        cap: "20 cursos completos por mês",
+        cta: "Iniciar Masterclass",
+      },
+      enterprise: {
+        name: "Enterprise",
+        eyebrow: "Para equipes",
+        pitch: "White-label, cursos prontos para você, learning designer dedicado.",
+        cta: "Falar com vendas",
+      },
+    },
+    fivePack: {
+      heading: "Experimente o Masterclass sem compromisso",
+      pitch: "5 gerações completas de Masterclass · 90 dias para usar",
+      cta: "Comprar o 5-Pack — €39",
+      conversionCredit: "€20 de desconto ao fazer upgrade para Masterclass em 30 dias",
+    },
+    bodyUnlock: {
+      cta: "Desbloquear conteúdo completo do curso — €5",
+      modalTitle: "Desbloquear conteúdo deste esqueleto",
+      modalBody: "€5 único. Gera os corpos completos dos módulos (~2 min).",
+    },
+  },
+  paywall: {
+    fromFree: {
+      title: "Você usou seu esqueleto gratuito este mês",
+      body: "Desbloqueie 15 esqueletos revisados e conteúdo sob demanda com o Planner.",
+      primaryCta: "Fazer upgrade para Planner",
+    },
+    fromPlannerCap: {
+      title: "Você usou todos os 15 esqueletos este mês",
+      body: "Faça upgrade para Masterclass para 20 cursos completos por mês, ou aguarde até o dia 1.",
+      primaryCta: "Fazer upgrade para Masterclass",
+    },
+    fromPlannerMasterclassBody: {
+      title: "Conteúdo no tamanho Masterclass requer o plano Masterclass",
+      body: "Faça upgrade para Masterclass ou experimente 5 Masterclasses com o 5-Pack.",
+      primaryCta: "Fazer upgrade para Masterclass",
+      secondaryCta: "Comprar o 5-Pack",
+    },
+    fromMasterclassCap: {
+      title: "Você atingiu o limite de 20 gerações",
+      body: "Entre em contato para Enterprise se sua equipe precisar de mais.",
+      primaryCta: "Falar com vendas",
+    },
   },
   finalCta: {
     heading: "Pronto para ouvir a diferença?",
