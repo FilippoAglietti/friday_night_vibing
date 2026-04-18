@@ -29,41 +29,7 @@ const session1Lessons: Lesson[] = [
       "Capture direct quotes — they carry more weight than your interpretation",
       "Time-box interviews to 15 minutes to keep energy high and force prioritization",
     ],
-    content: `## Why Most Interviews Fail
-
-Most stakeholder interviews produce polite, vague answers that tell you nothing actionable. The reason? We ask opinion questions ("What do you think about...") instead of experience questions ("Tell me about the last time...").
-
-In a design sprint, you have **zero time for fluff**. Every interview minute must yield a concrete insight you can act on within hours, not weeks.
-
-### The 15-Minute Sprint Interview Format
-
-Break your interview into three blocks:
-
-1. **Context (3 min)** — Ask the stakeholder to describe their role and what success looks like for them personally. This reveals hidden incentives.
-2. **Story time (7 min)** — Ask them to walk you through the last time they encountered the problem. Probe with "What happened next?" and "Why was that frustrating?" Do not let them speak in hypotheticals.
-3. **Magic wand (5 min)** — "If you could change one thing overnight, what would it be?" Then ask: "What's stopping that from happening today?"
-
-### Exercise: Pair Interview Practice
-
-**Time:** 10 minutes
-
-Partner up. One person plays the stakeholder (use a scenario card provided by the facilitator), the other runs the 15-minute format compressed to 10 minutes.
-
-**Rules:**
-- The interviewer may **not** suggest solutions
-- Write down at least **3 direct quotes**
-- After the interview, the interviewer has 2 minutes to identify the **#1 unspoken assumption** they detected
-
-> **Tip:** Record interviews (with permission) so you can revisit exact wording later. In a remote sprint, Zoom transcripts are your best friend.
-
-### Synthesizing Interview Data
-
-After conducting 3-5 interviews, look for:
-- **Repeated pain points** — if three people mention the same friction, it is real
-- **Contradictions** — stakeholders who disagree reveal where the real design tension lives
-- **Emotional language** — words like "hate," "dread," and "workaround" mark high-value opportunity areas
-
-Capture your top findings on sticky notes (physical or digital). You will feed these directly into the next exercise: journey mapping.`,
+    content: "",
     suggestedResources: [
       {
         title: "The Sprint Book — Interview Chapter",
@@ -96,49 +62,7 @@ Capture your top findings on sticky notes (physical or digital). You will feed t
       "Focus on the current experience first — save ideation for Session 2",
       "Color-code sticky notes: blue for actions, pink for pain points, green for opportunities",
     ],
-    content: `## From Interviews to a Shared Picture
-
-You just completed stakeholder interviews. Now you need to transform those individual perspectives into a single, shared understanding of the user's experience. That is what a journey map does.
-
-### The 30-Minute Journey Map Protocol
-
-**Materials:** A long whiteboard (or a FigJam/Miro board), sticky notes in three colors, markers.
-
-#### Step 1 — Define the Scope (5 min)
-
-Agree on:
-- **Who** is the user? Pick one primary persona.
-- **Starting trigger** — what event causes them to begin this journey? (e.g., "Receives an error email")
-- **End goal** — what does success look like? (e.g., "Issue is resolved and customer is notified")
-
-Write these on the far left and far right of your board.
-
-#### Step 2 — Map the Steps (10 min)
-
-Working **silently and individually**, each team member writes one action per sticky note for every step the user takes between trigger and goal. Place them in a horizontal row.
-
-After 10 minutes, the facilitator reads the steps aloud and the group consolidates duplicates. Aim for **8-12 steps**.
-
-#### Step 3 — Add the Emotional Layer (10 min)
-
-Below each step, draw a simple curve showing the user's emotional state: high (things are going well), neutral, or low (frustration, confusion).
-
-For every low point, add a **pink sticky note** describing the pain in the user's own words (pull from interview quotes).
-
-#### Step 4 — Mark Opportunities (5 min)
-
-Place **green sticky notes** on the 2-3 moments where a better experience would have the biggest impact. These become your "How Might We" targets.
-
-### Exercise: Build Your Map Now
-
-Using the interview data from the previous lesson, build a journey map with your sprint team. Appoint one facilitator to keep time.
-
-> **Tip:** Take a photo of your completed map. You will reference it throughout every remaining session. It is your team's single source of truth.
-
-### Common Mistakes
-- **Too granular** — if your map has 25+ steps, zoom out. Think phases, not clicks.
-- **Mixing current and future state** — this map shows what happens today, not what you wish happened.
-- **Skipping the emotional layer** — without it, you have a process diagram, not a journey map.`,
+    content: "",
     suggestedResources: [
       {
         title: "NNG: Journey Mapping 101",
@@ -170,55 +94,7 @@ Using the interview data from the previous lesson, build a journey map with your
       "Generate at least 10 HMWs before voting on the top 3",
       "The winning HMW becomes your sprint's design brief for Session 2",
     ],
-    content: `## The Bridge Between Problem and Solution
-
-"How Might We" (HMW) questions are the most important artifact in a design sprint. They take raw pain points and reframe them as creative opportunities. A great HMW question makes the team lean forward and say, "Oh, I have an idea for that."
-
-### Anatomy of a Great HMW
-
-**Formula:** "How might we [verb] [user outcome] without [constraint]?"
-
-**Examples from real sprints:**
-- Pain: "Users abandon the checkout flow at the address step."
-  - Bad HMW: "How might we redesign the checkout page?" (too vague)
-  - Bad HMW: "How might we add Google address autocomplete?" (solution baked in)
-  - **Good HMW:** "How might we help users complete their address in under 10 seconds?"
-
-- Pain: "New employees feel lost during their first week."
-  - **Good HMW:** "How might we make a new hire feel like an insider by day 3?"
-
-### Exercise: HMW Generation Blitz
-
-**Time:** 8 minutes silent writing, 7 minutes sharing
-
-1. Look at the **pink sticky notes** (pain points) on your journey map
-2. For each pain point, write **at least 2 HMW questions** on separate sticky notes
-3. Work silently — no discussion yet
-4. After 8 minutes, each person reads their HMWs aloud and sticks them on the board
-
-### Voting: Pick Your Sprint Target
-
-Give each team member **3 dot votes** (sticker dots or marker dots). Vote for the HMW questions you believe would create the most value if solved.
-
-**Voting rules:**
-- You may place multiple dots on the same question
-- The **decider** (product owner or sprint sponsor) gets **2 extra votes**
-- Tally votes. The top-voted HMW becomes your sprint's **design challenge**
-
-> **Tip:** If the top two questions are tied, let the decider break the tie. Design sprints are not democracies — they need a clear decision-maker.
-
-### What Happens Next
-
-Your winning HMW question will carry into Session 2, where the team generates as many solutions as possible. Pin it at the top of your board — every idea you sketch tomorrow must answer this question.
-
-### Quality Check
-
-Before you leave Session 1, make sure your HMW passes these tests:
-- **Actionable** — could you start sketching solutions right now?
-- **Human-centered** — does it mention a real user and a real outcome?
-- **Scope-appropriate** — could a small team prototype a solution in one day?
-
-If it fails any test, rewrite it before wrapping up.`,
+    content: "",
     suggestedResources: [
       {
         title: "Google Design Sprint Kit — HMW",
@@ -320,44 +196,7 @@ const session2Lessons: Lesson[] = [
       "Capture the 'big idea' from each demo on a sticky note for the team wall",
       "Lightning demos are about patterns, not copying — steal the principle, not the UI",
     ],
-    content: `## Why Start With What Already Exists
-
-Before you generate new ideas, study what is already working in the wild. Lightning demos prevent your team from reinventing solved problems and inject outside-industry thinking into your sprint.
-
-### How Lightning Demos Work
-
-Each team member gets **10 minutes of prep time** to find 1-2 products, services, or experiences that solve a problem similar to your HMW question — even if they come from a completely different domain.
-
-Then, one by one, each person presents a **3-minute walkthrough**:
-1. Show the product (screen share or screenshots)
-2. Explain the **one big idea** it demonstrates
-3. The team captures that idea on a sticky note and adds it to the inspiration wall
-
-### Where to Look for Inspiration
-
-- **Direct competitors** — what are they doing well? What feels broken?
-- **Adjacent industries** — if your HMW is about onboarding, look at how Duolingo onboards language learners or how Notion introduces features progressively
-- **Analog experiences** — physical-world solutions often hold brilliant design patterns. How does IKEA guide you through a warehouse? How does a restaurant menu direct your attention?
-- **Best-in-class digital products** — Stripe's developer docs, Linear's keyboard-first UI, Airbnb's trust-building flows
-
-### Exercise: Run Your Lightning Demos
-
-**Time:** 10 min prep + 3 min per person
-
-1. Open your laptop and find 1-2 examples relevant to your HMW question
-2. Prepare a quick screen share or paste screenshots into your shared board
-3. Present in round-robin order — facilitator keeps strict 3-minute time
-4. After all demos, the team silently reviews the inspiration wall for 2 minutes
-
-> **Tip:** The best lightning demos come from unexpected places. A team redesigning hospital check-in found their winning pattern in a hotel self-service kiosk. Look wide.
-
-### Building Your Inspiration Wall
-
-By the end of this exercise, you should have **8-15 sticky notes** on your inspiration wall, each capturing a single transferable idea. These notes stay visible for the next two exercises — they are fuel for your sketches.
-
-Keep the language pattern-focused:
-- Good: "Progressive disclosure — show only what's needed at each step"
-- Bad: "Copy Duolingo's green owl mascot"`,
+    content: "",
     suggestedResources: [
       {
         title: "Google Design Sprint Kit — Lightning Demos",
@@ -390,42 +229,7 @@ Keep the language pattern-focused:
       "Include annotations — arrows, labels, and notes that explain the flow",
       "Title your sketch with a memorable name so the team can reference it easily",
     ],
-    content: `## Sketching Is the Fastest Way to Think
-
-Writing a product spec takes days. Building a prototype takes hours. But sketching a solution concept? That takes **20 minutes** — and it forces a level of concreteness that no amount of verbal discussion can match.
-
-### The Four-Step Sketch Process
-
-Work through these steps **individually and silently**. No talking, no peeking at your neighbor's work.
-
-#### Step 1 — Notes (5 min)
-Walk around the room and review the journey map, HMW questions, and lightning demo wall. Jot down anything that sparks an idea on a piece of paper. This is your private brainstorm dump.
-
-#### Step 2 — Rough Ideas (5 min)
-Sketch **3-5 rough ideas** on paper. Each one is a single frame — a quick doodle showing one possible approach. Draw boxes for screens, stick figures for users, arrows for flows. No detail needed.
-
-#### Step 3 — Crazy 8s (8 min)
-Fold a sheet of paper into 8 panels. Set a timer for **8 minutes**. Sketch **one variation per panel** — that is one minute per sketch. This forces rapid exploration and kills perfectionism. Most panels will be rough or silly, and that is the point.
-
-#### Step 4 — Solution Sketch (20 min)
-Pick your strongest idea from the Crazy 8s and develop it into a **3-panel storyboard** on a fresh sheet of paper:
-- **Panel 1:** How does the user discover or arrive at your solution?
-- **Panel 2:** What is the core interaction or "magic moment"?
-- **Panel 3:** What does success look like for the user?
-
-Add **annotations**: labels, arrows, callout boxes explaining what is happening. Write a catchy **title** at the top.
-
-### Exercise: Complete Your Solution Sketch
-
-**Time:** 38 minutes total (following the four steps above)
-
-**Rules:**
-- Work alone and in silence
-- Your sketch must be understandable without verbal explanation
-- Use a thick marker so details stay intentionally low-fidelity
-- When done, fold your sketch in half and place it face-down — no one sees it until Session 3
-
-> **Tip:** If you think you cannot draw, you are the ideal participant. The constraint of low-fidelity forces you to focus on the concept, not the polish. That is exactly what a sprint needs.`,
+    content: "",
     suggestedResources: [
       {
         title: "NNG: UX Sketching",
@@ -452,54 +256,7 @@ Add **annotations**: labels, arrows, callout boxes explaining what is happening.
       "Aim for variety, not quality — at least 3 of your 8 should feel 'out there'",
       "After Crazy 8s, circle the one panel that excites you most for your solution sketch",
     ],
-    content: `## Why Speed Unlocks Creativity
-
-When you have 30 minutes, your brain defaults to the safe, obvious answer. When you have 60 seconds, your brain panics — and that panic bypasses your inner critic. Crazy 8s exploits this phenomenon to generate ideas you would never reach through careful deliberation.
-
-### The Crazy 8s Protocol
-
-**Materials:** One sheet of paper folded into 8 panels (fold in half 3 times), a thick marker, a timer.
-
-**Setup:** Place your HMW question where you can see it. Have the inspiration wall and journey map visible.
-
-**Execution:**
-1. The facilitator starts a timer for **8 minutes total**
-2. Every 60 seconds, the facilitator calls "Next!"
-3. You sketch **one idea per panel** — it can be a screen, a flow, a concept, or even a single interaction
-4. When the timer ends, put your marker down
-
-### Coaching Notes for Facilitators
-
-- Play upbeat music during the exercise — it keeps energy high
-- Announce the time loudly: "Panel 4 — halfway there!"
-- If someone freezes, tell them to **draw the opposite** of their last idea
-- Remind the group: "Ugly is beautiful. Speed is the goal."
-
-### Exercise: Double-Round Crazy 8s
-
-For this workshop, we run **two rounds**:
-
-**Round 1 (8 min):** Classic Crazy 8s. Sketch 8 variations of your solution.
-
-**Round 2 (8 min):** Constraint round. The facilitator adds a constraint before each panel:
-- Panel 1: "What if it had to work with no text at all?"
-- Panel 2: "What if the user were a complete beginner?"
-- Panel 3: "What if it had to work on a smartwatch?"
-- Panel 4: "What if you could only use one screen?"
-- Panel 5: "What if it had to delight a 5-year-old?"
-- Panel 6: "What if it cost zero dollars to build?"
-- Panel 7: "What if it had to work offline?"
-- Panel 8: "What if it were physical, not digital?"
-
-These absurd constraints break habitual thinking and often produce the most innovative kernels.
-
-### After Crazy 8s
-
-1. Lay out both sheets in front of you
-2. **Circle** the 2-3 panels that have the strongest potential
-3. Use these as the foundation for your solution sketch (the detailed 3-panel storyboard from the previous lesson)
-
-> **Tip:** Keep your Crazy 8s sheets. Teams that revisit "rejected" panels during the converge phase often find that a wild idea becomes the differentiating detail in their final concept.`,
+    content: "",
     suggestedResources: [
       {
         title: "AJ&Smart: How to Crazy 8s",
@@ -608,42 +365,7 @@ const session3Lessons: Lesson[] = [
       "The decider's vote carries extra weight in breaking ties",
       "Silence during voting prevents anchoring bias",
     ],
-    content: `## Why Traditional Feedback Fails in Sprints
-
-In a typical design review, someone presents their work, the loudest person in the room shares their opinion, and everyone else agrees to avoid conflict. This produces mediocre consensus, not the best idea.
-
-The **Art Museum method** flips this dynamic entirely: sketches are anonymous, critique is silent, and voting is democratic (with a decisive tiebreaker).
-
-### Setting Up the Art Museum
-
-1. **Post sketches** on the wall in a row, like paintings in a gallery. Remove any identifying marks — this is anonymous.
-2. **Set a timer for 10 minutes** of silent review. Team members walk along the wall, studying each sketch carefully.
-3. **Dot voting round:** Give each person **10-15 small dot stickers**. They place dots on any **specific element** that they find compelling — a clever interaction, a smart flow decision, a delightful detail. Not on the sketch as a whole, but on the parts that work.
-
-### Reading the Heat Map
-
-After voting, step back and look at the wall. You will see natural clusters:
-- **Hot zones** — areas with many dots indicate ideas that resonate broadly
-- **Cold zones** — areas with no dots are not necessarily bad, but they did not grab anyone
-- **Lone dots** — a single dot from the decider is worth investigating
-
-### Exercise: Run Your Art Museum
-
-**Time:** 10 min silent review + 5 min dot voting + 10 min discussion
-
-1. Post all solution sketches from Session 2
-2. Silent review (no talking, no gesturing, no reactions)
-3. Dot voting — place dots on the specific parts you love
-4. The facilitator reads each sketch aloud, narrating the dots: "This area got 7 dots — what do people see here?"
-5. Sketch creators may clarify **only when asked a direct question**
-
-> **Tip:** If you are running a remote sprint, use FigJam's stamp tool or Miro's voting feature. The principle is the same: silent, individual evaluation before any group discussion.
-
-### Supervote: The Decider's Call
-
-After the group discussion, the **decider** (product owner or sponsor) places **3 large star stickers** on the ideas they want to move forward. These supervotes are the final word.
-
-The sketches (or sketch components) with supervotes advance to the storyboarding phase. Everything else goes into a "parking lot" for future sprints.`,
+    content: "",
     suggestedResources: [
       {
         title: "Design Sprint Kit — Decide Phase",
@@ -671,48 +393,7 @@ The sketches (or sketch components) with supervotes advance to the storyboarding
       "End with the success moment and what happens after",
       "Keep it rough — detail comes in the prototype phase",
     ],
-    content: `## From Voted Ideas to a Single Story
-
-Your Art Museum produced a set of winning components — clever interactions, smart flows, and compelling moments. Now you need to weave them into a **single, coherent user story** that you can prototype tomorrow.
-
-### The Storyboard Format
-
-Use a horizontal row of **6-8 panels**, each representing one key moment in the user's experience:
-
-| Panel | Content |
-|-------|---------|
-| 1 | **Entry point** — How does the user discover your solution? (Google search? Email link? App notification?) |
-| 2 | **First impression** — What do they see first? What is the headline promise? |
-| 3 | **Core action** — What does the user do? What is the primary interaction? |
-| 4 | **Decision point** — Where does the user make a choice? What are the options? |
-| 5 | **Magic moment** — The "aha" instant where the value becomes clear |
-| 6 | **Outcome** — What does success look like? What feedback does the user receive? |
-| 7-8 | **Follow-up** — What happens next? Sharing, saving, next steps? |
-
-### Exercise: Collaborative Storyboard
-
-**Time:** 30 minutes
-
-The **facilitator** leads this exercise at the whiteboard. The rest of the team contributes ideas, but the facilitator makes final decisions on what goes in each panel.
-
-**Process:**
-1. Draw 8 empty panels on the whiteboard
-2. Start with Panel 1: "Where does our user's story begin?" Pull from the winning sketches.
-3. Work through each panel sequentially. For each one:
-   - Propose what happens (draw it roughly)
-   - Check: does this incorporate a supervoted idea?
-   - Ask the decider: "Does this feel right?"
-4. When complete, read the storyboard aloud as a narrative: "First, the user sees... then they... and finally..."
-
-### Quality Checklist
-
-Before leaving this exercise, verify:
-- [ ] The storyboard answers your HMW question
-- [ ] Every panel is concrete enough to prototype (no "and then magic happens" gaps)
-- [ ] The flow takes **5 minutes or less** for a test user to complete
-- [ ] The success moment is emotionally satisfying, not just functional
-
-> **Tip:** Number your panels and add short captions. Tomorrow's prototypers will use this as their build spec, so clarity now saves hours later.`,
+    content: "",
     suggestedResources: [
       {
         title: "Sprint Stories: Storyboarding for Design Sprints",
@@ -744,53 +425,7 @@ Before leaving this exercise, verify:
       "The 2x2 matrix (Impact vs. Effort) is the fastest way to prioritize features",
       "When all else fails, the decider decides — that is their role in the sprint",
     ],
-    content: `## Disagreement Is a Feature, Not a Bug
-
-If everyone on your sprint team agrees on everything, you either have the wrong people in the room or no one is being honest. Healthy disagreement surfaces trade-offs and catches blind spots. The goal is not to eliminate disagreement — it is to **resolve it quickly** so the sprint keeps moving.
-
-### Framework 1: The 2x2 Prioritization Matrix
-
-Draw a large cross on the whiteboard:
-- **X-axis:** Effort (low to high)
-- **Y-axis:** Impact (low to high)
-
-Place each competing idea on the matrix. The conversation becomes immediately visual:
-- **High impact, low effort** = do this first (the "quick wins")
-- **High impact, high effort** = worth doing but plan carefully
-- **Low impact, low effort** = nice-to-haves, deprioritize
-- **Low impact, high effort** = discard
-
-### Framework 2: Note and Vote
-
-When the team is stuck in circular debate:
-
-1. **Silent note (2 min):** Each person writes their preferred option on a sticky note, along with one sentence explaining why.
-2. **Reveal:** Everyone flips their note simultaneously. No peeking, no changing answers.
-3. **Brief advocacy (1 min each):** Each person explains their choice.
-4. **Final vote:** Simple majority wins. If tied, the decider breaks it.
-
-Total time: under 10 minutes for a decision that could otherwise consume an hour.
-
-### Framework 3: Reversibility Test
-
-Ask: "Is this decision easily reversible?"
-
-- **Reversible** (e.g., button color, copy wording) — decide fast, test later, move on
-- **Irreversible** (e.g., core architecture, target user) — invest more time in deliberation
-
-Most sprint decisions are reversible. Treat them accordingly.
-
-### Exercise: Practice Note and Vote
-
-**Time:** 10 minutes
-
-The facilitator presents a real (or simulated) sprint dilemma:
-
-*"Your storyboard has two possible entry points: (A) a landing page with a video explainer, or (B) a streamlined sign-up form with progressive disclosure. The team is split. Use Note and Vote to decide."*
-
-Run the full Note and Vote protocol. Debrief: How did it feel compared to open debate?
-
-> **Tip:** Post your chosen decision framework on the wall. When the next disagreement arises (and it will), point to the framework instead of re-explaining the process.`,
+    content: "",
     suggestedResources: [
       {
         title: "NNG: Prioritization Matrices for UX",
@@ -882,47 +517,7 @@ const session4Lessons: Lesson[] = [
       "Use real content (real text, real images) — Lorem Ipsum kills believability",
       "Plan for the 'happy path' first, then add one error state if time allows",
     ],
-    content: `## The Prototype Mindset
-
-A design sprint prototype has one job: **to generate honest reactions from real users**. It is not a beta product. It is not a proof of concept for engineering. It is a learning tool, and it should be treated as disposable.
-
-### Goldilocks Quality
-
-Your prototype needs to hit the sweet spot:
-- **Too rough** (wireframes, gray boxes, placeholder text) — users cannot react naturally because the experience does not feel real. They comment on the fidelity instead of the concept.
-- **Too polished** (pixel-perfect, animated, production-ready) — you spend 8 hours building something you might throw away after testing. Worse, the team becomes emotionally attached and resists negative feedback.
-- **Just right** — realistic enough that a user forgets they are looking at a prototype for at least 20 seconds. Real text, real images, plausible interactions.
-
-### The Division of Labor
-
-With your storyboard as the blueprint, split the work:
-
-| Role | Responsibility |
-|------|---------------|
-| **Makers** (2-3 people) | Build the prototype screens in Figma, Keynote, or your tool of choice |
-| **Writer** (1 person) | Create all text content — headlines, button labels, error messages, notifications |
-| **Asset collector** (1 person) | Source realistic images, icons, and logos |
-| **Stitcher** (1 person) | Connect screens into a clickable flow and test all transitions |
-
-### Exercise: Set Up Your Prototype Project
-
-**Time:** 15 minutes
-
-1. Create a new Figma file (or equivalent) with frames matching your storyboard panels
-2. Agree on a simple design system: one font, one accent color, consistent button style
-3. Assign roles from the table above
-4. Set a checkpoint: the team reconvenes in 90 minutes to review the first draft
-
-> **Tip:** Start with the "magic moment" screen (Panel 5 of your storyboard). If you run out of time, you want the most important screen to be the most polished.
-
-### What to Skip
-
-Do **not** build:
-- A working backend
-- More than one user flow
-- Edge cases beyond one basic error state
-- A responsive mobile version (unless mobile is your test device)
-- Animations beyond simple screen transitions`,
+    content: "",
     suggestedResources: [
       {
         title: "Figma: Getting Started Guide",
@@ -955,55 +550,7 @@ Do **not** build:
       "Use the 'Smart Animate' transition for a polished feel with zero effort",
       "Share your prototype with a single link — no downloads, no installs for testers",
     ],
-    content: `## Figma in 45 Minutes: Everything You Need
-
-You do not need to be a Figma expert to build a sprint prototype. You need exactly **5 skills**. This lesson teaches all of them.
-
-### Skill 1 — Frames (5 min)
-
-Frames are the containers for each screen. Press **F** to create a frame, then choose a device size from the right panel (iPhone 14, Desktop 1440px, etc.). Each storyboard panel gets one frame.
-
-**Action:** Create frames for panels 1 through 6 of your storyboard. Name them descriptively: "01-Landing", "02-Signup", etc.
-
-### Skill 2 — Components from the Community (10 min)
-
-Do not design buttons, input fields, or navigation bars from scratch. Go to **Figma Community** (the globe icon in the toolbar) and search for a free UI kit like "Untitled UI" or "Material Design Kit."
-
-**Action:** Import a UI kit. Drag in the components you need: buttons, text fields, cards, navigation bars.
-
-### Skill 3 — Text and Images (10 min)
-
-Press **T** for text. Use the Writer's copy from the division of labor — paste real headlines and labels, never placeholder text.
-
-For images, drag files directly onto the canvas, or use the **Unsplash plugin** (search "Unsplash" in Figma plugins) to insert relevant stock photos.
-
-**Action:** Populate your first two frames with real text and images.
-
-### Skill 4 — Prototype Links (15 min)
-
-Switch to the **Prototype** tab (top right). Click on any element (a button, a card, a link), drag the blue arrow to the destination frame. Choose:
-- **Trigger:** On click
-- **Action:** Navigate to
-- **Transition:** Smart animate, 300ms ease-in-out
-
-**Action:** Link all your frames into a linear flow. Test it by pressing the **Play** button (top right).
-
-### Skill 5 — Sharing (5 min)
-
-Click **Share** > copy the prototype link. Anyone with the link can open it in their browser and click through the flow — no Figma account required.
-
-**Action:** Share the link with your team for an internal review.
-
-### Exercise: Build Your First Three Screens
-
-**Time:** 30 minutes
-
-Using the skills above, build frames for the first three panels of your storyboard. Focus on:
-- Real content (no lorem ipsum)
-- Clickable navigation between screens
-- One interactive element per screen (a button, a form, a toggle)
-
-> **Tip:** If you get stuck, use Figma's built-in "Prototype" flow tutorial — it is a 3-minute interactive walkthrough available from the Help menu.`,
+    content: "",
     suggestedResources: [
       {
         title: "Figma Prototyping Tutorial",
@@ -1036,59 +583,7 @@ Using the skills above, build frames for the first three panels of your storyboa
       "Never say 'Did you find it easy?' — ask 'How was that for you?' instead",
       "Prepare a brief intro that sets the tester at ease and clarifies you are testing the product, not them",
     ],
-    content: `## Your Script Is Your Research Instrument
-
-Without a consistent test script, your user interviews will produce anecdotes, not patterns. A good script ensures that all 5 testers attempt the same core tasks, allowing you to compare their reactions and spot recurring issues.
-
-### Test Script Template
-
-#### Part 1: Introduction (3 min)
-
-Read this aloud to every tester — consistency matters:
-
-*"Thanks for being here. We are testing an early version of a product, and your feedback will directly shape what we build. A few things to know:*
-- *There are no wrong answers. We are testing the product, not you.*
-- *Please think out loud — tell me what you see, what you expect, and what confuses you.*
-- *This is a prototype, so some things will not work. That is fine — just tell me what you would expect to happen.*
-- *We will be done in about 20 minutes."*
-
-#### Part 2: Background (2 min)
-
-Ask 2-3 questions to understand the tester's context:
-- "Have you ever used a product like [category]?"
-- "How do you currently handle [the problem your HMW addresses]?"
-
-#### Part 3: Tasks (12 min)
-
-Write **3-4 tasks** that map to your storyboard panels:
-- **Task 1:** "Imagine you just received [trigger]. What would you do first?"
-- **Task 2:** "You want to [core goal]. Go ahead and try."
-- **Task 3:** "You have completed [action]. What do you expect happens next?"
-
-After each task, ask:
-- "What are you thinking right now?"
-- "Is this what you expected?"
-- "What would you do if you got stuck here?"
-
-#### Part 4: Debrief (3 min)
-
-- "What stood out to you most?"
-- "Was anything confusing or frustrating?"
-- "Would you use something like this? Why or why not?"
-
-### Exercise: Write Your Test Script
-
-**Time:** 20 minutes
-
-Using the template above, write a complete test script for your prototype:
-1. Customize the introduction for your product
-2. Write 3 tasks that match your storyboard flow
-3. Add follow-up probes for each task
-4. Write 3 debrief questions
-
-Then **pair up and practice**: one person reads the script while the other plays the tester. Swap roles. Refine any questions that felt awkward or leading.
-
-> **Tip:** Print your script or keep it on a separate device during testing. Looking at the script and the tester's screen simultaneously prevents you from accidentally guiding their behavior with your body language.`,
+    content: "",
     suggestedResources: [
       {
         title: "NNG: Usability Testing 101",
@@ -1196,47 +691,7 @@ const session5Lessons: Lesson[] = [
       "Assign one team member as interviewer and one as note-taker — never combine roles",
       "Resist the urge to help when users struggle — struggle is data",
     ],
-    content: `## Five Users, Five Revelations
-
-Research by Jakob Nielsen shows that **5 usability tests** uncover approximately 85% of usability problems. You do not need 50 users and a statistics degree. You need 5 real people, a quiet room, and the discipline to watch without helping.
-
-### The Testing Setup
-
-**Room layout:**
-- The **tester** sits in front of a laptop or phone with the prototype loaded
-- The **interviewer** sits beside them (not across — side-by-side feels less confrontational)
-- The **note-taker** sits behind or to the side, out of the tester's peripheral vision
-- Screen-share to a separate room where the rest of the sprint team watches the live feed
-
-**Equipment:**
-- Screen recording software (Loom, OBS, or Figma's built-in recording)
-- The printed test script
-- A note-taking grid (columns: Task, Observation, Quote, Severity)
-
-### Running the Session
-
-1. **Introduction (3 min):** Read the script introduction. Emphasize: "We are testing the product, not you."
-2. **Background (2 min):** Ask the context questions from your script.
-3. **Tasks (12 min):** Present one task at a time. After each task:
-   - "What did you expect to happen?"
-   - "How confident are you that it worked?"
-   - If they get stuck for more than 30 seconds, ask: "What are you looking for?"
-4. **Debrief (3 min):** Open-ended reflection questions.
-
-### The Interviewer's Rules
-
-- **Never explain the UI.** If the user asks "What does this button do?" reply: "What do you think it does?"
-- **Never apologize for bugs.** Say: "That is great feedback, thank you."
-- **Never lead.** Not: "Did you notice the menu?" But: "How would you navigate from here?"
-- **Stay neutral.** Your facial expression is data too — keep it warm but unreadable.
-
-### Exercise: Run a Practice Test
-
-**Time:** 20 minutes
-
-Pair up within your team. One person plays the tester (pretend you have never seen the prototype), one plays the interviewer, one takes notes. Run through all 3 tasks from your script. Then rotate roles.
-
-> **Tip:** The most valuable moment in testing is when a user goes quiet and squints at the screen. That silence means they are confused but not saying it. Gently prompt: "I notice you paused — what is going through your mind?"`,
+    content: "",
     suggestedResources: [
       {
         title: "NNG: Thinking Aloud Protocol",
@@ -1269,51 +724,7 @@ Pair up within your team. One person plays the tester (pretend you have never se
       "Affinity mapping after all 5 tests reveals patterns no single test shows",
       "Three or more users hitting the same issue = a confirmed pattern worth fixing",
     ],
-    content: `## From Raw Notes to Actionable Patterns
-
-After 5 usability tests, you will have pages of observations, quotes, and impressions. Without a system, this data is overwhelming. With the right structure, it tells a clear story about what works, what fails, and what to fix first.
-
-### The Note-Taking Grid
-
-Before testing begins, set up a grid (spreadsheet, whiteboard, or sticky notes):
-
-| User | Task 1 | Task 2 | Task 3 | Key Quotes | Overall |
-|------|--------|--------|--------|------------|---------|
-| User 1 | | | | | |
-| User 2 | | | | | |
-| ... | | | | | |
-
-For each task cell, record:
-- **Outcome:** Green (completed easily), Yellow (struggled but completed), Red (failed or needed help)
-- **Observation:** What specifically happened? What did they click? Where did they hesitate?
-- **Quote:** Any notable thing they said, in their exact words
-
-### Exercise: Affinity Mapping Your Results
-
-**Time:** 25 minutes
-
-After completing all 5 tests:
-
-1. **Individual sticky notes (10 min):** Each observer writes one observation per sticky note. Include the user number: "U3: Expected the back button to go to the dashboard, not the previous form."
-2. **Silent clustering (10 min):** Place all sticky notes on a wall. Silently, as a team, move related notes into clusters. Do not label the clusters yet.
-3. **Name the clusters (5 min):** Once the clusters stabilize, give each one a descriptive label: "Navigation confusion," "Trust gap at sign-up," "Delightful onboarding moment."
-
-### Reading the Results
-
-Look at your grid and clusters:
-- **Rows with all green:** Your storyboard nailed this part. Move fast here during iteration.
-- **Rows with 3+ reds:** Critical usability failure. This needs redesign, not tweaking.
-- **Consistent yellow tasks:** The concept works but the execution needs polish. These are your highest-ROI improvements.
-- **Positive clusters:** Do not just fix problems — amplify what users loved.
-
-### Presenting to Stakeholders
-
-Stakeholders do not read spreadsheets. They respond to:
-1. **Video clips** of real users struggling (or delighting) — 30-second clips are devastatingly persuasive
-2. **Direct quotes** on sticky notes
-3. **The traffic-light grid** — visual, immediate, undeniable
-
-> **Tip:** Never present findings as "users did not like X." Present them as "3 out of 5 users could not complete X because Y." Evidence over opinion.`,
+    content: "",
     suggestedResources: [
       {
         title: "NNG: Affinity Diagramming",
@@ -1341,61 +752,7 @@ Stakeholders do not read spreadsheets. They respond to:
       "Schedule a follow-up sprint for the 'iterate' bucket within 2-4 weeks",
       "Celebrate what you learned, even if the prototype failed — a fast failure saves months of building the wrong thing",
     ],
-    content: `## The Sprint Is Not the End — It Is the Beginning
-
-You have spent 5 intense sessions moving from problem to validated prototype. Now comes the most important moment: **deciding what to do with what you learned.** A sprint that produces great insights but no action is worse than no sprint at all.
-
-### The Three-Bucket Framework
-
-Lay out your affinity map clusters and traffic-light grid. As a team, sort every finding into one of three buckets:
-
-**1. Build It (Green)**
-Concepts that users understood, completed successfully, and responded to positively. These are validated — move them to your product backlog with high priority.
-
-Questions to confirm:
-- Did 4+ out of 5 users succeed at the related task?
-- Did users express genuine interest (not just polite agreement)?
-- Is the technical feasibility confirmed?
-
-**2. Iterate and Retest (Yellow)**
-Concepts that showed promise but tripped users up. These need redesign and another round of testing — not a full sprint, but a focused 1-2 day iteration cycle.
-
-Questions to confirm:
-- Did 2-3 users struggle but eventually succeed?
-- Is the core idea sound, with the execution needing refinement?
-- Can you identify the specific friction point to fix?
-
-**3. Kill It (Red)**
-Concepts that fundamentally did not work. Users did not understand the value, could not complete the task, or expressed clear disinterest. These save you months of building something nobody wants.
-
-Questions to confirm:
-- Did 4+ users fail or express confusion?
-- Is the problem with the concept itself (not just the prototype execution)?
-- Would fixing it require rethinking the core approach?
-
-### Exercise: Build Your Action Plan
-
-**Time:** 20 minutes
-
-1. Sort all findings into the three buckets (10 min)
-2. For each "Build" item, assign an **owner** and a **target date**
-3. For each "Iterate" item, schedule a **retest date** within 2-4 weeks
-4. For each "Kill" item, document **what you learned** so the insight is not lost
-
-Write the action plan on a shared document. Take a photo of the wall. Send both to every stakeholder within 24 hours.
-
-### The Sprint Retro (10 min)
-
-Before the team disperses, do a quick retrospective:
-- **What worked?** Which sprint activities produced the most value?
-- **What was frustrating?** What would you change about the process?
-- **What surprised you?** The biggest unexpected insight from testing?
-
-### Closing
-
-A design sprint compresses months of guesswork into days of evidence-based decision-making. The prototype you built may be disposable, but the insights you gained are permanent. Whether you are building, iterating, or killing an idea, you are making that decision with **confidence grounded in real user behavior** — and that is the entire point.
-
-> **Tip:** Share a 2-minute video highlight reel of testing moments with your broader organization. Nothing builds design culture faster than showing real users interacting with real prototypes.`,
+    content: "",
     suggestedResources: [
       {
         title: "Sprint Book — Friday: Test",

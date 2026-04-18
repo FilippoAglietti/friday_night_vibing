@@ -465,6 +465,26 @@ export default function Home() {
     setPreviewTeachingStyle(null);
   }, []);
 
+  const handleExamplePreviewNotebookLMDownload = useCallback(() => {
+    if (!previewCurriculum) return;
+    import("@/lib/exports/generateNotebookLMMarkdown").then(({
+      generateNotebookLMMarkdown,
+      notebookLMFilename,
+    }) => {
+      const md = generateNotebookLMMarkdown(previewCurriculum);
+      const filename = notebookLMFilename(previewCurriculum);
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }, [previewCurriculum]);
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
@@ -1153,6 +1173,18 @@ export default function Home() {
                       <span className="font-medium">{t("examples.preview")}</span>
                     </div>
 
+                    {/* Tier badge */}
+                    <Badge
+                      variant="outline"
+                      className={`mt-1 rounded-full px-3 py-0.5 text-[10px] font-semibold tracking-wider uppercase ${
+                        exampleCurriculaWithStyles[i]?.tier === "masterclass"
+                          ? "border-amber-500/40 text-amber-500 bg-amber-500/5"
+                          : "border-violet-500/40 text-violet-500 bg-violet-500/5"
+                      }`}
+                    >
+                      {exampleCurriculaWithStyles[i]?.tier === "masterclass" ? "Masterclass output" : "Planner output"}
+                    </Badge>
+
                     {/* Title — fixed height so stats grid aligns across cards */}
                     <div className="mt-3 flex h-16 xl:h-18 items-center justify-center">
                       <h3 className="text-xl xl:text-2xl 2xl:text-[1.7rem] font-semibold leading-tight">
@@ -1783,6 +1815,20 @@ export default function Home() {
               teachingStyle={previewTeachingStyle}
               onGenerateAnother={closePreview}
             />
+            {exampleCurriculaWithStyles.find(
+              (e) => e.curriculum === previewCurriculum,
+            )?.tier === "masterclass" && (
+              <div className="mt-4 flex justify-center">
+                <Button
+                  onClick={handleExamplePreviewNotebookLMDownload}
+                  className="gap-2 bg-orange-600 hover:bg-orange-700 text-white border-0"
+                  size="lg"
+                >
+                  <Headphones className="h-4 w-4" />
+                  Download for NotebookLM
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
