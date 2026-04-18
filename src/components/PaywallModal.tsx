@@ -12,6 +12,7 @@ import {
   Headphones,
 } from "lucide-react";
 import { useState } from "react";
+import { isPricingLive } from "@/lib/pricing/pricingLive";
 
 interface PaywallModalProps {
   open: boolean;
@@ -61,12 +62,12 @@ const plans = [
     priceAnnual: "€82",
     annualBilledLabel: "billed €990/year",
     period: "/month",
-    description: "Ready-to-teach courses with Opus polish + audio.",
+    description: "Polished, ready-to-teach courses with NotebookLM podcast export.",
     badge: "Best for teachers",
     features: [
       "20 full courses/month",
       "Opus strategic polish on key lessons",
-      "ElevenLabs audio narration",
+      "NotebookLM-ready export → conversational podcast",
       "Masterclass-length courses",
       "White-label exports",
       "Priority queue",
@@ -92,6 +93,7 @@ export default function PaywallModal({
 }: PaywallModalProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annual">("monthly");
+  const pricingLive = isPricingLive();
 
   // Filter plans based on current plan — don't show what they already have
   const visiblePlans =
@@ -113,6 +115,10 @@ export default function PaywallModal({
   }[reason];
 
   const handleCheckout = async (priceId: string | undefined) => {
+    if (!isPricingLive()) {
+      console.info("Checkout disabled: NEXT_PUBLIC_PRICING_LIVE not set to 'true'");
+      return;
+    }
     if (!priceId) {
       console.error("No price ID configured for this plan");
       return;
@@ -289,14 +295,20 @@ export default function PaywallModal({
 
                       <Button
                         onClick={() => handleCheckout(activePriceId)}
-                        disabled={loading !== null}
-                        className={`w-full rounded-full text-sm font-semibold border-0 transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r ${plan.gradient} text-white shadow-lg ${
-                          plan.highlight
-                            ? "shadow-amber-500/20 hover:shadow-amber-500/40"
-                            : "shadow-violet-500/20 hover:shadow-violet-500/40"
+                        disabled={!pricingLive || loading !== null}
+                        className={`w-full rounded-full text-sm font-semibold border-0 transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                          pricingLive
+                            ? `bg-gradient-to-r ${plan.gradient} text-white shadow-lg ${
+                                plan.highlight
+                                  ? "shadow-amber-500/20 hover:shadow-amber-500/40"
+                                  : "shadow-violet-500/20 hover:shadow-violet-500/40"
+                              }`
+                            : "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
                         }`}
                       >
-                        {loading === activePriceId ? (
+                        {!pricingLive ? (
+                          <span>Launching tomorrow</span>
+                        ) : loading === activePriceId ? (
                           <span className="flex items-center gap-2">
                             <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             Redirecting…
