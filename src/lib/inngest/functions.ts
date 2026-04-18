@@ -40,6 +40,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { inngest } from "./client";
 import { validateCourseUrls } from "./validate-urls";
 import { reviewSkeleton } from "@/lib/inngest/reviewer";
+import { selectLessonsToPolish, polishLesson } from "@/lib/inngest/polish";
 import { tierOrFallback, TIERS } from "@/lib/pricing/tiers";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { recordEvent } from "@/lib/observability/metrics";
@@ -1245,6 +1246,59 @@ export const courseFinalize = inngest.createFunction(
           finalStatus: ratio >= MIN_SUCCESS_RATIO ? ("ready" as const) : ("partial" as const),
         };
       });
+
+    // Strategic polish (Masterclass-length only, flag-gated + tier-gated).
+    // Runs OUTSIDE step.run so recordEvent calls inside polish.ts are not
+    // memoised by Inngest. Mutates `merged` in place — soft degradation on
+    // per-lesson failure keeps the Sonnet body.
+    const { data: polishCourse } = await supabase
+      .from("courses")
+      .select("user_id, length")
+      .eq("id", courseId)
+      .single();
+
+    if (
+      polishCourse?.length === "masterclass" &&
+      polishCourse.user_id &&
+      process.env.MASTERCLASS_STRATEGIC_POLISH_ENABLED === "true"
+    ) {
+      const { data: polishProfile } = await supabase
+        .from("profiles")
+        .select("plan")
+        .eq("id", polishCourse.user_id)
+        .single();
+      const polishTier = tierOrFallback(polishProfile?.plan ?? "free");
+
+      if (TIERS[polishTier].hasPolish && merged.modules) {
+        const selected = selectLessonsToPolish(
+          merged.modules.map((m) => ({
+            id: m.id ?? "",
+            lessons: (m.lessons ?? []).map((l) => ({
+              id: l.id ?? "",
+              bodyLength: l.content?.length ?? 0,
+              body: l.content,
+            })),
+          })),
+        );
+        const selectedIds = new Set(selected.map((l) => l.id));
+        const polishJobs: Array<Promise<void>> = [];
+        for (const m of merged.modules) {
+          for (const l of m.lessons ?? []) {
+            if (!l.id || !selectedIds.has(l.id)) continue;
+            polishJobs.push(
+              polishLesson({
+                courseId,
+                lessonId: l.id,
+                body: l.content ?? "",
+              }).then((polished) => {
+                if (polished) l.content = polished;
+              }),
+            );
+          }
+        }
+        await Promise.allSettled(polishJobs);
+      }
+    }
 
     // Observability: fire a finalize outcome event BEFORE the
     // mark-final-status step. Intentionally NOT inside step.run()
