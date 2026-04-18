@@ -17,6 +17,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { TIERS, FIVE_PACK_CREDIT_EUR, FIVE_PACK_CREDIT_WINDOW_DAYS } from "@/lib/pricing/tiers";
 
 // ─── Route config ─────────────────────────────────────────────
 
@@ -41,58 +42,65 @@ async function findUserByCustomerId(
   return profiles && profiles.length > 0 ? profiles[0].id : null;
 }
 
-// ─── Canonical EUR price IDs (source of truth) ────────────────
-// All pricing migrated to EUR on 2026-04-09. USD price IDs were deprecated
-// in the same cutover. These are hard-coded here as a backstop in case the
-// NEXT_PUBLIC_STRIPE_*_PRICE_ID env vars are missing or misconfigured on
-// Vercel — the webhook MUST always resolve a known price ID to a plan,
-// otherwise invoice.paid events for existing subscribers would downgrade
-// them to `unknown` and their monthly renewals would silently break.
-const EUR_PRICE_IDS = {
-  pro: "price_1TKBpS3kBvceiBKLANxOEgzs", // €28/mo
-  fivePack: "price_1TKBpT3kBvceiBKLgw6NIFap", // €33 one-time
-  proMax: "price_1TKBpU3kBvceiBKLmKdWHeub", // €69/mo
-} as const;
-
-type ResolvedPlan = "pro" | "5pack" | "promax" | "unknown";
+// ─── Resolved-plan types ──────────────────────────────────────
+type ResolvedPlan =
+  | "planner"
+  | "masterclass"
+  | "masterclass_5pack"
+  | "planner_body_unlock"
+  | "unknown";
 type BillingInterval = "month" | "year" | "one_time";
 
-/**
- * Annual Pro quota — 15 generations/month × 12 months. Granted upfront on
- * purchase and on every yearly renewal. Annual Pro Max stays unlimited (-1),
- * so this only affects the Pro tier.
+/** Legacy EUR price IDs kept ONLY to gracefully handle in-flight
+ *  webhook events from the pre-redesign era. After all live
+ *  subscribers are migrated (migration 017), these can be removed.
+ *  They resolve to the new tiers per the data migration:
+ *    pro     → planner      (€28 monthly)
+ *    pro_max → masterclass  (€69 monthly)
+ *    5-Pack  → masterclass_5pack (€33 one-time)
  */
-const PRO_MONTHLY_QUOTA = 15;
-const PRO_ANNUAL_QUOTA = PRO_MONTHLY_QUOTA * 12;
+const LEGACY_PRICE_IDS = {
+  pro: "price_1TKBpS3kBvceiBKLANxOEgzs",
+  fivePack: "price_1TKBpT3kBvceiBKLgw6NIFap",
+  proMax: "price_1TKBpU3kBvceiBKLmKdWHeub",
+} as const;
 
 /**
  * Resolves a Stripe price ID into our internal plan + billing interval.
  *
- * Env vars win (ops-rotatable without redeploy); the EUR backstop covers
- * the monthly tier only. Annual price IDs must always come from env vars
- * since they're created at launch time — no hard-coded fallback for annual.
+ * NEW env vars (2026-04-18 cutover):
+ *   NEXT_PUBLIC_STRIPE_PLANNER_MONTHLY_PRICE_ID       €29
+ *   NEXT_PUBLIC_STRIPE_PLANNER_ANNUAL_PRICE_ID        €290
+ *   NEXT_PUBLIC_STRIPE_MASTERCLASS_MONTHLY_PRICE_ID   €99
+ *   NEXT_PUBLIC_STRIPE_MASTERCLASS_ANNUAL_PRICE_ID    €990
+ *   NEXT_PUBLIC_STRIPE_MASTERCLASS_5PACK_PRICE_ID     €39 one-time
+ *   NEXT_PUBLIC_STRIPE_PLANNER_BODY_UNLOCK_PRICE_ID   €5 one-time
  */
 function resolvePriceId(priceId: string): { plan: ResolvedPlan; interval: BillingInterval } {
-  const proMonthly = process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || "";
-  const proAnnual = process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID || "";
-  const fivePack = process.env.NEXT_PUBLIC_STRIPE_5PACK_PRICE_ID || "";
-  const proMaxMonthly = process.env.NEXT_PUBLIC_STRIPE_PROMAX_PRICE_ID || "";
-  const proMaxAnnual = process.env.NEXT_PUBLIC_STRIPE_PROMAX_ANNUAL_PRICE_ID || "";
+  const plannerMonthly = process.env.NEXT_PUBLIC_STRIPE_PLANNER_MONTHLY_PRICE_ID || "";
+  const plannerAnnual = process.env.NEXT_PUBLIC_STRIPE_PLANNER_ANNUAL_PRICE_ID || "";
+  const masterclassMonthly = process.env.NEXT_PUBLIC_STRIPE_MASTERCLASS_MONTHLY_PRICE_ID || "";
+  const masterclassAnnual = process.env.NEXT_PUBLIC_STRIPE_MASTERCLASS_ANNUAL_PRICE_ID || "";
+  const masterclass5Pack = process.env.NEXT_PUBLIC_STRIPE_MASTERCLASS_5PACK_PRICE_ID || "";
+  const plannerBodyUnlock = process.env.NEXT_PUBLIC_STRIPE_PLANNER_BODY_UNLOCK_PRICE_ID || "";
 
-  // ── 1) Env var match (ops-rotatable) ────────────────────────
-  if (priceId && priceId === proMonthly) return { plan: "pro", interval: "month" };
-  if (priceId && priceId === proAnnual) return { plan: "pro", interval: "year" };
-  if (priceId && priceId === fivePack) return { plan: "5pack", interval: "one_time" };
-  if (priceId && priceId === proMaxMonthly) return { plan: "promax", interval: "month" };
-  if (priceId && priceId === proMaxAnnual) return { plan: "promax", interval: "year" };
+  if (priceId && priceId === plannerMonthly) return { plan: "planner", interval: "month" };
+  if (priceId && priceId === plannerAnnual) return { plan: "planner", interval: "year" };
+  if (priceId && priceId === masterclassMonthly) return { plan: "masterclass", interval: "month" };
+  if (priceId && priceId === masterclassAnnual) return { plan: "masterclass", interval: "year" };
+  if (priceId && priceId === masterclass5Pack) return { plan: "masterclass_5pack", interval: "one_time" };
+  if (priceId && priceId === plannerBodyUnlock) return { plan: "planner_body_unlock", interval: "one_time" };
 
-  // ── 2) Hard-coded EUR backstop (monthly only) ───────────────
-  if (priceId === EUR_PRICE_IDS.pro) return { plan: "pro", interval: "month" };
-  if (priceId === EUR_PRICE_IDS.fivePack) return { plan: "5pack", interval: "one_time" };
-  if (priceId === EUR_PRICE_IDS.proMax) return { plan: "promax", interval: "month" };
+  if (priceId === LEGACY_PRICE_IDS.pro) return { plan: "planner", interval: "month" };
+  if (priceId === LEGACY_PRICE_IDS.fivePack) return { plan: "masterclass_5pack", interval: "one_time" };
+  if (priceId === LEGACY_PRICE_IDS.proMax) return { plan: "masterclass", interval: "month" };
 
-  // ── 3) Unknown — webhook will log + skip ────────────────────
   return { plan: "unknown", interval: "month" };
+}
+
+function capForTier(tier: "planner" | "masterclass", interval: BillingInterval): number {
+  const monthlyCap = TIERS[tier].monthlyCap;
+  return interval === "year" ? monthlyCap * 12 : monthlyCap;
 }
 
 // ─── Route handler ────────────────────────────────────────────
