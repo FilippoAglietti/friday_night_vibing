@@ -39,6 +39,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { inngest } from "./client";
 import { validateCourseUrls } from "./validate-urls";
+import { reviewSkeleton } from "@/lib/inngest/reviewer";
+import { tierOrFallback, TIERS } from "@/lib/pricing/tiers";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { recordEvent } from "@/lib/observability/metrics";
 import {
@@ -652,6 +654,32 @@ export const courseGenerate = inngest.createFunction(
         generation_completed_modules: 0,
       }).eq("id", courseId);
     });
+
+    // Opus reviewer quality gate (flag-gated + tier-gated). Per spec
+    // §5.3, reviewer feedback never blocks publish — we only annotate
+    // courses.quality_warnings so the UI can surface it. Called OUTSIDE
+    // step.run per AGENTS.md guidance for recordEvent().
+    if (thisCourse?.user_id) {
+      const { data: reviewerProfile } = await supabase
+        .from("profiles")
+        .select("plan")
+        .eq("id", thisCourse.user_id)
+        .single();
+      const reviewerTier = tierOrFallback(reviewerProfile?.plan ?? "free");
+      if (TIERS[reviewerTier].hasReviewer) {
+        const review = await reviewSkeleton({ courseId, skeleton });
+        if (review.verdict === "needs_revision") {
+          console.warn(
+            `[courseGenerate] skeleton reviewer flagged ${courseId}: ${review.feedback.join("; ")}`,
+          );
+          await supabase
+            .from("courses")
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .update({ quality_warnings: review.feedback as any })
+            .eq("id", courseId);
+        }
+      }
+    }
 
     // Step 3: insert generation_jobs rows. ON CONFLICT DO NOTHING
     // because Inngest retries could otherwise create duplicates

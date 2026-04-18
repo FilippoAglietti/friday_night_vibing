@@ -1,7 +1,7 @@
 // ============================================================
 // SUPABASE DATABASE TYPES - AUTO-GENERATED
 // Progetto: syllabi-ai (gmxseuttpurnxbluvcwx)
-// Generato il: 2026-04-18 (post migration 017 pricing redesign)
+// Generato il: 2026-04-18 (post migration 017b quality_warnings)
 // NON modificare manualmente — rigenera con: supabase gen types
 // ============================================================
 
@@ -85,6 +85,7 @@ export type Database = {
           level: Database["public"]["Enums"]["course_level"] | null
           niche: string | null
           output_structure: string | null
+          quality_warnings: Json | null
           status: Database["public"]["Enums"]["generation_status"]
           teaching_style: string | null
           thumbnail_url: string | null
@@ -120,6 +121,7 @@ export type Database = {
           level?: Database["public"]["Enums"]["course_level"] | null
           niche?: string | null
           output_structure?: string | null
+          quality_warnings?: Json | null
           status?: Database["public"]["Enums"]["generation_status"]
           teaching_style?: string | null
           thumbnail_url?: string | null
@@ -155,6 +157,7 @@ export type Database = {
           level?: Database["public"]["Enums"]["course_level"] | null
           niche?: string | null
           output_structure?: string | null
+          quality_warnings?: Json | null
           status?: Database["public"]["Enums"]["generation_status"]
           teaching_style?: string | null
           thumbnail_url?: string | null
