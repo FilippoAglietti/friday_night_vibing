@@ -9,7 +9,6 @@ import {
   Sparkles,
   Crown,
   ArrowRight,
-  Flame,
   Headphones,
 } from "lucide-react";
 import { useState } from "react";

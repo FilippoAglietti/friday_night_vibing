@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, X, Flame, Crown, Headphones, ArrowRight } from "lucide-react";
+import { Check, X, Crown, Headphones, ArrowRight } from "lucide-react";
 import { EnterpriseMailtoCta } from "@/components/EnterpriseMailtoCta";
 import {
   Card,
