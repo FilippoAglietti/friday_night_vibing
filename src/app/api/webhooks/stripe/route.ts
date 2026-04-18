@@ -167,86 +167,120 @@ export async function POST(req: NextRequest) {
         `[stripe-webhook] Checkout completed for user ${userId}, price: ${priceId}, plan: ${plan}, interval: ${interval}`
       );
 
-      if (plan === "5pack") {
-        // ── 5-Pack (Pro Max one-time): adds 5 premium generations and
-        //    promotes the profile to the "pro_max" tier so quality flags
-        //    downstream can unlock masterclass features. Stacks on any
-        //    existing positive balance (free users start at 3, pro_max
-        //    buyers at 0 or whatever they had left). If the user already
-        //    has unlimited pro_max (limit < 0), we leave the limit alone.
+      if (plan === "planner_body_unlock") {
+        const courseId = session.metadata?.courseId;
+        if (!courseId) {
+          console.error("[stripe-webhook] body_unlock session missing courseId in metadata");
+          break;
+        }
+        await supabaseAdmin
+          .from("courses")
+          .update({
+            body_unlock_purchased: true,
+            body_unlock_purchased_at: new Date().toISOString(),
+            body_unlock_stripe_session_id: session.id,
+          })
+          .eq("id", courseId)
+          .eq("user_id", userId);
+
+        const { inngest } = await import("@/lib/inngest/client");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (inngest as any).send({
+          name: "course/body-unlock.requested",
+          data: { courseId, userId },
+        });
+
+        console.log(`[stripe-webhook] Body unlock purchased for course ${courseId}`);
+        break;
+      }
+
+      if (plan === "masterclass_5pack") {
         const { data: profile } = await supabaseAdmin
           .from("profiles")
-          .select("generations_limit, plan")
+          .select("generations_limit, generations_used, plan")
           .eq("id", userId)
           .single();
 
         const currentLimit = profile?.generations_limit ?? 0;
-        const nextLimit = currentLimit < 0 ? currentLimit : currentLimit + 5;
+        const nextLimit = currentLimit + 5;
 
         await supabaseAdmin
           .from("profiles")
           .update({
-            plan: "pro_max",
+            plan: "masterclass",
             generations_limit: nextLimit,
-            white_label: true, // 5-Pack buyers get white-label exports
-            stripe_customer_id: session.customer as string,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", userId);
-
-        console.log(
-          `[stripe-webhook] 5-Pack purchased by ${userId}: plan=pro_max, limit ${currentLimit} → ${nextLimit}, white_label=true`
-        );
-      } else if (plan === "promax") {
-        // ── Pro Max monthly subscription: unlimited (-1) ──
-        await supabaseAdmin
-          .from("profiles")
-          .update({
-            plan: "pro_max",
-            generations_limit: -1,
             white_label: true,
             stripe_customer_id: session.customer as string,
+            billing_period: "one_time",
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
 
-        console.log(`[stripe-webhook] Upgraded user ${userId} to Pro Max monthly (unlimited, white_label=true)`);
-      } else if (plan === "pro") {
-        // ── Pro subscription ─────────────────────────────────
-        // Monthly: 15 generations/month, reset each invoice.paid.
-        // Annual:  180 generations/year, granted upfront, reset on
-        //          the yearly invoice.paid. Matches "15/mo" in aggregate
-        //          without forcing us to run a monthly cron for annual
-        //          subscribers.
-        const quota = interval === "year" ? PRO_ANNUAL_QUOTA : PRO_MONTHLY_QUOTA;
+        const expiresAt = new Date(Date.now() + FIVE_PACK_CREDIT_WINDOW_DAYS * 86400_000).toISOString();
+        await supabaseAdmin
+          .from("conversion_credits")
+          .upsert(
+            {
+              user_id: userId,
+              source_purchase_stripe_session_id: session.id,
+              amount_eur: FIVE_PACK_CREDIT_EUR,
+              expires_at: expiresAt,
+              redeemed: false,
+            },
+            { onConflict: "source_purchase_stripe_session_id" }
+          );
+
+        console.log(
+          `[stripe-webhook] 5-Pack purchased by ${userId}: +5 generations, credit expires ${expiresAt}`
+        );
+        break;
+      }
+
+      if (plan === "masterclass") {
+        const cap = capForTier("masterclass", interval);
         await supabaseAdmin
           .from("profiles")
           .update({
-            plan: "pro",
-            generations_limit: quota,
-            white_label: false, // Pro keeps Syllabi branding
+            plan: "masterclass",
+            generations_limit: cap,
+            generations_used: 0,
+            white_label: true,
             stripe_customer_id: session.customer as string,
+            billing_period: interval === "year" ? "annual" : "monthly",
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
 
         console.log(
-          `[stripe-webhook] Upgraded user ${userId} to Pro ${interval === "year" ? "annual" : "monthly"} (${quota} generations, white_label=false)`
+          `[stripe-webhook] Upgraded user ${userId} to Masterclass ${interval === "year" ? "annual" : "monthly"} (cap=${cap})`
         );
-      } else {
-        console.warn(`[stripe-webhook] Unknown plan for price ${priceId}, treating as Pro monthly`);
+        break;
+      }
+
+      if (plan === "planner") {
+        const cap = capForTier("planner", interval);
         await supabaseAdmin
           .from("profiles")
           .update({
-            plan: "pro",
-            generations_limit: PRO_MONTHLY_QUOTA,
+            plan: "planner",
+            generations_limit: cap,
+            generations_used: 0,
             white_label: false,
             stripe_customer_id: session.customer as string,
+            billing_period: interval === "year" ? "annual" : "monthly",
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
+
+        console.log(
+          `[stripe-webhook] Upgraded user ${userId} to Planner ${interval === "year" ? "annual" : "monthly"} (cap=${cap})`
+        );
+        break;
       }
 
+      console.warn(
+        `[stripe-webhook] Unknown plan for price ${priceId}; no profile update performed.`
+      );
       break;
     }
 
@@ -257,7 +291,6 @@ export async function POST(req: NextRequest) {
       const invoice = event.data.object as Stripe.Invoice;
       const customerId = invoice.customer as string;
 
-      // Skip the first invoice — already handled by checkout.session.completed
       if (invoice.billing_reason === "subscription_create") {
         console.log("[stripe-webhook] Skipping invoice.paid for new subscription (handled by checkout)");
         break;
@@ -269,49 +302,71 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // Figure out which plan AND interval the renewal corresponds to.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const renewalPriceId = (invoice.lines?.data?.[0] as any)?.price?.id || "";
       const { plan: renewalPlan, interval: renewalInterval } = resolvePriceId(renewalPriceId);
 
-      // CRITICAL: reset generations_used on every renewal so the budget
-      // actually resets. Without this, a Pro user who hits their quota
-      // in month 1 stays blocked forever despite renewing.
-      //
-      // Monthly cycle  → reset every month → fresh 15
-      // Annual cycle   → reset every year → fresh 180 (= 15 × 12)
-      // Pro Max        → unlimited regardless of interval
-      if (renewalPlan === "promax") {
+      if (renewalPlan === "masterclass") {
+        const cap = capForTier("masterclass", renewalInterval);
         await supabaseAdmin
           .from("profiles")
           .update({
-            plan: "pro_max",
-            generations_limit: -1,
-            generations_used: 0, // fresh cycle → fresh budget
+            plan: "masterclass",
+            generations_limit: cap,
+            generations_used: 0,
             white_label: true,
+            billing_period: renewalInterval === "year" ? "annual" : "monthly",
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
-        console.log(
-          `[stripe-webhook] Invoice paid — confirmed pro_max ${renewalInterval} for user ${userId}, counter reset`
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const discounts = (invoice as any).discount
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ? [(invoice as any).discount]
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          : ((invoice as any).discounts || []);
+        const hasConversionCredit = discounts.some(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (d: any) => d?.coupon?.id === "masterclass_5pack_conversion_credit"
         );
-      } else {
-        // Pro renewal: size quota to interval
-        const quota = renewalInterval === "year" ? PRO_ANNUAL_QUOTA : PRO_MONTHLY_QUOTA;
+        if (hasConversionCredit) {
+          await supabaseAdmin
+            .from("conversion_credits")
+            .update({
+              redeemed: true,
+              redeemed_at: new Date().toISOString(),
+              redeemed_stripe_invoice_id: invoice.id,
+            })
+            .eq("user_id", userId)
+            .eq("redeemed", false);
+        }
+
+        console.log(
+          `[stripe-webhook] Invoice paid — Masterclass ${renewalInterval} for ${userId} (cap=${cap}, credit=${hasConversionCredit})`
+        );
+        break;
+      }
+
+      if (renewalPlan === "planner") {
+        const cap = capForTier("planner", renewalInterval);
         await supabaseAdmin
           .from("profiles")
           .update({
-            plan: "pro",
-            generations_limit: quota,
+            plan: "planner",
+            generations_limit: cap,
             generations_used: 0,
             white_label: false,
+            billing_period: renewalInterval === "year" ? "annual" : "monthly",
             updated_at: new Date().toISOString(),
           })
           .eq("id", userId);
         console.log(
-          `[stripe-webhook] Invoice paid — confirmed pro ${renewalInterval} for user ${userId}, reset to 0/${quota}`
+          `[stripe-webhook] Invoice paid — Planner ${renewalInterval} for ${userId} (cap=${cap})`
         );
+        break;
       }
+
       break;
     }
 
@@ -362,20 +417,11 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      // Check if subscription is being cancelled at period end
       if (subscription.cancel_at_period_end) {
         console.log(`[stripe-webhook] Subscription set to cancel at period end for user ${userId}`);
-        // Don't downgrade yet — they keep access until the period ends
         break;
       }
 
-      // Sync the current plan + interval from the subscription's price.
-      // Tier change (pro <-> pro_max) → reset counter to 0.
-      // Interval change on the same tier (monthly <-> annual) → re-size
-      //   the Pro quota (15 ↔ 180) but leave the counter alone so we
-      //   don't accidentally re-grant or revoke budget mid-cycle; the
-      //   next invoice.paid will reset cleanly at the cycle boundary.
-      // Cosmetic update (same tier + interval) → no-op on counter.
       const currentPriceId = subscription.items.data[0]?.price?.id || "";
       const { plan, interval } = resolvePriceId(currentPriceId);
 
@@ -384,41 +430,51 @@ export async function POST(req: NextRequest) {
         .select("plan")
         .eq("id", userId)
         .single();
-      const previousPlan = currentProfile?.plan as "free" | "pro" | "pro_max" | null;
+      const previousPlan = currentProfile?.plan as
+        | "free"
+        | "planner"
+        | "masterclass"
+        | "enterprise"
+        | null;
 
-      if (plan === "pro") {
-        const tierChanged = previousPlan !== "pro";
-        const quota = interval === "year" ? PRO_ANNUAL_QUOTA : PRO_MONTHLY_QUOTA;
+      if (plan === "planner") {
+        const tierChanged = previousPlan !== "planner";
+        const cap = capForTier("planner", interval);
         const updatePayload: Record<string, unknown> = {
-          plan: "pro",
-          generations_limit: quota,
+          plan: "planner",
+          generations_limit: cap,
           white_label: false,
+          billing_period: interval === "year" ? "annual" : "monthly",
           updated_at: new Date().toISOString(),
         };
         if (tierChanged) updatePayload.generations_used = 0;
-        await supabaseAdmin
-          .from("profiles")
-          .update(updatePayload)
-          .eq("id", userId);
+        await supabaseAdmin.from("profiles").update(updatePayload).eq("id", userId);
         console.log(
-          `[stripe-webhook] Subscription updated — user ${userId} on pro ${interval}${tierChanged ? " (tier change, counter reset)" : ""}`
+          `[stripe-webhook] Subscription updated — user ${userId} on planner ${interval}${
+            tierChanged ? " (tier change, counter reset)" : ""
+          }`
         );
-      } else if (plan === "promax") {
-        const tierChanged = previousPlan !== "pro_max";
+        break;
+      }
+
+      if (plan === "masterclass") {
+        const tierChanged = previousPlan !== "masterclass";
+        const cap = capForTier("masterclass", interval);
         const updatePayload: Record<string, unknown> = {
-          plan: "pro_max",
-          generations_limit: -1,
+          plan: "masterclass",
+          generations_limit: cap,
           white_label: true,
+          billing_period: interval === "year" ? "annual" : "monthly",
           updated_at: new Date().toISOString(),
         };
         if (tierChanged) updatePayload.generations_used = 0;
-        await supabaseAdmin
-          .from("profiles")
-          .update(updatePayload)
-          .eq("id", userId);
+        await supabaseAdmin.from("profiles").update(updatePayload).eq("id", userId);
         console.log(
-          `[stripe-webhook] Subscription updated — user ${userId} on pro_max ${interval}${tierChanged ? " (tier change, counter reset)" : ""}`
+          `[stripe-webhook] Subscription updated — user ${userId} on masterclass ${interval}${
+            tierChanged ? " (tier change, counter reset)" : ""
+          }`
         );
+        break;
       }
 
       break;
@@ -441,7 +497,7 @@ export async function POST(req: NextRequest) {
         .from("profiles")
         .update({
           plan: "free",
-          generations_limit: 3, // Updated default per latest product spec
+          generations_limit: 1,
           white_label: false, // Free tier = branded exports
           updated_at: new Date().toISOString(),
         })
