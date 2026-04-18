@@ -11,11 +11,15 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { Curriculum, TeachingStyle } from "@/types/curriculum";
 import CourseContent from "./course-content";
 import GeneratingView from "./generating-view";
+import { BodyUnlockButton } from "@/components/BodyUnlockButton";
+import { courseHasModuleBodies } from "@/lib/curriculum";
 
 // ─── Supabase admin client (server-side only) ────────────────
 
@@ -27,8 +31,36 @@ function getSupabase() {
   );
 }
 
-// ─── Types ───────────────────────────────────────────────────
+// ─── Get current authenticated user ID via cookie-based client ──
 
+async function getCurrentUserId(): Promise<string | null> {
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+          set() {
+            // read-only in server component
+          },
+          remove() {
+            // read-only in server component
+          },
+        },
+      }
+    );
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
 
 // ─── Dynamic metadata for SEO / social sharing ──────────────
 
@@ -79,7 +111,7 @@ export default async function CoursePage({
   const { data: course, error } = await supabase
     .from("courses")
     .select(
-      "id, title, topic, curriculum, status, created_at, teaching_style, generation_progress, generation_total_modules, generation_completed_modules",
+      "id, title, topic, curriculum, status, created_at, teaching_style, generation_progress, generation_total_modules, generation_completed_modules, user_id, body_unlock_purchased",
     )
     .eq("id", id)
     .single();
@@ -112,12 +144,33 @@ export default async function CoursePage({
     notFound();
   }
 
+  // Get current user to determine whether to show the body-unlock CTA.
+  const currentUserId = await getCurrentUserId();
+
+  const showBodyUnlock =
+    course.body_unlock_purchased !== true &&
+    course.status === "ready" &&
+    !courseHasModuleBodies(course.curriculum) &&
+    course.user_id === currentUserId;
+
   return (
-    <CourseContent
-      curriculum={course.curriculum as Curriculum}
-      courseId={course.id}
-      createdAt={course.created_at}
-      teachingStyle={(course.teaching_style as TeachingStyle | null) ?? null}
-    />
+    <>
+      {showBodyUnlock && (
+        <div className="mx-auto max-w-4xl px-4 pt-6">
+          <div className="mb-8 rounded-lg border border-violet-200/30 bg-violet-50/5 dark:bg-violet-500/5 dark:border-violet-500/20 p-4">
+            <p className="mb-3 text-sm text-muted-foreground">
+              This is the skeleton. Unlock full module bodies (~2 min):
+            </p>
+            <BodyUnlockButton courseId={course.id} />
+          </div>
+        </div>
+      )}
+      <CourseContent
+        curriculum={course.curriculum as Curriculum}
+        courseId={course.id}
+        createdAt={course.created_at}
+        teachingStyle={(course.teaching_style as TeachingStyle | null) ?? null}
+      />
+    </>
   );
 }
