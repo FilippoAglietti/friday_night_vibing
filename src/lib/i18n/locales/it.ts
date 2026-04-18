@@ -10,12 +10,12 @@ const it: Translations = {
     getStartedFree: "Inizia Gratis",
   },
   hero: {
-    badge: "Corsi Audio · Link Condivisibili · Design Straordinario",
+    badge: "Corsi Pronti per il Podcast · Link Condivisibili · Design Straordinario",
     title1: "Il Generatore di Corsi",
     titleConnector: "che",
     title2: "Suona Bene quanto Appare",
     subtitle:
-      "L'IA crea corsi completi con narrazione audio, design bellissimo e link condivisibili — pronti per insegnare, vendere o condividere.",
+      "L'IA crea corsi completi con export pronto per il podcast, design bellissimo e link condivisibili — pronti per insegnare, vendere o condividere.",
     cta: "Genera il Tuo Primo Corso Gratis",
     secondaryCta: "Vedi un Corso di Esempio",
     tagline: "Nessuna carta di credito richiesta · Il tuo primo corso è gratuito",
@@ -24,16 +24,16 @@ const it: Translations = {
     eyebrow: "Il Problema",
     heading: "Ti suona familiare?",
     subheading:
-      "Gli altri strumenti di IA ti danno un muro di testo e lo chiamano corso. I tuoi studenti meritano audio da ascoltare, un design da guardare e un link che possano davvero aprire.",
+      "Gli altri strumenti di IA ti danno un muro di testo e lo chiamano corso. I tuoi studenti meritano contenuti da ascoltare, un design da guardare e un link che possano davvero aprire.",
     pain1Problem: "I tuoi corsi sembrano uguali a tutti gli altri",
     pain1Solution:
-      "Syllabi genera corsi con design straordinario e narrazione audio reale — così curati che i tuoi studenti non crederanno sia IA.",
+      "Syllabi genera corsi con design straordinario ed export pronto per il podcast — così curati che i tuoi studenti non crederanno sia IA.",
     pain2Problem: "Nessuno finisce i tuoi corsi",
     pain2Solution:
-      "Lezioni audio, ritmo strutturato e visuali bellissimi mantengono i corsisti coinvolti dall'inizio alla fine — non solo a sfogliare.",
+      "Ritmo strutturato e visuali bellissimi mantengono i corsisti coinvolti dall'inizio alla fine — non solo a sfogliare.",
     pain3Problem: "Creare e condividere è un incubo da 10 strumenti",
     pain3Solution:
-      "Un clic ti dà un corso completo con link condivisibile, audio, quiz e file pronti per l'esportazione. Nessun LMS necessario.",
+      "Un clic ti dà un corso completo con link condivisibile, export pronto per il podcast, quiz e file pronti per l'esportazione. Nessun LMS necessario.",
   },
   howItWorks: {
     eyebrow: "Come Funziona",
@@ -42,7 +42,7 @@ const it: Translations = {
     step1Desc: "Inserisci il tuo argomento, scegli uno stile e il livello di approfondimento.",
     step2Title: "L'IA costruisce il tuo corso",
     step2Desc:
-      "Ottieni moduli, lezioni, quiz, narrazione audio e un link condivisibile — tutto modificabile.",
+      "Ottieni moduli, lezioni, quiz, export pronto per il podcast e un link condivisibile — tutto modificabile.",
     step3Title: "Condividi, insegna o vendi",
     step3Desc:
       "Invia un link, esporta su Notion o PDF, o trasformalo in un lead magnet. Il tuo corso, a modo tuo.",
@@ -72,7 +72,7 @@ const it: Translations = {
     eyebrow: "Esempi Reali",
     heading: "Ascoltalo. Guardalo. Condividilo.",
     subheading:
-      "Ogni corso qui sotto è stato generato con Syllabi — completo di narrazione audio, lezioni strutturate, quiz e link condivisibile.",
+      "Ogni corso qui sotto è stato generato con Syllabi — completo di export pronto per il podcast, lezioni strutturate, quiz e link condivisibile.",
     modules: "Moduli",
     lessons: "Lezioni",
     total: "Totale",
@@ -82,7 +82,7 @@ const it: Translations = {
     eyebrow: "Cosa Dicono i Creator",
     heading: "Hanno provato gli altri. Poi hanno ascoltato Syllabi",
     subheading:
-      "Creator di corsi, coach e formatori che sono passati ai corsi audio e non sono più tornati indietro.",
+      "Creator di corsi, coach e formatori che sono passati all'export pronto per il podcast e non sono più tornati indietro.",
   },
   pricing: {
     eyebrow: "Prezzi",
@@ -104,8 +104,8 @@ const it: Translations = {
     proDesc: "Per i creator di corsi seri che pubblicano regolarmente.",
     fivePackDesc: "5 generazioni premium. Nessun abbonamento.",
     proMaxDesc: "Il kit definitivo per creare e vendere corsi.",
-    aiAudioTitle: "Lezioni Audio con IA",
-    aiAudioDesc: "Genera audio narrato per ogni lezione",
+    notebookLMExportTitle: "Export pronto per NotebookLM",
+    notebookLMExportDesc: "Scarica un file Markdown e genera un podcast in Google NotebookLM",
     swipePlans: "Scorri per vedere tutti i piani →",
     startProBtn: "Inizia Pro — €28/mese",
     tryProMaxBtn: "Prova Pro Max — €33",
@@ -114,7 +114,6 @@ const it: Translations = {
     free2: "Moduli, lezioni e quiz",
     free3: "Esportazione PDF e Notion",
     free4: "Link corso condivisibili",
-    free5: "Narrazione audio",
     free6: "15 generazioni/mese (Pro)",
     pro1: "15 generazioni di corsi/mese",
     pro2: "Moduli, lezioni e quiz completi",
@@ -122,14 +121,14 @@ const it: Translations = {
     pro4: "Tutte le lunghezze e gli stili di corso",
     pro5: "Elaborazione IA prioritaria",
     pm1: "Tutto di Pro",
-    pm2: "Lezioni audio generate dall'IA",
+    pm2: "Export pronto per NotebookLM (pronto per il podcast)",
     pm3: "Generazione completa del contenuto dei capitoli",
     pm4: "Esportazione premium Notion e PDF",
     pm5: "Pacchetti corso pronti per la vendita",
     pm6: "White-label branding",
     pm7: "Elaborazione IA dedicata",
     pack1: "5 generazioni Pro Max",
-    pack2: "Lezioni audio generate dall'IA",
+    pack2: "Export pronto per NotebookLM (pronto per il podcast)",
     pack3: "Generazione completa del contenuto dei capitoli",
     pack4: "Esportazione premium Notion e PDF",
     pack5: "White-label branding",
@@ -204,7 +203,7 @@ const it: Translations = {
   finalCta: {
     heading: "Pronto ad ascoltare la differenza?",
     subheading:
-      "Crea un corso con audio, design e un link condivisibile. La tua prima generazione è gratuita.",
+      "Crea un corso con export pronto per il podcast, design e un link condivisibile. La tua prima generazione è gratuita.",
     cta: "Genera il Tuo Primo Corso Gratis",
   },
   footer: {
@@ -294,15 +293,15 @@ const it: Translations = {
     step4Title: "Fallo Tuo",
     step4Desc: "Apri il Course Editor per riscrivere titoli, modificare contenuti, aggiungere quiz, riordinare moduli o rimuovere ciò che non serve.",
     step4Detail: "Ogni singolo elemento è modificabile — niente è bloccato.",
-    step5Title: "Aggiungi la Narrazione Audio",
+    step5Title: "Scarica per NotebookLM",
     step5Desc: "Genera una narrazione vocale professionale per ogni lezione. Scegli tra diverse voci AI per adattarti al tono del corso.",
-    step5Detail: "Disponibile su Pro Max. Trasforma le lezioni in audio stile podcast.",
+    step5Detail: "Disponibile su Masterclass. Scarica il tuo corso come file Markdown pronto per NotebookLM — caricalo su Google NotebookLM per generare un podcast conversazionale.",
     step6Title: "Condividi, Esporta, Vendi",
     step6Desc: "Copia il tuo link condivisibile, esporta in PDF, Notion, PPTX o DOCX. Aggiungi un gate email per far crescere la tua lista, o vendilo direttamente.",
     step6Detail: "I link condivisibili funzionano ovunque — nessun login richiesto al tuo pubblico.",
     tipsTitle: "Consigli Pro",
     tip1: "Aggiungi una nicchia (es. \"vendite SaaS\") per contenuti più mirati e specifici.",
-    tip2: "Usa la narrazione audio su Pro Max per creare lezioni in stile podcast da ascoltare in movimento.",
+    tip2: "Scarica il tuo corso per NotebookLM per trasformarlo in un podcast conversazionale da ascoltare in movimento.",
     tip3: "Trasforma i mini-corsi in lead magnet aggiungendo un gate email — fai crescere la tua lista in automatico.",
     cta: "Pronto a creare il tuo primo corso?",
     ctaSub: "Nessuna carta di credito richiesta. I tuoi primi 3 corsi sono gratuiti.",

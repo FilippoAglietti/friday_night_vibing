@@ -13,7 +13,6 @@ export interface TierConfig {
   hasReviewer: boolean;
   hasModuleBodies: boolean;
   hasPolish: boolean;
-  hasAudio: boolean;
   hasNotebookLMExport: boolean;
   hasWhiteLabel: boolean;
 }

@@ -10,12 +10,12 @@ const fr: Translations = {
     getStartedFree: "Commencer gratuitement",
   },
   hero: {
-    badge: "Cours audio · Liens partageables · Design époustouflant",
+    badge: "Cours prêts pour le podcast · Liens partageables · Design époustouflant",
     title1: "Le Générateur de Cours",
     titleConnector: "qui",
     title2: "Sonne Aussi Bien Qu'il en a l'Air",
     subtitle:
-      "L'IA crée des cours complets avec narration audio, un design soigné et des liens partageables — prêts à enseigner, vendre ou partager.",
+      "L'IA crée des cours complets avec export prêt pour le podcast, un design soigné et des liens partageables — prêts à enseigner, vendre ou partager.",
     cta: "Générez Votre Premier Cours Gratuitement",
     secondaryCta: "Voir un cours exemple",
     tagline: "Sans carte bancaire · Votre premier cours est gratuit",
@@ -24,16 +24,16 @@ const fr: Translations = {
     eyebrow: "Le Problème",
     heading: "Ça vous parle ?",
     subheading:
-      "Les autres outils IA vous donnent un bloc de texte et appellent ça un cours. Vos apprenants méritent un audio à écouter, un design à regarder et un lien qu'ils peuvent vraiment ouvrir.",
+      "Les autres outils IA vous donnent un bloc de texte et appellent ça un cours. Vos apprenants méritent du contenu à écouter, un design à regarder et un lien qu'ils peuvent vraiment ouvrir.",
     pain1Problem: "Vos cours ressemblent à ceux de tout le monde",
     pain1Solution:
-      "Syllabi génère des cours avec un design époustouflant et une vraie narration audio — tellement soignés que vos apprenants n'en croiront pas que c'est de l'IA.",
+      "Syllabi génère des cours avec un design époustouflant et un export prêt pour le podcast — tellement soignés que vos apprenants n'en croiront pas que c'est de l'IA.",
     pain2Problem: "Personne ne termine vos cours",
     pain2Solution:
-      "Les leçons audio, le rythme structuré et les visuels soignés maintiennent les apprenants engagés du début à la fin — pas juste en survol.",
+      "Le rythme structuré et les visuels soignés maintiennent les apprenants engagés du début à la fin — pas juste en survol.",
     pain3Problem: "Créer et partager est un cauchemar à 10 outils",
     pain3Solution:
-      "Un clic vous donne un cours complet avec un lien partageable, de l'audio, des quiz et des fichiers prêts à exporter. Aucun LMS requis.",
+      "Un clic vous donne un cours complet avec un lien partageable, un export prêt pour le podcast, des quiz et des fichiers prêts à exporter. Aucun LMS requis.",
   },
   howItWorks: {
     eyebrow: "Comment ça marche",
@@ -43,7 +43,7 @@ const fr: Translations = {
       'Entrez votre sujet, choisissez un style et un niveau — de « Python pour la science des données » à « Boulangerie au levain 101 ».',
     step2Title: "L'IA construit votre cours",
     step2Desc:
-      "Vous obtenez des modules, des leçons, des quiz, une narration audio et un lien partageable — tout est modifiable.",
+      "Vous obtenez des modules, des leçons, des quiz, un export prêt pour le podcast et un lien partageable — tout est modifiable.",
     step3Title: "Partagez, enseignez ou vendez",
     step3Desc:
       "Envoyez un lien, exportez vers Notion ou PDF, ou transformez-le en lead magnet. Votre cours, à votre façon.",
@@ -73,7 +73,7 @@ const fr: Translations = {
     eyebrow: "Exemples réels",
     heading: "Écoutez. Voyez. Partagez.",
     subheading:
-      "Chaque cours ci-dessous a été généré avec Syllabi — avec narration audio, leçons structurées, quiz et lien partageable.",
+      "Chaque cours ci-dessous a été généré avec Syllabi — avec export prêt pour le podcast, leçons structurées, quiz et lien partageable.",
     modules: "Modules",
     lessons: "Leçons",
     total: "Total",
@@ -83,7 +83,7 @@ const fr: Translations = {
     eyebrow: "Ce que disent les créateurs",
     heading: "Ils ont tout essayé. Puis ils ont entendu Syllabi",
     subheading:
-      "Des créateurs de cours, coachs et formateurs qui sont passés aux cours axés sur l'audio et ne sont jamais revenus en arrière.",
+      "Des créateurs de cours, coachs et formateurs qui sont passés à l'export prêt pour le podcast et ne sont jamais revenus en arrière.",
   },
   pricing: {
     eyebrow: "Tarifs",
@@ -105,8 +105,8 @@ const fr: Translations = {
     proDesc: "Pour les créateurs de cours sérieux qui publient régulièrement.",
     fivePackDesc: "5 générations premium. Sans abonnement.",
     proMaxDesc: "La boîte à outils ultime pour créer et vendre des cours.",
-    aiAudioTitle: "Leçons audio IA",
-    aiAudioDesc: "Générez une narration audio pour chaque leçon",
+    notebookLMExportTitle: "Export prêt pour NotebookLM",
+    notebookLMExportDesc: "Téléchargez un fichier Markdown et générez un podcast dans Google NotebookLM",
     swipePlans: "Faites glisser pour voir tous les forfaits →",
     startProBtn: "Passer à Pro — €28/mois",
     tryProMaxBtn: "Essayer Pro Max — €33",
@@ -115,7 +115,6 @@ const fr: Translations = {
     free2: "Modules, leçons et quiz",
     free3: "Export PDF et Notion",
     free4: "Liens de cours partageables",
-    free5: "Narration audio",
     free6: "15 générations/mois (Pro)",
     pro1: "15 générations de cours par mois",
     pro2: "Modules, leçons et quiz complets",
@@ -123,14 +122,14 @@ const fr: Translations = {
     pro4: "Tous les formats et styles de cours",
     pro5: "Traitement IA prioritaire",
     pm1: "Tout ce qu'il y a dans Pro",
-    pm2: "Leçons audio générées par IA",
+    pm2: "Export prêt pour NotebookLM (prêt pour le podcast)",
     pm3: "Génération complète du contenu par chapitre",
     pm4: "Export premium Notion et PDF",
     pm5: "Packages de cours prêts à vendre",
     pm6: "Marque white-label",
     pm7: "Traitement IA dédié",
     pack1: "5 générations Pro Max",
-    pack2: "Leçons audio générées par IA",
+    pack2: "Export prêt pour NotebookLM (prêt pour le podcast)",
     pack3: "Génération complète du contenu par chapitre",
     pack4: "Export premium Notion et PDF",
     pack5: "Marque white-label",
@@ -205,7 +204,7 @@ const fr: Translations = {
   finalCta: {
     heading: "Prêt à entendre la différence ?",
     subheading:
-      "Créez un cours avec audio, design et lien partageable. Votre première génération est gratuite.",
+      "Créez un cours avec export prêt pour le podcast, design et lien partageable. Votre première génération est gratuite.",
     cta: "Générez Votre Premier Cours Gratuitement",
   },
   footer: {
@@ -296,15 +295,15 @@ const fr: Translations = {
     step4Title: "Faites-le Vôtre",
     step4Desc: "Ouvrez l'Éditeur de Cours pour réécrire les titres, ajuster le contenu, ajouter des questions de quiz, réordonner les modules ou supprimer ce qui ne convient pas.",
     step4Detail: "Chaque élément est modifiable — rien n'est verrouillé.",
-    step5Title: "Ajoutez la Narration Audio",
+    step5Title: "Téléchargez pour NotebookLM",
     step5Desc: "Générez une narration vocale professionnelle pour chaque leçon. Choisissez parmi plusieurs voix IA pour correspondre au ton de votre cours.",
-    step5Detail: "Disponible sur Pro Max. Transforme les leçons texte en audio style podcast.",
+    step5Detail: "Disponible sur Masterclass. Téléchargez votre cours sous forme de fichier Markdown prêt pour NotebookLM — déposez-le dans Google NotebookLM pour générer un podcast conversationnel.",
     step6Title: "Partagez, Exportez, Vendez",
     step6Desc: "Copiez votre lien partageable, exportez en PDF, Notion, PPTX ou DOCX. Ajoutez une capture d'email pour développer votre liste, ou vendez-le directement.",
     step6Detail: "Les liens partageables fonctionnent partout — aucune connexion requise pour votre audience.",
     tipsTitle: "Astuces Pro",
     tip1: "Ajoutez une niche (ex. \"ventes SaaS\") pour un contenu plus ciblé et spécifique.",
-    tip2: "Utilisez la narration audio sur Pro Max pour créer des leçons style podcast à écouter en déplacement.",
+    tip2: "Téléchargez votre cours pour NotebookLM pour le transformer en podcast conversationnel à écouter en déplacement.",
     tip3: "Transformez vos mini-cours en lead magnets en ajoutant une capture d'email — développez votre liste en pilote automatique.",
     cta: "Prêt à créer votre premier cours ?",
     ctaSub: "Aucune carte de crédit requise. Vos 3 premiers cours sont gratuits.",

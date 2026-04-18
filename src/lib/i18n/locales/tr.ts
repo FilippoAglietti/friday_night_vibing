@@ -10,12 +10,12 @@ const tr: Translations = {
     getStartedFree: "Ücretsiz Başla",
   },
   hero: {
-    badge: "Sesli Kurslar · Paylaşılabilir Bağlantılar · Çarpıcı Tasarım",
+    badge: "Podcast'e Hazır Kurslar · Paylaşılabilir Bağlantılar · Çarpıcı Tasarım",
     title1: "Kurs Oluşturucu",
     titleConnector: "hem",
     title2: "kulağa da göründüğü kadar güzel",
     subtitle:
-      "Yapay zeka, sesli anlatım, güzel tasarım ve paylaşılabilir bağlantılarla eksiksiz kurslar oluşturur — öğretmeye, satmaya veya paylaşmaya hazır.",
+      "Yapay zeka, podcast'e hazır dışa aktarma, güzel tasarım ve paylaşılabilir bağlantılarla eksiksiz kurslar oluşturur — öğretmeye, satmaya veya paylaşmaya hazır.",
     cta: "İlk Kursunuzu Ücretsiz Oluşturun",
     secondaryCta: "Örnek Kursu Gör",
     tagline: "Kredi kartı gerekmez · İlk kursunuz ücretsiz",
@@ -27,13 +27,13 @@ const tr: Translations = {
       "Diğer yapay zeka araçları size bir metin yığını verir ve buna kurs der. Öğrencileriniz dinleyebilecekleri sesler, bakmak istedikleri bir tasarım ve gerçekten açabilecekleri bir bağlantı hak ediyor.",
     pain1Problem: "Kurslarınız herkesinkiyle aynı görünüyor",
     pain1Solution:
-      "Syllabi, çarpıcı tasarım ve gerçek sesli anlatımla kurslar oluşturur — o kadar cilalı ki öğrencileriniz bunun yapay zeka olduğuna inanmaz.",
+      "Syllabi, çarpıcı tasarım ve podcast'e hazır dışa aktarma ile kurslar oluşturur — o kadar cilalı ki öğrencileriniz bunun yapay zeka olduğuna inanmaz.",
     pain2Problem: "Kurslarınızı kimse bitiremiyor",
     pain2Solution:
-      "Sesli dersler, yapılandırılmış tempo ve güzel görseller öğrencileri baştan sona meşgul tutar.",
+      "Yapılandırılmış tempo ve güzel görseller öğrencileri baştan sona meşgul tutar — sadece göz gezdirmekle kalmazlar.",
     pain3Problem: "Oluşturmak ve paylaşmak 10 araçlık bir kabus",
     pain3Solution:
-      "Tek tıkla paylaşılabilir bağlantı, ses, quiz ve dışa aktarmaya hazır dosyalarla eksiksiz bir kurs alırsınız. LMS gerekmez.",
+      "Tek tıkla paylaşılabilir bağlantı, podcast'e hazır dışa aktarma, quiz ve dışa aktarmaya hazır dosyalarla eksiksiz bir kurs alırsınız. LMS gerekmez.",
   },
   howItWorks: {
     eyebrow: "Nasıl Çalışır",
@@ -42,7 +42,7 @@ const tr: Translations = {
     step1Desc: "Konunuzu girin, bir stil ve derinlik seçin.",
     step2Title: "Yapay zeka kursunuzu oluşturur",
     step2Desc:
-      "Modüller, dersler, quizler, sesli anlatım ve paylaşılabilir bir bağlantı alırsınız — hepsi düzenlenebilir.",
+      "Modüller, dersler, quizler, podcast'e hazır dışa aktarma ve paylaşılabilir bir bağlantı alırsınız — hepsi düzenlenebilir.",
     step3Title: "Paylaşın, öğretin veya satın",
     step3Desc:
       "Bir bağlantı gönderin, Notion veya PDF'ye aktarın ya da potansiyel müşteri mıknatısına dönüştürün. Sizin kursunuz, sizin tarzınız.",
@@ -72,7 +72,7 @@ const tr: Translations = {
     eyebrow: "Gerçek Örnekler",
     heading: "Dinle. Gör. Paylaş.",
     subheading:
-      "Aşağıdaki her kurs Syllabi ile oluşturuldu — sesli anlatım, yapılandırılmış dersler, quizler ve paylaşılabilir bağlantıyla eksiksiz.",
+      "Aşağıdaki her kurs Syllabi ile oluşturuldu — podcast'e hazır dışa aktarma, yapılandırılmış dersler, quizler ve paylaşılabilir bağlantıyla eksiksiz.",
     modules: "Modüller",
     lessons: "Dersler",
     total: "Toplam",
@@ -82,7 +82,7 @@ const tr: Translations = {
     eyebrow: "İçerik Üreticiler Ne Diyor",
     heading: "Diğerlerini denediler. Sonra Syllabi'yi duydular.",
     subheading:
-      "Ses öncelikli kurslara geçen ve bir daha geriye bakmayan kurs üreticileri, koçlar ve eğitmenler.",
+      "Podcast'e hazır dışa aktarmaya geçen ve bir daha geriye bakmayan kurs üreticileri, koçlar ve eğitmenler.",
   },
   pricing: {
     eyebrow: "Fiyatlandırma",
@@ -104,8 +104,8 @@ const tr: Translations = {
     proDesc: "Düzenli yayın yapan ciddi kurs üreticileri için.",
     fivePackDesc: "5 premium oluşturma. Abonelik yok.",
     proMaxDesc: "Kurs oluşturmak ve satmak için nihai araç seti.",
-    aiAudioTitle: "AI Audio Lessons",
-    aiAudioDesc: "Her ders için seslendirilmiş ses oluşturun",
+    notebookLMExportTitle: "NotebookLM için dışa aktarma",
+    notebookLMExportDesc: "Bir Markdown dosyası indirin ve Google NotebookLM'de podcast oluşturun",
     swipePlans: "Tüm planları görmek için kaydırın →",
     startProBtn: "Pro'ya Başla — €28/mo",
     tryProMaxBtn: "Pro Max'i Dene — €33",
@@ -114,7 +114,6 @@ const tr: Translations = {
     free2: "Modüller, dersler ve quizler",
     free3: "PDF ve Notion dışa aktarma",
     free4: "Paylaşılabilir kurs bağlantıları",
-    free5: "Sesli anlatım",
     free6: "15 oluşturma/ay (Pro)",
     pro1: "Ayda 15 kurs oluşturma",
     pro2: "Tam modüller, dersler ve quizler",
@@ -122,14 +121,14 @@ const tr: Translations = {
     pro4: "Tüm kurs uzunlukları ve stilleri",
     pro5: "Öncelikli yapay zeka işleme",
     pm1: "Pro'daki her şey",
-    pm2: "Yapay zeka tarafından oluşturulan sesli dersler",
+    pm2: "NotebookLM için dışa aktarma (podcast'e hazır)",
     pm3: "Tam bölüm içeriği oluşturma",
     pm4: "Premium Notion ve PDF dışa aktarma",
     pm5: "Satışa hazır kurs paketleri",
     pm6: "Beyaz etiket markalama",
     pm7: "Özel yapay zeka işleme",
     pack1: "5 Pro Max oluşturma",
-    pack2: "Yapay zeka tarafından oluşturulan sesli dersler",
+    pack2: "NotebookLM için dışa aktarma (podcast'e hazır)",
     pack3: "Tam bölüm içeriği oluşturma",
     pack4: "Premium Notion ve PDF dışa aktarma",
     pack5: "Beyaz etiket markalama",
@@ -204,7 +203,7 @@ const tr: Translations = {
   finalCta: {
     heading: "Farkı duymaya hazır mısınız?",
     subheading:
-      "Ses, tasarım ve paylaşılabilir bağlantıyla bir kurs oluşturun. İlk oluşturmanız ücretsiz.",
+      "Podcast'e hazır dışa aktarma, tasarım ve paylaşılabilir bağlantıyla bir kurs oluşturun. İlk oluşturmanız ücretsiz.",
     cta: "İlk Kursunuzu Ücretsiz Oluşturun",
   },
   footer: {
@@ -294,15 +293,15 @@ const tr: Translations = {
     step4Title: "Kendinize Ait Yapın",
     step4Desc: "Kurs Düzenleyiciyi açarak başlıkları yeniden yazın, içeriği düzenleyin, sınav soruları ekleyin, modülleri yeniden sıralayın veya uymayanları kaldırın.",
     step4Detail: "Her eleman düzenlenebilir — hiçbir şey kilitli değil.",
-    step5Title: "Sesli Anlatım Ekleyin",
+    step5Title: "NotebookLM için İndirin",
     step5Desc: "Her ders için profesyonel sesli anlatım oluşturun. Kurs tonunuza uyacak birden fazla AI sesi arasından seçim yapın.",
-    step5Detail: "Pro Max'te kullanılabilir. Metin derslerini podcast tarzı sese dönüştürür.",
+    step5Detail: "Masterclass'ta kullanılabilir. Kursunuzu NotebookLM için hazır bir Markdown dosyası olarak indirin — Google NotebookLM'e yükleyerek sohbet tarzı bir podcast oluşturun.",
     step6Title: "Paylaşın, Dışa Aktarın, Satın",
     step6Desc: "Paylaşılabilir bağlantınızı kopyalayın, PDF, Notion, PPTX veya DOCX'e dışa aktarın. Listenizi büyütmek için e-posta yakalama ekleyin veya doğrudan satın.",
     step6Detail: "Paylaşılabilir bağlantılar her yerde çalışır — kitleniz için giriş gerekmez.",
     tipsTitle: "Pro ipuçları",
     tip1: "Daha hedefli, spesifik içerik için bir niş ekleyin (örn. \"SaaS satışları\").",
-    tip2: "Pro Max'te sesli anlatımı kullanarak kitlenizin hareket halindeyken dinleyebileceği podcast tarzı dersler oluşturun.",
+    tip2: "Kursunuzu NotebookLM için indirerek onu hareket halindeyken dinleyebileceğiniz sohbet tarzı bir podcast'e dönüştürün.",
     tip3: "E-posta yakalama ekleyerek mini kursları lead magnet'lere dönüştürün — listenizi otomatik pilotta büyütün.",
     cta: "İlk kursunuzu oluşturmaya hazır mısınız?",
     ctaSub: "Kredi kartı gerekmez. İlk 3 kursunuz ücretsiz.",

@@ -10,12 +10,12 @@ const nl: Translations = {
     getStartedFree: "Gratis beginnen",
   },
   hero: {
-    badge: "Audiocursussen · Deelbare links · Verbluffend design",
+    badge: "Podcast-klare cursussen · Deelbare links · Verbluffend design",
     title1: "De Cursusgenerator",
     titleConnector: "die",
     title2: "Zo Goed Klinkt als Hij Eruitziet",
     subtitle:
-      "AI maakt complete cursussen met audiovertelling, prachtig design en deelbare links — klaar om te onderwijzen, verkopen of delen.",
+      "AI maakt complete cursussen met podcast-klare export, prachtig design en deelbare links — klaar om te onderwijzen, verkopen of delen.",
     cta: "Genereer Gratis Je Eerste Cursus",
     secondaryCta: "Bekijk een Voorbeeldcursus",
     tagline: "Geen creditcard vereist · Je eerste cursus is gratis",
@@ -24,16 +24,16 @@ const nl: Translations = {
     eyebrow: "Het Probleem",
     heading: "Klinkt dit bekend?",
     subheading:
-      "Andere AI-tools geven je een tekstdump en noemen het een cursus. Je studenten verdienen audio om naar te luisteren, design om naar te kijken en een link die ze echt kunnen openen.",
+      "Andere AI-tools geven je een tekstdump en noemen het een cursus. Je studenten verdienen content om naar te luisteren, design om naar te kijken en een link die ze echt kunnen openen.",
     pain1Problem: "Je cursussen zien er hetzelfde uit als die van iedereen",
     pain1Solution:
-      "Syllabi genereert cursussen met verbluffend design en echte audiovertelling — zo gepolijst dat je studenten niet zullen geloven dat het AI is.",
+      "Syllabi genereert cursussen met verbluffend design en podcast-klare export — zo gepolijst dat je studenten niet zullen geloven dat het AI is.",
     pain2Problem: "Niemand maakt je cursussen af",
     pain2Solution:
-      "Audiolessen, gestructureerd tempo en prachtige visuals houden cursisten betrokken van begin tot eind — niet alleen skim­mend.",
+      "Gestructureerd tempo en prachtige visuals houden cursisten betrokken van begin tot eind — niet alleen skim­mend.",
     pain3Problem: "Aanmaken en delen is een nachtmerrie van 10 tools",
     pain3Solution:
-      "Eén klik geeft je een complete cursus met een deelbare link, audio, quizzen en exportklare bestanden. Geen LMS vereist.",
+      "Eén klik geeft je een complete cursus met een deelbare link, podcast-klare export, quizzen en exportklare bestanden. Geen LMS vereist.",
   },
   howItWorks: {
     eyebrow: "Hoe Het Werkt",
@@ -42,7 +42,7 @@ const nl: Translations = {
     step1Desc: "Voer je onderwerp in, kies een stijl en diepgang.",
     step2Title: "AI bouwt je cursus",
     step2Desc:
-      "Je krijgt modules, lessen, quizzen, audiovertelling en een deelbare link — allemaal bewerkbaar.",
+      "Je krijgt modules, lessen, quizzen, podcast-klare export en een deelbare link — allemaal bewerkbaar.",
     step3Title: "Deel, onderwijs of verkoop",
     step3Desc:
       "Stuur een link, exporteer naar Notion of PDF, of maak er een lead magnet van. Jouw cursus, op jouw manier.",
@@ -72,7 +72,7 @@ const nl: Translations = {
     eyebrow: "Echte Voorbeelden",
     heading: "Beluister het. Bekijk het. Deel het.",
     subheading:
-      "Elke cursus hieronder werd gegenereerd met Syllabi — compleet met audiovertelling, gestructureerde lessen, quizzen en een deelbare link.",
+      "Elke cursus hieronder werd gegenereerd met Syllabi — compleet met podcast-klare export, gestructureerde lessen, quizzen en een deelbare link.",
     modules: "Modules",
     lessons: "Lessen",
     total: "Totaal",
@@ -82,7 +82,7 @@ const nl: Translations = {
     eyebrow: "Wat Creators Zeggen",
     heading: "Ze probeerden de rest. Toen hoorden ze Syllabi",
     subheading:
-      "Cursusontwikkelaars, coaches en trainers die overstapten op audio-first cursussen en nooit meer terugkeken.",
+      "Cursusontwikkelaars, coaches en trainers die overstapten op podcast-klare export en nooit meer terugkeken.",
   },
   pricing: {
     eyebrow: "Prijzen",
@@ -104,8 +104,8 @@ const nl: Translations = {
     proDesc: "Voor serieuze cursusontwikkelaars die regelmatig publiceren.",
     fivePackDesc: "5 premium generaties. Geen abonnement.",
     proMaxDesc: "De ultieme toolkit om cursussen te maken en te verkopen.",
-    aiAudioTitle: "AI-audiolessen",
-    aiAudioDesc: "Genereer verteld audio voor elke les",
+    notebookLMExportTitle: "NotebookLM-klare export",
+    notebookLMExportDesc: "Download een Markdown-bestand en genereer een podcast in Google NotebookLM",
     swipePlans: "Veeg om alle plannen te zien →",
     startProBtn: "Start Pro — €28/mnd",
     tryProMaxBtn: "Probeer Pro Max — €33",
@@ -114,7 +114,6 @@ const nl: Translations = {
     free2: "Modules, lessen en quizzen",
     free3: "PDF en Notion export",
     free4: "Deelbare cursuslinks",
-    free5: "Audiovertelling",
     free6: "15 generaties/maand (Pro)",
     pro1: "15 cursusgeneraties/maand",
     pro2: "Volledige modules, lessen en quizzen",
@@ -122,14 +121,14 @@ const nl: Translations = {
     pro4: "Alle cursuslengte en -stijlen",
     pro5: "Prioriteit AI-verwerking",
     pm1: "Alles in Pro",
-    pm2: "AI-gegenereerde audiolessen",
+    pm2: "NotebookLM-klare export (podcast-klaar)",
     pm3: "Volledige hoofdstukinhoudgeneratie",
     pm4: "Premium Notion en PDF export",
     pm5: "Verkoopklare cursuspakketten",
     pm6: "White-label branding",
     pm7: "Dedicated AI-verwerking",
     pack1: "5 Pro Max-generaties",
-    pack2: "AI-gegenereerde audiolessen",
+    pack2: "NotebookLM-klare export (podcast-klaar)",
     pack3: "Volledige hoofdstukinhoudgeneratie",
     pack4: "Premium Notion en PDF export",
     pack5: "White-label branding",
@@ -204,7 +203,7 @@ const nl: Translations = {
   finalCta: {
     heading: "Klaar om het verschil te horen?",
     subheading:
-      "Maak een cursus met audio, design en een deelbare link. Je eerste generatie is gratis.",
+      "Maak een cursus met podcast-klare export, design en een deelbare link. Je eerste generatie is gratis.",
     cta: "Genereer Gratis Je Eerste Cursus",
   },
   footer: {
@@ -294,15 +293,15 @@ const nl: Translations = {
     step4Title: "Maak Het Je Eigen",
     step4Desc: "Open de Cursus Editor om titels te herschrijven, inhoud aan te passen, quizvragen toe te voegen, modules te herordenen of alles te verwijderen dat niet past.",
     step4Detail: "Elk element is bewerkbaar — niets is vergrendeld.",
-    step5Title: "Voeg Audiovertelling Toe",
+    step5Title: "Download voor NotebookLM",
     step5Desc: "Genereer professionele stemvertelling voor elke les. Kies uit meerdere AI-stemmen die passen bij de toon van je cursus.",
-    step5Detail: "Beschikbaar op Pro Max. Verandert tekstlessen in podcast-achtige audio.",
+    step5Detail: "Beschikbaar op Masterclass. Download je cursus als een NotebookLM-klaar Markdown-bestand — zet het in Google NotebookLM om een conversationele podcast te genereren.",
     step6Title: "Delen, Exporteren, Verkopen",
     step6Desc: "Kopieer je deelbare link, exporteer naar PDF, Notion, PPTX of DOCX. Voeg e-mailcapture toe om je lijst te laten groeien, of verkoop direct.",
     step6Detail: "Deelbare links werken overal — geen login vereist voor je publiek.",
     tipsTitle: "Pro-tips",
     tip1: "Voeg een niche toe (bijv. \"SaaS sales\") voor meer gerichte, specifieke content.",
-    tip2: "Gebruik audiovertelling op Pro Max om podcast-achtige lessen te maken die je publiek onderweg kan beluisteren.",
+    tip2: "Download je cursus voor NotebookLM om hem om te zetten in een conversationele podcast die je onderweg kunt beluisteren.",
     tip3: "Maak van mini-cursussen lead magnets door e-mailcapture toe te voegen — laat je lijst automatisch groeien.",
     cta: "Klaar om je eerste cursus te maken?",
     ctaSub: "Geen creditcard nodig. Je eerste 3 cursussen zijn gratis.",

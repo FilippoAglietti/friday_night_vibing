@@ -10,12 +10,12 @@ const de: Translations = {
     getStartedFree: "Kostenlos starten",
   },
   hero: {
-    badge: "Audio-Kurse · Teilbare Links · Beeindruckendes Design",
+    badge: "Podcast-fertige Kurse · Teilbare Links · Beeindruckendes Design",
     title1: "Der Kurs-Generator",
     titleConnector: "der",
     title2: "So Gut Klingt Wie Er Aussieht",
     subtitle:
-      "KI erstellt vollständige Kurse mit Audio-Narration, ansprechendem Design und teilbaren Links — bereit zum Lehren, Verkaufen oder Teilen.",
+      "KI erstellt vollständige Kurse mit Podcast-fertigem Export, ansprechendem Design und teilbaren Links — bereit zum Lehren, Verkaufen oder Teilen.",
     cta: "Ihren ersten Kurs kostenlos erstellen",
     secondaryCta: "Beispielkurs ansehen",
     tagline: "Keine Kreditkarte erforderlich · Ihr erster Kurs ist kostenlos",
@@ -24,16 +24,16 @@ const de: Translations = {
     eyebrow: "Das Problem",
     heading: "Kommt Ihnen das bekannt vor?",
     subheading:
-      "Andere KI-Tools liefern Ihnen einen Textblock und nennen es einen Kurs. Ihre Teilnehmer verdienen Audio zum Anhören, Design zum Anschauen und einen Link, den sie wirklich öffnen können.",
+      "Andere KI-Tools liefern Ihnen einen Textblock und nennen es einen Kurs. Ihre Teilnehmer verdienen Inhalte zum Anhören, Design zum Anschauen und einen Link, den sie wirklich öffnen können.",
     pain1Problem: "Ihre Kurse sehen aus wie die aller anderen",
     pain1Solution:
-      "Syllabi erstellt Kurse mit beeindruckendem Design und echter Audio-Narration — so poliert, dass Ihre Teilnehmer nicht glauben werden, dass es KI ist.",
+      "Syllabi erstellt Kurse mit beeindruckendem Design und Podcast-fertigem Export — so poliert, dass Ihre Teilnehmer nicht glauben werden, dass es KI ist.",
     pain2Problem: "Niemand schließt Ihre Kurse ab",
     pain2Solution:
-      "Audio-Lektionen, strukturiertes Tempo und ansprechende Visualisierungen halten Lernende vom Anfang bis zum Ende bei der Stange — kein bloßes Überfliegen.",
+      "Strukturiertes Tempo und ansprechende Visualisierungen halten Lernende vom Anfang bis zum Ende bei der Stange — kein bloßes Überfliegen.",
     pain3Problem: "Erstellen und Teilen ist ein Albtraum mit 10 Tools",
     pain3Solution:
-      "Ein Klick gibt Ihnen einen vollständigen Kurs mit teilbarem Link, Audio, Quizzes und exportfertigen Dateien. Kein LMS erforderlich.",
+      "Ein Klick gibt Ihnen einen vollständigen Kurs mit teilbarem Link, Podcast-fertigem Export, Quizzes und exportfertigen Dateien. Kein LMS erforderlich.",
   },
   howItWorks: {
     eyebrow: "So funktioniert's",
@@ -43,7 +43,7 @@ const de: Translations = {
       'Geben Sie Ihr Thema ein, wählen Sie Stil und Tiefe — von „Python für Data Science" bis „Sauerteigbrot backen 101".',
     step2Title: "KI baut Ihren Kurs",
     step2Desc:
-      "Sie erhalten Module, Lektionen, Quizzes, Audio-Narration und einen teilbaren Link — alles bearbeitbar.",
+      "Sie erhalten Module, Lektionen, Quizzes, Podcast-fertigen Export und einen teilbaren Link — alles bearbeitbar.",
     step3Title: "Teilen, lehren oder verkaufen",
     step3Desc:
       "Senden Sie einen Link, exportieren Sie nach Notion oder PDF, oder verwandeln Sie ihn in einen Lead-Magneten. Ihr Kurs, Ihr Weg.",
@@ -73,7 +73,7 @@ const de: Translations = {
     eyebrow: "Echte Beispiele",
     heading: "Hören. Sehen. Teilen.",
     subheading:
-      "Jeder Kurs unten wurde mit Syllabi erstellt — komplett mit Audio-Narration, strukturierten Lektionen, Quizzes und einem teilbaren Link.",
+      "Jeder Kurs unten wurde mit Syllabi erstellt — komplett mit Podcast-fertigem Export, strukturierten Lektionen, Quizzes und einem teilbaren Link.",
     modules: "Module",
     lessons: "Lektionen",
     total: "Gesamt",
@@ -83,7 +83,7 @@ const de: Translations = {
     eyebrow: "Was Ersteller sagen",
     heading: "Sie haben alles ausprobiert. Dann hörten sie Syllabi",
     subheading:
-      "Kursersteller, Coaches und Trainer, die zu audio-first-Kursen gewechselt haben und nie zurückgeblickt haben.",
+      "Kursersteller, Coaches und Trainer, die zum Podcast-fertigen Export gewechselt haben und nie zurückgeblickt haben.",
   },
   pricing: {
     eyebrow: "Preise",
@@ -105,8 +105,8 @@ const de: Translations = {
     proDesc: "Für ernsthafte Kursersteller, die regelmäßig veröffentlichen.",
     fivePackDesc: "5 Premium-Generierungen. Kein Abonnement.",
     proMaxDesc: "Das ultimative Toolkit zum Erstellen und Verkaufen von Kursen.",
-    aiAudioTitle: "KI-Audio-Lektionen",
-    aiAudioDesc: "Erzähltes Audio für jede Lektion generieren",
+    notebookLMExportTitle: "NotebookLM-fertiger Export",
+    notebookLMExportDesc: "Laden Sie eine Markdown-Datei herunter und erzeugen Sie einen Podcast in Google NotebookLM",
     swipePlans: "Wischen um alle Tarife zu sehen →",
     startProBtn: "Pro starten — €28/Monat",
     tryProMaxBtn: "Pro Max testen — €33",
@@ -115,7 +115,6 @@ const de: Translations = {
     free2: "Module, Lektionen & Quizzes",
     free3: "PDF- & Notion-Export",
     free4: "Teilbare Kurs-Links",
-    free5: "Audio-Narration",
     free6: "15 Generierungen/Monat (Pro)",
     pro1: "15 Kurs-Generierungen pro Monat",
     pro2: "Vollständige Module, Lektionen & Quizzes",
@@ -123,14 +122,14 @@ const de: Translations = {
     pro4: "Alle Kurslängen & Stile",
     pro5: "Priorisierte KI-Verarbeitung",
     pm1: "Alles aus Pro",
-    pm2: "KI-generierte Audio-Lektionen",
+    pm2: "NotebookLM-fertiger Export (Podcast-fertig)",
     pm3: "Vollständige Kapitelinhalts-Generierung",
     pm4: "Premium-Notion- & PDF-Export",
     pm5: "Verkaufsfertige Kurspakete",
     pm6: "White-Label-Branding",
     pm7: "Dedizierte KI-Verarbeitung",
     pack1: "5 Pro Max-Generierungen",
-    pack2: "KI-generierte Audio-Lektionen",
+    pack2: "NotebookLM-fertiger Export (Podcast-fertig)",
     pack3: "Vollständige Kapitelinhalts-Generierung",
     pack4: "Premium-Notion- & PDF-Export",
     pack5: "White-Label-Branding",
@@ -205,7 +204,7 @@ const de: Translations = {
   finalCta: {
     heading: "Bereit, den Unterschied zu hören?",
     subheading:
-      "Erstellen Sie einen Kurs mit Audio, Design und teilbarem Link. Ihre erste Generierung ist kostenlos.",
+      "Erstellen Sie einen Kurs mit Podcast-fertigem Export, Design und teilbarem Link. Ihre erste Generierung ist kostenlos.",
     cta: "Ihren ersten Kurs kostenlos erstellen",
   },
   footer: {
@@ -296,15 +295,15 @@ const de: Translations = {
     step4Title: "Mach Ihn Zu Deinem",
     step4Desc: "Öffne den Kurs-Editor, um Titel umzuschreiben, Inhalte anzupassen, Quizfragen hinzuzufügen, Module umzuordnen oder alles zu entfernen, was nicht passt.",
     step4Detail: "Jedes einzelne Element ist bearbeitbar — nichts ist gesperrt.",
-    step5Title: "Füge Audio-Narration Hinzu",
+    step5Title: "Download für NotebookLM",
     step5Desc: "Generiere professionelle Sprachnarration für jede Lektion. Wähle aus mehreren KI-Stimmen, die zum Ton deines Kurses passen.",
-    step5Detail: "Verfügbar auf Pro Max. Verwandelt Text-Lektionen in Podcast-artiges Audio.",
+    step5Detail: "Verfügbar bei Masterclass. Lade deinen Kurs als NotebookLM-fertige Markdown-Datei herunter — lege sie in Google NotebookLM ab, um einen dialogorientierten Podcast zu erzeugen.",
     step6Title: "Teilen, Exportieren, Verkaufen",
     step6Desc: "Kopiere deinen teilbaren Link, exportiere als PDF, Notion, PPTX oder DOCX. Füge eine E-Mail-Erfassung hinzu, um deine Liste aufzubauen, oder verkaufe direkt.",
     step6Detail: "Teilbare Links funktionieren überall — kein Login für dein Publikum erforderlich.",
     tipsTitle: "Pro-Tipps",
     tip1: "Füge eine Nische hinzu (z.B. \"SaaS-Vertrieb\") für gezielteren, spezifischeren Inhalt.",
-    tip2: "Nutze Audio-Narration auf Pro Max, um Podcast-artige Lektionen zu erstellen, die dein Publikum unterwegs hören kann.",
+    tip2: "Lade deinen Kurs für NotebookLM herunter, um ihn in einen dialogorientierten Podcast zu verwandeln, den du unterwegs hören kannst.",
     tip3: "Verwandle Mini-Kurse in Lead Magnets, indem du eine E-Mail-Erfassung hinzufügst — baue deine Liste automatisch auf.",
     cta: "Bereit, deinen ersten Kurs zu erstellen?",
     ctaSub: "Keine Kreditkarte erforderlich. Deine ersten 3 Kurse sind kostenlos.",

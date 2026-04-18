@@ -14,7 +14,6 @@ describe("TIERS config", () => {
   it("masterclass has full pipeline", () => {
     expect(TIERS.masterclass.hasModuleBodies).toBe(true);
     expect(TIERS.masterclass.hasPolish).toBe(true);
-    expect(TIERS.masterclass.hasAudio).toBe(true);
     expect(TIERS.masterclass.hasNotebookLMExport).toBe(true);
     expect(TIERS.masterclass.hasWhiteLabel).toBe(true);
   });

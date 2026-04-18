@@ -1431,8 +1431,8 @@ export default function Home() {
                         <Headphones className="size-5 text-amber-500" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-amber-500">{t("pricing.aiAudioTitle")}</p>
-                        <p className="text-[11px] text-muted-foreground">{t("pricing.aiAudioDesc")}</p>
+                        <p className="text-xs font-semibold text-amber-500">{t("pricing.notebookLMExportTitle")}</p>
+                        <p className="text-[11px] text-muted-foreground">{t("pricing.notebookLMExportDesc")}</p>
                       </div>
                     </div>
                     <ul className="space-y-3">
@@ -1580,8 +1580,8 @@ export default function Home() {
                           <Headphones className="size-4 text-amber-500" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[10px] font-semibold text-amber-500">{t("pricing.aiAudioTitle")}</p>
-                          <p className="text-[10px] text-muted-foreground">{t("pricing.aiAudioDesc")}</p>
+                          <p className="text-[10px] font-semibold text-amber-500">{t("pricing.notebookLMExportTitle")}</p>
+                          <p className="text-[10px] text-muted-foreground">{t("pricing.notebookLMExportDesc")}</p>
                         </div>
                       </div>
                       <ul className="space-y-2">

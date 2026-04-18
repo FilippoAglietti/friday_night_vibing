@@ -10,12 +10,12 @@ const pt: Translations = {
     getStartedFree: "Comece Grátis",
   },
   hero: {
-    badge: "Cursos em Áudio · Links Compartilháveis · Design Impressionante",
+    badge: "Cursos Prontos para Podcast · Links Compartilháveis · Design Impressionante",
     title1: "O Gerador de Cursos",
     titleConnector: "que",
     title2: "Soa Tão Bem Quanto Parece",
     subtitle:
-      "A IA cria cursos completos com narração em áudio, design bonito e links compartilháveis — prontos para ensinar, vender ou compartilhar.",
+      "A IA cria cursos completos com exportação pronta para podcast, design bonito e links compartilháveis — prontos para ensinar, vender ou compartilhar.",
     cta: "Gere Seu Primeiro Curso Grátis",
     secondaryCta: "Veja um Curso de Exemplo",
     tagline: "Sem cartão de crédito · Seu primeiro curso é gratuito",
@@ -24,16 +24,16 @@ const pt: Translations = {
     eyebrow: "O Problema",
     heading: "Parece familiar?",
     subheading:
-      "Outras ferramentas de IA te entregam um bloco de texto e chamam isso de curso. Seus alunos merecem áudio para ouvir, design para apreciar e um link que realmente abre.",
+      "Outras ferramentas de IA te entregam um bloco de texto e chamam isso de curso. Seus alunos merecem conteúdo para ouvir, design para apreciar e um link que realmente abre.",
     pain1Problem: "Seus cursos parecem iguais aos de todos os outros",
     pain1Solution:
-      "Syllabi gera cursos com design impressionante e narração em áudio real — tão polidos que seus alunos não vão acreditar que é IA.",
+      "Syllabi gera cursos com design impressionante e exportação pronta para podcast — tão polidos que seus alunos não vão acreditar que é IA.",
     pain2Problem: "Ninguém termina seus cursos",
     pain2Solution:
-      "Aulas em áudio, ritmo estruturado e visuais bonitos mantêm os alunos engajados do início ao fim — sem pular.",
+      "Ritmo estruturado e visuais bonitos mantêm os alunos engajados do início ao fim — sem pular.",
     pain3Problem: "Criar e compartilhar é um pesadelo com 10 ferramentas",
     pain3Solution:
-      "Um clique te dá um curso completo com link compartilhável, áudio, quizzes e arquivos prontos para exportação. Sem LMS necessário.",
+      "Um clique te dá um curso completo com link compartilhável, exportação pronta para podcast, quizzes e arquivos prontos para exportação. Sem LMS necessário.",
   },
   howItWorks: {
     eyebrow: "Como Funciona",
@@ -43,7 +43,7 @@ const pt: Translations = {
       'Digite seu tema, escolha um estilo e profundidade — de "Python para ciência de dados" a "Panificação com fermentação natural 101".',
     step2Title: "A IA monta seu curso",
     step2Desc:
-      "Você recebe módulos, aulas, quizzes, narração em áudio e um link compartilhável — tudo editável.",
+      "Você recebe módulos, aulas, quizzes, exportação pronta para podcast e um link compartilhável — tudo editável.",
     step3Title: "Compartilhe, ensine ou venda",
     step3Desc:
       "Envie um link, exporte para Notion ou PDF, ou transforme em um lead magnet. Seu curso, do seu jeito.",
@@ -73,7 +73,7 @@ const pt: Translations = {
     eyebrow: "Exemplos Reais",
     heading: "Ouça. Veja. Compartilhe.",
     subheading:
-      "Cada curso abaixo foi gerado com Syllabi — completo com narração em áudio, aulas estruturadas, quizzes e link compartilhável.",
+      "Cada curso abaixo foi gerado com Syllabi — completo com exportação pronta para podcast, aulas estruturadas, quizzes e link compartilhável.",
     modules: "Módulos",
     lessons: "Aulas",
     total: "Total",
@@ -83,7 +83,7 @@ const pt: Translations = {
     eyebrow: "O Que Dizem os Criadores",
     heading: "Eles tentaram outras opções. Depois ouviram o Syllabi",
     subheading:
-      "Criadores de cursos, coaches e treinadores que migraram para cursos com foco em áudio e nunca mais voltaram atrás.",
+      "Criadores de cursos, coaches e treinadores que migraram para a exportação pronta para podcast e nunca mais voltaram atrás.",
   },
   pricing: {
     eyebrow: "Preços",
@@ -105,8 +105,8 @@ const pt: Translations = {
     proDesc: "Para criadores de cursos sérios que publicam regularmente.",
     fivePackDesc: "5 gerações premium. Sem assinatura.",
     proMaxDesc: "O kit completo para criar e vender cursos.",
-    aiAudioTitle: "Aulas em Áudio com IA",
-    aiAudioDesc: "Gere áudio narrado para cada aula",
+    notebookLMExportTitle: "Exportação pronta para NotebookLM",
+    notebookLMExportDesc: "Baixe um arquivo Markdown e gere um podcast no Google NotebookLM",
     swipePlans: "Deslize para ver todos os planos →",
     startProBtn: "Começar Pro — €28/mês",
     tryProMaxBtn: "Experimentar Pro Max — €33",
@@ -115,7 +115,6 @@ const pt: Translations = {
     free2: "Módulos, aulas e quizzes",
     free3: "Exportação para PDF e Notion",
     free4: "Links compartilháveis de cursos",
-    free5: "Narração em áudio",
     free6: "15 gerações/mês (Pro)",
     pro1: "15 gerações de cursos por mês",
     pro2: "Módulos, aulas e quizzes completos",
@@ -123,14 +122,14 @@ const pt: Translations = {
     pro4: "Todos os tamanhos e estilos de curso",
     pro5: "Processamento de IA prioritário",
     pm1: "Tudo do Pro",
-    pm2: "Aulas em áudio geradas por IA",
+    pm2: "Exportação pronta para NotebookLM (pronta para podcast)",
     pm3: "Geração completa de conteúdo por capítulo",
     pm4: "Exportação premium para Notion e PDF",
     pm5: "Pacotes de cursos prontos para venda",
     pm6: "Marca white-label",
     pm7: "Processamento de IA dedicado",
     pack1: "5 gerações Pro Max",
-    pack2: "Aulas em áudio geradas por IA",
+    pack2: "Exportação pronta para NotebookLM (pronta para podcast)",
     pack3: "Geração completa de conteúdo por capítulo",
     pack4: "Exportação premium para Notion e PDF",
     pack5: "Marca white-label",
@@ -205,7 +204,7 @@ const pt: Translations = {
   finalCta: {
     heading: "Pronto para ouvir a diferença?",
     subheading:
-      "Crie um curso com áudio, design e link compartilhável. Sua primeira geração é gratuita.",
+      "Crie um curso com exportação pronta para podcast, design e link compartilhável. Sua primeira geração é gratuita.",
     cta: "Gere Seu Primeiro Curso Grátis",
   },
   footer: {
@@ -296,15 +295,15 @@ const pt: Translations = {
     step4Title: "Faça-o Seu",
     step4Desc: "Abra o Editor de Cursos para reescrever títulos, ajustar conteúdo, adicionar perguntas de quiz, reordenar módulos ou remover o que não encaixar.",
     step4Detail: "Cada elemento é editável — nada está bloqueado.",
-    step5Title: "Adicione Narração de Áudio",
+    step5Title: "Baixe para NotebookLM",
     step5Desc: "Gere narração de voz profissional para cada lição. Escolha entre múltiplas vozes IA para combinar com o tom do seu curso.",
-    step5Detail: "Disponível no Pro Max. Transforma lições de texto em áudio estilo podcast.",
+    step5Detail: "Disponível no Masterclass. Baixe seu curso como um arquivo Markdown pronto para NotebookLM — carregue-o no Google NotebookLM para gerar um podcast conversacional.",
     step6Title: "Partilhe, Exporte, Venda",
     step6Desc: "Copie o seu link partilhável, exporte para PDF, Notion, PPTX ou DOCX. Adicione captura de email para fazer crescer a sua lista, ou venda diretamente.",
     step6Detail: "Links partilháveis funcionam em qualquer lugar — sem login necessário para a sua audiência.",
     tipsTitle: "Dicas Pro",
     tip1: "Adicione um nicho (ex. \"vendas SaaS\") para conteúdo mais direcionado e específico.",
-    tip2: "Use narração de áudio no Pro Max para criar lições estilo podcast que a sua audiência pode ouvir em movimento.",
+    tip2: "Baixe seu curso para NotebookLM para transformá-lo em um podcast conversacional que a sua audiência pode ouvir em movimento.",
     tip3: "Transforme mini-cursos em lead magnets adicionando captura de email — faça crescer a sua lista em piloto automático.",
     cta: "Pronto para criar o seu primeiro curso?",
     ctaSub: "Sem cartão de crédito. Os seus primeiros 3 cursos são gratuitos.",

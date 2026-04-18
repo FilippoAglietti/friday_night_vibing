@@ -138,8 +138,8 @@ export interface Translations {
     proDesc: string;
     fivePackDesc: string;
     proMaxDesc: string;
-    aiAudioTitle: string;
-    aiAudioDesc: string;
+    notebookLMExportTitle: string;
+    notebookLMExportDesc: string;
     swipePlans: string;
     startProBtn: string;
     tryProMaxBtn: string;
@@ -148,7 +148,6 @@ export interface Translations {
     free2: string;
     free3: string;
     free4: string;
-    free5: string;
     free6: string;
     pro1: string;
     pro2: string;
