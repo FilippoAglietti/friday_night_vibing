@@ -37,6 +37,9 @@ import { generateRateLimit } from "@/lib/rate-limiter";
 // not the generation architecture. The after() fallback only fires
 // if inngest.send() itself throws (e.g. Inngest outage).
 import { inngest } from "@/lib/inngest/client";
+import { canGenerate } from "@/lib/pricing/cap-enforcement";
+import { tierOrFallback } from "@/lib/pricing/tiers";
+import type { CapResult } from "@/types/pricing";
 
 export const dynamic = "force-dynamic";
 
@@ -1042,31 +1045,28 @@ async function createSupabaseServer() {
  * Checks whether the authenticated user is allowed to generate a curriculum.
  * Free plan: 3 mini-course generations.
  * Pro plan: 15 generations/month.
- * Pro Max monthly: unlimited (-1).
- * Pro Max 5-Pack: 5 one-time generations.
- *
- * @param userId - The authenticated user's UUID
- * @returns true if generation is allowed, false if the limit is reached
+ * Checks whether the authenticated user is allowed to generate a curriculum
+ * against their tier's monthly cap. Returns a structured CapResult so the
+ * route can surface tier/cap/resetAt to the client for the paywall modal.
  */
-async function checkGenerationLimit(userId: string): Promise<boolean> {
+async function checkGenerationLimit(userId: string): Promise<CapResult> {
   const supabase = await createSupabaseServer();
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("plan, generations_used, generations_limit")
+    .select("plan, generations_used, enterprise_gen_cap")
     .eq("id", userId)
     .single();
 
   if (error || !profile) {
-    // Profile not found — allow generation (will be created on first save)
-    return true;
+    return { allowed: true };
   }
 
-  // Pro Max monthly subscribers: generations_limit = -1 means unlimited.
-  if (profile.plan === "pro_max" && profile.generations_limit < 0) return true;
-
-  // All other plans (free=3, pro=15, pro_max 5-pack=5): limit by counter
-  return profile.generations_used < profile.generations_limit;
+  return canGenerate({
+    tier: tierOrFallback(profile.plan),
+    generationsUsedThisMonth: profile.generations_used,
+    enterpriseGenCap: profile.enterprise_gen_cap,
+  });
 }
 
 /**
@@ -1309,16 +1309,17 @@ export async function POST(req: NextRequest): Promise<NextResponse<GenerateAsync
     if (user) {
       userId = user.id;
       console.log("[/api/generate] Authenticated user:", userId, user.email);
-      const canGenerate = await checkGenerationLimit(userId);
-      if (!canGenerate) {
+      const capResult = await checkGenerationLimit(userId);
+      if (!capResult.allowed) {
         return NextResponse.json(
           {
             success: false,
-            error: "Generation limit reached.",
-            details:
-              "You have used all your generations. Upgrade to Pro for 15 generations/month.",
+            error: "cap_exceeded",
+            tier: capResult.tier,
+            cap: capResult.cap,
+            resetAt: capResult.resetAt,
           },
-          { status: 403 }
+          { status: 402 }
         );
       }
     } else {
