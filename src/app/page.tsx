@@ -103,19 +103,19 @@ const painPoints = [
     icon: Clock,
     problem: "Your courses look like everyone else's",
     solution:
-      "Syllabi generates courses with stunning design and real audio narration — so polished your students won't believe it's AI.",
+      "Syllabi generates courses with stunning design and a NotebookLM-ready podcast export — so polished your students won't believe it's AI.",
   },
   {
     icon: Brain,
     problem: "Nobody finishes your courses",
     solution:
-      "Audio lessons, structured pacing, and beautiful visuals keep learners engaged from start to finish — not just skimming.",
+      "Structured pacing, beautiful visuals, and a two-host conversational podcast export keep learners engaged from start to finish — not just skimming.",
   },
   {
     icon: Target,
     problem: "Creating & sharing is a 10-tool nightmare",
     solution:
-      "One click gives you a complete course with a shareable link, audio, quizzes, and export-ready files. No LMS required.",
+      "One click gives you a complete course with a shareable link, NotebookLM podcast export, quizzes, and export-ready files. No LMS required.",
   },
 ];
 
@@ -130,7 +130,7 @@ const steps = [
     num: "02",
     icon: Sparkles,
     title: "AI builds your course",
-    desc: "You get modules, lessons, quizzes, audio narration, and a shareable link — all editable.",
+    desc: "You get modules, lessons, quizzes, a NotebookLM-ready podcast export, and a shareable link — all editable.",
   },
   {
     num: "03",
@@ -181,7 +181,7 @@ const freePlanFeatures = [
   { text: "Modules, lessons & quizzes", included: true },
   { text: "PDF & Notion export", included: true },
   { text: "Shareable course links", included: true },
-  { text: "Audio narration", included: false },
+  { text: "NotebookLM podcast export", included: false },
   { text: "15 skeletons/month (Planner)", included: false },
 ];
 
@@ -195,7 +195,7 @@ const proPlanFeatures = [
 
 const proMaxFeatures = [
   { text: "Everything in Planner", included: true },
-  { text: "AI-generated audio lessons", included: true },
+  { text: "NotebookLM-ready podcast export", included: true },
   { text: "Commercial license for sold courses", included: true },
   { text: "Premium Notion & PDF export", included: true },
   { text: "Sell-ready course packages", included: true },
@@ -1425,7 +1425,7 @@ export default function Home() {
                     </p>
                   </CardHeader>
                   <CardContent className="flex-1">
-                    {/* AI Audio highlight */}
+                    {/* NotebookLM export highlight */}
                     <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center gap-3">
                       <div className="flex items-center justify-center size-9 shrink-0 rounded-lg bg-amber-500/10">
                         <Headphones className="size-5 text-amber-500" />

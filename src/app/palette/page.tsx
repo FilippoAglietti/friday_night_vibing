@@ -195,7 +195,7 @@ function FullPreview({ p }: { p: typeof palettes[PaletteKey] }) {
             className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium mb-5"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
-            Now with AI audio narration
+            Now with NotebookLM podcast export
           </span>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-[1.1]">
@@ -217,8 +217,8 @@ function FullPreview({ p }: { p: typeof palettes[PaletteKey] }) {
           </h1>
 
           <p className="mt-4 text-sm max-w-md mx-auto" style={{ color: p.textMuted }}>
-            AI generates modules, lessons, quizzes, and audio narration.
-            Export to PDF, Notion, or share with a link.
+            AI generates modules, lessons, quizzes, and a NotebookLM-ready
+            podcast export. Export to PDF, Notion, or share with a link.
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-3">
@@ -256,8 +256,8 @@ function FullPreview({ p }: { p: typeof palettes[PaletteKey] }) {
         <h2 className="text-xl font-bold text-center mb-8">Course creation shouldn&apos;t be this hard</h2>
         <div className="grid grid-cols-3 gap-3">
           {[
-            { icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", title: "Looks like everyone else's", desc: "Stunning design and real audio narration that feels professional." },
-            { icon: "M12 2a10 10 0 1 0 10 10H12V2z", title: "Nobody finishes courses", desc: "Audio lessons and pacing schedules keep learners engaged." },
+            { icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", title: "Looks like everyone else's", desc: "Stunning design and a NotebookLM-ready podcast export that feels professional." },
+            { icon: "M12 2a10 10 0 1 0 10 10H12V2z", title: "Nobody finishes courses", desc: "Podcast exports and pacing schedules keep learners engaged." },
             { icon: "M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z", title: "10-tool nightmare", desc: "One click: complete course, shareable link, all exports." },
           ].map((item, i) => (
             <div
@@ -292,7 +292,7 @@ function FullPreview({ p }: { p: typeof palettes[PaletteKey] }) {
         <div className="flex items-start gap-4">
           {[
             { num: "01", label: "Describe what you teach", sub: "Enter topic, pick style & depth" },
-            { num: "02", label: "AI builds your course", sub: "Modules, quizzes, audio in seconds" },
+            { num: "02", label: "AI builds your course", sub: "Modules, quizzes, podcast export in seconds" },
             { num: "03", label: "Share, teach, or sell", sub: "Link, PDF, Notion — your way" },
           ].map((s, i) => (
             <div key={i} className="flex-1 text-center">
@@ -322,7 +322,7 @@ function FullPreview({ p }: { p: typeof palettes[PaletteKey] }) {
           {[
             { name: "Free", price: "€0", features: ["3 mini-courses", "PDF export", "Shareable links"], highlighted: false },
             { name: "Planner", price: "€29/mo", features: ["15 skeletons/mo", "All export formats", "Priority AI"], highlighted: true },
-            { name: "Masterclass", price: "€99/mo", features: ["20 full courses", "Audio narration", "White-label"], highlighted: false },
+            { name: "Masterclass", price: "€99/mo", features: ["20 full courses", "NotebookLM podcast export", "White-label"], highlighted: false },
           ].map((plan, i) => (
             <div
               key={i}

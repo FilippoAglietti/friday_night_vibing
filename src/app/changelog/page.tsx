@@ -35,9 +35,9 @@ const releases: Release[] = [
   {
     version: "1.5.0",
     date: "April 8, 2026",
-    highlight: "AI Audio Lessons & Inngest Pipeline",
+    highlight: "NotebookLM Export & Inngest Pipeline",
     changes: [
-      { type: "new", text: "AI-powered audio narration for every lesson — choose from multiple voices and generate podcast-style content." },
+      { type: "new", text: "NotebookLM-ready podcast export — format your course for Google NotebookLM's two-host podcast generator." },
       { type: "new", text: "Inngest background processing pipeline for faster, more reliable course generation." },
       { type: "new", text: "Shareable course links — one-click sharing with a beautiful public course view." },
       { type: "new", text: "DOCX and SCORM export formats alongside existing PDF and Notion exports." },

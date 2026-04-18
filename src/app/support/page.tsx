@@ -65,7 +65,7 @@ const faqs = [
     questions: [
       {
         q: "Which export formats are available?",
-        a: "All plans include JSON, Markdown, PDF, and Notion export. Masterclass adds AI-generated audio narration, PPTX and DOCX exports, white-label branding, and shareable course links with email capture. The Notion export copies blocks you can paste directly into any Notion page.",
+        a: "All plans include JSON, Markdown, PDF, and Notion export. Masterclass adds NotebookLM-ready podcast export, PPTX and DOCX exports, white-label branding, and shareable course links with email capture. The Notion export copies blocks you can paste directly into any Notion page.",
       },
       {
         q: "Can I re-export a course I generated earlier?",

@@ -710,7 +710,7 @@ export default function CurriculumOutput({
                   onChange={(e) =>
                     setLeadMagnet((prev) => ({ ...prev, description: e.target.value }))
                   }
-                  placeholder="Enter your email to unlock all modules, quizzes, and audio lessons"
+                  placeholder="Enter your email to unlock all modules, quizzes, and the NotebookLM-ready podcast export"
                   className="w-full rounded-lg border border-border/40 bg-card/50 px-3 py-2 text-sm focus:border-violet-500/50 focus:outline-none focus:ring-1 focus:ring-violet-500/20"
                 />
               </div>

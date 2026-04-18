@@ -157,7 +157,7 @@ export default async function OGImage({
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           {[
             "AI-Powered",
-            "Audio Narration",
+            "NotebookLM Export",
             "PDF & Notion Export",
             "Quizzes",
             "Free to Start",

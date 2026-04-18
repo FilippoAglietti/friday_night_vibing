@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // ── Features (shared across all niche pages) ─────────────────
 const FEATURES = [
   { icon: Brain, label: "AI-Powered Generation", desc: "Complete courses in under 60 seconds" },
-  { icon: Headphones, label: "Audio Narration", desc: "AI-generated audio for every lesson" },
+  { icon: Headphones, label: "NotebookLM Export", desc: "One-click Markdown → conversational podcast via Google NotebookLM" },
   { icon: FileText, label: "Multi-Format Export", desc: "PDF, Notion, PPTX, DOCX, and JSON" },
   { icon: Globe, label: "16 Languages", desc: "Generate courses in any supported language" },
   { icon: BookOpen, label: "Quizzes & Assessments", desc: "Auto-generated per-module quizzes" },

@@ -101,7 +101,7 @@ const COPY_BY_PHASE: Record<Phase, string[]> = {
   polish: [
     "Polishing the edges. Almost there…",
     "Double-checking nobody will fall asleep in Module 5…",
-    "Making sure the audio narrator doesn't sound bored…",
+    "Prepping your NotebookLM-ready podcast export…",
     "Tidying up the roadmap…",
     "One last pass — this is the fun part…",
     "Putting the finishing touches on {topic}…",

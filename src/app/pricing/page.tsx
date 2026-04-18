@@ -8,12 +8,12 @@ const BASE_URL = "https://www.syllabi.online";
 export const metadata: Metadata = {
   title: "Pricing — Free, Planner, Masterclass, Enterprise | Syllabi AI Course Generator",
   description:
-    "Simple pricing for the AI course generator. Free skeleton to start, Planner at €29/mo for 15 reviewed skeletons, Masterclass at €99/mo with polish + audio + white-label, Enterprise on request.",
+    "Simple pricing for the AI course generator. Free skeleton to start, Planner at €29/mo for 15 reviewed skeletons, Masterclass at €99/mo with polish + NotebookLM podcast export + white-label, Enterprise on request.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     title: "Syllabi Pricing — Free / Planner / Masterclass / Enterprise",
     description:
-      "Free skeleton to start. €29/mo Planner. €99/mo Masterclass with audio + polish + white-label. Enterprise contact us.",
+      "Free skeleton to start. €29/mo Planner. €99/mo Masterclass with NotebookLM podcast export + polish + white-label. Enterprise contact us.",
     url: `${BASE_URL}/pricing`,
     type: "website",
   },
@@ -44,7 +44,7 @@ function buildJsonLd() {
         "@type": "Product",
         name: "Syllabi — AI Course Generator",
         description:
-          "AI course generator that builds complete courses with modules, lessons, quizzes, and audio narration.",
+          "AI course generator that builds complete courses with modules, lessons, quizzes, and a NotebookLM-ready podcast export.",
         brand: { "@type": "Brand", name: "Syllabi" },
         offers: [
           {
@@ -201,12 +201,13 @@ export default function PricingPage() {
             </div>
             <div>
               <h3 className="font-semibold mb-1">
-                What does AI audio narration include?
+                What is the NotebookLM export?
               </h3>
               <p className="text-sm text-muted-foreground">
-                Masterclass uses ElevenLabs to generate natural-sounding narration for
-                every lesson in your course, so you can listen while you learn or share
-                audio-first experiences.
+                Masterclass gives you a one-click Markdown export formatted for Google
+                NotebookLM. Drop the file into a new NotebookLM notebook — it generates
+                a two-host conversational podcast of your course. No TTS bills, better
+                output than per-lesson narration.
               </p>
             </div>
           </div>

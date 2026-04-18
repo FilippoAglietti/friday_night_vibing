@@ -6,12 +6,12 @@ import { JsonLd, breadcrumbJsonLd, BREADCRUMBS } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Documentation — AI Course Generator Guide",
   description:
-    "Complete guide to Syllabi's AI course generator. Learn how to create courses, export to PDF & Notion, add audio narration, and customize your courses.",
+    "Complete guide to Syllabi's AI course generator. Learn how to create courses, export to PDF & Notion, generate a NotebookLM-ready podcast export, and customize your courses.",
   alternates: { canonical: "/docs" },
   openGraph: {
     title: "Documentation — Syllabi AI Course Generator",
     description:
-      "Complete guide to creating AI-powered courses with Syllabi. Modules, lessons, quizzes, audio, and export options explained.",
+      "Complete guide to creating AI-powered courses with Syllabi. Modules, lessons, quizzes, NotebookLM podcast export, and export options explained.",
     url: "https://www.syllabi.online/docs",
     siteName: "Syllabi",
     type: "website",
@@ -101,11 +101,11 @@ const sections = [
       },
       {
         heading: "Masterclass (€99/month)",
-        body: "20 full courses/month with Opus-quality review, strategic polish on key lessons, AI-generated audio narration, DOCX and SCORM export, white-label branding, and dedicated AI processing.",
+        body: "20 full courses/month with Opus-quality review, strategic polish on key lessons, NotebookLM-ready podcast export, DOCX and SCORM export, white-label branding, and dedicated AI processing.",
       },
       {
         heading: "5-Pack (€39 one-time)",
-        body: "5 Masterclass generations with audio, full lesson bodies, and all export formats. No subscription required. Perfect for one-time projects.",
+        body: "5 Masterclass generations with NotebookLM export, full lesson bodies, and all export formats. No subscription required. Perfect for one-time projects.",
       },
     ],
   },
