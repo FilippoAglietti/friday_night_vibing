@@ -37,6 +37,7 @@ import {
   Flame,
   ArrowUpRight,
   BarChart3,
+  Headphones,
   Award,
   Share2,
   Check,
@@ -55,6 +56,7 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
+import { CheckoutButton } from "@/components/CheckoutButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
@@ -1005,6 +1007,20 @@ export default function ProfilePage() {
                 </Button>
             </div>
 
+            {/* €10 Upgrade-to-Masterclass CTA for Planner users */}
+            {userProfile?.plan === "pro" && (
+              <div className="mt-3 pt-3 border-t border-border/20" onClick={(e) => e.stopPropagation()}>
+                <CheckoutButton
+                  href={`/api/checkout?tier=single_masterclass&course_id=${gen.id}`}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow hover:shadow-lg transition-all"
+                  disabledClassName="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium bg-muted text-muted-foreground cursor-not-allowed opacity-60 pointer-events-none"
+                  launchingLabel="Upgrade €10 — launching tomorrow"
+                >
+                  Upgrade to Masterclass — €10
+                </CheckoutButton>
+              </div>
+            )}
+
             {/* Expanded content */}
             <AnimatePresence>
               {isExpanded && (
@@ -1616,7 +1632,7 @@ export default function ProfilePage() {
               </motion.div>
             )}
 
-            {/* ── PRO MAX LOCKED FEATURES ──────────────────── */}
+            {/* ── MASTERCLASS LOCKED FEATURES ──────────────────── */}
             {userProfile && userProfile.plan !== "pro_max" && (
               <motion.div variants={fadeUp}>
                 <Card className="border-border/40 bg-card/50 backdrop-blur-sm overflow-hidden">
@@ -1630,12 +1646,12 @@ export default function ProfilePage() {
                   <CardContent>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {[
-                        { icon: Brain, label: "AI Course Branding", desc: "Custom branded templates with your logo & colors", locked: userProfile.plan !== "pro_max" },
-                        { icon: Presentation, label: "Video Script Generator", desc: "Turn lessons into camera-ready video scripts", locked: userProfile.plan !== "pro_max" },
-                        { icon: BarChart3, label: "Student Analytics", desc: "Track engagement, completion, and quiz scores", locked: userProfile.plan !== "pro_max" },
-                        { icon: Layers, label: "Team Collaboration", desc: "Invite co-creators and share course drafts", locked: userProfile.plan !== "pro_max" },
-                        { icon: Zap, label: "API Access", desc: "Generate courses programmatically via REST API", locked: userProfile.plan !== "pro_max" },
-                        { icon: Shield, label: "White-Label Export", desc: "Remove Syllabi branding from all exports", locked: userProfile.plan !== "pro_max" },
+                        { icon: Headphones, label: "NotebookLM podcast export", desc: "One-click Markdown export → Google NotebookLM two-host podcast", locked: userProfile.plan !== "pro_max" },
+                        { icon: Brain, label: "Opus strategic polish", desc: "Key lessons rewritten by Opus for pedagogical clarity", locked: userProfile.plan !== "pro_max" },
+                        { icon: BarChart3, label: "20 full Masterclass courses/month", desc: "Full-body generation with modules, lessons, and resources", locked: userProfile.plan !== "pro_max" },
+                        { icon: Shield, label: "White-label exports", desc: "Remove Syllabi branding from all exports", locked: userProfile.plan !== "pro_max" },
+                        { icon: Zap, label: "Priority queue", desc: "Faster generation during peak hours", locked: userProfile.plan !== "pro_max" },
+                        { icon: Layers, label: "Masterclass-length courses", desc: "Generate our longest course format (12+ hours)", locked: userProfile.plan !== "pro_max" },
                       ].map((feat) => (
                         <div
                           key={feat.label}
@@ -1679,7 +1695,7 @@ export default function ProfilePage() {
                       <div className="mt-3 flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 p-3">
                         <div>
                           <p className="text-xs font-semibold text-amber-400">Unlock the full toolkit</p>
-                          <p className="text-[10px] text-muted-foreground">Upgrade to Masterclass for AI audio, white-label exports & more</p>
+                          <p className="text-[10px] text-muted-foreground">Upgrade to Masterclass for NotebookLM podcast export, white-label exports & more</p>
                         </div>
                         <Button size="sm" className="h-7 text-[10px] bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 rounded-full shrink-0" onClick={() => setShowPaywall(true)}>
                           Go Masterclass<ChevronRight className="size-3 ml-0.5" />
