@@ -66,9 +66,13 @@ import type {
 
 // ─── Model selection ────────────────────────────────────────
 //
-// Configurable via GENERATION_MODEL env var. Defaults to Haiku 4.5
-// for cost efficiency. Set to "claude-sonnet-4-6" for higher quality.
-const GENERATION_MODEL = process.env.GENERATION_MODEL || "claude-haiku-4-5-20251001";
+// Configurable via GENERATION_MODEL env var. Default is Sonnet 4.6 per
+// the 2026-04-18 pricing+model redesign spec (§5.1 routing matrix) —
+// skeleton + module bodies run on Sonnet for every tier. The prior
+// Haiku default was an emergency fallback to dodge Sonnet's prose-preamble
+// regression; the assistant-prefill `{` fix in `callClaude` makes the
+// preamble bug physically impossible on any model, so Sonnet is safe again.
+const GENERATION_MODEL = process.env.GENERATION_MODEL || "claude-sonnet-4-6";
 
 // ─── Anthropic pricing (USD per 1M tokens) ──────────────────
 //
@@ -100,9 +104,19 @@ async function callClaude(params: {
   timeoutMs: number;
   courseId: string;
   phase: "skeleton" | "module_detail";
+  // When set, appended as an assistant turn so the model's continuation starts
+  // from this exact text. For JSON responses we pass "{" — this makes the
+  // "I'll search…" prose-preamble failure class physically impossible (Sonnet 4.6
+  // regression observed 2026-04-19, Brugada masterclass). Prefill string is
+  // prepended to the returned text so the downstream parser sees complete JSON.
+  jsonPrefill?: string;
 }): Promise<string> {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const startTime = Date.now();
+
+  const effectiveMessages: Anthropic.MessageParam[] = params.jsonPrefill
+    ? [...params.messages, { role: "assistant", content: params.jsonPrefill }]
+    : params.messages;
 
   // CRITICAL: The Anthropic SDK's AbortController integration does NOT
   // reliably kill an in-flight stream.finalMessage() call. Once the
@@ -121,7 +135,7 @@ async function callClaude(params: {
       model: params.model,
       max_tokens: params.maxTokens,
       system: params.system,
-      messages: params.messages,
+      messages: effectiveMessages,
     },
     { signal: controller.signal },
   );
@@ -204,7 +218,8 @@ async function callClaude(params: {
     );
   }
 
-  return textBlock.text.trim();
+  const text = textBlock.text.trim();
+  return params.jsonPrefill ? params.jsonPrefill + text : text;
 }
 
 /**
@@ -695,6 +710,7 @@ export const courseGenerate = inngest.createFunction(
         courseId,
         phase: "skeleton",
         timeoutMs: skeletonTimeout,
+        jsonPrefill: "{",
       });
 
       const parsed = await parseClaudeJson<Curriculum>(rawText, "skeleton", courseId);
@@ -1108,6 +1124,7 @@ export const moduleGenerate = inngest.createFunction(
         timeoutMs: moduleTimeout,
         courseId,
         phase: "module_detail",
+        jsonPrefill: "{",
       });
       const parsed = await parseClaudeJson<{ lessons: Module["lessons"]; quiz: Module["quiz"] }>(
         rawText,
@@ -1275,21 +1292,37 @@ export const courseFinalize = inngest.createFunction(
       return { courseId, status: "already-ready" };
     }
 
-    // Step 2: merge + decide final status. If fewer than
-    // MIN_SUCCESS_RATIO of modules succeeded, the course is marked
-    // 'partial' (still viewable, still navigable — but flagged so
-    // the UI can show a retry affordance and the user is NOT
-    // charged a generation against their quota).
+    // Step 2: merge + decide final status. A module counts as successful
+    // ONLY if the job is "done" AND every lesson has substantive content
+    // (≥ MIN_LESSON_CONTENT_CHARS). Empty/stub bodies used to slip through
+    // as "ready" because generation_jobs.status was the only signal — this
+    // was the root cause of the "partial dressed as ready" class of
+    // failures (Brugada 2026-04-19). If fewer than MIN_SUCCESS_RATIO of
+    // modules pass this check, the course is marked 'partial'.
     const { merged, successRatio, successfulCount, totalCount, finalStatus } =
       await step.run("merge-modules", async () => {
         const MIN_SUCCESS_RATIO = 0.8;
+        const MIN_LESSON_CONTENT_CHARS = 200;
+
+        const hasSubstantiveContent = (
+          detail: { lessons?: Array<{ content?: string | null }> } | null | undefined,
+        ): boolean => {
+          if (!detail?.lessons?.length) return false;
+          return detail.lessons.every(
+            (l) => (l.content?.length ?? 0) >= MIN_LESSON_CONTENT_CHARS,
+          );
+        };
+
         const mergedModules: Module[] = skeleton.modules.map((skelMod, i) => {
           const job = jobs.find((j) => j.module_index === i);
-          if (job?.status === "done" && job.result) {
-            const detail = job.result as unknown as {
-              lessons: Module["lessons"];
-              quiz?: Module["quiz"];
-            };
+          const detail =
+            job?.status === "done" && job.result
+              ? (job.result as unknown as {
+                  lessons: Module["lessons"];
+                  quiz?: Module["quiz"];
+                })
+              : null;
+          if (detail && hasSubstantiveContent(detail)) {
             return {
               ...skelMod,
               lessons: detail.lessons,
@@ -1299,7 +1332,12 @@ export const courseFinalize = inngest.createFunction(
           return skelMod;
         });
         const total = skeleton.modules.length;
-        const successful = jobs.filter((j) => j.status === "done").length;
+        const successful = jobs.filter((j) => {
+          if (j.status !== "done") return false;
+          return hasSubstantiveContent(
+            j.result as unknown as { lessons?: Array<{ content?: string | null }> } | null,
+          );
+        }).length;
         const ratio = total === 0 ? 0 : successful / total;
         return {
           merged: { ...skeleton, modules: mergedModules } as Curriculum,
