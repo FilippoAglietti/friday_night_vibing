@@ -58,6 +58,7 @@ import {
   Headphones,
   Menu,
   Flame,
+  Building2,
 } from "lucide-react";
 
 /* ─── Countdown Hook ─────────────────────────────────────── */
@@ -441,6 +442,11 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [genProgress, setGenProgress] = useState<GenerationProgress | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallPreSelect, setPaywallPreSelect] = useState<"planner" | "masterclass" | undefined>(undefined);
+  const openPaywall = useCallback((preSelect?: "planner" | "masterclass") => {
+    setPaywallPreSelect(preSelect);
+    setShowPaywall(true);
+  }, []);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<unknown>(null);
@@ -1374,7 +1380,7 @@ export default function Home() {
                       id="pricing-pro-cta"
                       className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all hover:scale-[1.02]"
                       size="lg"
-                      onClick={() => setShowPaywall(true)}
+                      onClick={() => openPaywall("planner")}
                     >
                       {t("pricing.startProBtn")}
                     </Button>
@@ -1483,7 +1489,7 @@ export default function Home() {
                       id="pricing-promax-cta"
                       className="w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:scale-[1.02]"
                       size="lg"
-                      onClick={() => setShowPaywall(true)}
+                      onClick={() => openPaywall("masterclass")}
                     >
                       {t("pricing.goProMaxBtn")}
                       <ArrowRight className="ml-2 size-4" />
@@ -1555,7 +1561,7 @@ export default function Home() {
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
-                      <Button className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20" size="sm" onClick={() => setShowPaywall(true)}>
+                      <Button className="w-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20" size="sm" onClick={() => openPaywall("planner")}>
                         {t("pricing.startProBtn")}
                       </Button>
                     </CardFooter>
@@ -1631,7 +1637,7 @@ export default function Home() {
                       </ul>
                     </CardContent>
                     <CardFooter className="mt-auto pt-0 pb-5">
-                      <Button className="w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40" size="sm" onClick={() => setShowPaywall(true)}>
+                      <Button className="w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40" size="sm" onClick={() => openPaywall("masterclass")}>
                         {t("pricing.goProMaxBtn")}
                       </Button>
                     </CardFooter>
@@ -1640,6 +1646,39 @@ export default function Home() {
               </div>
               <p className="text-center text-[11px] text-muted-foreground/50 mt-1">{t("pricing.swipePlans")}</p>
             </div>
+
+            {/* ENTERPRISE STRIP */}
+            <AnimateInView containerRef={containerRef} amount={0.2} variants={fadeUp} className="mt-8 md:mt-12">
+              <div className="relative overflow-hidden rounded-2xl border border-slate-500/20 bg-gradient-to-r from-slate-900/60 via-slate-800/50 to-slate-900/60 backdrop-blur-sm p-5 sm:p-6 md:p-8">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-400/40 to-transparent" />
+                <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-slate-500/10 blur-3xl" />
+                <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-600 to-slate-800 shadow-lg shadow-slate-900/30">
+                      <Building2 className="size-5 text-white" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        {t("pricing.enterpriseStrip.eyebrow")}
+                      </span>
+                      <h3 className="mt-0.5 text-lg sm:text-xl font-bold tracking-tight text-foreground">
+                        {t("pricing.enterpriseStrip.heading")}
+                      </h3>
+                      <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-xl">
+                        {t("pricing.enterpriseStrip.desc")}
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="mailto:hello@syllabi.online?subject=Syllabi%20Enterprise%20Inquiry&body=Hi%20Syllabi%20team%2C%0A%0AWe%27re%20interested%20in%20Syllabi%20Enterprise.%20Here%27s%20some%20context%20about%20our%20team%3A%0A%0A-%20Team%20size%3A%20%0A-%20Use%20case%3A%20%0A-%20Expected%20monthly%20generations%3A%20%0A%0AThanks%21"
+                    className="inline-flex w-full md:w-auto items-center justify-center gap-2 rounded-full bg-gradient-to-r from-slate-600 to-slate-800 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-900/30 transition-all hover:scale-[1.02] hover:shadow-slate-900/50"
+                  >
+                    {t("pricing.enterpriseStrip.cta")}
+                    <ArrowRight className="size-4" />
+                  </a>
+                </div>
+              </div>
+            </AnimateInView>
           </div>
         </section>
 
@@ -1790,7 +1829,14 @@ export default function Home() {
       </div> {/* end snap-scroll-container */}
 
       {/* ── Modals ─────────────────────────────────────── */}
-      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />
+      <PaywallModal
+        open={showPaywall}
+        onClose={() => {
+          setShowPaywall(false);
+          setPaywallPreSelect(undefined);
+        }}
+        preSelectedPlan={paywallPreSelect}
+      />
       <AuthModal
         open={showAuthModal}
         onClose={() => setShowAuthModal(false)}
