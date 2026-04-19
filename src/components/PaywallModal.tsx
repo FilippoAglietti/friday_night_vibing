@@ -26,11 +26,11 @@ interface PaywallModalProps {
    * When set, render a focused single-plan view (monthly/annual toggle only)
    * instead of the full plan grid. Used when user clicked a specific plan CTA.
    */
-  preSelectedPlan?: "planner" | "masterclass";
+  preSelectedPlan?: "planner" | "masterclass" | "fivepack";
 }
 
 type PlanCard = {
-  id: "planner" | "masterclass" | "enterprise";
+  id: "planner" | "masterclass" | "fivepack" | "enterprise";
   name: string;
   price: string;
   priceAnnual?: string;
@@ -123,6 +123,30 @@ export default function PaywallModal({
       hasAnnual: true,
     },
     {
+      id: "fivepack",
+      name: "Masterclass · 5-Pack",
+      price: "€39",
+      period: t("pricing.oneTimeLabel"),
+      description: t("pricing.fivePackDesc"),
+      badge: t("pricing.oneTime"),
+      features: [
+        t("pricing.pack1"),
+        t("pricing.pack2"),
+        t("pricing.pack3"),
+        t("pricing.pack4"),
+        t("pricing.pack5"),
+        t("pricing.pack6"),
+      ],
+      cta: t("pricing.tryProMaxBtn"),
+      priceId: process.env.NEXT_PUBLIC_STRIPE_MASTERCLASS_5PACK_PRICE_ID,
+      icon: Crown,
+      gradient: "from-amber-600 to-orange-600",
+      badgeGradient: "from-amber-600 to-orange-600",
+      checkColor: "text-amber-400",
+      highlight: false,
+      hasAnnual: false,
+    },
+    {
       id: "enterprise",
       name: t("pricing.tiers.enterprise.name"),
       price: "Custom",
@@ -151,12 +175,12 @@ export default function PaywallModal({
   const visiblePlans = preSelectedPlan
     ? plans.filter((p) => p.id === preSelectedPlan)
     : currentPlan === "planner"
-    ? plans.filter((p) => p.id !== "planner")
+    ? plans.filter((p) => p.id !== "planner" && p.id !== "fivepack")
     : currentPlan === "masterclass"
     ? plans.filter((p) => p.id === "enterprise")
     : currentPlan === "enterprise"
     ? []
-    : plans;
+    : plans.filter((p) => p.id !== "fivepack");
 
   const headerCopy = preSelectedPlan
     ? t("pricing.upgradeEyebrow")
@@ -203,7 +227,7 @@ export default function PaywallModal({
     }
   };
 
-  const isFocused = Boolean(preSelectedPlan) && visiblePlans.length === 1 && visiblePlans[0].hasAnnual;
+  const isFocused = Boolean(preSelectedPlan) && visiblePlans.length === 1;
 
   return (
     <AnimatePresence>
