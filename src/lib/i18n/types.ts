@@ -126,6 +126,8 @@ export interface Translations {
     mostPopular: string;
     oneTime: string;
     bestValue: string;
+    chipSkeleton: string;
+    chipFullContent: string;
     forever: string;
     month: string;
     oneTimeLabel: string;
@@ -165,6 +167,8 @@ export interface Translations {
     pro4: string;
     /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro5: string;
+    /** Deprecated key name — content is canonical 2026-04-19 post-rebrand. */
+    pro6: string;
     /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm1: string;
     /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */

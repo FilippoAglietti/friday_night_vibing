@@ -177,30 +177,30 @@ const exampleCurricula = [
 ];
 
 const freePlanFeatures = [
-  { text: "1 free course per month", included: true },
-  { text: "Modules, lessons & quizzes", included: true },
-  { text: "PDF & Notion export", included: true },
-  { text: "Shareable course links", included: true },
-  { text: "NotebookLM podcast export", included: false },
-  { text: "15 generations/month (Planner)", included: false },
+  { included: true },
+  { included: true },
+  { included: true },
+  { included: true },
+  { included: false },
+  { included: false },
 ];
 
 const proPlanFeatures = [
-  { text: "15 course generations/month", included: true },
-  { text: "Full modules, lessons & quizzes", included: true },
-  { text: "PDF, Markdown & Notion export", included: true },
-  { text: "All course lengths & styles", included: true },
-  { text: "Priority AI processing", included: true },
+  { included: true },
+  { included: true },
+  { included: true },
+  { included: true },
+  { included: true },
+  { included: true },
 ];
 
 const proMaxFeatures = [
-  { text: "Everything in Planner", included: true },
-  { text: "NotebookLM-ready podcast export", included: true },
-  { text: "Commercial license for sold courses", included: true },
-  { text: "Premium Notion & PDF export", included: true },
-  { text: "Sell-ready course packages", included: true },
-  { text: "White-label branding", included: true },
-  { text: "Dedicated AI processing", included: true },
+  { included: true },
+  { included: true },
+  { included: true },
+  { included: true },
+  { included: true },
+  { included: true },
 ];
 
 /* ─── Course Templates ─────────────────────────────────── */
@@ -1284,9 +1284,12 @@ export default function Home() {
                     <Badge className="rounded-full px-4 py-1.5 text-xs">‌</Badge>
                   </div>
                   <CardHeader className="pt-8">
-                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Free
-                    </CardDescription>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Free
+                      </CardDescription>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/25">{t("pricing.chipSkeleton")}</span>
+                    </div>
                     <CardTitle className="text-3xl font-bold">
                       €0
                       <span className="text-base font-normal text-muted-foreground">
@@ -1336,9 +1339,12 @@ export default function Home() {
                     </Badge>
                   </div>
                   <CardHeader className="pt-8">
-                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">
-                      Planner
-                    </CardDescription>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">
+                        Planner
+                      </CardDescription>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/25">{t("pricing.chipSkeleton")}</span>
+                    </div>
                     <CardTitle className="text-3xl font-bold">
                       €29
                       <span className="text-base font-normal text-muted-foreground">
@@ -1385,10 +1391,13 @@ export default function Home() {
                     </Badge>
                   </div>
                   <CardHeader className="pt-8">
-                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                      <Crown className="size-3.5" />
-                      Masterclass · 5-Pack
-                    </CardDescription>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                        <Crown className="size-3.5" />
+                        Masterclass · 5-Pack
+                      </CardDescription>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">{t("pricing.chipFullContent")}</span>
+                    </div>
                     <CardTitle className="text-3xl font-bold">
                       €39
                       <span className="text-base font-normal text-muted-foreground">
@@ -1438,10 +1447,13 @@ export default function Home() {
                     </Badge>
                   </div>
                   <CardHeader className="pt-8">
-                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
-                      <Crown className="size-3.5" />
-                      Masterclass
-                    </CardDescription>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
+                        <Crown className="size-3.5" />
+                        Masterclass
+                      </CardDescription>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">{t("pricing.chipFullContent")}</span>
+                    </div>
                     <CardTitle className="text-3xl font-bold">
                       €99
                       <span className="text-base font-normal text-muted-foreground">
@@ -1457,16 +1469,6 @@ export default function Home() {
                     </p>
                   </CardHeader>
                   <CardContent className="flex-1">
-                    {/* NotebookLM export highlight */}
-                    <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center gap-3">
-                      <div className="flex items-center justify-center size-9 shrink-0 rounded-lg bg-amber-500/10">
-                        <Headphones className="size-5 text-amber-500" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold text-amber-500">{t("pricing.notebookLMExportTitle")}</p>
-                        <p className="text-[11px] text-muted-foreground">{t("pricing.notebookLMExportDesc")}</p>
-                      </div>
-                    </div>
                     <ul className="space-y-3">
                       {proMaxFeatures.map((f, i) => (
                         <li key={i} className="flex items-center gap-2.5 text-sm">
@@ -1498,9 +1500,12 @@ export default function Home() {
                 <div className="w-[280px] shrink-0">
                   <Card className="relative flex flex-col h-full overflow-visible border-border/50 bg-card/50 backdrop-blur-sm">
                     <CardHeader className="pt-6 pb-3">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Free</CardDescription>
-                      <CardTitle className="text-2xl font-bold">€0<span className="text-sm font-normal text-muted-foreground">/forever</span></CardTitle>
-                      <p className="text-xs text-muted-foreground">1 free course per month. Same AI quality as paid plans. No card required.</p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Free</CardDescription>
+                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/25">{t("pricing.chipSkeleton")}</span>
+                      </div>
+                      <CardTitle className="text-2xl font-bold">€0<span className="text-sm font-normal text-muted-foreground">{t("pricing.forever")}</span></CardTitle>
+                      <p className="text-xs text-muted-foreground">{t("pricing.freeDesc")}</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
                       <ul className="space-y-2">
@@ -1528,7 +1533,10 @@ export default function Home() {
                       <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">{t("pricing.mostPopular")}</Badge>
                     </div>
                     <CardHeader className="pt-7 pb-3">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Planner</CardDescription>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Planner</CardDescription>
+                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/25">{t("pricing.chipSkeleton")}</span>
+                      </div>
                       <CardTitle className="text-2xl font-bold">€29<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">€35/mo</span>
@@ -1558,9 +1566,12 @@ export default function Home() {
                 <div className="w-[280px] shrink-0">
                   <Card className="relative flex flex-col h-full overflow-visible border-amber-500/20 bg-gradient-to-b from-amber-500/[0.03] via-card/50 to-card/50 backdrop-blur-sm">
                     <CardHeader className="pt-6 pb-3">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
-                        <Crown className="size-3" />Masterclass · 5-Pack
-                      </CardDescription>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+                          <Crown className="size-3" />Masterclass · 5-Pack
+                        </CardDescription>
+                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">{t("pricing.chipFullContent")}</span>
+                      </div>
                       <CardTitle className="text-2xl font-bold">€39<span className="text-sm font-normal text-muted-foreground"> {t("pricing.oneTimeLabel")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">€49</span>
@@ -1596,9 +1607,12 @@ export default function Home() {
                       </Badge>
                     </div>
                     <CardHeader className="pt-7 pb-3">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1">
-                        <Crown className="size-3" />Masterclass
-                      </CardDescription>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1">
+                          <Crown className="size-3" />Masterclass
+                        </CardDescription>
+                        <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">{t("pricing.chipFullContent")}</span>
+                      </div>
                       <CardTitle className="text-2xl font-bold">€99<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">€119/mo</span>
@@ -1607,17 +1621,8 @@ export default function Home() {
                       <p className="text-xs text-muted-foreground">{t("pricing.proMaxDesc")}</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
-                      <div className="mb-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-2.5 flex items-center gap-2.5">
-                        <div className="flex items-center justify-center size-8 shrink-0 rounded-lg bg-amber-500/10">
-                          <Headphones className="size-4 text-amber-500" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] font-semibold text-amber-500">{t("pricing.notebookLMExportTitle")}</p>
-                          <p className="text-[10px] text-muted-foreground">{t("pricing.notebookLMExportDesc")}</p>
-                        </div>
-                      </div>
                       <ul className="space-y-2">
-                        {proMaxFeatures.slice(0, 5).map((f, i) => (
+                        {proMaxFeatures.map((f, i) => (
                           <li key={i} className="flex items-center gap-2 text-xs">
                             <Check className="size-3.5 text-amber-500 shrink-0" />
                             <span>{t(`pricing.pm${i + 1}`)}</span>
