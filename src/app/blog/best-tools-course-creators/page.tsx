@@ -164,7 +164,7 @@ export default function Article() {
           <ToolCard
             name="Syllabi"
             category="AI Course Generator"
-            description="Generate complete courses with modules, lessons, quizzes, and AI audio narration in 60 seconds. Supports 16 languages and exports to PDF, Notion, DOCX, and more."
+            description="Generate complete courses with modules, lessons, quizzes, and a NotebookLM-ready podcast export in 60 seconds. Supports 16 languages and exports to PDF, Notion, DOCX, and more."
             price="Free / from €29/mo"
             highlight
           />

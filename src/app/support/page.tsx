@@ -65,7 +65,7 @@ const faqs = [
     questions: [
       {
         q: "Which export formats are available?",
-        a: "All plans include JSON, Markdown, PDF, and Notion export. Pro Max adds AI-generated audio narration, PPTX and DOCX exports, white-label branding, and shareable course links with email capture. The Notion export copies blocks you can paste directly into any Notion page.",
+        a: "All plans include JSON, Markdown, PDF, and Notion export. Masterclass adds NotebookLM-ready podcast export, PPTX and DOCX exports, white-label branding, and shareable course links with email capture. The Notion export copies blocks you can paste directly into any Notion page.",
       },
       {
         q: "Can I re-export a course I generated earlier?",
@@ -81,7 +81,7 @@ const faqs = [
     category: "Billing & Plans",
     questions: [
       {
-        q: "How do I cancel my Pro subscription?",
+        q: "How do I cancel my Planner or Masterclass subscription?",
         a: "Log in, go to your profile, and click Manage Subscription. You'll be redirected to the Stripe billing portal where you can cancel. Your access continues until the end of the paid period.",
       },
       {
@@ -89,8 +89,8 @@ const faqs = [
         a: "Monthly subscription charges are non-refundable for past periods. If you cancel within 24 hours of your first subscription charge and haven't used any generations, contact us and we'll consider a courtesy refund.",
       },
       {
-        q: "What's the difference between Pro and the 5-Pack?",
-        a: "Pro (€28/month) gives you 15 course generations per month — ideal if you create courses regularly. The 5-Pack (€33 one-time) gives you 5 premium generations with no recurring charges — ideal if you just need a few courses.",
+        q: "What's the difference between Planner and the 5-Pack?",
+        a: "Planner (€29/month) gives you 15 reviewed course skeletons per month — ideal if you create courses regularly. The 5-Pack (€39 one-time) gives you 5 full Masterclass generations with no recurring charges — ideal if you just need a few courses.",
       },
       {
         q: "Is my payment information secure?",

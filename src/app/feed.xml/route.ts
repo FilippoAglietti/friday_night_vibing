@@ -2,9 +2,9 @@ const BASE_URL = "https://www.syllabi.online";
 
 const blogPosts = [
   {
-    title: "AI Audio Lessons Are Here — Turn Your Course into a Podcast",
+    title: "NotebookLM Export Is Here — Turn Your Course into a Conversational Podcast",
     description:
-      "Pro Max users can now generate professional voice narration for every lesson. Choose from multiple AI voices and let your students learn on the go.",
+      "Masterclass users can now export any course as NotebookLM-ready Markdown. Drop the file into Google NotebookLM to generate a two-host conversational podcast on demand — no TTS bills, better output than per-lesson narration.",
     date: "2026-04-08",
     category: "Product",
   },

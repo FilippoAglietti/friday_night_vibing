@@ -356,7 +356,7 @@ export default function QuickCourseClient() {
               {/* Upsell CTA */}
               <div className="mt-10 rounded-xl border border-violet-500/15 bg-violet-500/5 p-5 text-center">
                 <p className="text-sm text-muted-foreground mb-3">
-                  Want the full course with lessons, quizzes, and audio?
+                  Want the full course with lessons, quizzes, and NotebookLM podcast export?
                 </p>
                 <Link href="/">
                   <Button className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20">

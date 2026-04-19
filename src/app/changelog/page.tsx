@@ -35,9 +35,9 @@ const releases: Release[] = [
   {
     version: "1.5.0",
     date: "April 8, 2026",
-    highlight: "AI Audio Lessons & Inngest Pipeline",
+    highlight: "NotebookLM Export & Inngest Pipeline",
     changes: [
-      { type: "new", text: "AI-powered audio narration for every lesson — choose from multiple voices and generate podcast-style content." },
+      { type: "new", text: "NotebookLM-ready podcast export — format your course for Google NotebookLM's two-host podcast generator." },
       { type: "new", text: "Inngest background processing pipeline for faster, more reliable course generation." },
       { type: "new", text: "Shareable course links — one-click sharing with a beautiful public course view." },
       { type: "new", text: "DOCX and SCORM export formats alongside existing PDF and Notion exports." },
@@ -55,7 +55,7 @@ const releases: Release[] = [
     changes: [
       { type: "new", text: "Notion export — copy your course as Notion blocks and paste directly into any Notion page." },
       { type: "improvement", text: "Pricing page redesign with improved card alignment across all plans." },
-      { type: "improvement", text: "Pro Max card now shows a Join Waitlist CTA instead of a disabled button." },
+      { type: "improvement", text: "Masterclass card now shows a Join Waitlist CTA instead of a disabled button." },
       { type: "fix", text: "Fixed profile page querying the wrong database table for past generations." },
     ],
   },
@@ -79,7 +79,7 @@ const releases: Release[] = [
       { type: "new", text: "Profile page — view and re-export all past course generations." },
       { type: "new", text: "Delete individual generations from your history." },
       { type: "improvement", text: "Auth modal now supports Google OAuth as the primary sign-in method." },
-      { type: "improvement", text: "Pacing schedules are now included for all Pro generations." },
+      { type: "improvement", text: "Pacing schedules are now included for all Planner generations." },
       { type: "fix", text: "Fixed animation jank on pricing card entrance on Safari." },
       { type: "fix", text: "Fixed CSS class conflict between animate-* and tw-animate-css classes." },
     ],
@@ -87,10 +87,10 @@ const releases: Release[] = [
   {
     version: "1.1.0",
     date: "January 12, 2026",
-    highlight: "Pro Subscription & 5-Pack",
+    highlight: "Planner Subscription & 5-Pack",
     changes: [
-      { type: "new", text: "Pro subscription (€28/month) — 15 generations/month and all export formats." },
-      { type: "new", text: "5-Pack one-time purchase (€33) — 5 full generations, no subscription." },
+      { type: "new", text: "Planner subscription (€29/month) — 15 reviewed skeletons/month and all export formats." },
+      { type: "new", text: "5-Pack one-time purchase (€39) — 5 full generations, no subscription." },
       { type: "new", text: "Stripe integration for secure payment processing." },
       { type: "new", text: "Paywall modal with clear plan comparison and one-click checkout." },
       { type: "improvement", text: "Bonus resources section added to all generated courses." },

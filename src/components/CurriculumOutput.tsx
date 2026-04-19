@@ -33,14 +33,17 @@ import {
   Trophy,
   Wand2,
 } from "lucide-react";
-import { useState, useMemo, useCallback } from "react";
-import AudioPlayer, { type AudioTrack } from "@/components/AudioPlayer";
+import { useState, useMemo } from "react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
 import { generateShareableUrl, type LeadMagnetSettings } from "@/lib/exports/generateShareUrl";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
+import {
+  generateNotebookLMMarkdown,
+  notebookLMFilename,
+} from "@/lib/exports/generateNotebookLMMarkdown";
 import type { Curriculum, Lesson, Module, QuizQuestion, BonusResource, TeachingStyle } from "@/types/curriculum";
 
 interface CurriculumOutputProps {
@@ -303,85 +306,12 @@ export default function CurriculumOutput({
   const [copied, setCopied] = useState(false);
   const [notionCopied, setNotionCopied] = useState(false);
   const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
-  const [showAudioPlayer, setShowAudioPlayer] = useState(true);
   const [leadMagnet, setLeadMagnet] = useState<LeadMagnetSettings>({
     enabled: false,
     headline: "Get free access to this course",
     ctaText: "Unlock Course",
   });
   const [showLeadMagnetPanel, setShowLeadMagnetPanel] = useState(false);
-  const [audioGenerating, setAudioGenerating] = useState(false);
-  const [audioProgress, setAudioProgress] = useState({ done: 0, total: 0 });
-  const [audioError, setAudioError] = useState<string | null>(null);
-
-  // ── Audio Generation Handler ──
-  const handleGenerateAudio = useCallback(async () => {
-    // Collect all lesson IDs across modules
-    const lessons: { moduleIndex: number; lessonIndex: number; lessonId: string; title: string }[] = [];
-    curriculum.modules.forEach((mod, mi) => {
-      mod.lessons.forEach((lesson, li) => {
-        lessons.push({ moduleIndex: mi, lessonIndex: li, lessonId: lesson.id, title: lesson.title });
-      });
-    });
-
-    if (lessons.length === 0) return;
-
-    setAudioGenerating(true);
-    setAudioError(null);
-    setAudioProgress({ done: 0, total: lessons.length });
-
-    // We need a course_id — check if the curriculum was saved to Supabase
-    // For now, trigger generation for each lesson sequentially
-    let completed = 0;
-    const errors: string[] = [];
-
-    for (const lesson of lessons) {
-      try {
-        const res = await fetch("/api/audio/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            // The API expects course_id and lesson_id
-            // We pass the curriculum data for the lesson so the API can build narration
-            course_id: (curriculum as unknown as Record<string, unknown>).courseId || "preview",
-            lesson_id: lesson.lessonId,
-          }),
-        });
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({ error: "Unknown error" }));
-          errors.push(`${lesson.title}: ${err.error || res.statusText}`);
-        }
-      } catch (e) {
-        errors.push(`${lesson.title}: ${e instanceof Error ? e.message : "Network error"}`);
-      }
-
-      completed++;
-      setAudioProgress({ done: completed, total: lessons.length });
-    }
-
-    setAudioGenerating(false);
-    if (errors.length > 0) {
-      setAudioError(`${errors.length} lesson(s) failed. Audio generation requires an API key configured on the server.`);
-    }
-  }, [curriculum]);
-
-  // Build audio tracks from curriculum modules/lessons
-  const audioTracks = useMemo<AudioTrack[]>(() => {
-    const tracks: AudioTrack[] = [];
-    curriculum.modules.forEach((mod, mi) => {
-      mod.lessons.forEach((lesson, li) => {
-        tracks.push({
-          id: `${mi}-${li}`,
-          title: lesson.title,
-          subtitle: `Module ${mi + 1} · Lesson ${li + 1}`,
-          duration: lesson.durationMinutes * 60,
-          url: (lesson as unknown as Record<string, unknown>).audioUrl as string | undefined, // will be undefined until backend generates audio
-        });
-      });
-    });
-    return tracks;
-  }, [curriculum]);
 
   const totalLessons = curriculum.modules.reduce(
     (acc, m) => acc + (m.lessons?.length || 0),
@@ -456,6 +386,19 @@ export default function CurriculumOutput({
     }
   };
 
+  const handleExportNotebookLM = () => {
+    const md = generateNotebookLMMarkdown(curriculum);
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = notebookLMFilename(curriculum);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const handleShareLink = async () => {
     try {
       const shareUrl = generateShareableUrl(
@@ -506,69 +449,6 @@ export default function CurriculumOutput({
           </div>
         </CardHeader>
       </Card>
-
-      {/* ── Audio Generation Card ── */}
-      <Card className="border-amber-500/20 bg-gradient-to-br from-amber-500/[0.03] via-card to-card overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center size-10 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                <Headphones className="size-5 text-amber-500" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-sm">AI Audio Lessons</h3>
-                <p className="text-xs text-muted-foreground">
-                  {audioTracks.filter(t => t.url).length > 0
-                    ? `${audioTracks.filter(t => t.url).length}/${audioTracks.length} lessons narrated`
-                    : `Generate narration for all ${audioTracks.length} lessons`
-                  }
-                </p>
-              </div>
-            </div>
-            <Button
-              onClick={handleGenerateAudio}
-              disabled={audioGenerating}
-              size="sm"
-              className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 gap-2"
-            >
-              {audioGenerating ? (
-                <>
-                  <RefreshCw className="size-3.5 animate-spin" />
-                  {audioProgress.done}/{audioProgress.total}
-                </>
-              ) : (
-                <>
-                  <Sparkles className="size-3.5" />
-                  Generate Audio
-                </>
-              )}
-            </Button>
-          </div>
-          {audioGenerating && (
-            <div className="mt-3">
-              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500"
-                  style={{ width: `${audioProgress.total > 0 ? (audioProgress.done / audioProgress.total) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
-          )}
-          {audioError && (
-            <p className="mt-2 text-xs text-rose-400">{audioError}</p>
-          )}
-        </CardHeader>
-      </Card>
-
-      {/* ── Audio Player ── */}
-      {showAudioPlayer && audioTracks.length > 0 && (
-        <AudioPlayer
-          tracks={audioTracks}
-          courseTitle={curriculum.title}
-          onClose={() => setShowAudioPlayer(false)}
-        />
-      )}
 
       {/* ── Learning Outcomes ── */}
       {curriculum.objectives && curriculum.objectives.length > 0 && (
@@ -830,7 +710,7 @@ export default function CurriculumOutput({
                   onChange={(e) =>
                     setLeadMagnet((prev) => ({ ...prev, description: e.target.value }))
                   }
-                  placeholder="Enter your email to unlock all modules, quizzes, and audio lessons"
+                  placeholder="Enter your email to unlock all modules, quizzes, and the NotebookLM-ready podcast export"
                   className="w-full rounded-lg border border-border/40 bg-card/50 px-3 py-2 text-sm focus:border-violet-500/50 focus:outline-none focus:ring-1 focus:ring-violet-500/20"
                 />
               </div>
@@ -915,6 +795,15 @@ export default function CurriculumOutput({
           >
             <GraduationCap className="h-4 w-4" />
             {loadingExports.scorm ? "Generating..." : "SCORM"}
+          </Button>
+          <Button
+            onClick={handleExportNotebookLM}
+            title="Download a Markdown file and drop it into Google NotebookLM to generate a conversational podcast of your course."
+            className="flex-1 gap-2 min-w-[140px] bg-orange-600 hover:bg-orange-700 text-white border-0"
+            size="lg"
+          >
+            <Headphones className="h-4 w-4" />
+            Download for NotebookLM
           </Button>
           <Button
             onClick={handleShareLink}

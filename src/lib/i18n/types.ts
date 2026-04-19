@@ -120,6 +120,7 @@ export interface Translations {
   pricing: {
     eyebrow: string;
     heading: string;
+    subheading: string;
     launchSpecial: string;
     endsIn: string;
     mostPopular: string;
@@ -134,32 +135,48 @@ export interface Translations {
     save21: string;
     save13: string;
     freeDesc: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     proDesc: string;
     fivePackDesc: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     proMaxDesc: string;
-    aiAudioTitle: string;
-    aiAudioDesc: string;
+    notebookLMExportTitle: string;
+    notebookLMExportDesc: string;
     swipePlans: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     startProBtn: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     tryProMaxBtn: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     goProMaxBtn: string;
     free1: string;
     free2: string;
     free3: string;
     free4: string;
-    free5: string;
     free6: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro1: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro2: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro3: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro4: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro5: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm1: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm2: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm3: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm4: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm5: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm6: string;
+    /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pm7: string;
     pack1: string;
     pack2: string;
@@ -167,6 +184,21 @@ export interface Translations {
     pack4: string;
     pack5: string;
     pack6: string;
+    toggle: { monthly: string; annual: string; savePitch: string };
+    tiers: {
+      free: { name: string; eyebrow: string; pitch: string; cap: string; cta: string };
+      planner: { name: string; eyebrow: string; pitch: string; cap: string; bodyUnlock: string; cta: string };
+      masterclass: { name: string; eyebrow: string; pitch: string; cap: string; cta: string };
+      enterprise: { name: string; eyebrow: string; pitch: string; cta: string };
+    };
+    fivePack: { heading: string; pitch: string; cta: string; conversionCredit: string };
+    bodyUnlock: { cta: string; modalTitle: string; modalBody: string };
+  };
+  paywall: {
+    fromFree: { title: string; body: string; primaryCta: string };
+    fromPlannerCap: { title: string; body: string; primaryCta: string };
+    fromPlannerMasterclassBody: { title: string; body: string; primaryCta: string; secondaryCta: string };
+    fromMasterclassCap: { title: string; body: string; primaryCta: string };
   };
   finalCta: {
     heading: string;

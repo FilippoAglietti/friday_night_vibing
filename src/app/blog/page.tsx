@@ -60,9 +60,9 @@ const posts = [
     category: "Product",
     date: "April 4, 2026",
     readTime: "3 min read",
-    title: "AI Audio Lessons Are Here — Turn Your Course into a Podcast",
+    title: "NotebookLM Export Is Here — Turn Your Course into a Conversational Podcast",
     excerpt:
-      "Pro Max users can now generate professional voice narration for every lesson. Choose from multiple AI voices and let your students learn on the go.",
+      "Masterclass users can now export any course as NotebookLM-ready Markdown. Drop the file into Google NotebookLM to generate a two-host conversational podcast on demand.",
     accent: "text-rose-400",
   },
   {

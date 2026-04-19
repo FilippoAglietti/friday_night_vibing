@@ -39,6 +39,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { inngest } from "./client";
 import { validateCourseUrls } from "./validate-urls";
+import { reviewSkeleton } from "@/lib/inngest/reviewer";
+import { selectLessonsToPolish, polishLesson } from "@/lib/inngest/polish";
+import { tierOrFallback, TIERS } from "@/lib/pricing/tiers";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { recordEvent } from "@/lib/observability/metrics";
 import {
@@ -464,6 +467,63 @@ function classifySkeletonError(message: string): SkeletonErrorCategory {
   return "unknown";
 }
 
+// Deterministic pacing normalisation. Claude treats totalHours,
+// hoursPerWeek, totalWeeks, and weeklyPlan as four independent
+// numbers and routinely produces inconsistent sets (e.g. modules
+// summing to 10.5h while totalHours=10 and hoursPerWeek×totalWeeks=12).
+// Reviewer flagged this on the 2026-04-18 Distributed Systems test.
+// This helper rebuilds the math from the authoritative source —
+// module durations — so the numbers agree without another LLM call.
+function normalizeSkeletonPacing(skeleton: Curriculum): Curriculum {
+  const modules = skeleton.modules ?? [];
+  const totalMinutes = modules.reduce((sum, m) => sum + (m.durationMinutes || 0), 0);
+  if (totalMinutes === 0) return skeleton;
+
+  const totalHours = Math.max(1, Math.round(totalMinutes / 60));
+  const hoursPerWeek = Math.max(1, Math.min(10, skeleton.pacing?.hoursPerWeek ?? 3));
+  const totalWeeks = Math.max(1, Math.ceil(totalHours / hoursPerWeek));
+
+  const existingPlan = skeleton.pacing?.weeklyPlan ?? [];
+  const planHasAllModules =
+    existingPlan.length > 0 &&
+    new Set(existingPlan.flatMap((w) => w.moduleIds)).size === modules.length;
+
+  let weeklyPlan = existingPlan;
+  if (!planHasAllModules) {
+    const minutesPerWeek = totalMinutes / totalWeeks;
+    weeklyPlan = [];
+    let weekIdx = 0;
+    let weekMinutes = 0;
+    let currentWeek: { week: number; label?: string; moduleIds: string[] } = {
+      week: 1,
+      moduleIds: [],
+    };
+    for (const m of modules) {
+      if (weekMinutes + (m.durationMinutes || 0) > minutesPerWeek * 1.3 && currentWeek.moduleIds.length > 0) {
+        weeklyPlan.push(currentWeek);
+        weekIdx += 1;
+        currentWeek = { week: weekIdx + 1, moduleIds: [] };
+        weekMinutes = 0;
+      }
+      currentWeek.moduleIds.push(m.id);
+      weekMinutes += m.durationMinutes || 0;
+    }
+    if (currentWeek.moduleIds.length > 0) weeklyPlan.push(currentWeek);
+  }
+
+  return {
+    ...skeleton,
+    pacing: {
+      ...skeleton.pacing,
+      style: skeleton.pacing?.style ?? "self-paced",
+      totalHours,
+      hoursPerWeek,
+      totalWeeks,
+      weeklyPlan,
+    },
+  };
+}
+
 // ─── Function 1: course.generate (skeleton + fan-out) ────────
 
 /**
@@ -637,7 +697,8 @@ export const courseGenerate = inngest.createFunction(
         timeoutMs: skeletonTimeout,
       });
 
-      return parseClaudeJson<Curriculum>(rawText, "skeleton", courseId);
+      const parsed = await parseClaudeJson<Curriculum>(rawText, "skeleton", courseId);
+      return normalizeSkeletonPacing(parsed);
     });
 
     // Step 2: persist skeleton to courses.curriculum so the
@@ -652,6 +713,37 @@ export const courseGenerate = inngest.createFunction(
         generation_completed_modules: 0,
       }).eq("id", courseId);
     });
+
+    // Opus reviewer quality gate (flag-gated + tier-gated). Per spec
+    // §5.3, reviewer feedback never blocks publish — we only annotate
+    // courses.quality_warnings so the UI can surface it. Wrapped in
+    // step.run so Inngest memoises the verdict — otherwise every
+    // later step's replay would re-invoke the Opus API (~$0.12/call).
+    // The helper catches its own errors and records telemetry inside,
+    // so step.run always resolves and fires exactly once.
+    if (thisCourse?.user_id) {
+      const { data: reviewerProfile } = await supabase
+        .from("profiles")
+        .select("plan")
+        .eq("id", thisCourse.user_id)
+        .single();
+      const reviewerTier = tierOrFallback(reviewerProfile?.plan ?? "free");
+      if (TIERS[reviewerTier].hasReviewer) {
+        const review = await step.run("reviewer-skeleton", () =>
+          reviewSkeleton({ courseId, skeleton }),
+        );
+        if (review.verdict === "needs_revision") {
+          console.warn(
+            `[courseGenerate] skeleton reviewer flagged ${courseId}: ${review.feedback.join("; ")}`,
+          );
+          await supabase
+            .from("courses")
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .update({ quality_warnings: review.feedback as any })
+            .eq("id", courseId);
+        }
+      }
+    }
 
     // Step 3: insert generation_jobs rows. ON CONFLICT DO NOTHING
     // because Inngest retries could otherwise create duplicates
@@ -1218,6 +1310,65 @@ export const courseFinalize = inngest.createFunction(
         };
       });
 
+    // Strategic polish (Masterclass-length only, flag-gated + tier-gated).
+    // Runs OUTSIDE step.run so recordEvent calls inside polish.ts are not
+    // memoised by Inngest. Mutates `merged` in place — soft degradation on
+    // per-lesson failure keeps the Sonnet body.
+    const { data: polishCourse } = await supabase
+      .from("courses")
+      .select("user_id, length")
+      .eq("id", courseId)
+      .single();
+
+    if (
+      polishCourse?.length === "masterclass" &&
+      polishCourse.user_id &&
+      process.env.MASTERCLASS_STRATEGIC_POLISH_ENABLED === "true"
+    ) {
+      const { data: polishProfile } = await supabase
+        .from("profiles")
+        .select("plan")
+        .eq("id", polishCourse.user_id)
+        .single();
+      const polishTier = tierOrFallback(polishProfile?.plan ?? "free");
+
+      if (TIERS[polishTier].hasPolish && merged.modules) {
+        const selected = selectLessonsToPolish(
+          merged.modules.map((m) => ({
+            id: m.id ?? "",
+            lessons: (m.lessons ?? []).map((l) => ({
+              id: l.id ?? "",
+              bodyLength: l.content?.length ?? 0,
+              body: l.content,
+            })),
+          })),
+        );
+        const selectedIds = new Set(selected.map((l) => l.id));
+        // Each polishLesson is wrapped in its own step.run so Inngest
+        // memoises results per-lesson. Without this, every subsequent
+        // step replay would re-invoke the Opus API for each selected
+        // lesson (~$0.10–$0.30 each × up to 15 lessons = painful).
+        const polishJobs: Array<Promise<void>> = [];
+        for (const m of merged.modules) {
+          for (const l of m.lessons ?? []) {
+            if (!l.id || !selectedIds.has(l.id)) continue;
+            const lessonId = l.id;
+            const body = l.content ?? "";
+            polishJobs.push(
+              step
+                .run(`polish-lesson-${lessonId}`, () =>
+                  polishLesson({ courseId, lessonId, body }),
+                )
+                .then((polished) => {
+                  if (polished) l.content = polished;
+                }),
+            );
+          }
+        }
+        await Promise.allSettled(polishJobs);
+      }
+    }
+
     // Observability: fire a finalize outcome event BEFORE the
     // mark-final-status step. Intentionally NOT inside step.run()
     // so Inngest retries can't replay it from memoised cache.
@@ -1313,9 +1464,12 @@ export const courseFinalize = inngest.createFunction(
  * this array and passes it to `serve()`. Adding a new function
  * means appending it here and nothing else.
  */
+import { bodyUnlock } from "@/lib/inngest/body-unlock";
+
 export const inngestFunctions = [
   courseGenerate,
   moduleGenerate,
   courseFinalize,
   validateCourseUrls,
+  bodyUnlock,
 ];

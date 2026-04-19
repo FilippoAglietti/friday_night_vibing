@@ -103,19 +103,19 @@ const painPoints = [
     icon: Clock,
     problem: "Your courses look like everyone else's",
     solution:
-      "Syllabi generates courses with stunning design and real audio narration — so polished your students won't believe it's AI.",
+      "Syllabi generates courses with stunning design and a NotebookLM-ready podcast export — so polished your students won't believe it's AI.",
   },
   {
     icon: Brain,
     problem: "Nobody finishes your courses",
     solution:
-      "Audio lessons, structured pacing, and beautiful visuals keep learners engaged from start to finish — not just skimming.",
+      "Structured pacing, beautiful visuals, and a two-host conversational podcast export keep learners engaged from start to finish — not just skimming.",
   },
   {
     icon: Target,
     problem: "Creating & sharing is a 10-tool nightmare",
     solution:
-      "One click gives you a complete course with a shareable link, audio, quizzes, and export-ready files. No LMS required.",
+      "One click gives you a complete course with a shareable link, NotebookLM podcast export, quizzes, and export-ready files. No LMS required.",
   },
 ];
 
@@ -130,7 +130,7 @@ const steps = [
     num: "02",
     icon: Sparkles,
     title: "AI builds your course",
-    desc: "You get modules, lessons, quizzes, audio narration, and a shareable link — all editable.",
+    desc: "You get modules, lessons, quizzes, a NotebookLM-ready podcast export, and a shareable link — all editable.",
   },
   {
     num: "03",
@@ -181,8 +181,8 @@ const freePlanFeatures = [
   { text: "Modules, lessons & quizzes", included: true },
   { text: "PDF & Notion export", included: true },
   { text: "Shareable course links", included: true },
-  { text: "Audio narration", included: false },
-  { text: "15 generations/month (Pro)", included: false },
+  { text: "NotebookLM podcast export", included: false },
+  { text: "15 skeletons/month (Planner)", included: false },
 ];
 
 const proPlanFeatures = [
@@ -194,8 +194,8 @@ const proPlanFeatures = [
 ];
 
 const proMaxFeatures = [
-  { text: "Everything in Pro", included: true },
-  { text: "AI-generated audio lessons", included: true },
+  { text: "Everything in Planner", included: true },
+  { text: "NotebookLM-ready podcast export", included: true },
   { text: "Commercial license for sold courses", included: true },
   { text: "Premium Notion & PDF export", included: true },
   { text: "Sell-ready course packages", included: true },
@@ -464,6 +464,26 @@ export default function Home() {
     setPreviewCurriculum(null);
     setPreviewTeachingStyle(null);
   }, []);
+
+  const handleExamplePreviewNotebookLMDownload = useCallback(() => {
+    if (!previewCurriculum) return;
+    import("@/lib/exports/generateNotebookLMMarkdown").then(({
+      generateNotebookLMMarkdown,
+      notebookLMFilename,
+    }) => {
+      const md = generateNotebookLMMarkdown(previewCurriculum);
+      const filename = notebookLMFilename(previewCurriculum);
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }, [previewCurriculum]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -1153,6 +1173,18 @@ export default function Home() {
                       <span className="font-medium">{t("examples.preview")}</span>
                     </div>
 
+                    {/* Tier badge */}
+                    <Badge
+                      variant="outline"
+                      className={`mt-1 rounded-full px-3 py-0.5 text-[10px] font-semibold tracking-wider uppercase ${
+                        exampleCurriculaWithStyles[i]?.tier === "masterclass"
+                          ? "border-amber-500/40 text-amber-500 bg-amber-500/5"
+                          : "border-violet-500/40 text-violet-500 bg-violet-500/5"
+                      }`}
+                    >
+                      {exampleCurriculaWithStyles[i]?.tier === "masterclass" ? "Masterclass output" : "Planner output"}
+                    </Badge>
+
                     {/* Title — fixed height so stats grid aligns across cards */}
                     <div className="mt-3 flex h-16 xl:h-18 items-center justify-center">
                       <h3 className="text-xl xl:text-2xl 2xl:text-[1.7rem] font-semibold leading-tight">
@@ -1305,10 +1337,10 @@ export default function Home() {
                   </div>
                   <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">
-                      Pro
+                      Planner
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      €28
+                      €29
                       <span className="text-base font-normal text-muted-foreground">
                         {t("pricing.month")}
                       </span>
@@ -1355,16 +1387,16 @@ export default function Home() {
                   <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
                       <Crown className="size-3.5" />
-                      Pro Max · 5-Pack
+                      Masterclass · 5-Pack
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      €33
+                      €39
                       <span className="text-base font-normal text-muted-foreground">
                         {" "}{t("pricing.oneTimeLabel")}
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm line-through text-muted-foreground/60">€42</span>
+                      <span className="text-sm line-through text-muted-foreground/60">€49</span>
                       <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />{t("pricing.save21")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -1408,16 +1440,16 @@ export default function Home() {
                   <CardHeader className="pt-8">
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
                       <Crown className="size-3.5" />
-                      Pro Max
+                      Masterclass
                     </CardDescription>
                     <CardTitle className="text-3xl font-bold">
-                      €69
+                      €99
                       <span className="text-base font-normal text-muted-foreground">
                         {t("pricing.month")}
                       </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm line-through text-muted-foreground/60">€79/mo</span>
+                      <span className="text-sm line-through text-muted-foreground/60">€119/mo</span>
                       <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider text-rose-400 bg-gradient-to-r from-rose-500/20 to-amber-500/20 border border-rose-500/30 px-2.5 py-0.5 rounded-full shadow-sm shadow-rose-500/10"><Flame className="size-3" />{t("pricing.save13")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -1425,14 +1457,14 @@ export default function Home() {
                     </p>
                   </CardHeader>
                   <CardContent className="flex-1">
-                    {/* AI Audio highlight */}
+                    {/* NotebookLM export highlight */}
                     <div className="mb-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 flex items-center gap-3">
                       <div className="flex items-center justify-center size-9 shrink-0 rounded-lg bg-amber-500/10">
                         <Headphones className="size-5 text-amber-500" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-amber-500">{t("pricing.aiAudioTitle")}</p>
-                        <p className="text-[11px] text-muted-foreground">{t("pricing.aiAudioDesc")}</p>
+                        <p className="text-xs font-semibold text-amber-500">{t("pricing.notebookLMExportTitle")}</p>
+                        <p className="text-[11px] text-muted-foreground">{t("pricing.notebookLMExportDesc")}</p>
                       </div>
                     </div>
                     <ul className="space-y-3">
@@ -1496,11 +1528,11 @@ export default function Home() {
                       <Badge className="rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 text-xs font-semibold text-white border-0 shadow-lg shadow-violet-500/25">{t("pricing.mostPopular")}</Badge>
                     </div>
                     <CardHeader className="pt-7 pb-3">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Pro</CardDescription>
-                      <CardTitle className="text-2xl font-bold">€28<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
+                      <CardDescription className="text-xs font-semibold uppercase tracking-wider text-violet-500">Planner</CardDescription>
+                      <CardTitle className="text-2xl font-bold">€29<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className="text-xs line-through text-muted-foreground/60">€35/mo</span>
-                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-20%</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-17%</span>
                       </div>
                       <p className="text-xs text-muted-foreground">{t("pricing.proDesc")}</p>
                     </CardHeader>
@@ -1527,12 +1559,12 @@ export default function Home() {
                   <Card className="relative flex flex-col h-full overflow-visible border-amber-500/20 bg-gradient-to-b from-amber-500/[0.03] via-card/50 to-card/50 backdrop-blur-sm">
                     <CardHeader className="pt-6 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-400 flex items-center gap-1">
-                        <Crown className="size-3" />Pro Max · 5-Pack
+                        <Crown className="size-3" />Masterclass · 5-Pack
                       </CardDescription>
-                      <CardTitle className="text-2xl font-bold">€33<span className="text-sm font-normal text-muted-foreground"> {t("pricing.oneTimeLabel")}</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€39<span className="text-sm font-normal text-muted-foreground"> {t("pricing.oneTimeLabel")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-xs line-through text-muted-foreground/60">€42</span>
-                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-21%</span>
+                        <span className="text-xs line-through text-muted-foreground/60">€49</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-20%</span>
                       </div>
                       <p className="text-xs text-muted-foreground">{t("pricing.fivePackDesc")}</p>
                     </CardHeader>
@@ -1565,12 +1597,12 @@ export default function Home() {
                     </div>
                     <CardHeader className="pt-7 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-amber-500 flex items-center gap-1">
-                        <Crown className="size-3" />Pro Max
+                        <Crown className="size-3" />Masterclass
                       </CardDescription>
-                      <CardTitle className="text-2xl font-bold">€69<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
+                      <CardTitle className="text-2xl font-bold">€99<span className="text-sm font-normal text-muted-foreground">{t("pricing.month")}</span></CardTitle>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-xs line-through text-muted-foreground/60">€79/mo</span>
-                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-13%</span>
+                        <span className="text-xs line-through text-muted-foreground/60">€119/mo</span>
+                        <span className="text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">-17%</span>
                       </div>
                       <p className="text-xs text-muted-foreground">{t("pricing.proMaxDesc")}</p>
                     </CardHeader>
@@ -1580,8 +1612,8 @@ export default function Home() {
                           <Headphones className="size-4 text-amber-500" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[10px] font-semibold text-amber-500">{t("pricing.aiAudioTitle")}</p>
-                          <p className="text-[10px] text-muted-foreground">{t("pricing.aiAudioDesc")}</p>
+                          <p className="text-[10px] font-semibold text-amber-500">{t("pricing.notebookLMExportTitle")}</p>
+                          <p className="text-[10px] text-muted-foreground">{t("pricing.notebookLMExportDesc")}</p>
                         </div>
                       </div>
                       <ul className="space-y-2">
@@ -1783,6 +1815,20 @@ export default function Home() {
               teachingStyle={previewTeachingStyle}
               onGenerateAnother={closePreview}
             />
+            {exampleCurriculaWithStyles.find(
+              (e) => e.curriculum === previewCurriculum,
+            )?.tier === "masterclass" && (
+              <div className="mt-4 flex justify-center">
+                <Button
+                  onClick={handleExamplePreviewNotebookLMDownload}
+                  className="gap-2 bg-orange-600 hover:bg-orange-700 text-white border-0"
+                  size="lg"
+                >
+                  <Headphones className="h-4 w-4" />
+                  Download for NotebookLM
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}

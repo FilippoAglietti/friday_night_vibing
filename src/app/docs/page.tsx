@@ -6,12 +6,12 @@ import { JsonLd, breadcrumbJsonLd, BREADCRUMBS } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Documentation — AI Course Generator Guide",
   description:
-    "Complete guide to Syllabi's AI course generator. Learn how to create courses, export to PDF & Notion, add audio narration, and customize your courses.",
+    "Complete guide to Syllabi's AI course generator. Learn how to create courses, export to PDF & Notion, generate a NotebookLM-ready podcast export, and customize your courses.",
   alternates: { canonical: "/docs" },
   openGraph: {
     title: "Documentation — Syllabi AI Course Generator",
     description:
-      "Complete guide to creating AI-powered courses with Syllabi. Modules, lessons, quizzes, audio, and export options explained.",
+      "Complete guide to creating AI-powered courses with Syllabi. Modules, lessons, quizzes, NotebookLM podcast export, and export options explained.",
     url: "https://www.syllabi.online/docs",
     siteName: "Syllabi",
     type: "website",
@@ -96,16 +96,16 @@ const sections = [
         body: "3 free mini-course generations. Includes modules, lessons, quizzes, and all export formats (JSON, Markdown, PDF, Notion). Shareable course links included. No credit card required.",
       },
       {
-        heading: "Pro (€28/month)",
-        body: "15 course generations/month. All course lengths and styles (crash to masterclass). Full content including quizzes, pacing schedules, and all export formats. Custom pacing and priority AI processing.",
+        heading: "Planner (€29/month)",
+        body: "15 reviewed course skeletons/month. All course lengths and styles (crash to masterclass). Lesson titles, objectives, pacing schedules, and all export formats. €5 on-demand body unlock per skeleton.",
       },
       {
-        heading: "Pro Max (€69/month)",
-        body: "Unlimited generations with AI-generated audio narration, full chapter content generation, premium Notion and PDF export, DOCX and SCORM export, white-label branding, and dedicated AI processing.",
+        heading: "Masterclass (€99/month)",
+        body: "20 full courses/month with Opus-quality review, strategic polish on key lessons, NotebookLM-ready podcast export, DOCX and SCORM export, white-label branding, and dedicated AI processing.",
       },
       {
-        heading: "5-Pack (€33 one-time)",
-        body: "5 Pro Max generations with audio, chapter content, and all export formats. No subscription required. Perfect for one-time projects.",
+        heading: "5-Pack (€39 one-time)",
+        body: "5 Masterclass generations with NotebookLM export, full lesson bodies, and all export formats. No subscription required. Perfect for one-time projects.",
       },
     ],
   },

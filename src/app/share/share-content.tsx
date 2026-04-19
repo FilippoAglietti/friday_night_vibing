@@ -246,7 +246,7 @@ export default function SharePageContent() {
 
               {!leadMagnet?.description && (
                 <p className="text-center text-slate-400 mb-6 text-sm">
-                  Enter your email to unlock all {curriculum.modules?.length || 0} modules, {totalQuizzes} quizzes, and audio lessons.
+                  Enter your email to unlock all {curriculum.modules?.length || 0} modules, {totalQuizzes} quizzes, and the NotebookLM-ready podcast export.
                 </p>
               )}
 
@@ -531,7 +531,7 @@ export default function SharePageContent() {
             Want to create courses like this?
           </h2>
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Syllabi generates complete courses with audio narration, stunning design, and shareable links.
+            Syllabi generates complete courses with NotebookLM podcast export, stunning design, and shareable links.
           </p>
           <a
             href="https://syllabi.online"

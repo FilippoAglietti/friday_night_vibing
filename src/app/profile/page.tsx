@@ -37,6 +37,7 @@ import {
   Flame,
   ArrowUpRight,
   BarChart3,
+  Headphones,
   Award,
   Share2,
   Check,
@@ -55,6 +56,7 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
+import { CheckoutButton } from "@/components/CheckoutButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
@@ -819,7 +821,7 @@ export default function ProfilePage() {
   const name = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
   const firstName = name.split(" ")[0];
 
-  const planLabel = userProfile?.plan === "pro_max" ? "Pro Max" : userProfile?.plan === "pro" ? "Pro" : "Free";
+  const planLabel = userProfile?.plan === "pro_max" ? "Masterclass" : userProfile?.plan === "pro" ? "Planner" : "Free";
   const planBadgeClass =
     userProfile?.plan === "pro_max" ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
     : userProfile?.plan === "pro" ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
@@ -1005,6 +1007,20 @@ export default function ProfilePage() {
                 </Button>
             </div>
 
+            {/* €10 Upgrade-to-Masterclass CTA for Planner users */}
+            {userProfile?.plan === "pro" && (
+              <div className="mt-3 pt-3 border-t border-border/20" onClick={(e) => e.stopPropagation()}>
+                <CheckoutButton
+                  href={`/api/checkout?tier=single_masterclass&course_id=${gen.id}`}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow hover:shadow-lg transition-all"
+                  disabledClassName="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium bg-muted text-muted-foreground cursor-not-allowed opacity-60 pointer-events-none"
+                  launchingLabel="Upgrade €10 — launching tomorrow"
+                >
+                  Upgrade to Masterclass — €10
+                </CheckoutButton>
+              </div>
+            )}
+
             {/* Expanded content */}
             <AnimatePresence>
               {isExpanded && (
@@ -1151,8 +1167,8 @@ export default function ProfilePage() {
                   <h1 className="text-xl sm:text-2xl font-bold truncate">{firstName}</h1>
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     <Badge variant="outline" className={`text-xs flex items-center gap-1 ${planBadgeClass}`}>
-                      {planLabel === "Pro Max" && <Crown className="size-3" />}
-                      {planLabel === "Pro" && <Zap className="size-3" />}
+                      {planLabel === "Masterclass" && <Crown className="size-3" />}
+                      {planLabel === "Planner" && <Zap className="size-3" />}
                       {planLabel} Plan
                     </Badge>
                     {streak > 0 && (
@@ -1196,8 +1212,8 @@ export default function ProfilePage() {
               <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
               <div className="flex items-center gap-2 mt-1.5">
                 <Badge variant="outline" className={`text-xs flex items-center gap-1 ${planBadgeClass}`}>
-                  {planLabel === "Pro Max" && <Crown className="size-3" />}
-                  {planLabel === "Pro" && <Zap className="size-3" />}
+                  {planLabel === "Masterclass" && <Crown className="size-3" />}
+                  {planLabel === "Planner" && <Zap className="size-3" />}
                   {planLabel} Plan
                 </Badge>
               </div>
@@ -1388,7 +1404,7 @@ export default function ProfilePage() {
                         <div className="absolute inset-0 flex items-center justify-center"><Crown className="size-6 text-amber-400" /></div>
                       </div>
                       <p className="text-xs font-semibold mt-3">Unlimited</p>
-                      <p className="text-[10px] text-muted-foreground">Pro Max Plan</p>
+                      <p className="text-[10px] text-muted-foreground">Masterclass Plan</p>
                     </div>
                   ) : userProfile?.plan === "pro_max" ? (
                     <div className="flex flex-col items-center justify-center py-2">
@@ -1399,7 +1415,7 @@ export default function ProfilePage() {
                           <span className="text-[9px] text-muted-foreground">remaining</span>
                         </div>
                       </div>
-                      <p className="text-xs font-medium mt-2">Pro Max 5-Pack</p>
+                      <p className="text-xs font-medium mt-2">Masterclass 5-Pack</p>
                       {usagePercent >= 100 ? (
                         <Button size="sm" className="mt-3 h-7 text-[10px] bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 rounded-full" onClick={() => setShowPaywall(true)}>
                           Go Unlimited<ChevronRight className="size-3 ml-0.5" />
@@ -1616,26 +1632,26 @@ export default function ProfilePage() {
               </motion.div>
             )}
 
-            {/* ── PRO MAX LOCKED FEATURES ──────────────────── */}
+            {/* ── MASTERCLASS LOCKED FEATURES ──────────────────── */}
             {userProfile && userProfile.plan !== "pro_max" && (
               <motion.div variants={fadeUp}>
                 <Card className="border-border/40 bg-card/50 backdrop-blur-sm overflow-hidden">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Crown className="size-4 text-amber-500" />
-                      Pro Max Features
+                      Masterclass Features
                       <Badge className="ml-auto text-[9px] bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border-amber-500/30">Upgrade</Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {[
-                        { icon: Brain, label: "AI Course Branding", desc: "Custom branded templates with your logo & colors", locked: userProfile.plan !== "pro_max" },
-                        { icon: Presentation, label: "Video Script Generator", desc: "Turn lessons into camera-ready video scripts", locked: userProfile.plan !== "pro_max" },
-                        { icon: BarChart3, label: "Student Analytics", desc: "Track engagement, completion, and quiz scores", locked: userProfile.plan !== "pro_max" },
-                        { icon: Layers, label: "Team Collaboration", desc: "Invite co-creators and share course drafts", locked: userProfile.plan !== "pro_max" },
-                        { icon: Zap, label: "API Access", desc: "Generate courses programmatically via REST API", locked: userProfile.plan !== "pro_max" },
-                        { icon: Shield, label: "White-Label Export", desc: "Remove Syllabi branding from all exports", locked: userProfile.plan !== "pro_max" },
+                        { icon: Headphones, label: "NotebookLM podcast export", desc: "One-click Markdown export → Google NotebookLM two-host podcast", locked: userProfile.plan !== "pro_max" },
+                        { icon: Brain, label: "Opus strategic polish", desc: "Key lessons rewritten by Opus for pedagogical clarity", locked: userProfile.plan !== "pro_max" },
+                        { icon: BarChart3, label: "20 full Masterclass courses/month", desc: "Full-body generation with modules, lessons, and resources", locked: userProfile.plan !== "pro_max" },
+                        { icon: Shield, label: "White-label exports", desc: "Remove Syllabi branding from all exports", locked: userProfile.plan !== "pro_max" },
+                        { icon: Zap, label: "Priority queue", desc: "Faster generation during peak hours", locked: userProfile.plan !== "pro_max" },
+                        { icon: Layers, label: "Masterclass-length courses", desc: "Generate our longest course format (12+ hours)", locked: userProfile.plan !== "pro_max" },
                       ].map((feat) => (
                         <div
                           key={feat.label}
@@ -1668,7 +1684,7 @@ export default function ProfilePage() {
                       <div className="mt-3 flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 p-3">
                         <div>
                           <p className="text-xs font-semibold text-amber-400">Unlock all features</p>
-                          <p className="text-[10px] text-muted-foreground">Upgrade to Pro first, then unlock Pro Max</p>
+                          <p className="text-[10px] text-muted-foreground">Upgrade to Planner first, then unlock Masterclass</p>
                         </div>
                         <Button size="sm" className="h-7 text-[10px] bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full" onClick={() => setShowPaywall(true)}>
                           Upgrade<ChevronRight className="size-3 ml-0.5" />
@@ -1679,10 +1695,10 @@ export default function ProfilePage() {
                       <div className="mt-3 flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 p-3">
                         <div>
                           <p className="text-xs font-semibold text-amber-400">Unlock the full toolkit</p>
-                          <p className="text-[10px] text-muted-foreground">Upgrade to Pro Max for AI audio, white-label exports & more</p>
+                          <p className="text-[10px] text-muted-foreground">Upgrade to Masterclass for NotebookLM podcast export, white-label exports & more</p>
                         </div>
                         <Button size="sm" className="h-7 text-[10px] bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 rounded-full shrink-0" onClick={() => setShowPaywall(true)}>
-                          Go Pro Max<ChevronRight className="size-3 ml-0.5" />
+                          Go Masterclass<ChevronRight className="size-3 ml-0.5" />
                         </Button>
                       </div>
                     )}
@@ -2058,7 +2074,7 @@ export default function ProfilePage() {
                   <div>
                     <p className="font-semibold text-sm">{planLabel} Plan</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {userProfile?.plan === "free" ? "3 mini-course generations included" : userProfile?.plan === "pro" ? "15 generations/month" : userProfile && userProfile.generations_limit > 0 && userProfile.generations_limit < 1000 ? `${userProfile.generations_limit} Pro Max generations` : "Unlimited generations"}
+                      {userProfile?.plan === "free" ? "1 course skeleton/month included" : userProfile?.plan === "pro" ? "15 skeletons/month" : userProfile && userProfile.generations_limit > 0 && userProfile.generations_limit < 1000 ? `${userProfile.generations_limit} Masterclass generations` : "Unlimited generations"}
                     </p>
                   </div>
                   <Badge variant="outline" className={`text-xs ${planBadgeClass}`}>{planLabel}</Badge>
@@ -2083,7 +2099,7 @@ export default function ProfilePage() {
                   <>
                     <Separator className="border-border/30" />
                     <div className="rounded-xl bg-violet-500/5 border border-violet-500/15 p-4">
-                      <p className="text-sm font-semibold mb-1 flex items-center gap-1.5"><Crown className="size-3.5 text-violet-500" />Upgrade to Pro</p>
+                      <p className="text-sm font-semibold mb-1 flex items-center gap-1.5"><Crown className="size-3.5 text-violet-500" />Upgrade to Planner</p>
                       <ul className="space-y-1 mb-3">
                         {["50 generations per month", "Standard & Bootcamp course lengths", "Advanced difficulty tier", "Priority support"].map((f) => (
                           <li key={f} className="text-xs text-muted-foreground flex items-center gap-1.5"><div className="size-1 rounded-full bg-violet-500 shrink-0" />{f}</li>
@@ -2144,7 +2160,7 @@ export default function ProfilePage() {
       </main>
 
       {/* Paywall Modal for Upgrade buttons */}
-      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} currentPlan={(userProfile?.plan as "free" | "pro" | "pro_max") || "free"} />
+      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} currentPlan={(userProfile?.plan as "free" | "planner" | "masterclass" | "enterprise") || "free"} />
 
       {/* Welcome Animation — plays on login */}
       <WelcomeAnimation
