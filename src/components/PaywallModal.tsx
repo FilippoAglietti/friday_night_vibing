@@ -10,6 +10,7 @@ import {
   Crown,
   ArrowRight,
   Headphones,
+  Building2,
 } from "lucide-react";
 import { useState } from "react";
 import { isPricingLive } from "@/lib/pricing/pricingLive";
@@ -22,12 +23,31 @@ interface PaywallModalProps {
   reason?: "cap_exceeded" | "masterclass_body_on_planner" | "unknown";
 }
 
-/* Annual billing availability check */
-const PLANNER_ANNUAL_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PLANNER_ANNUAL_PRICE_ID;
-const MASTERCLASS_ANNUAL_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_MASTERCLASS_ANNUAL_PRICE_ID;
-const ANNUAL_BILLING_AVAILABLE = Boolean(PLANNER_ANNUAL_PRICE_ID && MASTERCLASS_ANNUAL_PRICE_ID);
+type PlanCard = {
+  id: "planner" | "masterclass" | "enterprise";
+  name: string;
+  price: string;
+  priceAnnual?: string;
+  annualBilledLabel?: string;
+  period: string;
+  description: string;
+  badge?: string;
+  features: string[];
+  cta: string;
+  ctaAnnual?: string;
+  priceId?: string;
+  priceIdAnnual?: string;
+  icon: typeof Crown;
+  gradient: string;
+  badgeGradient: string;
+  checkColor: string;
+  highlight: boolean;
+  hasAnnual: boolean;
+  contactSales?: boolean;
+  mailto?: string;
+};
 
-const plans = [
+const plans: PlanCard[] = [
   {
     id: "planner",
     name: "Planner",
@@ -83,6 +103,29 @@ const plans = [
     highlight: true,
     hasAnnual: true,
   },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    period: "",
+    description: "White-labeled, SSO, and dedicated support for teams.",
+    features: [
+      "Unlimited generations",
+      "SSO + SCIM provisioning",
+      "Dedicated success manager",
+      "Custom branding & domain",
+      "Priority support SLA",
+    ],
+    cta: "Contact sales",
+    icon: Building2,
+    gradient: "from-slate-600 to-slate-800",
+    badgeGradient: "from-slate-600 to-slate-800",
+    checkColor: "text-slate-400",
+    highlight: false,
+    hasAnnual: false,
+    contactSales: true,
+    mailto: "mailto:hello@syllabi.online?subject=Syllabi%20Enterprise%20Inquiry&body=Hi%20Syllabi%20team%2C%0A%0AWe%27re%20interested%20in%20Syllabi%20Enterprise.%20Here%27s%20some%20context%20about%20our%20team%3A%0A%0A-%20Team%20size%3A%20%0A-%20Use%20case%3A%20%0A-%20Expected%20monthly%20generations%3A%20%0A%0AThanks%21",
+  },
 ];
 
 export default function PaywallModal({
@@ -98,10 +141,12 @@ export default function PaywallModal({
   // Filter plans based on current plan — don't show what they already have
   const visiblePlans =
     currentPlan === "planner"
-      ? plans.filter((p) => p.id !== "planner")  // Planner users: show Masterclass only
-      : currentPlan === "masterclass" || currentPlan === "enterprise"
-      ? []                                         // Masterclass/Enterprise: nothing to upgrade to
-      : plans;                                     // Free users: show all
+      ? plans.filter((p) => p.id !== "planner")  // Planner: Masterclass + Enterprise
+      : currentPlan === "masterclass"
+      ? plans.filter((p) => p.id === "enterprise")  // Masterclass: Enterprise only
+      : currentPlan === "enterprise"
+      ? []                                         // Enterprise: nothing higher
+      : plans;                                     // Free: all three
 
   const headerCopy = {
     cap_exceeded:
@@ -167,7 +212,7 @@ export default function PaywallModal({
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
             className="fixed inset-0 z-[95] flex items-center justify-center p-4"
           >
-            <div className="relative w-full max-w-3xl rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl shadow-violet-500/10 overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div className="relative w-full max-w-5xl rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl shadow-violet-500/10 overflow-hidden max-h-[90vh] overflow-y-auto">
               {/* Close button */}
               <button
                 onClick={onClose}
@@ -192,37 +237,35 @@ export default function PaywallModal({
                   Choose your plan and start creating professional courses with AI.
                 </p>
 
-                {ANNUAL_BILLING_AVAILABLE && (
-                  <div className="mt-5 inline-flex items-center gap-1 rounded-full border border-border/60 bg-card/60 p-1">
-                    <button
-                      type="button"
-                      onClick={() => setBillingPeriod("monthly")}
-                      className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
-                        billingPeriod === "monthly"
-                          ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                      aria-pressed={billingPeriod === "monthly"}
-                    >
-                      Monthly
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setBillingPeriod("annual")}
-                      className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                        billingPeriod === "annual"
-                          ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                      aria-pressed={billingPeriod === "annual"}
-                    >
-                      Annual
-                      <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400">
-                        Save 2 mo
-                      </span>
-                    </button>
-                  </div>
-                )}
+                <div className="mt-5 inline-flex items-center gap-1 rounded-full border border-border/60 bg-card/60 p-1">
+                  <button
+                    type="button"
+                    onClick={() => setBillingPeriod("monthly")}
+                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
+                      billingPeriod === "monthly"
+                        ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    aria-pressed={billingPeriod === "monthly"}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBillingPeriod("annual")}
+                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                      billingPeriod === "annual"
+                        ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    aria-pressed={billingPeriod === "annual"}
+                  >
+                    Annual
+                    <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400">
+                      Save 2 mo
+                    </span>
+                  </button>
+                </div>
               </div>
 
               {/* Plans grid */}
@@ -230,14 +273,16 @@ export default function PaywallModal({
                 className={`grid gap-4 px-6 pb-8 pt-2 ${
                   visiblePlans.length === 1
                     ? "max-w-sm mx-auto"
-                    : "sm:grid-cols-2 max-w-2xl mx-auto"
+                    : visiblePlans.length === 2
+                    ? "sm:grid-cols-2 max-w-2xl mx-auto"
+                    : "sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto"
                 }`}
               >
                 {visiblePlans.map((plan) => {
                   const showAnnual =
-                    billingPeriod === "annual" && plan.hasAnnual && plan.priceIdAnnual;
+                    billingPeriod === "annual" && plan.hasAnnual && plan.priceAnnual;
                   const displayPrice = showAnnual ? plan.priceAnnual : plan.price;
-                  const displayCta = showAnnual ? plan.ctaAnnual : plan.cta;
+                  const displayCta = showAnnual && plan.ctaAnnual ? plan.ctaAnnual : plan.cta;
                   const activePriceId =
                     showAnnual && plan.priceIdAnnual ? plan.priceIdAnnual : plan.priceId;
                   const showBilledLabel = showAnnual && plan.annualBilledLabel && plan.hasAnnual;
@@ -293,33 +338,43 @@ export default function PaywallModal({
                         ))}
                       </ul>
 
-                      <Button
-                        onClick={() => handleCheckout(activePriceId)}
-                        disabled={!pricingLive || loading !== null}
-                        className={`w-full rounded-full text-sm font-semibold border-0 transition-all hover:scale-[1.02] active:scale-[0.98] ${
-                          pricingLive
-                            ? `bg-gradient-to-r ${plan.gradient} text-white shadow-lg ${
-                                plan.highlight
-                                  ? "shadow-amber-500/20 hover:shadow-amber-500/40"
-                                  : "shadow-violet-500/20 hover:shadow-violet-500/40"
-                              }`
-                            : "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
-                        }`}
-                      >
-                        {!pricingLive ? (
-                          <span>Launching tomorrow</span>
-                        ) : loading === activePriceId ? (
-                          <span className="flex items-center gap-2">
-                            <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            Redirecting…
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-2">
-                            {displayCta}
-                            <ArrowRight className="size-3.5" />
-                          </span>
-                        )}
-                      </Button>
+                      {plan.contactSales ? (
+                        <a
+                          href={plan.mailto}
+                          className={`inline-flex w-full items-center justify-center gap-2 rounded-full text-sm font-semibold border-0 transition-all hover:scale-[1.02] active:scale-[0.98] px-4 py-2 bg-gradient-to-r ${plan.gradient} text-white shadow-lg shadow-slate-500/20 hover:shadow-slate-500/40`}
+                        >
+                          {displayCta}
+                          <ArrowRight className="size-3.5" />
+                        </a>
+                      ) : (
+                        <Button
+                          onClick={() => handleCheckout(activePriceId)}
+                          disabled={!pricingLive || loading !== null}
+                          className={`w-full rounded-full text-sm font-semibold border-0 transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                            pricingLive
+                              ? `bg-gradient-to-r ${plan.gradient} text-white shadow-lg ${
+                                  plan.highlight
+                                    ? "shadow-amber-500/20 hover:shadow-amber-500/40"
+                                    : "shadow-violet-500/20 hover:shadow-violet-500/40"
+                                }`
+                              : "bg-muted text-muted-foreground cursor-not-allowed opacity-60"
+                          }`}
+                        >
+                          {!pricingLive ? (
+                            <span>Launching tomorrow</span>
+                          ) : loading === activePriceId ? (
+                            <span className="flex items-center gap-2">
+                              <div className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              Redirecting…
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-2">
+                              {displayCta}
+                              <ArrowRight className="size-3.5" />
+                            </span>
+                          )}
+                        </Button>
+                      )}
                     </div>
                   );
                 })}
