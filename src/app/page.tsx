@@ -177,12 +177,12 @@ const exampleCurricula = [
 ];
 
 const freePlanFeatures = [
-  { text: "3 free mini-course generations", included: true },
+  { text: "1 free course per month", included: true },
   { text: "Modules, lessons & quizzes", included: true },
   { text: "PDF & Notion export", included: true },
   { text: "Shareable course links", included: true },
   { text: "NotebookLM podcast export", included: false },
-  { text: "15 skeletons/month (Planner)", included: false },
+  { text: "15 generations/month (Planner)", included: false },
 ];
 
 const proPlanFeatures = [
@@ -1500,7 +1500,7 @@ export default function Home() {
                     <CardHeader className="pt-6 pb-3">
                       <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Free</CardDescription>
                       <CardTitle className="text-2xl font-bold">€0<span className="text-sm font-normal text-muted-foreground">/forever</span></CardTitle>
-                      <p className="text-xs text-muted-foreground">Create 3 mini-courses free. No card required.</p>
+                      <p className="text-xs text-muted-foreground">1 free course per month. Same AI quality as paid plans. No card required.</p>
                     </CardHeader>
                     <CardContent className="flex-1 pb-3">
                       <ul className="space-y-2">

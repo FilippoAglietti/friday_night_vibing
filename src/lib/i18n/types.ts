@@ -153,6 +153,7 @@ export interface Translations {
     free2: string;
     free3: string;
     free4: string;
+    free5: string;
     free6: string;
     /** Deprecated key name — content is canonical 2026-04-18 post-rebrand. */
     pro1: string;
