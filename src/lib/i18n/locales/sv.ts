@@ -119,7 +119,7 @@ const sv: Translations = {
     free5: "Generering av fullständigt kapitelinnehåll",
     free6: "NotebookLM-poddexport",
     pro1: "15 granskade skelett / månad",
-    pro2: "Redigera i dashboarden — regenerera valfri sektion",
+    pro2: "Redigera i dashboarden — ändra valfri sektion",
     pro3: "Om-exportera när som helst: PDF, Notion, Markdown",
     pro4: "Publik dellänk per kurs",
     pro5: "Alla längder: Crash · Short · Full · Masterclass",

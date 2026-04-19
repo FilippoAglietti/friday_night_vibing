@@ -103,7 +103,7 @@ const zh: Translations = {
     free5: "完整章节内容生成",
     free6: "NotebookLM 播客导出",
     pro1: "每月 15 份审阅过的骨架",
-    pro2: "在仪表板中编辑 — 任意章节可重新生成",
+    pro2: "在仪表板中编辑 — 任意章节可修改",
     pro3: "随时再导出：PDF、Notion、Markdown",
     pro4: "每门课程一个公开分享链接",
     pro5: "全部时长：Crash · Short · Full · Masterclass",

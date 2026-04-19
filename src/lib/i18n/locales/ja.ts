@@ -119,7 +119,7 @@ const ja: Translations = {
     free5: "フルチャプター内容の生成",
     free6: "NotebookLM ポッドキャスト エクスポート",
     pro1: "月15本のレビュー済みスケルトン",
-    pro2: "ダッシュボードで編集 — どのセクションも再生成可能",
+    pro2: "ダッシュボードで編集 — どのセクションも修正可能",
     pro3: "いつでも再エクスポート: PDF・Notion・Markdown",
     pro4: "コースごとに公開共有リンク",
     pro5: "全コース長: Crash · Short · Full · Masterclass",

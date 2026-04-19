@@ -103,7 +103,7 @@ const ko: Translations = {
     free5: "전체 챕터 콘텐츠 생성",
     free6: "NotebookLM 팟캐스트 내보내기",
     pro1: "월 15개 검토된 스켈레톤",
-    pro2: "대시보드에서 편집 — 어떤 섹션이든 재생성",
+    pro2: "대시보드에서 편집 — 어떤 섹션이든 수정",
     pro3: "언제든지 다시 내보내기: PDF, Notion, Markdown",
     pro4: "강의별 공개 공유 링크",
     pro5: "모든 길이: Crash · Short · Full · Masterclass",

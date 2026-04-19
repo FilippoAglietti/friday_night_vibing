@@ -119,7 +119,7 @@ const tr: Translations = {
     free5: "Tam bölüm içeriği oluşturma",
     free6: "NotebookLM podcast dışa aktarma",
     pro1: "Ayda 15 gözden geçirilmiş iskelet",
-    pro2: "Dashboard'da düzenle — herhangi bir bölümü yeniden oluştur",
+    pro2: "Dashboard'da düzenle — herhangi bir bölümü değiştir",
     pro3: "İstediğin zaman yeniden dışa aktar: PDF, Notion, Markdown",
     pro4: "Kurs başına herkese açık paylaşım bağlantısı",
     pro5: "Tüm uzunluklar: Crash · Short · Full · Masterclass",

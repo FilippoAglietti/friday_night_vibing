@@ -120,7 +120,7 @@ const de: Translations = {
     free5: "Generierung des vollen Kapitelinhalts",
     free6: "NotebookLM-Podcast-Export",
     pro1: "15 geprüfte Gerüste / Monat",
-    pro2: "Im Dashboard bearbeiten — jeden Abschnitt neu generieren",
+    pro2: "Im Dashboard bearbeiten — jeden Abschnitt ändern",
     pro3: "Jederzeit re-exportieren: PDF, Notion, Markdown",
     pro4: "Öffentlicher Teilen-Link pro Kurs",
     pro5: "Alle Längen: Crash · Short · Full · Masterclass",

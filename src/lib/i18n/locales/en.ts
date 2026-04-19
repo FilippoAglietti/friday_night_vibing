@@ -121,7 +121,7 @@ const en: Translations = {
     free5: "Full chapter content generation",
     free6: "NotebookLM podcast export",
     pro1: "15 reviewed skeletons / month",
-    pro2: "Edit in-dashboard — regenerate any section",
+    pro2: "Edit in-dashboard — modify any section",
     pro3: "Re-export anytime: PDF, Notion, Markdown",
     pro4: "Public share link per course",
     pro5: "All lengths: Crash · Short · Full · Masterclass",

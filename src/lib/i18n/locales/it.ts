@@ -119,7 +119,7 @@ const it: Translations = {
     free5: "Generazione del contenuto completo dei capitoli",
     free6: "Esportazione podcast NotebookLM",
     pro1: "15 scheletri revisionati / mese",
-    pro2: "Modifica nella dashboard — rigenera qualsiasi sezione",
+    pro2: "Modifica nella dashboard — cambia qualsiasi sezione",
     pro3: "Ri-esporta quando vuoi: PDF, Notion, Markdown",
     pro4: "Link pubblico condivisibile per ogni corso",
     pro5: "Tutte le lunghezze: Crash · Short · Full · Masterclass",

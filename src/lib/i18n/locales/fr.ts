@@ -120,7 +120,7 @@ const fr: Translations = {
     free5: "Génération du contenu complet des chapitres",
     free6: "Export podcast NotebookLM",
     pro1: "15 squelettes relus / mois",
-    pro2: "Modifiez dans le dashboard — régénérez n'importe quelle section",
+    pro2: "Modifiez dans le dashboard — changez n'importe quelle section",
     pro3: "Ré-exportez à tout moment : PDF, Notion, Markdown",
     pro4: "Lien public partageable par cours",
     pro5: "Tous les formats : Crash · Short · Full · Masterclass",

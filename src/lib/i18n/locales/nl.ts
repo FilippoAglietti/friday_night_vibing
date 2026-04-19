@@ -119,7 +119,7 @@ const nl: Translations = {
     free5: "Generatie van volledige hoofdstukinhoud",
     free6: "NotebookLM-podcastexport",
     pro1: "15 nagekeken skeletten / maand",
-    pro2: "Bewerk in het dashboard — regenereer elke sectie",
+    pro2: "Bewerk in het dashboard — pas elke sectie aan",
     pro3: "Her-exporteer wanneer je wilt: PDF, Notion, Markdown",
     pro4: "Openbare deellink per cursus",
     pro5: "Alle lengtes: Crash · Short · Full · Masterclass",

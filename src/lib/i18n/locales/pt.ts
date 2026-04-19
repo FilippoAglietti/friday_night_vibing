@@ -120,7 +120,7 @@ const pt: Translations = {
     free5: "Geração do conteúdo completo dos capítulos",
     free6: "Exportação de podcast NotebookLM",
     pro1: "15 esqueletos revisados / mês",
-    pro2: "Edite no dashboard — regenere qualquer seção",
+    pro2: "Edite no dashboard — modifique qualquer seção",
     pro3: "Reexporte quando quiser: PDF, Notion, Markdown",
     pro4: "Link público para compartilhar por curso",
     pro5: "Todas as durações: Crash · Short · Full · Masterclass",
