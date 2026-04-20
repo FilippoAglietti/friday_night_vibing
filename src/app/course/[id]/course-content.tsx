@@ -21,20 +21,35 @@ import {
   CheckCircle2,
   ChevronDown,
   Clock,
+  Copy,
   Download,
   ExternalLink,
+  FileText,
   GraduationCap,
+  Headphones,
   HelpCircle,
   Lightbulb,
+  Presentation,
+  Share2,
   Sparkles,
   Target,
-  Trophy,
   Users,
   Calendar,
-  FileText,
-  Share2,
 } from "lucide-react";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
+import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
+import { generateScormPackage } from "@/lib/exports/generateScorm";
+import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
+import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
+import {
+  generateNotebookLMMarkdown,
+  notebookLMFilename,
+} from "@/lib/exports/generateNotebookLMMarkdown";
+import {
+  generateNotebookLMSlidesMarkdown,
+  notebookLMSlidesFilename,
+} from "@/lib/exports/generateNotebookLMSlidesMarkdown";
+import { curriculumToMarkdown } from "@/lib/exports/toMarkdown";
 import type { Curriculum, Module, Lesson, QuizQuestion, TeachingStyle } from "@/types/curriculum";
 
 // ─── Props ───────────────────────────────────────────────────
@@ -492,16 +507,111 @@ export default function CourseContent({
   createdAt,
   teachingStyle,
 }: CourseContentProps) {
+  void courseId;
+  void createdAt;
   const totalLessons = getTotalLessons(c);
   const totalQuizzes = getTotalQuizzes(c);
   const moduleCount = c.modules?.length || 0;
   const totalHours = c.pacing?.totalHours || 0;
 
-  const handleDownloadPDF = async () => {
+  const [copiedMarkdown, setCopiedMarkdown] = useState(false);
+  const [copiedNotion, setCopiedNotion] = useState(false);
+  const [copiedShare, setCopiedShare] = useState(false);
+  const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
+
+  const sanitizeFilename = (title: string) =>
+    title.replace(/[^a-z0-9]/gi, "_").toLowerCase() || "course";
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadPDF = () => {
     try {
-      await generateCurriculumPDF(c, { teachingStyle });
+      const pdf = generateCurriculumPDF(c, { teachingStyle });
+      pdf.save(`${sanitizeFilename(c.title)}_syllabus.pdf`);
     } catch (err) {
       console.error("PDF generation failed:", err);
+    }
+  };
+
+  const handleExportDocx = async () => {
+    try {
+      setLoadingExports((p) => ({ ...p, docx: true }));
+      const blob = await generateCurriculumDocx(c, { teachingStyle });
+      downloadBlob(blob, `${sanitizeFilename(c.title)}.docx`);
+    } catch (err) {
+      console.error("Word export failed:", err);
+    } finally {
+      setLoadingExports((p) => ({ ...p, docx: false }));
+    }
+  };
+
+  const handleExportScorm = async () => {
+    try {
+      setLoadingExports((p) => ({ ...p, scorm: true }));
+      const blob = await generateScormPackage(c, { teachingStyle });
+      downloadBlob(blob, `${sanitizeFilename(c.title)}_scorm.zip`);
+    } catch (err) {
+      console.error("SCORM export failed:", err);
+    } finally {
+      setLoadingExports((p) => ({ ...p, scorm: false }));
+    }
+  };
+
+  const handleExportNotebookLMAudio = () => {
+    try {
+      const md = generateNotebookLMMarkdown(c);
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+      downloadBlob(blob, notebookLMFilename(c));
+    } catch (err) {
+      console.error("NotebookLM audio export failed:", err);
+    }
+  };
+
+  const handleExportNotebookLMSlides = () => {
+    try {
+      const md = generateNotebookLMSlidesMarkdown(c);
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+      downloadBlob(blob, notebookLMSlidesFilename(c));
+    } catch (err) {
+      console.error("NotebookLM slides export failed:", err);
+    }
+  };
+
+  const handleExportNotion = async () => {
+    const ok = await copyNotionHtmlToClipboard(c, { teachingStyle });
+    if (ok) {
+      setCopiedNotion(true);
+      setTimeout(() => setCopiedNotion(false), 2500);
+    }
+  };
+
+  const handleCopyMarkdown = async () => {
+    try {
+      await navigator.clipboard.writeText(curriculumToMarkdown(c));
+      setCopiedMarkdown(true);
+      setTimeout(() => setCopiedMarkdown(false), 2000);
+    } catch (err) {
+      console.error("Copy markdown failed:", err);
+    }
+  };
+
+  const handleShareLink = async () => {
+    try {
+      const url = generateShareableUrl(c);
+      await navigator.clipboard.writeText(url);
+      setCopiedShare(true);
+      setTimeout(() => setCopiedShare(false), 2000);
+    } catch (err) {
+      console.error("Share failed:", err);
     }
   };
 
@@ -518,12 +628,12 @@ export default function CourseContent({
             <span className="hidden sm:inline">Back to Dashboard</span>
           </Link>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleDownloadPDF}
+            <a
+              href="#export-share"
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"
             >
-              <Download className="size-3" /> PDF
-            </button>
+              <Download className="size-3" /> Export
+            </a>
             <Link
               href="/"
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-lg transition-colors font-medium"
@@ -602,6 +712,103 @@ export default function CourseContent({
 
       {/* ── Body ────────────────────────────────────────── */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 space-y-12">
+        {/* ── Export & Share ──────────────────────────── */}
+        <section id="export-share" className="scroll-mt-20">
+          <div className="p-5 sm:p-6 bg-gradient-to-br from-violet-500/[0.06] via-white/[0.02] to-indigo-500/[0.06] border border-violet-500/15 rounded-2xl">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <div className="flex items-center gap-2">
+                <Download className="size-4 text-violet-400" />
+                <h2 className="text-sm font-semibold text-white">Export & Share</h2>
+                <span className="hidden sm:inline text-[11px] text-slate-500">
+                  · 7 formats + share link
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {/* PDF */}
+              <button
+                onClick={handleDownloadPDF}
+                className="group flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-white bg-gradient-to-br from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-lg transition-all shadow-sm shadow-violet-500/20 hover:shadow-violet-500/40"
+              >
+                <Download className="size-3.5" />
+                <span>PDF</span>
+              </button>
+
+              {/* Word */}
+              <button
+                onClick={handleExportDocx}
+                disabled={loadingExports.docx}
+                className="group flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-wait rounded-lg transition-colors"
+              >
+                <FileText className="size-3.5" />
+                <span>{loadingExports.docx ? "Generating…" : "Word"}</span>
+              </button>
+
+              {/* Copy for Notion */}
+              <button
+                onClick={handleExportNotion}
+                className="group flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-white bg-gradient-to-br from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 rounded-lg transition-all"
+              >
+                <FileText className="size-3.5" />
+                <span className="truncate">{copiedNotion ? "Copied!" : "Notion"}</span>
+              </button>
+
+              {/* Copy Markdown */}
+              <button
+                onClick={handleCopyMarkdown}
+                className="group flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-slate-200 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg transition-colors"
+              >
+                <Copy className="size-3.5" />
+                <span>{copiedMarkdown ? "Copied!" : "Markdown"}</span>
+              </button>
+
+              {/* SCORM */}
+              <button
+                onClick={handleExportScorm}
+                disabled={loadingExports.scorm}
+                className="group flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-wait rounded-lg transition-colors"
+              >
+                <GraduationCap className="size-3.5" />
+                <span>{loadingExports.scorm ? "Zipping…" : "SCORM"}</span>
+              </button>
+
+              {/* NotebookLM Audio */}
+              <button
+                onClick={handleExportNotebookLMAudio}
+                title="Download a markdown file and drop it into Google NotebookLM to generate a conversational podcast."
+                className="group flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors"
+              >
+                <Headphones className="size-3.5" />
+                <span>NLM Audio</span>
+              </button>
+
+              {/* NotebookLM Slides — NEW */}
+              <button
+                onClick={handleExportNotebookLMSlides}
+                title="Slide-deck markdown (Marp-compatible) — drop into NotebookLM or Marp/Slidev for a ready presentation."
+                className="group flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-white bg-gradient-to-br from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 rounded-lg transition-all"
+              >
+                <Presentation className="size-3.5" />
+                <span>NLM Slides</span>
+              </button>
+
+              {/* Share link */}
+              <button
+                onClick={handleShareLink}
+                className="group flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-white bg-cyan-600 hover:bg-cyan-500 rounded-lg transition-colors"
+              >
+                <Share2 className="size-3.5" />
+                <span>{copiedShare ? "Link copied!" : "Share"}</span>
+              </button>
+            </div>
+
+            <p className="mt-3 text-[11px] text-slate-500 leading-relaxed">
+              PDF & Word for printing · SCORM for LMS upload · NotebookLM Audio for an AI podcast · NotebookLM Slides for a deck · Notion copies formatted · Share generates a public link.
+            </p>
+          </div>
+        </section>
+
         {/* ── About + Target Audience ─────────────────── */}
         {(c.description || c.targetAudience) && (
           <section className="grid sm:grid-cols-2 gap-6">
