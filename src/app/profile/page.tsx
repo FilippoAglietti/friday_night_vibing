@@ -972,9 +972,14 @@ export default function ProfilePage() {
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-indigo-500/10 hover:text-indigo-400" onClick={(e) => { e.stopPropagation(); setEditingGenId(gen.id); setActiveTab("courses"); }} title="Edit Course">
                   <Pencil className="size-3.5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c, gen.teaching_style); }} title="Download PDF">
+                <Link
+                  href={`/course/${gen.id}#export-share`}
+                  onClick={(e) => e.stopPropagation()}
+                  title="Export (PDF · Word · SCORM · NotebookLM Audio/Slides · Notion · Markdown)"
+                  className="inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:bg-violet-500/10 hover:text-violet-400 transition-colors"
+                >
                   <Download className="size-3.5" />
-                </Button>
+                </Link>
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-purple-500/10 hover:text-purple-400" onClick={(e) => { e.stopPropagation(); handleExportNotion(c, gen.teaching_style);}} title="Copy for Notion">
                   <FileText className="size-3.5" />
                 </Button>
