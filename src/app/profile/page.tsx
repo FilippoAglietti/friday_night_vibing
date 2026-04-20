@@ -64,6 +64,8 @@ import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
 import { normalizePlan } from "@/lib/pricing/tiers";
+import { PlanBadge } from "@/components/dashboard/PlanBadge";
+import { BenefitsStrip } from "@/components/dashboard/BenefitsStrip";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength, type GenerationProgress } from "@/components/CurriculumForm";
 import CourseAssemblyLoader from "@/components/CourseAssemblyLoader";
@@ -1173,11 +1175,7 @@ export default function ProfilePage() {
                   <p className="text-sm text-violet-500 dark:text-violet-400 font-medium">{getGreeting()},</p>
                   <h1 className="text-xl sm:text-2xl font-bold truncate">{firstName}</h1>
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                    <Badge variant="outline" className={`text-xs flex items-center gap-1 ${planBadgeClass}`}>
-                      {planLabel === "Masterclass" && <Crown className="size-3" />}
-                      {planLabel === "Planner" && <Zap className="size-3" />}
-                      {planLabel} Plan
-                    </Badge>
+                    <PlanBadge tier={plan.tier} label={`${plan.label} Plan`} />
                     {streak > 0 && (
                       <Badge variant="outline" className="text-xs flex items-center gap-1 border-amber-500/30 text-amber-400 bg-amber-500/10">
                         <Flame className="size-3" />
@@ -1218,11 +1216,7 @@ export default function ProfilePage() {
               <h1 className="text-xl sm:text-2xl font-bold truncate">{name}</h1>
               <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
               <div className="flex items-center gap-2 mt-1.5">
-                <Badge variant="outline" className={`text-xs flex items-center gap-1 ${planBadgeClass}`}>
-                  {planLabel === "Masterclass" && <Crown className="size-3" />}
-                  {planLabel === "Planner" && <Zap className="size-3" />}
-                  {planLabel} Plan
-                </Badge>
+                <PlanBadge tier={plan.tier} label={`${plan.label} Plan`} />
               </div>
             </div>
           </div>
@@ -1263,6 +1257,18 @@ export default function ProfilePage() {
         ══════════════════════════════════════════════════ */}
         {activeTab === "overview" && (
           <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-6">
+
+            {/* ── BENEFITS STRIP ──────────────────────────── */}
+            {userProfile && (
+              <motion.div variants={fadeUp}>
+                <BenefitsStrip
+                  tier={plan.tier}
+                  creditsUsed={userProfile.generations_used}
+                  creditsLimit={userProfile.generations_limit}
+                  onUpgrade={() => setShowPaywall(true)}
+                />
+              </motion.div>
+            )}
 
             {/* ── STAT CARDS ──────────────────────────────── */}
             <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
