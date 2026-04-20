@@ -63,3 +63,23 @@ export function tierOrFallback(raw: string | null | undefined): Tier {
   if (raw === "pro_max") return "masterclass";
   return "free";
 }
+
+export function normalizePlan(rawPlan: string | null | undefined): {
+  tier: Tier;
+  isPaid: boolean;
+  isMasterclass: boolean;
+  isPlanner: boolean;
+  isFree: boolean;
+  label: "Free" | "Planner" | "Masterclass" | "Enterprise";
+} {
+  const tier = tierOrFallback(rawPlan);
+  const labels = { free: "Free", planner: "Planner", masterclass: "Masterclass", enterprise: "Enterprise" } as const;
+  return {
+    tier,
+    isPaid: tier !== "free",
+    isMasterclass: tier === "masterclass" || tier === "enterprise",
+    isPlanner: tier === "planner",
+    isFree: tier === "free",
+    label: labels[tier],
+  };
+}
