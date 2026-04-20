@@ -66,6 +66,11 @@ import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
 import { normalizePlan } from "@/lib/pricing/tiers";
 import { PlanBadge } from "@/components/dashboard/PlanBadge";
 import { BenefitsStrip } from "@/components/dashboard/BenefitsStrip";
+import { ExportGrid, type ExportFormat } from "@/components/dashboard/ExportGrid";
+import { generateScormPackage } from "@/lib/exports/generateScorm";
+import { generateNotebookLMMarkdown, notebookLMFilename } from "@/lib/exports/generateNotebookLMMarkdown";
+import { generateNotebookLMSlidesMarkdown, notebookLMSlidesFilename } from "@/lib/exports/generateNotebookLMSlidesMarkdown";
+import { curriculumToMarkdown } from "@/lib/exports/toMarkdown";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength, type GenerationProgress } from "@/components/CurriculumForm";
 import CourseAssemblyLoader from "@/components/CourseAssemblyLoader";
@@ -743,6 +748,66 @@ export default function ProfilePage() {
     setTimeout(() => setCopiedId(null), 2000);
   }, []);
 
+  const handleCopyMarkdown = useCallback(async (curriculum: Curriculum) => {
+    try {
+      await navigator.clipboard.writeText(curriculumToMarkdown(curriculum));
+    } catch (e) {
+      console.error("Copy markdown failed:", e);
+    }
+  }, []);
+
+  const sanitizeForFilename = useCallback((title: string) => title.replace(/[^a-z0-9]/gi, "_").toLowerCase(), []);
+
+  const handleExportScorm = useCallback(async (curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
+    try {
+      const blob = await generateScormPackage(curriculum, { teachingStyle });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${sanitizeForFilename(curriculum.title)}_scorm.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("SCORM export failed:", e);
+    }
+  }, [sanitizeForFilename]);
+
+  const handleExportNotebookLMAudio = useCallback((curriculum: Curriculum) => {
+    try {
+      const md = generateNotebookLMMarkdown(curriculum);
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = notebookLMFilename(curriculum);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("NotebookLM audio export failed:", e);
+    }
+  }, []);
+
+  const handleExportNotebookLMSlides = useCallback((curriculum: Curriculum) => {
+    try {
+      const md = generateNotebookLMSlidesMarkdown(curriculum);
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = notebookLMSlidesFilename(curriculum);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("NotebookLM slides export failed:", e);
+    }
+  }, []);
+
   // ── Course editor save handler ────────────────────────────
   const handleSaveEditedCourse = useCallback(async (genId: string, updated: Curriculum) => {
     // Update local state immediately
@@ -969,51 +1034,41 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Footer: date + actions */}
-            <div className="flex items-center justify-between pt-2 border-t border-border/20">
-              <span className="text-[10px] text-muted-foreground">{timeAgo(gen.created_at)}</span>
+            {/* Footer: date + actions + Exports pill */}
+            <div className="flex items-center justify-between pt-2 border-t border-border/20 gap-2">
+              <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(gen.created_at)}</span>
               <div className="flex gap-0.5">
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-indigo-500/10 hover:text-indigo-400" onClick={(e) => { e.stopPropagation(); setEditingGenId(gen.id); setActiveTab("courses"); }} title="Edit Course">
                   <Pencil className="size-3.5" />
                 </Button>
-                <Link
-                  href={`/course/${gen.id}#export-share`}
-                  onClick={(e) => e.stopPropagation()}
-                  title="Export (PDF · Word · SCORM · NotebookLM Audio/Slides · Notion · Markdown)"
-                  className="inline-flex items-center justify-center h-7 w-7 rounded-md text-muted-foreground hover:bg-violet-500/10 hover:text-violet-400 transition-colors"
-                >
-                  <Download className="size-3.5" />
-                </Link>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-purple-500/10 hover:text-purple-400" onClick={(e) => { e.stopPropagation(); handleExportNotion(c, gen.teaching_style);}} title="Copy for Notion">
-                  <FileText className="size-3.5" />
-                </Button>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-emerald-500/10 hover:text-emerald-400" onClick={(e) => { e.stopPropagation(); handleShareCourse(gen); }} title="Share">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 hover:bg-cyan-500/10 hover:text-cyan-400" onClick={(e) => { e.stopPropagation(); handleShareCourse(gen); }} title="Share">
                   {copiedId === gen.id ? <Check className="size-3.5 text-emerald-400" /> : <Share2 className="size-3.5" />}
                 </Button>
                 <Button
                   variant="ghost" size="sm"
                   className="h-7 w-7 p-0 hover:bg-amber-500/10 hover:text-amber-400"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`/course/${gen.id}`, "_blank");
-                  }}
+                  onClick={(e) => { e.stopPropagation(); window.open(`/course/${gen.id}`, "_blank"); }}
                   title="View Course"
                 >
                   <Eye className="size-3.5" />
                 </Button>
-              </div>
                 <Button
                   variant="ghost" size="sm"
                   className="h-7 w-7 p-0 hover:bg-pink-500/10 hover:text-pink-400"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDuplicateCourse(gen);
-                    setActiveTab("generate");
-                  }}
+                  onClick={(e) => { e.stopPropagation(); handleDuplicateCourse(gen); setActiveTab("generate"); }}
                   title="Duplicate & Remix"
                 >
                   <Copy className="size-3.5" />
                 </Button>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setExpandedId(isExpanded ? null : gen.id); }}
+                className="inline-flex items-center gap-1 rounded-md border border-violet-500/30 bg-gradient-to-r from-violet-600/15 to-indigo-600/15 px-2.5 py-1 text-[11px] font-medium text-violet-300 hover:from-violet-600/25 hover:to-indigo-600/25 transition-colors shrink-0"
+                title="Show export formats"
+              >
+                Exports <span className="text-[9px] opacity-70">{isExpanded ? "▲" : "▼"}</span>
+              </button>
             </div>
 
             {/* €10 Upgrade-to-Masterclass CTA for Planner users */}
@@ -1040,7 +1095,33 @@ export default function ProfilePage() {
                   transition={{ duration: 0.25, ease: "easeInOut" }}
                   className="overflow-hidden"
                 >
-                  <div className="mt-4 pt-4 border-t border-border/20 space-y-4">
+                  <div className="mt-4 pt-4 border-t border-border/20 space-y-4" onClick={(e) => e.stopPropagation()}>
+                    {/* Tier-aware export grid */}
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1">
+                        <Download className="size-3" /> Export
+                      </p>
+                      <ExportGrid
+                        tier={plan.tier}
+                        onExport={(format: ExportFormat) => {
+                          switch (format) {
+                            case "pdf":       return handleDownloadPDF(c, gen.teaching_style);
+                            case "word":      return handleExportDocx(c, gen.teaching_style);
+                            case "markdown":  return handleCopyMarkdown(c);
+                            case "notion":    return handleExportNotion(c, gen.teaching_style);
+                            case "scorm":     return handleExportScorm(c, gen.teaching_style);
+                            case "nlmAudio":  return handleExportNotebookLMAudio(c);
+                            case "nlmSlides": return handleExportNotebookLMSlides(c);
+                            case "share":     return handleShareCourse(gen);
+                          }
+                        }}
+                        onLockedClick={() => setShowPaywall(true)}
+                        onDeepLink={() => window.open(`/course/${gen.id}#export-share`, "_blank")}
+                      />
+                    </div>
+
+                    <Separator className="border-border/20" />
+
                     {/* Learning objectives */}
                     <div>
                       <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1">
@@ -1076,30 +1157,6 @@ export default function ProfilePage() {
                       </div>
                     </div>
 
-                    {/* Export actions */}
-                    <div className="grid grid-cols-2 gap-1.5 pt-1">
-                      <Button
-                        variant="outline" size="sm"
-                        className="h-7 text-[10px] gap-1 border-violet-500/20 hover:bg-violet-500/10 hover:text-violet-400 hover:border-violet-500/30"
-                        onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c, gen.teaching_style); }}
-                      >
-                        <FileDown className="size-3" /> PDF
-                      </Button>
-                      <Button
-                        variant="outline" size="sm"
-                        className="h-7 text-[10px] gap-1 border-purple-500/20 hover:bg-purple-500/10 hover:text-purple-400 hover:border-purple-500/30"
-                        onClick={(e) => { e.stopPropagation(); handleExportNotion(c, gen.teaching_style);}}
-                      >
-                        <FileText className="size-3" /> Notion
-                      </Button>
-                      <Button
-                        variant="outline" size="sm"
-                        className="h-7 text-[10px] gap-1 border-blue-500/20 hover:bg-blue-500/10 hover:text-blue-400 hover:border-blue-500/30"
-                        onClick={(e) => { e.stopPropagation(); handleExportDocx(c, gen.teaching_style); }}
-                      >
-                        <FileText className="size-3" /> Word
-                      </Button>
-                    </div>
                   </div>
                 </motion.div>
               )}
