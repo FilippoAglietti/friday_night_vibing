@@ -1926,7 +1926,13 @@ export default function ProfilePage() {
                     <>
                       <Sparkles className="size-10 text-violet-500/40 mx-auto mb-4" />
                       <h3 className="text-base font-semibold mb-2">No courses yet</h3>
-                      <p className="text-sm text-muted-foreground mb-5 max-w-sm mx-auto">Generate your first AI-powered course and it will appear here.</p>
+                      <p className="text-sm text-muted-foreground mb-5 max-w-sm mx-auto">
+                        {plan.isMasterclass
+                          ? "Your Masterclass toolkit is ready — PDF, Word, Notion, SCORM, NLM Audio & Slides. Generate your first course to unlock all eight formats."
+                          : plan.isPlanner
+                          ? "Your Planner toolkit is ready — PDF, Word, Notion and shareable links. Generate your first course to get started."
+                          : "Generate your first AI-powered course and it will appear here — PDF & Markdown included on the free plan."}
+                      </p>
                       <Button className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0" onClick={() => (setActiveTab("generate"))}>Generate Your First Course</Button>
                     </>
                   )}
