@@ -63,6 +63,7 @@ import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
+import { normalizePlan } from "@/lib/pricing/tiers";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength, type GenerationProgress } from "@/components/CurriculumForm";
 import CourseAssemblyLoader from "@/components/CourseAssemblyLoader";
@@ -821,10 +822,11 @@ export default function ProfilePage() {
   const name = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
   const firstName = name.split(" ")[0];
 
-  const planLabel = userProfile?.plan === "pro_max" ? "Masterclass" : userProfile?.plan === "pro" ? "Planner" : "Free";
+  const plan = normalizePlan(userProfile?.plan);
+  const planLabel = plan.label;
   const planBadgeClass =
-    userProfile?.plan === "pro_max" ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-    : userProfile?.plan === "pro" ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
+    plan.isMasterclass ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+    : plan.isPlanner ? "bg-violet-500/10 text-violet-400 border-violet-500/20"
     : "border-border/60 text-muted-foreground";
 
   const usagePercent = userProfile
@@ -1013,7 +1015,7 @@ export default function ProfilePage() {
             </div>
 
             {/* €10 Upgrade-to-Masterclass CTA for Planner users */}
-            {userProfile?.plan === "pro" && (
+            {plan.isPlanner && (
               <div className="mt-3 pt-3 border-t border-border/20" onClick={(e) => e.stopPropagation()}>
                 <CheckoutButton
                   href={`/api/checkout?tier=single_masterclass&course_id=${gen.id}`}
@@ -1402,7 +1404,7 @@ export default function ProfilePage() {
                 <CardContent>
                   {loading ? (
                     <div className="h-[120px] bg-muted/20 rounded-lg animate-pulse" />
-                  ) : userProfile?.plan === "pro_max" && (userProfile.generations_limit < 0 || userProfile.generations_limit >= 1000) ? (
+                  ) : plan.isMasterclass && userProfile && (userProfile.generations_limit < 0 || userProfile.generations_limit >= 1000) ? (
                     <div className="flex flex-col items-center justify-center py-4">
                       <div className="relative">
                         <ProgressRing percent={100} color="text-amber-400" />
@@ -1411,7 +1413,7 @@ export default function ProfilePage() {
                       <p className="text-xs font-semibold mt-3">Unlimited</p>
                       <p className="text-[10px] text-muted-foreground">Masterclass Plan</p>
                     </div>
-                  ) : userProfile?.plan === "pro_max" ? (
+                  ) : plan.isMasterclass ? (
                     <div className="flex flex-col items-center justify-center py-2">
                       <div className="relative">
                         <ProgressRing percent={usagePercent} color={usagePercent >= 90 ? "text-rose-500" : usagePercent >= 80 ? "text-amber-500" : "text-amber-400"} />
@@ -1439,7 +1441,7 @@ export default function ProfilePage() {
                         </div>
                       </div>
                       <p className="text-xs font-medium mt-2">{Math.round(usagePercent)}% used</p>
-                      {userProfile?.plan === "free" && (
+                      {plan.isFree && (
                         <Button size="sm" className="mt-3 h-7 text-[10px] bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 rounded-full" onClick={() => setShowPaywall(true)}>
                           Upgrade<ChevronRight className="size-3 ml-0.5" />
                         </Button>
@@ -1638,7 +1640,7 @@ export default function ProfilePage() {
             )}
 
             {/* ── MASTERCLASS LOCKED FEATURES ──────────────────── */}
-            {userProfile && userProfile.plan !== "pro_max" && (
+            {userProfile && !plan.isMasterclass && (
               <motion.div variants={fadeUp}>
                 <Card className="border-border/40 bg-card/50 backdrop-blur-sm overflow-hidden">
                   <CardHeader className="pb-2">
@@ -1651,12 +1653,12 @@ export default function ProfilePage() {
                   <CardContent>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {[
-                        { icon: Headphones, label: "NotebookLM podcast export", desc: "One-click Markdown export → Google NotebookLM two-host podcast", locked: userProfile.plan !== "pro_max" },
-                        { icon: Brain, label: "Opus strategic polish", desc: "Key lessons rewritten by Opus for pedagogical clarity", locked: userProfile.plan !== "pro_max" },
-                        { icon: BarChart3, label: "20 full Masterclass courses/month", desc: "Full-body generation with modules, lessons, and resources", locked: userProfile.plan !== "pro_max" },
-                        { icon: Shield, label: "White-label exports", desc: "Remove Syllabi branding from all exports", locked: userProfile.plan !== "pro_max" },
-                        { icon: Zap, label: "Priority queue", desc: "Faster generation during peak hours", locked: userProfile.plan !== "pro_max" },
-                        { icon: Layers, label: "Masterclass-length courses", desc: "Generate our longest course format (12+ hours)", locked: userProfile.plan !== "pro_max" },
+                        { icon: Headphones, label: "NotebookLM podcast export", desc: "One-click Markdown export → Google NotebookLM two-host podcast", locked: !plan.isMasterclass },
+                        { icon: Brain, label: "Opus strategic polish", desc: "Key lessons rewritten by Opus for pedagogical clarity", locked: !plan.isMasterclass },
+                        { icon: BarChart3, label: "20 full Masterclass courses/month", desc: "Full-body generation with modules, lessons, and resources", locked: !plan.isMasterclass },
+                        { icon: Shield, label: "White-label exports", desc: "Remove Syllabi branding from all exports", locked: !plan.isMasterclass },
+                        { icon: Zap, label: "Priority queue", desc: "Faster generation during peak hours", locked: !plan.isMasterclass },
+                        { icon: Layers, label: "Masterclass-length courses", desc: "Generate our longest course format (12+ hours)", locked: !plan.isMasterclass },
                       ].map((feat) => (
                         <div
                           key={feat.label}
@@ -1685,7 +1687,7 @@ export default function ProfilePage() {
                         </div>
                       ))}
                     </div>
-                    {userProfile.plan === "free" && (
+                    {plan.isFree && (
                       <div className="mt-3 flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 p-3">
                         <div>
                           <p className="text-xs font-semibold text-amber-400">Unlock all features</p>
@@ -1696,7 +1698,7 @@ export default function ProfilePage() {
                         </Button>
                       </div>
                     )}
-                    {userProfile.plan === "pro" && (
+                    {plan.isPlanner && (
                       <div className="mt-3 flex items-center justify-between rounded-lg bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15 p-3">
                         <div>
                           <p className="text-xs font-semibold text-amber-400">Unlock the full toolkit</p>
@@ -2012,7 +2014,7 @@ export default function ProfilePage() {
                     onGenerated={handleFormGenerated}
                     onLoadingChange={handleFormLoadingChange}
                     onProgressUpdate={handleFormProgressUpdate}
-                    isFreeUser={userProfile?.plan === "free"}
+                    isFreeUser={plan.isFree}
                     initialValues={templateConfig || duplicateConfig || undefined}
                   />
                 </div>
@@ -2079,13 +2081,13 @@ export default function ProfilePage() {
                   <div>
                     <p className="font-semibold text-sm">{planLabel} Plan</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {userProfile?.plan === "free" ? "1 course skeleton/month included" : userProfile?.plan === "pro" ? "15 skeletons/month" : userProfile && userProfile.generations_limit > 0 && userProfile.generations_limit < 1000 ? `${userProfile.generations_limit} Masterclass generations` : "Unlimited generations"}
+                      {plan.isFree ? "1 course skeleton/month included" : plan.isPlanner ? "15 skeletons/month" : userProfile && userProfile.generations_limit > 0 && userProfile.generations_limit < 1000 ? `${userProfile.generations_limit} Masterclass generations` : "Unlimited generations"}
                     </p>
                   </div>
                   <Badge variant="outline" className={`text-xs ${planBadgeClass}`}>{planLabel}</Badge>
                 </div>
 
-                {userProfile && (userProfile.plan !== "pro_max" || (userProfile.generations_limit > 0 && userProfile.generations_limit < 1000)) && (
+                {userProfile && (!plan.isMasterclass || (userProfile.generations_limit > 0 && userProfile.generations_limit < 1000)) && (
                   <>
                     <Separator className="border-border/30" />
                     <div>
@@ -2100,7 +2102,7 @@ export default function ProfilePage() {
                   </>
                 )}
 
-                {userProfile?.plan === "free" && (
+                {plan.isFree && (
                   <>
                     <Separator className="border-border/30" />
                     <div className="rounded-xl bg-violet-500/5 border border-violet-500/15 p-4">
@@ -2165,7 +2167,7 @@ export default function ProfilePage() {
       </main>
 
       {/* Paywall Modal for Upgrade buttons */}
-      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} currentPlan={(userProfile?.plan as "free" | "planner" | "masterclass" | "enterprise") || "free"} />
+      <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} currentPlan={plan.tier} />
 
       {/* Welcome Animation — plays on login */}
       <WelcomeAnimation
