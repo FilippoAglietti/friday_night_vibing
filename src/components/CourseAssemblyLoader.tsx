@@ -491,7 +491,7 @@ function ModuleCards({
                         : "text-slate-500"
                   }`}
                 >
-                  {title ?? (skeletonMode ? `Module ${moduleNum}` : `Module ${moduleNum}`)}
+                  {title ?? `Module ${moduleNum}`}
                 </p>
                 {/* Progress sweeper */}
                 {isActive && !reduced ? (
@@ -621,7 +621,7 @@ function PhaseChips({ phaseIdx, reduced }: { phaseIdx: number; reduced: boolean 
                   : "bg-white/[0.02] border-white/5 text-slate-500"
             }`}
           >
-            <Icon className={`size-4 ${isActive ? "animate-pulse" : ""}`} />
+            <Icon className={`size-4 ${isActive ? "animate-pulse" : ""}`} aria-hidden="true" />
             <span className="text-[10px] font-semibold uppercase tracking-wide">
               {p.label}
             </span>
@@ -801,7 +801,7 @@ export default function CourseAssemblyLoader({
         {/* Status pill — matches the hero badge pattern */}
         <div className="flex justify-center">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/5 px-4 py-1.5 text-xs font-medium text-violet-400 backdrop-blur-sm">
-            <Sparkles className="size-3.5 animate-pulse" />
+            <Sparkles className="size-3.5 animate-pulse" aria-hidden="true" />
             Live generation
           </div>
         </div>
