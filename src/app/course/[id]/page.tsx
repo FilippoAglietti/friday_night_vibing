@@ -147,6 +147,17 @@ export default async function CoursePage({
   // Get current user to determine whether to show the body-unlock CTA.
   const currentUserId = await getCurrentUserId();
 
+  // Fetch the user's plan so the export grid can be tier-gated.
+  let rawPlan: string | null = null;
+  if (currentUserId) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", currentUserId)
+      .single();
+    rawPlan = (profile?.plan as string | null) ?? null;
+  }
+
   const showBodyUnlock =
     course.body_unlock_purchased !== true &&
     course.status === "ready" &&
@@ -170,6 +181,7 @@ export default async function CoursePage({
         courseId={course.id}
         createdAt={course.created_at}
         teachingStyle={(course.teaching_style as TeachingStyle | null) ?? null}
+        rawPlan={rawPlan}
       />
     </>
   );
