@@ -182,6 +182,7 @@ export default async function CoursePage({
         createdAt={course.created_at}
         teachingStyle={(course.teaching_style as TeachingStyle | null) ?? null}
         rawPlan={rawPlan}
+        isOwner={course.user_id === currentUserId}
       />
     </>
   );

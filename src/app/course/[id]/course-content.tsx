@@ -56,6 +56,7 @@ import { normalizePlan } from "@/lib/pricing/tiers";
 import { ExportGrid, type ExportFormat } from "@/components/dashboard/ExportGrid";
 import { appendExportEvent, summarizeExportHistory, type ExportFormatId } from "@/lib/exports/exportHistory";
 import { useRouter } from "next/navigation";
+import QuizResultsPanel from "@/components/course/QuizResultsPanel";
 
 // ─── Props ───────────────────────────────────────────────────
 
@@ -65,6 +66,7 @@ interface CourseContentProps {
   createdAt: string;
   teachingStyle?: TeachingStyle | null;
   rawPlan?: string | null;
+  isOwner?: boolean;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -513,6 +515,7 @@ export default function CourseContent({
   createdAt,
   teachingStyle,
   rawPlan,
+  isOwner = false,
 }: CourseContentProps) {
   void createdAt;
   const totalLessons = getTotalLessons(c);
@@ -786,6 +789,8 @@ export default function CourseContent({
             </p>
           </div>
         </section>
+
+        {isOwner && <QuizResultsPanel courseId={courseId} />}
 
         {/* ── About + Target Audience ─────────────────── */}
         {(c.description || c.targetAudience) && (
