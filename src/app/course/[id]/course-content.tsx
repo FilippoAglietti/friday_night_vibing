@@ -39,7 +39,8 @@ import {
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
-import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
+import { generateStudentShareUrl } from "@/lib/exports/generateShareUrl";
+import { supabaseBrowser } from "@/lib/supabase";
 import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
 import {
   generateNotebookLMMarkdown,
@@ -619,7 +620,12 @@ export default function CourseContent({
 
   const handleShareLink = async () => {
     try {
-      const url = generateShareableUrl(c);
+      const { error } = await supabaseBrowser
+        .from("courses")
+        .update({ is_public: true })
+        .eq("id", courseId);
+      if (error) console.error("Failed to make course public:", error);
+      const url = generateStudentShareUrl(courseId);
       await navigator.clipboard.writeText(url);
       recordExport("share");
     } catch (err) {

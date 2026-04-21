@@ -94,3 +94,19 @@ export function decodeCurriculumFromUrl(encodedData: string): Curriculum | null 
   const payload = decodeSharePayload(encodedData);
   return payload?.curriculum ?? null;
 }
+
+/**
+ * Generates a student-facing share URL that points to `/s/[courseId]`.
+ * The target page is publicly viewable only when `courses.is_public = true`,
+ * so flip that flag before handing the URL to a student.
+ *
+ * Unlike generateShareableUrl(), this does NOT embed curriculum content in
+ * the URL — students load it server-side from Supabase. This is what lets
+ * us track quiz attempts back to the course owner.
+ */
+export function generateStudentShareUrl(courseId: string): string {
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}/s/${courseId}`;
+  }
+  return `/s/${courseId}`;
+}

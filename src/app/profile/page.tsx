@@ -62,7 +62,7 @@ import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateNotionMarkdown } from "@/lib/exports/generateNotionMarkdown";
 import { copyNotionHtmlToClipboard } from "@/lib/exports/generateNotionHtml";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
-import { generateShareableUrl } from "@/lib/exports/generateShareUrl";
+import { generateStudentShareUrl } from "@/lib/exports/generateShareUrl";
 import { normalizePlan } from "@/lib/pricing/tiers";
 import { PlanBadge } from "@/components/dashboard/PlanBadge";
 import { BenefitsStrip } from "@/components/dashboard/BenefitsStrip";
@@ -740,12 +740,23 @@ export default function ProfilePage() {
     }
   }, []);
 
-  const handleShareCourse = useCallback((gen: Generation) => {
+  const handleShareCourse = useCallback(async (gen: Generation) => {
     if (!gen.curriculum) return;
-    const url = generateShareableUrl(gen.curriculum);
-    navigator.clipboard.writeText(url);
-    setCopiedId(gen.id);
-    setTimeout(() => setCopiedId(null), 2000);
+    try {
+      // Flip is_public so /s/[id] becomes accessible to students and
+      // quiz_attempts inserts are allowed by RLS.
+      const { error } = await supabaseBrowser
+        .from("courses")
+        .update({ is_public: true })
+        .eq("id", gen.id);
+      if (error) console.error("Failed to make course public:", error);
+      const url = generateStudentShareUrl(gen.id);
+      await navigator.clipboard.writeText(url);
+      setCopiedId(gen.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error("Share failed:", err);
+    }
   }, []);
 
   const handleCopyMarkdown = useCallback(async (curriculum: Curriculum) => {
