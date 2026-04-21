@@ -49,7 +49,9 @@ import {
 import {
   generateNotebookLMSlidesMarkdown,
   notebookLMSlidesFilename,
+  type SlideStyle,
 } from "@/lib/exports/generateNotebookLMSlidesMarkdown";
+import SlideStyleModal from "@/components/exports/SlideStyleModal";
 import { curriculumToMarkdown } from "@/lib/exports/toMarkdown";
 import type { Curriculum, Module, Lesson, QuizQuestion, TeachingStyle } from "@/types/curriculum";
 import { normalizePlan } from "@/lib/pricing/tiers";
@@ -596,15 +598,28 @@ export default function CourseContent({
     }
   };
 
-  const handleExportNotebookLMSlides = () => {
+  const [slideModalOpen, setSlideModalOpen] = useState(false);
+
+  const defaultSlideStyle: SlideStyle =
+    teachingStyle === "academic"
+      ? "academic"
+      : teachingStyle === "hands-on"
+      ? "executive"
+      : "conversational";
+
+  const runSlideExport = (style: SlideStyle) => {
     try {
-      const md = generateNotebookLMSlidesMarkdown(c);
+      const md = generateNotebookLMSlidesMarkdown(c, { style });
       const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
-      downloadBlob(blob, notebookLMSlidesFilename(c));
+      downloadBlob(blob, notebookLMSlidesFilename(c, style));
       recordExport("nlmSlides");
     } catch (err) {
       console.error("NotebookLM slides export failed:", err);
     }
+  };
+
+  const handleExportNotebookLMSlides = () => {
+    setSlideModalOpen(true);
   };
 
   const handleExportNotion = async () => {
@@ -962,6 +977,16 @@ export default function CourseContent({
           </Link>
         </section>
       </main>
+
+      <SlideStyleModal
+        open={slideModalOpen}
+        defaultStyle={defaultSlideStyle}
+        onClose={() => setSlideModalOpen(false)}
+        onSelect={(style) => {
+          setSlideModalOpen(false);
+          runSlideExport(style);
+        }}
+      />
     </div>
   );
 }

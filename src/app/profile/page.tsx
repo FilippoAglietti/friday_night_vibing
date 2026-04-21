@@ -69,7 +69,8 @@ import { BenefitsStrip } from "@/components/dashboard/BenefitsStrip";
 import { ExportGrid, type ExportFormat } from "@/components/dashboard/ExportGrid";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
 import { generateNotebookLMMarkdown, notebookLMFilename } from "@/lib/exports/generateNotebookLMMarkdown";
-import { generateNotebookLMSlidesMarkdown, notebookLMSlidesFilename } from "@/lib/exports/generateNotebookLMSlidesMarkdown";
+import { generateNotebookLMSlidesMarkdown, notebookLMSlidesFilename, type SlideStyle } from "@/lib/exports/generateNotebookLMSlidesMarkdown";
+import SlideStyleModal from "@/components/exports/SlideStyleModal";
 import { curriculumToMarkdown } from "@/lib/exports/toMarkdown";
 import { motion, AnimatePresence } from "framer-motion";
 import CurriculumForm, { CurriculumFormData, CourseLength, type GenerationProgress } from "@/components/CurriculumForm";
@@ -350,6 +351,7 @@ export default function ProfilePage() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [editingGenId, setEditingGenId] = useState<string | null>(null);
+  const [slideExport, setSlideExport] = useState<{ curriculum: Curriculum; defaultStyle: SlideStyle } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [genProgress, setGenProgress] = useState<GenerationProgress | null>(null);
 
@@ -802,14 +804,14 @@ export default function ProfilePage() {
     }
   }, []);
 
-  const handleExportNotebookLMSlides = useCallback((curriculum: Curriculum) => {
+  const runSlideExport = useCallback((curriculum: Curriculum, style: SlideStyle) => {
     try {
-      const md = generateNotebookLMSlidesMarkdown(curriculum);
+      const md = generateNotebookLMSlidesMarkdown(curriculum, { style });
       const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = notebookLMSlidesFilename(curriculum);
+      a.download = notebookLMSlidesFilename(curriculum, style);
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -817,6 +819,16 @@ export default function ProfilePage() {
     } catch (e) {
       console.error("NotebookLM slides export failed:", e);
     }
+  }, []);
+
+  const handleExportNotebookLMSlides = useCallback((curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
+    const defaultStyle: SlideStyle =
+      teachingStyle === "academic"
+        ? "academic"
+        : teachingStyle === "hands-on"
+        ? "executive"
+        : "conversational";
+    setSlideExport({ curriculum, defaultStyle });
   }, []);
 
   // ── Course editor save handler ────────────────────────────
@@ -1122,7 +1134,7 @@ export default function ProfilePage() {
                             case "notion":    return handleExportNotion(c, gen.teaching_style);
                             case "scorm":     return handleExportScorm(c, gen.teaching_style);
                             case "nlmAudio":  return handleExportNotebookLMAudio(c);
-                            case "nlmSlides": return handleExportNotebookLMSlides(c);
+                            case "nlmSlides": return handleExportNotebookLMSlides(c, gen.teaching_style);
                             case "share":     return handleShareCourse(gen);
                           }
                         }}
@@ -2260,6 +2272,17 @@ export default function ProfilePage() {
       <OnboardingQuiz
         open={showOnboarding && !showWelcome}
         onComplete={handleOnboardingComplete}
+      />
+
+      {/* Slide style selector for NotebookLM / Marp / Slidev export */}
+      <SlideStyleModal
+        open={slideExport !== null}
+        defaultStyle={slideExport?.defaultStyle}
+        onClose={() => setSlideExport(null)}
+        onSelect={(style) => {
+          if (slideExport) runSlideExport(slideExport.curriculum, style);
+          setSlideExport(null);
+        }}
       />
     </div>
   );

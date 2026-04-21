@@ -1,9 +1,118 @@
 import type { Curriculum, Lesson, Module } from "@/types/curriculum";
 
+// ── Slide style ──────────────────────────────────────────────
+
+export type SlideStyle = "academic" | "conversational" | "executive";
+
+export const SLIDE_STYLES: Array<{
+  id: SlideStyle;
+  label: string;
+  description: string;
+}> = [
+  {
+    id: "academic",
+    label: "Academic",
+    description: "Formal tone, dense bullets, thesis framing — for universities & conferences.",
+  },
+  {
+    id: "conversational",
+    label: "Conversational",
+    description: "Question-led openers, light bullets, storytelling — for classrooms & workshops.",
+  },
+  {
+    id: "executive",
+    label: "Executive",
+    description: "Headline-first, outcome-driven, minimal bullets — for boardrooms & stakeholders.",
+  },
+];
+
+// ── Constants ────────────────────────────────────────────────
+
 const MOD_PREFIX_RE = /^(?:module|chapter|session|unit|lesson|scene)\s*\d+\s*[:.\-–—]\s*/i;
 const SLIDE_SEP = "\n\n---\n\n";
-const MAX_BULLETS_PER_SLIDE = 5;
 const MAX_SPEAKER_NOTES_CHARS = 900;
+
+interface StyleConfig {
+  themeLine: string;
+  objectivesHeading: string;
+  closingHeading: string;
+  closingTagline: (title: string) => string;
+  moduleHeading: (num: number, title: string) => string;
+  lessonHeading: (num: string, title: string) => string;
+  lessonBulletHeader: string | null;
+  objectivesBulletPrefix: string;
+  maxBulletsPerSlide: number;
+  bulletsFromLesson: (lesson: Lesson) => string[];
+}
+
+function defaultBullets(lesson: Lesson): string[] {
+  return (
+    lesson.keyPoints?.length
+      ? lesson.keyPoints
+      : lesson.objectives?.length
+      ? lesson.objectives
+      : lesson.description
+      ? [lesson.description]
+      : []
+  );
+}
+
+function shorten(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > max * 0.7 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…";
+}
+
+function executiveBullet(text: string): string {
+  // Strip leading "You will…" / "The learner…" / "To…" patterns so each
+  // bullet reads as a punchy outcome line on its own.
+  return text
+    .replace(/^\s*(you will|the learner will|students will|this lesson covers|we will|to)\s+/i, "")
+    .replace(/^(be able to|understand|learn|discover|explore)\s+/i, "")
+    .trim();
+}
+
+const STYLE_CONFIG: Record<SlideStyle, StyleConfig> = {
+  academic: {
+    themeLine: "theme: gaia",
+    objectivesHeading: "Learning Outcomes",
+    closingHeading: "Questions & Discussion",
+    closingTagline: (title) => `_Thank you — open for questions on ${title}._`,
+    moduleHeading: (num, title) => `# Unit ${num}. ${title}`,
+    lessonHeading: (num, title) => `# §${num} — ${title}`,
+    lessonBulletHeader: "**Key points:**",
+    objectivesBulletPrefix: "1.",
+    maxBulletsPerSlide: 6,
+    bulletsFromLesson: defaultBullets,
+  },
+  conversational: {
+    themeLine: "theme: default",
+    objectivesHeading: "What you'll get out of this",
+    closingHeading: "Thanks for being here",
+    closingTagline: (title) => `_That's ${title} — let's talk._`,
+    moduleHeading: (num, title) => `# Module ${num}: ${title}`,
+    lessonHeading: (num, title) => `# ${num} · ${title}`,
+    lessonBulletHeader: null,
+    objectivesBulletPrefix: "-",
+    maxBulletsPerSlide: 5,
+    bulletsFromLesson: defaultBullets,
+  },
+  executive: {
+    themeLine: "theme: default",
+    objectivesHeading: "Outcomes",
+    closingHeading: "Decisions & next steps",
+    closingTagline: (title) => `_${title} — ready to deploy._`,
+    moduleHeading: (num, title) => `# ${num}. ${title}`,
+    lessonHeading: (num, title) => `# ${title}`,
+    lessonBulletHeader: null,
+    objectivesBulletPrefix: "▸",
+    maxBulletsPerSlide: 3,
+    bulletsFromLesson: (lesson) => defaultBullets(lesson).map(executiveBullet),
+  },
+};
+
+// ── Helpers ──────────────────────────────────────────────────
 
 function escapeHtmlComment(text: string): string {
   return text.replace(/-->/g, "--&gt;");
@@ -21,13 +130,6 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
-function truncate(text: string, max: number): string {
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max);
-  const lastSpace = cut.lastIndexOf(" ");
-  return (lastSpace > max * 0.7 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…";
-}
-
 function speakerNotes(parts: (string | null | undefined)[]): string {
   const joined = parts
     .map((p) => (p ?? "").trim())
@@ -35,20 +137,22 @@ function speakerNotes(parts: (string | null | undefined)[]): string {
     .join(" — ");
   if (!joined) return "";
   const clean = stripMarkdown(joined);
-  const safe = escapeHtmlComment(truncate(clean, MAX_SPEAKER_NOTES_CHARS));
-  return `<!-- Speaker notes: ${safe} -->`;
+  return `<!-- Speaker notes: ${escapeHtmlComment(shorten(clean, MAX_SPEAKER_NOTES_CHARS))} -->`;
 }
 
 function cleanTitle(raw: string): string {
   return raw.replace(MOD_PREFIX_RE, "").trim();
 }
 
-function coverSlide(c: Curriculum): string {
+// ── Slide builders ───────────────────────────────────────────
+
+function coverSlide(c: Curriculum, style: SlideStyle): string {
+  const cfg = STYLE_CONFIG[style];
   const lines: string[] = [];
   lines.push(`# ${c.title}`);
   if (c.subtitle) {
     lines.push("");
-    lines.push(`## ${c.subtitle}`);
+    lines.push(style === "executive" ? `**${c.subtitle}**` : `## ${c.subtitle}`);
   }
   const stats = [
     `${c.modules?.length ?? 0} modules`,
@@ -61,24 +165,39 @@ function coverSlide(c: Curriculum): string {
     lines.push("");
     lines.push(`_${stats}_`);
   }
-  const notes = speakerNotes([c.description, c.targetAudience]);
+  const hostCue =
+    style === "academic"
+      ? "Opening remarks: situate the work, frame the research question, establish stakes."
+      : style === "executive"
+      ? "Opening: lead with the bottom line. What changes for the audience when they leave this room?"
+      : "Opening: start with a question the room already half-has — then earn the answer over the next few slides.";
+  const notes = speakerNotes([c.description, c.targetAudience, hostCue]);
   if (notes) {
     lines.push("");
     lines.push(notes);
   }
+  void cfg; // cfg reserved for future cover variants
   return lines.join("\n");
 }
 
-function objectivesSlide(c: Curriculum): string | null {
+function objectivesSlide(c: Curriculum, style: SlideStyle): string | null {
   if (!c.objectives || c.objectives.length === 0) return null;
+  const cfg = STYLE_CONFIG[style];
   const lines: string[] = [];
-  lines.push(`# Learning Objectives`);
+  lines.push(`# ${cfg.objectivesHeading}`);
   lines.push("");
-  c.objectives.slice(0, MAX_BULLETS_PER_SLIDE).forEach((o) => lines.push(`- ${o}`));
-  const overflow = c.objectives.length - MAX_BULLETS_PER_SLIDE;
+  const visible = c.objectives.slice(0, cfg.maxBulletsPerSlide);
+  visible.forEach((o, idx) => {
+    const prefix =
+      cfg.objectivesBulletPrefix === "1."
+        ? `${idx + 1}.`
+        : cfg.objectivesBulletPrefix;
+    lines.push(`${prefix} ${style === "executive" ? executiveBullet(o) : o}`);
+  });
+  const overflow = c.objectives.length - cfg.maxBulletsPerSlide;
   if (overflow > 0) {
     lines.push("");
-    lines.push(`_+${overflow} more objectives_`);
+    lines.push(`_+${overflow} more_`);
   }
   const notes = speakerNotes([c.objectives.join(" • ")]);
   if (notes) {
@@ -88,22 +207,32 @@ function objectivesSlide(c: Curriculum): string | null {
   return lines.join("\n");
 }
 
-function moduleIntroSlide(mod: Module, index: number): string {
+function moduleIntroSlide(mod: Module, index: number, style: SlideStyle): string {
+  const cfg = STYLE_CONFIG[style];
   const num = (mod.order ?? index) + 1;
   const title = cleanTitle(mod.title || `Module ${num}`);
   const lines: string[] = [];
-  lines.push(`# Module ${num}: ${title}`);
+  lines.push(cfg.moduleHeading(num, title));
   if (mod.description) {
     lines.push("");
     lines.push(mod.description);
   }
   if (mod.objectives && mod.objectives.length > 0) {
     lines.push("");
-    mod.objectives.slice(0, MAX_BULLETS_PER_SLIDE).forEach((o) => lines.push(`- ${o}`));
+    mod.objectives.slice(0, cfg.maxBulletsPerSlide).forEach((o) => {
+      lines.push(`- ${style === "executive" ? executiveBullet(o) : o}`);
+    });
   }
+  const hostCue =
+    style === "academic"
+      ? "Situate this unit within the broader literature. Name the foundational scholars or frameworks."
+      : style === "executive"
+      ? "Lead with the decision this module unblocks."
+      : "Open with a story or a question the room has already thought about.";
   const notes = speakerNotes([
     mod.description,
     mod.objectives?.length ? `Objectives: ${mod.objectives.join("; ")}` : null,
+    hostCue,
   ]);
   if (notes) {
     lines.push("");
@@ -112,41 +241,42 @@ function moduleIntroSlide(mod: Module, index: number): string {
   return lines.join("\n");
 }
 
-function lessonSlide(lesson: Lesson, modIndex: number, lessonIndex: number): string {
+function lessonSlide(lesson: Lesson, modIndex: number, lessonIndex: number, style: SlideStyle): string {
+  const cfg = STYLE_CONFIG[style];
   const num = `${modIndex + 1}.${lessonIndex + 1}`;
   const title = cleanTitle(lesson.title || `Lesson ${num}`);
   const lines: string[] = [];
-  lines.push(`# ${num} · ${title}`);
+  lines.push(cfg.lessonHeading(num, title));
 
-  const bulletSource =
-    lesson.keyPoints && lesson.keyPoints.length > 0
-      ? lesson.keyPoints
-      : lesson.objectives && lesson.objectives.length > 0
-      ? lesson.objectives
-      : lesson.description
-      ? [lesson.description]
-      : [];
-
-  const bullets = bulletSource.slice(0, MAX_BULLETS_PER_SLIDE);
+  const allBullets = cfg.bulletsFromLesson(lesson);
+  const bullets = allBullets.slice(0, cfg.maxBulletsPerSlide);
   if (bullets.length > 0) {
     lines.push("");
+    if (cfg.lessonBulletHeader) {
+      lines.push(cfg.lessonBulletHeader);
+    }
     bullets.forEach((b) => lines.push(`- ${b}`));
   }
 
   const meta: string[] = [];
   if (lesson.durationMinutes) meta.push(`${lesson.durationMinutes} min`);
   if (lesson.format) meta.push(lesson.format);
-  if (meta.length > 0) {
+  if (meta.length > 0 && style !== "executive") {
     lines.push("");
     lines.push(`_${meta.join(" · ")}_`);
   }
 
-  const notes = speakerNotes([
-    lesson.content || lesson.description,
-    lesson.keyPoints && lesson.keyPoints.length > MAX_BULLETS_PER_SLIDE
-      ? `Additional key points: ${lesson.keyPoints.slice(MAX_BULLETS_PER_SLIDE).join("; ")}`
-      : null,
-  ]);
+  const hostCue =
+    style === "academic"
+      ? "Cite primary sources. Connect to prior units. Surface a counter-example before closing."
+      : style === "executive"
+      ? "Name the change this slide unlocks for the audience. Skip the background unless asked."
+      : "Ground the idea in a concrete example; ask one question before moving on.";
+  const overflow =
+    allBullets.length > cfg.maxBulletsPerSlide
+      ? `Additional points: ${allBullets.slice(cfg.maxBulletsPerSlide).join("; ")}`
+      : null;
+  const notes = speakerNotes([lesson.content || lesson.description, overflow, hostCue]);
   if (notes) {
     lines.push("");
     lines.push(notes);
@@ -155,15 +285,23 @@ function lessonSlide(lesson: Lesson, modIndex: number, lessonIndex: number): str
   return lines.join("\n");
 }
 
-function closingSlide(c: Curriculum): string {
+function closingSlide(c: Curriculum, style: SlideStyle): string {
+  const cfg = STYLE_CONFIG[style];
   const lines: string[] = [];
-  lines.push(`# Thank you`);
+  lines.push(`# ${cfg.closingHeading}`);
   lines.push("");
-  lines.push(`_${c.title}_`);
+  lines.push(cfg.closingTagline(c.title));
   lines.push("");
   lines.push(`Generated by [Syllabi](https://syllabi.online)`);
+  const hostCue =
+    style === "academic"
+      ? "Invite questions; reference the bibliography in the next slide."
+      : style === "executive"
+      ? "Ask for the decision. Name owner, deadline, budget."
+      : "Thank the room; point them at follow-up resources.";
   const notes = speakerNotes([
-    "Drop this markdown into Google NotebookLM and ask for a slide deck — or open it in Marp / Slidev for a ready-to-present deck.",
+    hostCue,
+    "Drop this markdown into Google NotebookLM, Marp, or Slidev for a ready deck.",
   ]);
   if (notes) {
     lines.push("");
@@ -172,35 +310,45 @@ function closingSlide(c: Curriculum): string {
   return lines.join("\n");
 }
 
-export function generateNotebookLMSlidesMarkdown(c: Curriculum): string {
+// ── Entry point ──────────────────────────────────────────────
+
+export interface SlidesOptions {
+  style?: SlideStyle;
+}
+
+export function generateNotebookLMSlidesMarkdown(c: Curriculum, opts: SlidesOptions = {}): string {
+  const style: SlideStyle = opts.style ?? "conversational";
+  const cfg = STYLE_CONFIG[style];
+
   const frontmatter = [
     "---",
     "marp: true",
-    "theme: default",
+    cfg.themeLine,
     "paginate: true",
     `title: ${JSON.stringify(c.title)}`,
+    `style: ${JSON.stringify(style)}`,
     "---",
   ].join("\n");
 
   const slides: string[] = [];
-  slides.push(coverSlide(c));
+  slides.push(coverSlide(c, style));
 
-  const objSlide = objectivesSlide(c);
+  const objSlide = objectivesSlide(c, style);
   if (objSlide) slides.push(objSlide);
 
   c.modules?.forEach((mod, mi) => {
-    slides.push(moduleIntroSlide(mod, mi));
+    slides.push(moduleIntroSlide(mod, mi, style));
     mod.lessons?.forEach((lesson, li) => {
-      slides.push(lessonSlide(lesson, mi, li));
+      slides.push(lessonSlide(lesson, mi, li, style));
     });
   });
 
-  slides.push(closingSlide(c));
+  slides.push(closingSlide(c, style));
 
   return `${frontmatter}\n\n${slides.join(SLIDE_SEP)}\n`;
 }
 
-export function notebookLMSlidesFilename(c: Curriculum): string {
+export function notebookLMSlidesFilename(c: Curriculum, style?: SlideStyle): string {
   const slug =
     c.title
       .toLowerCase()
@@ -208,5 +356,6 @@ export function notebookLMSlidesFilename(c: Curriculum): string {
       .replace(/^-+|-+$/g, "")
       .slice(0, 60) || "course";
   const date = new Date().toISOString().slice(0, 10);
-  return `${slug}-slides-${date}.md`;
+  const styleSuffix = style ? `-${style}` : "";
+  return `${slug}-slides${styleSuffix}-${date}.md`;
 }
