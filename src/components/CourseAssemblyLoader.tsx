@@ -478,7 +478,7 @@ function ModuleCards({
                       : "bg-white/5 text-slate-500 border border-white/5"
                 }`}
               >
-                {isDone ? <CheckCircle2 className="size-3.5" /> : moduleNum}
+                {isDone ? <CheckCircle2 aria-hidden="true" className="size-3.5" /> : moduleNum}
               </div>
 
               <div className="flex-1 min-w-0 space-y-1">
