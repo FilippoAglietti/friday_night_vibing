@@ -42,7 +42,7 @@ export const courseExport = inngest.createFunction(
     // results, so on retry a previous failed upload would reuse the stale render.
     const curriculum = course.curriculum as unknown as Curriculum;
     const branding = resolveBranding(profile);
-    const html = renderHtml(
+    const html = await renderHtml(
       <CourseDocument curriculum={curriculum} branding={branding} />,
     );
     const buffer = await renderPdf(html);

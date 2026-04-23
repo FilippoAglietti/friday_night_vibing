@@ -14,7 +14,7 @@ export async function renderFixtureToPngs(fixtureName: string): Promise<Buffer[]
     fs.readFileSync(path.join(FIXTURES_DIR, `${fixtureName}.json`), "utf8"),
   );
 
-  const html = renderHtml(
+  const html = await renderHtml(
     <CourseDocument
       curriculum={curriculum}
       branding={{ displayName: null, logoUrl: null, accent: null, heroUrl: null, footer: null }}

@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   const branding = resolveBranding(profile);
-  const html = renderHtml(
+  const html = await renderHtml(
     <CourseDocument curriculum={curriculum} branding={branding} />,
   );
   const buffer = await renderPdf(html);

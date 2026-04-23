@@ -40,7 +40,7 @@ describe("renderPdf", () => {
   );
 
   it.runIf(hasChromium)("produces a non-empty PDF starting with %PDF-", async () => {
-    const html = renderHtml(
+    const html = await renderHtml(
       <CourseDocument
         curriculum={fixture}
         branding={{ displayName: null, logoUrl: null, accent: null, heroUrl: null, footer: null }}

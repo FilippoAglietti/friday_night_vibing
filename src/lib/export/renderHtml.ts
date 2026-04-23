@@ -1,9 +1,12 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import fs from "node:fs";
 import path from "node:path";
 import type { ReactElement } from "react";
 
-export function renderHtml(element: ReactElement): string {
+// Dynamic import of react-dom/server — Next.js 16 Turbopack rejects a static
+// import from a route's server graph, even though this module only runs at
+// request time.
+export async function renderHtml(element: ReactElement): Promise<string> {
+  const { renderToStaticMarkup } = await import("react-dom/server");
   const body = renderToStaticMarkup(element);
 
   const cssDir = path.join(
