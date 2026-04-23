@@ -46,9 +46,9 @@ React components render to HTML. Headless Chrome (already on Cloud Run) renders 
 - Rejected: continuing with jsPDF (ceiling too low, bugs rooted in procedural model).
 - Rejected: `@react-pdf/renderer` (better than jsPDF, but weaker CSS, no web reuse, separate component library).
 
-**Why Playwright over Puppeteer:** Playwright is already in the repo's dev deps (check `package.json`); picks up fonts, print CSS, `@page` rules, and paged-media features more reliably.
+**Why Playwright over Puppeteer:** better handling of fonts, print CSS, `@page` rules, and paged-media features. Neither is installed today — Phase 1 adds Playwright as a dependency.
 
-**Where it runs:** existing Cloud Run service. The Inngest worker Dockerfile is already Chromium-capable (Playwright is present). New export flow adds an Inngest function `course.export.requested` that renders and uploads the PDF to a Supabase bucket, then emits a download URL. For small PDFs the sync route can also run on Vercel inside the 300s cap; masterclass-length courses must go async.
+**Where it runs:** existing Cloud Run service (`inngest-worker`, `europe-west8`). The current Dockerfile is Alpine + Node 20, **not** Chromium-capable today; Phase 1 reworks it (switch base image to Debian or install Chromium deps on Alpine). New export flow adds an Inngest function `course.export.requested` that renders and uploads the PDF to a Supabase bucket, then emits a download URL. For small PDFs the sync route can also run on Vercel inside the 300s cap (bundled Chromium via `@sparticuz/chromium` for serverless); masterclass-length courses must go async to Cloud Run. Cloud Run concurrency will drop from 10 → 2 for the export endpoint (Chromium is memory-heavy).
 
 ### 02 — Direction: Modern Handbook
 
