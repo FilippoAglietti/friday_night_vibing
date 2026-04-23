@@ -1,0 +1,111 @@
+/* ─────────────────────────────────────────────
+ * Handbook core — shared across all four dialects.
+ * Typography scale, grid, heading rhythm, callouts, running elements.
+ * Dialects add components on top; they do not override these rules.
+ * ───────────────────────────────────────────── */
+
+@import "./tokens.css";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--ff-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  color: var(--c-ink);
+  background: var(--c-paper);
+  /* Ensure web (preview) view respects the page width */
+  max-width: var(--page-width);
+}
+
+/* ── Typography ─────────────────────────────── */
+
+h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-tight);
+  margin: 0 0 var(--sp-4);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-tight);
+  margin: var(--sp-12) 0 var(--sp-3);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-tight);
+  margin: var(--sp-6) 0 var(--sp-2);
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 var(--sp-4);
+  max-width: 68ch;
+}
+
+a {
+  color: var(--c-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+/* ── Callouts — used by Core and dialects alike ─ */
+
+.callout {
+  background: var(--c-paper-alt);
+  border-left: 3px solid var(--c-accent);
+  padding: var(--sp-3) var(--sp-4);
+  margin: var(--sp-4) 0;
+  border-radius: 0 4px 4px 0;
+  break-inside: avoid;
+}
+
+.callout-label {
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  margin-bottom: var(--sp-1);
+}
+
+/* ── Grid helpers — used by module/lesson layouts ─ */
+
+.page {
+  width: var(--content-width);
+  margin: 0 auto;
+  padding-top: var(--sp-8);
+  padding-bottom: var(--sp-8);
+}
+
+.page-grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), 1fr);
+  gap: var(--grid-gutter);
+}
+
+.span-main  { grid-column: 1 / span 8; }
+.span-side  { grid-column: 9 / span 4; }
+.span-full  { grid-column: 1 / -1; }
+
+/* ── Code blocks — hero treatment in hands-on later, baseline here ─ */
+
+code, pre {
+  font-family: var(--ff-mono);
+  font-size: var(--fs-sm);
+}
+
+pre {
+  background: var(--c-ink);
+  color: var(--c-paper);
+  padding: var(--sp-4);
+  border-radius: 6px;
+  overflow-x: auto;
+  break-inside: avoid;
+}

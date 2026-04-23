@@ -59,6 +59,7 @@ import { ExportGrid, type ExportFormat } from "@/components/dashboard/ExportGrid
 import { appendExportEvent, summarizeExportHistory, type ExportFormatId } from "@/lib/exports/exportHistory";
 import { useRouter } from "next/navigation";
 import QuizResultsPanel from "@/components/course/QuizResultsPanel";
+import { downloadPdfV2, isExportV2ClientEnabled } from "@/lib/export/client";
 
 // ─── Props ───────────────────────────────────────────────────
 
@@ -551,7 +552,15 @@ export default function CourseContent({
     URL.revokeObjectURL(url);
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
+    if (isExportV2ClientEnabled()) {
+      try {
+        await downloadPdfV2(courseId);
+        return;
+      } catch (err) {
+        console.error("[export v2] failed, using legacy:", err);
+      }
+    }
     try {
       const pdf = generateCurriculumPDF(c, { teachingStyle });
       pdf.save(`${sanitizeFilename(c.title)}_syllabus.pdf`);

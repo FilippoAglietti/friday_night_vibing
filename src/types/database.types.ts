@@ -1,7 +1,7 @@
 // ============================================================
 // SUPABASE DATABASE TYPES - AUTO-GENERATED
 // Progetto: syllabi-ai (gmxseuttpurnxbluvcwx)
-// Generato il: 2026-04-18 (post migration 017b quality_warnings)
+// Generato il: 2026-04-23 (post migration 019 course_exports)
 // NON modificare manualmente — rigenera con: supabase gen types
 // ============================================================
 
@@ -56,6 +56,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      course_exports: {
+        Row: {
+          completed_at: string
+          course_id: string
+          format: string
+          id: string
+          storage_path: string
+        }
+        Insert: {
+          completed_at?: string
+          course_id: string
+          format: string
+          id?: string
+          storage_path: string
+        }
+        Update: {
+          completed_at?: string
+          course_id?: string
+          format?: string
+          id?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_exports_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       courses: {
         Row: {
@@ -507,6 +539,59 @@ export type Database = {
           white_label?: boolean
         }
         Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          answers: Json
+          correct_answers: number
+          course_id: string
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          module_index: number
+          module_title: string | null
+          score_percent: number | null
+          student_email: string | null
+          student_name: string
+          total_questions: number
+        }
+        Insert: {
+          answers?: Json
+          correct_answers: number
+          course_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          module_index: number
+          module_title?: string | null
+          score_percent?: number | null
+          student_email?: string | null
+          student_name: string
+          total_questions: number
+        }
+        Update: {
+          answers?: Json
+          correct_answers?: number
+          course_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          module_index?: number
+          module_title?: string | null
+          score_percent?: number | null
+          student_email?: string | null
+          student_name?: string
+          total_questions?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {

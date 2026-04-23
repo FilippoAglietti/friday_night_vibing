@@ -82,3 +82,22 @@ production pressure, then repoint Inngest back to Cloud Run when fixed.
 - **Inngest signature verification** uses `INNGEST_SIGNING_KEY`. If you see
   "Signature verification failed" after a deploy, check this secret is not
   corrupted (BOM, trailing newline) — set it via the console, not PowerShell.
+
+## Chromium (added 2026-04-23 for export v2)
+
+The runner stage of the Dockerfile installs Chromium via Playwright, stored at
+`/ms-playwright`. This is what the new export pipeline (`src/lib/export/renderPdf.ts`)
+uses to render React → PDF on the Inngest worker.
+
+**Concurrency:** the Cloud Run service is set to `--concurrency=2` because
+each active PDF render uses ~400 MB of memory.
+
+**Memory:** bumped to 4 GiB for masterclass-length PDFs (60–120 pages).
+
+**Font coverage:** Noto family installed for all 16 languages including CJK,
+Arabic (RTL), and emoji. If a new locale is added later, check its script
+is covered and add the matching `fonts-noto-*` package.
+
+**If PDF renders are failing with "browser not found":** the Playwright
+version in `package.json` must match the version installed in the Dockerfile
+(`RUN pnpm dlx playwright@X.X.X install chromium`). Keep them in lockstep.

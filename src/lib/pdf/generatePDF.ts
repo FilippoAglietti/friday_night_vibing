@@ -1,4 +1,11 @@
 /**
+ * DEPRECATED — Phase 1 of export v2 introduces HTML → Playwright → PDF
+ * rendering via src/lib/export/*. This file is retained as a rollback path
+ * while EXPORT_V2_ENABLED is rolled out. Do not add new features here.
+ *
+ * Scheduled removal: Phase 2 cleanup task, after v2 has burned in for ≥ 2 weeks.
+ * ─────────────────────────────────────────────────────────────
+ *
  * lib/pdf/generatePDF.ts
  * ─────────────────────────────────────────────────────────────
  * PREMIUM PDF export for Syllabi — stunning, magazine-quality
