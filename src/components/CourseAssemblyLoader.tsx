@@ -20,7 +20,7 @@
  * ─────────────────────────────────────────────────────────
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type ElementType, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Sparkles,
@@ -146,7 +146,7 @@ const MODULE_DYNAMIC_COPY = [
 
 /* ─── Phase chip definitions ──────────────────────────────── */
 
-const PHASE_TRACK: { key: Phase; label: string; Icon: React.ElementType }[] = [
+const PHASE_TRACK: { key: Phase; label: string; Icon: ElementType }[] = [
   { key: "skeleton", label: "Skeleton", Icon: Layers },
   { key: "modules", label: "Modules", Icon: PenLine },
   { key: "polish", label: "Polish", Icon: Wand2 },
