@@ -1,0 +1,76 @@
+/* ─────────────────────────────────────────────
+ * Print rules for PDF export.
+ * Applied only when Playwright renders with emulateMedia("print").
+ * Web share view does NOT import this file (it keeps the web viewport).
+ * ───────────────────────────────────────────── */
+
+@page {
+  size: A4;
+  margin: var(--page-margin-outer);
+  /* Running header left — creator name when set, blank otherwise (NO Syllabi) */
+  @top-left {
+    content: string(creator-name);
+    font-family: var(--ff-sans);
+    font-size: var(--fs-micro);
+    color: var(--c-ink-muted);
+  }
+  /* Running header right — course title */
+  @top-right {
+    content: string(course-title);
+    font-family: var(--ff-sans);
+    font-size: var(--fs-micro);
+    color: var(--c-ink-muted);
+  }
+  /* Page numbers only — never "Page X of Y / Syllabi" */
+  @bottom-center {
+    content: counter(page);
+    font-family: var(--ff-sans);
+    font-size: var(--fs-micro);
+    color: var(--c-ink-muted);
+  }
+}
+
+/* First page (cover) — no running header/footer */
+@page :first {
+  @top-left { content: none; }
+  @top-right { content: none; }
+  @bottom-center { content: none; }
+}
+
+/* Set running element values from hidden strings in the DOM */
+.running-creator-name {
+  string-set: creator-name content();
+  display: none;
+}
+.running-course-title {
+  string-set: course-title content();
+  display: none;
+}
+
+/* ── Page breaks ──────────────────────────────── */
+
+.page-break-before { break-before: page; }
+.page-break-after  { break-after: page; }
+.avoid-break       { break-inside: avoid; }
+
+/* Never split headings from their next paragraph */
+h1, h2, h3 {
+  break-after: avoid;
+}
+
+/* Never orphan a module opener */
+.module-opener {
+  break-before: page;
+  break-inside: avoid;
+}
+
+/* Certificate occupies its own page */
+.certificate {
+  break-before: page;
+  break-after: page;
+}
+
+/* Force table cell content to stay together */
+table, tr, td, th {
+  break-inside: avoid;
+}
