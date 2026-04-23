@@ -1503,6 +1503,7 @@ export const courseFinalize = inngest.createFunction(
  * means appending it here and nothing else.
  */
 import { bodyUnlock } from "@/lib/inngest/body-unlock";
+import { courseExport } from "@/lib/inngest/course-export";
 
 export const inngestFunctions = [
   courseGenerate,
@@ -1510,4 +1511,5 @@ export const inngestFunctions = [
   courseFinalize,
   validateCourseUrls,
   bodyUnlock,
+  courseExport,
 ];

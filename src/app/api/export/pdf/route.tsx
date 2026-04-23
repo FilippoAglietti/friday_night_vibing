@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
   if (path === "async") {
     // Long courses dispatch to Inngest; client polls /api/export/pdf/status/[courseId]
     // The Inngest function that consumes this event is registered in Task 19.
-    await (inngest.send as (e: unknown) => Promise<unknown>)({
+    await inngest.send({
       name: "course/export.requested",
       data: { courseId, userId: user.id, format: "pdf" },
     });

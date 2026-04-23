@@ -99,6 +99,13 @@ type Events = {
   "course/polish.requested": {
     data: { courseId: string };
   };
+  "course/export.requested": {
+    data: {
+      courseId: string;
+      userId: string;
+      format: "pdf";
+    };
+  };
 };
 
 /**
