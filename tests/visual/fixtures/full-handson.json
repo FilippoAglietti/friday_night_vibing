@@ -1,0 +1,374 @@
+{
+  "id": "fx-full-handson",
+  "title": "Build a REST API with Node.js",
+  "subtitle": "Hands-on guide to designing and shipping a production-ready API",
+  "description": "Go from zero to a deployed REST API using Node.js, Express, and PostgreSQL through a series of practical exercises.",
+  "targetAudience": "Junior developers comfortable with JavaScript who want backend experience",
+  "difficulty": "intermediate",
+  "objectives": [
+    "Design a resource-oriented REST API following conventions",
+    "Implement CRUD endpoints with Express and a PostgreSQL database",
+    "Secure endpoints with JWT authentication",
+    "Write automated tests for every route",
+    "Deploy the API to a cloud platform"
+  ],
+  "prerequisites": ["JavaScript fundamentals", "Basic command-line usage", "Understanding of HTTP"],
+  "tags": ["nodejs", "express", "rest-api", "postgresql", "backend"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Project Setup",
+      "description": "Scaffold the project, configure tooling, and connect to the database.",
+      "objectives": [
+        "Initialise an Express application",
+        "Configure environment variables with dotenv",
+        "Connect to PostgreSQL using pg"
+      ],
+      "order": 0,
+      "durationMinutes": 60,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Initialise Express",
+          "description": "Create a new Node.js project and install Express.",
+          "format": "project",
+          "durationMinutes": 15,
+          "order": 0,
+          "content": "Run npm init, install express and nodemon, then write a minimal server that responds with 200 OK on GET /health.",
+          "keyPoints": ["npm init -y creates package.json quickly", "nodemon restarts the server on file changes", "app.listen binds to a port and accepts connections"]
+        },
+        {
+          "id": "l2",
+          "title": "Environment Variables",
+          "description": "Keep secrets out of source code with dotenv.",
+          "format": "reading",
+          "durationMinutes": 10,
+          "order": 1,
+          "content": "Store database credentials and API keys in a .env file; dotenv loads them into process.env at startup — never commit .env to git.",
+          "keyPoints": ["dotenv.config() must run before any process.env access", ".env.example documents required vars without values", "CI platforms inject vars via environment, not a file"]
+        },
+        {
+          "id": "l3",
+          "title": "Connect to PostgreSQL",
+          "description": "Use the pg package to open a connection pool.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "Instantiate a pg Pool with DATABASE_URL from process.env and export a query helper used by all route handlers.",
+          "keyPoints": ["Pool reuses connections instead of opening a new one per query", "Always release the client back to the pool", "Use parameterised queries to prevent SQL injection"]
+        },
+        {
+          "id": "l4",
+          "title": "Database Migrations",
+          "description": "Version-control your schema with db-migrate.",
+          "format": "project",
+          "durationMinutes": 15,
+          "order": 3,
+          "content": "Write an UP migration that creates a users table, and a DOWN migration that drops it — run migrations before each test suite.",
+          "keyPoints": ["Migrations are repeatable and reversible", "Never alter a committed migration — write a new one", "Run migrations in CI before integration tests"]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "question": "Why should you never commit a .env file to git?",
+          "options": [
+            "dotenv does not work from a git repository",
+            "It contains secrets that would be exposed publicly",
+            "Git cannot parse KEY=VALUE syntax",
+            "Environment variables must be uppercase"
+          ],
+          "correctAnswer": 1,
+          "explanation": "A .env file holds database passwords and API keys — pushing it to a public repo exposes those credentials immediately.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "CRUD Endpoints",
+      "description": "Implement Create, Read, Update, and Delete routes for a resource.",
+      "objectives": [
+        "Map HTTP methods to CRUD operations",
+        "Validate request bodies with joi",
+        "Return proper HTTP status codes"
+      ],
+      "order": 1,
+      "durationMinutes": 90,
+      "lessons": [
+        {
+          "id": "l5",
+          "title": "GET — List and Retrieve",
+          "description": "Implement GET /items and GET /items/:id.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 0,
+          "content": "GET /items returns a JSON array; GET /items/:id returns a single object or 404 if not found — always set Content-Type: application/json.",
+          "keyPoints": ["Use 200 for success, 404 when the record is missing", "Parse req.params.id and validate it is a positive integer", "SELECT ... LIMIT for list endpoints prevents returning millions of rows"]
+        },
+        {
+          "id": "l6",
+          "title": "POST — Create",
+          "description": "Accept a request body, validate it, and insert a new row.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 1,
+          "content": "Parse the JSON body with express.json(), validate required fields with joi, insert into the database, and return 201 Created with the new record.",
+          "keyPoints": ["express.json() middleware must be registered before route handlers", "Return 400 Bad Request when validation fails", "INSERT ... RETURNING * gives back the inserted row without a second query"]
+        },
+        {
+          "id": "l7",
+          "title": "PUT — Replace",
+          "description": "Replace an existing resource with the full updated body.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "PUT /items/:id overwrites all mutable fields; if the record does not exist return 404, not 200.",
+          "keyPoints": ["PUT is idempotent — calling it twice has the same effect as once", "Validate all fields, not just the changed ones", "Use RETURNING * instead of a follow-up SELECT"]
+        },
+        {
+          "id": "l8",
+          "title": "DELETE — Remove",
+          "description": "Delete a record and handle the not-found case.",
+          "format": "project",
+          "durationMinutes": 15,
+          "order": 3,
+          "content": "DELETE /items/:id removes the row; return 204 No Content on success and 404 if the record is absent.",
+          "keyPoints": ["204 responses must not include a body", "Check rowCount from pg to detect missing records", "Soft deletes (setting deleted_at) are often safer than hard deletes in production"]
+        },
+        {
+          "id": "l9",
+          "title": "Input Validation with Joi",
+          "description": "Define schemas to reject invalid payloads early.",
+          "format": "reading",
+          "durationMinutes": 15,
+          "order": 4,
+          "content": "A Joi schema describes the expected shape of a request body; abortEarly: false collects all errors at once so the client can fix them in one round trip.",
+          "keyPoints": ["Joi.object().required() makes the entire body mandatory", "Use .messages() to write user-friendly error strings", "Centralise schemas in a validators/ directory"]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q2",
+          "type": "multiple-choice",
+          "question": "Which HTTP status code should a DELETE endpoint return on success?",
+          "options": ["200 OK", "201 Created", "204 No Content", "404 Not Found"],
+          "correctAnswer": 2,
+          "explanation": "204 No Content signals success without a response body, which is appropriate for DELETE.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Authentication",
+      "description": "Secure your API with JWT-based authentication.",
+      "objectives": [
+        "Hash passwords with bcrypt before storing them",
+        "Issue JWTs on login",
+        "Protect routes with an auth middleware"
+      ],
+      "order": 2,
+      "durationMinutes": 75,
+      "lessons": [
+        {
+          "id": "l10",
+          "title": "Password Hashing",
+          "description": "Store passwords safely with bcrypt.",
+          "format": "reading",
+          "durationMinutes": 15,
+          "order": 0,
+          "content": "Never store plain-text passwords — bcrypt hashes them with a salt so that even a database breach does not expose user credentials.",
+          "keyPoints": ["bcrypt.hash() takes the plain password and a cost factor", "Cost factor 12 is a reasonable default for 2026 hardware", "bcrypt.compare() verifies a plain password against a stored hash"]
+        },
+        {
+          "id": "l11",
+          "title": "Issuing JWTs",
+          "description": "Return a signed token on successful login.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 1,
+          "content": "After verifying credentials, sign a JWT containing the user's id and role, then return it so the client can attach it to future requests.",
+          "keyPoints": ["jwt.sign() needs a secret stored in an env var, never hardcoded", "Set a short expiry (e.g. 1h) and issue refresh tokens separately", "Store the JWT on the client in memory, not localStorage, to reduce XSS risk"]
+        },
+        {
+          "id": "l12",
+          "title": "Auth Middleware",
+          "description": "Verify the JWT on protected routes.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "Write a middleware that reads the Authorization header, verifies the JWT, and attaches the decoded payload to req.user — return 401 on any failure.",
+          "keyPoints": ["Always return 401, never 403, when the token is missing or invalid", "Use a try/catch around jwt.verify() to handle malformed tokens", "Attach only safe, non-secret fields to req.user"]
+        },
+        {
+          "id": "l13",
+          "title": "Role-Based Access",
+          "description": "Restrict certain endpoints to users with the right role.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 3,
+          "content": "A requireRole middleware reads req.user.role set by the auth middleware and returns 403 Forbidden if the caller lacks permission.",
+          "keyPoints": ["Run auth middleware before requireRole", "Keep roles simple: user and admin cover most APIs", "Return 403 (Forbidden) not 401 when the user is authenticated but lacks permission"]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q3",
+          "type": "multiple-choice",
+          "question": "What HTTP status code should an auth middleware return when a JWT is missing?",
+          "options": ["400 Bad Request", "401 Unauthorized", "403 Forbidden", "404 Not Found"],
+          "correctAnswer": 1,
+          "explanation": "401 Unauthorized means the request lacks valid authentication credentials — the client should log in and retry.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "title": "Testing and Deployment",
+      "description": "Write automated tests and deploy to a cloud platform.",
+      "objectives": [
+        "Write integration tests with supertest",
+        "Run tests in CI with GitHub Actions",
+        "Deploy the API with a Dockerfile"
+      ],
+      "order": 3,
+      "durationMinutes": 80,
+      "lessons": [
+        {
+          "id": "l14",
+          "title": "Integration Tests with Supertest",
+          "description": "Test each route end-to-end against a real database.",
+          "format": "project",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "Supertest spins up the Express app in-process and sends real HTTP requests — no mocking needed for straightforward CRUD tests.",
+          "keyPoints": ["Use a dedicated test database separate from development", "Truncate tables in beforeEach to isolate test cases", "Test both the happy path and every error branch"]
+        },
+        {
+          "id": "l15",
+          "title": "GitHub Actions CI",
+          "description": "Run tests automatically on every pull request.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 1,
+          "content": "A GitHub Actions workflow spins up a Postgres service container, runs migrations, then executes npm test — PRs cannot merge while tests are red.",
+          "keyPoints": ["Use services: postgres: in the workflow YAML to get a throwaway database", "Cache node_modules with actions/cache to speed up runs", "Set required status checks in branch protection rules"]
+        },
+        {
+          "id": "l16",
+          "title": "Dockerfile",
+          "description": "Package the API as a container image.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "A multi-stage Dockerfile installs dependencies in a build stage, then copies only the production artefacts to a lean runtime image — reducing the final image size.",
+          "keyPoints": ["Use node:20-alpine as the runtime base to keep images small", "COPY package*.json first to maximise layer caching", "Never run the process as root inside the container"]
+        },
+        {
+          "id": "l17",
+          "title": "Deploy to Railway",
+          "description": "Ship the containerised API to a managed cloud platform.",
+          "format": "project",
+          "durationMinutes": 15,
+          "order": 3,
+          "content": "Railway detects your Dockerfile, provisions a managed Postgres database, and wires DATABASE_URL automatically — one git push deploys the API.",
+          "keyPoints": ["Pin a specific image tag in production, never use :latest", "Use Railway's env var UI to inject secrets", "Enable health-check probes so Railway can restart crashed instances automatically"]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q4",
+          "type": "multiple-choice",
+          "question": "Why should tests use a separate database instead of the development database?",
+          "options": [
+            "Tests run faster on a dedicated database",
+            "The development database does not support SQL",
+            "Tests truncate tables and would destroy development data",
+            "Supertest cannot connect to a development database"
+          ],
+          "correctAnswer": 2,
+          "explanation": "Test suites routinely wipe and re-seed tables — doing that against the development database would destroy your local data.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "title": "Going Further",
+      "description": "Production patterns: pagination, rate limiting, and observability.",
+      "objectives": [
+        "Implement cursor-based pagination",
+        "Add rate limiting with express-rate-limit",
+        "Emit structured logs with pino"
+      ],
+      "order": 4,
+      "durationMinutes": 45,
+      "lessons": [
+        {
+          "id": "l18",
+          "title": "Pagination",
+          "description": "Return large lists in manageable pages.",
+          "format": "reading",
+          "durationMinutes": 15,
+          "order": 0,
+          "content": "Cursor-based pagination uses an opaque cursor (usually the last row's id) instead of page numbers — it stays consistent even when rows are inserted between requests.",
+          "keyPoints": ["Offset pagination breaks when rows are inserted mid-page", "Return a nextCursor in the response; null means no more pages", "Use LIMIT n+1 to detect whether another page exists without a COUNT query"]
+        },
+        {
+          "id": "l19",
+          "title": "Rate Limiting",
+          "description": "Protect your API from abuse with request throttling.",
+          "format": "reading",
+          "durationMinutes": 10,
+          "order": 1,
+          "content": "express-rate-limit tracks requests per IP and returns 429 Too Many Requests when the threshold is exceeded — apply stricter limits to auth endpoints.",
+          "keyPoints": ["Set windowMs and max to define the throttle window", "Use a Redis store for rate limits in multi-instance deployments", "429 responses should include Retry-After in the header"]
+        },
+        {
+          "id": "l20",
+          "title": "Structured Logging with Pino",
+          "description": "Emit JSON logs that are easy to search and alert on.",
+          "format": "reading",
+          "durationMinutes": 10,
+          "order": 2,
+          "content": "Pino writes newline-delimited JSON instead of plain strings — log aggregators like Datadog or CloudWatch can parse fields and build dashboards from them.",
+          "keyPoints": ["Always include a request id in every log line", "Log at the right level: debug in dev, info/warn/error in production", "Never log sensitive data (passwords, tokens, PII)"]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q5",
+          "type": "multiple-choice",
+          "question": "What HTTP status code does a rate limiter return when the threshold is exceeded?",
+          "options": ["400 Bad Request", "401 Unauthorized", "403 Forbidden", "429 Too Many Requests"],
+          "correctAnswer": 3,
+          "explanation": "429 Too Many Requests signals that the client has sent too many requests in a given timeframe.",
+          "points": 1
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 6,
+    "hoursPerWeek": 3,
+    "totalWeeks": 2
+  },
+  "bonusResources": [
+    {
+      "id": "br1",
+      "title": "Node.js Best Practices",
+      "type": "article",
+      "url": "https://github.com/goldbergyoni/nodebestpractices",
+      "description": "Community-maintained list of Node.js production patterns.",
+      "isFree": true
+    }
+  ],
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-23T00:00:00Z",
+  "updatedAt": "2026-04-23T00:00:00Z",
+  "version": "1"
+}

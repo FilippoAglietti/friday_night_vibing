@@ -44,3 +44,6 @@ next-env.d.ts
 
 # Visual Companion brainstorm sessions (superpowers)
 .superpowers/
+
+# Visual regression baselines — generated, not committed until Phase 1 QA
+tests/visual/baselines/

@@ -1,0 +1,116 @@
+{
+  "id": "fx-crash-academic",
+  "title": "SQL Basics",
+  "subtitle": "A crash course for absolute beginners",
+  "description": "Learn the fundamental SQL commands needed to query relational databases in under two hours.",
+  "targetAudience": "Developers and analysts with no prior SQL experience",
+  "difficulty": "beginner",
+  "objectives": [
+    "Write SELECT queries to retrieve data from a table",
+    "Filter rows using WHERE clauses",
+    "Combine data from multiple tables with JOINs"
+  ],
+  "prerequisites": ["Basic familiarity with spreadsheets"],
+  "tags": ["sql", "databases", "beginner"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Querying Data",
+      "description": "Core SELECT syntax for reading data from a single table.",
+      "objectives": [
+        "Use SELECT and FROM to fetch columns",
+        "Alias columns with AS",
+        "Limit result sets with LIMIT"
+      ],
+      "order": 0,
+      "durationMinutes": 30,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "SELECT",
+          "description": "Fetch columns from a table using the SELECT statement.",
+          "format": "reading",
+          "durationMinutes": 10,
+          "order": 0,
+          "content": "The SELECT statement is the entry point to every SQL query — it tells the database which columns you want to see.",
+          "keyPoints": ["SELECT * returns all columns", "List column names to be explicit", "Use AS to rename columns in the result"]
+        },
+        {
+          "id": "l2",
+          "title": "WHERE",
+          "description": "Filter rows with conditional expressions.",
+          "format": "reading",
+          "durationMinutes": 10,
+          "order": 1,
+          "content": "WHERE narrows results to only the rows that satisfy a condition — think of it as a row-level if statement.",
+          "keyPoints": ["Comparison operators: =, <>, <, >, <=, >=", "Combine conditions with AND / OR", "Use IN for multiple allowed values"]
+        },
+        {
+          "id": "l3",
+          "title": "JOINs",
+          "description": "Combine rows from two tables on a shared key.",
+          "format": "reading",
+          "durationMinutes": 10,
+          "order": 2,
+          "content": "INNER JOIN returns only rows that have a match in both tables; LEFT JOIN returns all rows from the left table plus any matches.",
+          "keyPoints": ["INNER JOIN keeps only matched rows", "LEFT JOIN keeps all left rows", "Always qualify column names with table aliases when joining"]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "question": "Which SQL clause filters rows in a result set?",
+          "options": ["SELECT", "FROM", "WHERE", "ORDER BY"],
+          "correctAnswer": 2,
+          "explanation": "WHERE evaluates a condition row by row and keeps only those that pass.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Ordering and Aggregating",
+      "description": "Sort results and compute summary statistics.",
+      "objectives": [
+        "Sort results with ORDER BY",
+        "Count and sum rows with aggregate functions",
+        "Group rows with GROUP BY"
+      ],
+      "order": 1,
+      "durationMinutes": 20,
+      "lessons": [
+        {
+          "id": "l4",
+          "title": "ORDER BY",
+          "description": "Sort query results in ascending or descending order.",
+          "format": "reading",
+          "durationMinutes": 7,
+          "order": 0,
+          "content": "ORDER BY sorts the final result set; ASC (default) goes low-to-high, DESC goes high-to-low.",
+          "keyPoints": ["Default sort is ASC", "Can order by multiple columns", "NULL values sort last by default in most databases"]
+        },
+        {
+          "id": "l5",
+          "title": "Aggregates",
+          "description": "Use COUNT, SUM, AVG, MIN, and MAX to summarise data.",
+          "format": "reading",
+          "durationMinutes": 7,
+          "order": 1,
+          "content": "Aggregate functions collapse many rows into one summary value — pair them with GROUP BY to get per-group summaries.",
+          "keyPoints": ["COUNT(*) counts all rows including NULLs", "SUM and AVG ignore NULLs", "GROUP BY splits rows into buckets before aggregating"]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 1,
+    "hoursPerWeek": 1,
+    "totalWeeks": 1
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-23T00:00:00Z",
+  "updatedAt": "2026-04-23T00:00:00Z",
+  "version": "1"
+}
