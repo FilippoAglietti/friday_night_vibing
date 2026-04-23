@@ -1,4 +1,4 @@
--- supabase/migrations/018_export_storage.sql
+-- supabase/migrations/018b_export_storage.sql
 -- Phase 1 of export v2: storage bucket for generated PDFs (and later SCORM zips, Marp decks).
 
 insert into storage.buckets (id, name, public)

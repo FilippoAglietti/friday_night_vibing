@@ -46,7 +46,7 @@ Dockerfile                                  [rewritten — switch to debian base
 docs/cloud-run.md                           [modified — Playwright + concurrency note]
 AGENTS.md                                   [modified — export v2 pipeline note]
 
-supabase/migrations/018_export_storage.sql  [NEW — storage bucket + RLS policies only; personalisation columns land in Phase 5]
+supabase/migrations/018b_export_storage.sql  [NEW — storage bucket + RLS policies only; personalisation columns land in Phase 5]
 
 src/lib/export/
 ├── index.ts                                [NEW — public surface]
@@ -394,14 +394,14 @@ Documents the new config in docs/cloud-run.md."
 ## Task 3 · Supabase Storage bucket for exports
 
 **Files:**
-- Create: `supabase/migrations/018_export_storage.sql`
+- Create: `supabase/migrations/018b_export_storage.sql`
 
 **Context:** Generated PDFs need somewhere to live that gives us signed-URL delivery and RLS protection. Supabase Storage bucket `exports`, scoped per user. Phase 5 will add personalisation *columns* on `profiles`; this phase only creates the bucket and policies.
 
 - [ ] **Step 1: Write the migration**
 
 ```sql
--- supabase/migrations/018_export_storage.sql
+-- supabase/migrations/018b_export_storage.sql
 -- Phase 1 of export v2: storage bucket for generated PDFs (and later SCORM zips, Marp decks).
 
 insert into storage.buckets (id, name, public)
@@ -442,7 +442,7 @@ create policy "exports_owner_delete"
 supabase db push
 ```
 
-Expected: `Applying migration 018_export_storage.sql...` followed by `Finished supabase db push.`
+Expected: `Applying migration 018b_export_storage.sql...` followed by `Finished supabase db push.`
 
 - [ ] **Step 3: Verify the bucket exists**
 
@@ -465,7 +465,7 @@ Expected: file is rewritten with identical (or near-identical) content. No new t
 - [ ] **Step 5: Commit**
 
 ```bash
-git add supabase/migrations/018_export_storage.sql src/types/database.types.ts
+git add supabase/migrations/018b_export_storage.sql src/types/database.types.ts
 git commit -m "feat(storage): add exports bucket with owner-scoped RLS
 
 Bucket 'exports' stores generated PDFs (and later SCORM/Marp). Path convention
