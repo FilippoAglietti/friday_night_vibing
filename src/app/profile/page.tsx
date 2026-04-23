@@ -80,6 +80,7 @@ import PaywallModal from "@/components/PaywallModal";
 import OnboardingQuiz, { type OnboardingAnswers } from "@/components/OnboardingQuiz";
 import WelcomeAnimation from "@/components/WelcomeAnimation";
 import Link from "next/link";
+import { downloadPdfV2, isExportV2ClientEnabled } from "@/lib/export/client";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -710,7 +711,19 @@ export default function ProfilePage() {
   // ── Handlers ───────────────────────────────────────────────
 
   const handleDownloadPDF = useCallback(
-    (curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
+    (curriculum: Curriculum, teachingStyle?: TeachingStyle | null, courseId?: string) => {
+      if (courseId && isExportV2ClientEnabled()) {
+        downloadPdfV2(courseId).catch((err) => {
+          console.error("[export v2] failed, using legacy:", err);
+          try {
+            const pdf = generateCurriculumPDF(curriculum, { teachingStyle });
+            pdf.save(`${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_syllabus.pdf`);
+          } catch (e) {
+            console.error("Failed to generate PDF:", e);
+          }
+        });
+        return;
+      }
       try {
         const pdf = generateCurriculumPDF(curriculum, { teachingStyle });
         pdf.save(`${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_syllabus.pdf`);
@@ -1128,7 +1141,7 @@ export default function ProfilePage() {
                         tier={plan.tier}
                         onExport={(format: ExportFormat) => {
                           switch (format) {
-                            case "pdf":       return handleDownloadPDF(c, gen.teaching_style);
+                            case "pdf":       return handleDownloadPDF(c, gen.teaching_style, gen.id);
                             case "word":      return handleExportDocx(c, gen.teaching_style);
                             case "markdown":  return handleCopyMarkdown(c);
                             case "notion":    return handleExportNotion(c, gen.teaching_style);
@@ -1412,7 +1425,7 @@ export default function ProfilePage() {
                       <button
                         onClick={() => {
                           const latest = readyGenerations[0];
-                          if (latest?.curriculum) handleDownloadPDF(latest.curriculum, latest.teaching_style);
+                          if (latest?.curriculum) handleDownloadPDF(latest.curriculum, latest.teaching_style, latest.id);
                         }}
                         className="group flex flex-col items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 sm:p-4 hover:bg-amber-500/10 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-200"
                       >
@@ -1682,7 +1695,7 @@ export default function ProfilePage() {
 
                                     {/* Inline actions on hover */}
                                     <div className="flex gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                      <Button variant="ghost" size="sm" className="h-6 px-2 text-[9px] gap-1 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c, gen.teaching_style); }}>
+                                      <Button variant="ghost" size="sm" className="h-6 px-2 text-[9px] gap-1 hover:bg-violet-500/10 hover:text-violet-400" onClick={(e) => { e.stopPropagation(); handleDownloadPDF(c, gen.teaching_style, gen.id); }}>
                                         <Download className="size-2.5" />PDF
                                       </Button>
                                       <Button variant="ghost" size="sm" className="h-6 px-2 text-[9px] gap-1 hover:bg-cyan-500/10 hover:text-cyan-400" onClick={(e) => { e.stopPropagation(); handleShareCourse(gen); }}>
