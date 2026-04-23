@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
 
   const { data: course, error } = await supabase
     .from("courses")
-    .select("id, user_id, data")
+    .select("id, user_id, curriculum")
     .eq("id", courseId)
     .single();
   if (error || !course) {
@@ -73,8 +73,11 @@ export async function POST(req: NextRequest) {
   if (course.user_id !== user.id) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
+  if (!course.curriculum) {
+    return NextResponse.json({ error: "course has no curriculum yet" }, { status: 409 });
+  }
 
-  const curriculum = course.data as Curriculum;
+  const curriculum = course.curriculum as unknown as Curriculum;
   const path = decideExportPath(curriculum);
 
   if (path === "async") {
