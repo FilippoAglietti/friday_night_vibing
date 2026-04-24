@@ -1,0 +1,319 @@
+{
+  "id": "fx-full-storytelling",
+  "title": "The History of the Internet",
+  "subtitle": "From packet switching to the platform era — told as a story",
+  "description": "A narrative full-length course tracing the people and decisions behind the internet, from 1960s Cold War research labs to the centralised platforms of today.",
+  "targetAudience": "Anyone who has ever wondered how we got here",
+  "difficulty": "beginner",
+  "objectives": [
+    "Trace the lineage from ARPANET to the modern web",
+    "Understand why the internet is decentralised — and why the platforms aren't",
+    "Recognise the key design choices that still shape how we use it",
+    "See how policy decisions, not just technology, drove outcomes"
+  ],
+  "prerequisites": [],
+  "tags": ["history", "internet", "narrative", "technology"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Before the Net",
+      "description": "The Cold War labs where the idea was born.",
+      "objectives": [
+        "Understand packet switching as a response to a specific problem",
+        "Meet the people whose ideas made it possible"
+      ],
+      "order": 0,
+      "durationMinutes": 90,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "The Nuclear Question",
+          "description": "Paul Baran's 1964 memo and the problem it was solving.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "In 1964, Paul Baran at RAND was asked a chilling question: how could the United States maintain communications after a nuclear first strike? His answer — breaking messages into small pieces that could find their own way across a damaged network — became the packet-switching idea.",
+          "keyPoints": [
+            "The problem was survivability, not speed",
+            "Baran's memo sat unused for years before anyone implemented it",
+            "Centralised networks had a single point of failure the Pentagon couldn't accept"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "The Licklider Vision",
+          "description": "The man who pitched a network of computers as a network of minds.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "J.C.R. Licklider ran the computing division at ARPA in the early 1960s and wrote a series of memos imagining what he called an 'intergalactic computer network.' His titles were grandiose; his ideas — resource sharing, remote work, conversational computing — turned out mostly correct.",
+          "keyPoints": [
+            "Licklider funded the researchers who would build ARPANET",
+            "His memos read as startlingly accurate predictions of the 2020s",
+            "Government research funding was essential — no company would have taken the risk"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "Building ARPANET",
+          "description": "The first four nodes, and the first crash.",
+          "format": "reading",
+          "durationMinutes": 35,
+          "order": 2,
+          "content": "On October 29, 1969, a graduate student in Los Angeles tried to log into a computer in Stanford by typing 'LOGIN'. The system crashed after 'LO'. That was the first internet message — and the first internet bug.",
+          "keyPoints": [
+            "Interface Message Processors were the first routers",
+            "The original four nodes were UCLA, SRI, UCSB, and Utah",
+            "Early ARPANET was built by grad students under remarkable autonomy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Finding a Language",
+      "description": "How TCP/IP became the lingua franca of every network.",
+      "objectives": [
+        "See why a common protocol mattered",
+        "Understand the 'end-to-end' principle"
+      ],
+      "order": 1,
+      "durationMinutes": 70,
+      "lessons": [
+        {
+          "id": "l4",
+          "title": "Cerf and Kahn",
+          "description": "A design on a napkin in a San Francisco hotel.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "Vint Cerf and Bob Kahn sketched TCP/IP in 1974, partly on the back of an envelope. Their insight was that the network should be stupid — it just moved packets — while the computers at the edges did the clever work. That inversion is still the foundation today.",
+          "keyPoints": [
+            "The end-to-end principle shaped every layer above",
+            "TCP guarantees delivery; IP just routes",
+            "Separating concerns made independent evolution possible"
+          ]
+        },
+        {
+          "id": "l5",
+          "title": "The 1983 Switch",
+          "description": "Flag Day, and why it almost broke everything.",
+          "format": "reading",
+          "durationMinutes": 22,
+          "order": 1,
+          "content": "On January 1, 1983, ARPANET switched from its old NCP protocol to TCP/IP overnight. It was called Flag Day and it worked — mostly. It remains one of the few times a major network transitioned all at once, rather than gradually.",
+          "keyPoints": [
+            "Migrations this abrupt are now considered bad practice",
+            "The switch enabled the network to scale beyond ARPANET",
+            "TCP/IP's openness let other networks adopt it and connect"
+          ]
+        },
+        {
+          "id": "l6",
+          "title": "DNS",
+          "description": "How hostnames became tractable.",
+          "format": "reading",
+          "durationMinutes": 23,
+          "order": 2,
+          "content": "Early networks kept a single text file of every computer's name and address. When that got too big, Paul Mockapetris designed the Domain Name System in 1983 — a distributed, hierarchical directory service. It's still what turns 'example.com' into an IP address.",
+          "keyPoints": [
+            "The hosts.txt file couldn't scale past a few hundred machines",
+            "DNS is hierarchical, distributed, and cached — all by design",
+            "The root servers are a geopolitically sensitive set of thirteen clusters"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "The Web Arrives",
+      "description": "Tim Berners-Lee, CERN, and the idea that changed everything.",
+      "objectives": [
+        "Understand hypertext as an idea older than the web",
+        "See why the web won over competitors"
+      ],
+      "order": 2,
+      "durationMinutes": 85,
+      "lessons": [
+        {
+          "id": "l7",
+          "title": "Hypertext",
+          "description": "Bush, Nelson, and the idea you could link anything to anything.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "Vannevar Bush imagined a mechanical linking device in 1945. Ted Nelson coined 'hypertext' in 1965 and spent decades on Xanadu, a system he never shipped. Tim Berners-Lee's genius was knowing what to leave out.",
+          "keyPoints": [
+            "Hypertext was a 40-year idea before the web",
+            "Earlier systems tried for perfection and shipped nothing",
+            "Berners-Lee's web was intentionally simpler — and worked"
+          ]
+        },
+        {
+          "id": "l8",
+          "title": "CERN, 1989",
+          "description": "The memo that changed the world.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Tim Berners-Lee's 1989 proposal, titled 'Information Management: A Proposal,' got a handwritten 'vague but exciting' from his manager. He took that as a yes and built HTML, HTTP, and the first browser in his spare time over the next year.",
+          "keyPoints": [
+            "The web was built to solve CERN's internal documentation problem",
+            "Berners-Lee could have patented the web — he chose not to",
+            "The original browser was also an editor; the read/write split came later"
+          ]
+        },
+        {
+          "id": "l9",
+          "title": "Mosaic and the Explosion",
+          "description": "The browser that put the web on every desktop.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "By 1993, NCSA Mosaic gave the web inline images and point-and-click navigation. The web user base grew 10x that year. Mosaic's team then commercialised as Netscape — and the browser wars began.",
+          "keyPoints": [
+            "Mosaic didn't invent the web; it made it ordinary people could use it",
+            "Inline images made the web visual, not just textual",
+            "The Netscape IPO in 1995 kicked off the dot-com era"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "title": "Boom, Bust, and Platform",
+      "description": "The bubble, the crash, and what came after.",
+      "objectives": [
+        "Understand the dot-com bubble in its context",
+        "See why Web 2.0 looked different"
+      ],
+      "order": 3,
+      "durationMinutes": 75,
+      "lessons": [
+        {
+          "id": "l10",
+          "title": "The Bubble",
+          "description": "1995 to March 2000.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "Between 1995 and early 2000, internet stocks rose to levels no earnings could justify. Pets.com spent more on Super Bowl advertising than it earned in revenue. The NASDAQ peaked in March 2000 and then fell 78% over the next 30 months.",
+          "keyPoints": [
+            "Most of the bubble-era predictions were directionally correct — just 10 years too early",
+            "The crash destroyed fortunes but left the infrastructure built",
+            "Amazon, eBay, and Google survived; nearly everyone else didn't"
+          ]
+        },
+        {
+          "id": "l11",
+          "title": "Web 2.0",
+          "description": "When pages started listening.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 1,
+          "content": "After the crash, a new pattern emerged: sites where users created the content. YouTube, Facebook, Wikipedia, Flickr — these were the products. The network effect was the moat.",
+          "keyPoints": [
+            "User-generated content scaled in ways paid content never could",
+            "Network effects became the central economic logic",
+            "Open APIs accelerated the ecosystem — briefly"
+          ]
+        },
+        {
+          "id": "l12",
+          "title": "The Mobile Turn",
+          "description": "How the iPhone reshaped the internet.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 2,
+          "content": "The 2007 iPhone and the 2008 App Store quietly rewrote the rules. Mobile traffic overtook desktop by 2016. Apps replaced browsers for most activities, handing two companies veto power over half the internet.",
+          "keyPoints": [
+            "The mobile internet is not just a smaller version of desktop",
+            "The app-store model re-introduced centralised gatekeeping",
+            "The open web now competes with closed platforms it partly created"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "title": "Today's Questions",
+      "description": "The architecture of the next decade.",
+      "objectives": [
+        "Identify the current tensions",
+        "Form a view on where the trajectory is heading"
+      ],
+      "order": 4,
+      "durationMinutes": 60,
+      "lessons": [
+        {
+          "id": "l13",
+          "title": "The Platform Problem",
+          "description": "When a handful of companies mediate the rest.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "A few companies now sit between billions of users and the rest of the internet. That position produces great products, great profits, and great concentrations of power — and no one has a clean answer for what to do about it.",
+          "keyPoints": [
+            "Network effects reward consolidation",
+            "Antitrust frameworks from the 1890s don't fit digital markets neatly",
+            "The EU and US have drifted apart on regulatory approach"
+          ]
+        },
+        {
+          "id": "l14",
+          "title": "Decentralisation, Again",
+          "description": "Why every few years someone tries to rebuild the open web.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 1,
+          "content": "From Mastodon to blockchains to personal data pods, every few years a new wave promises to restore the decentralised internet. The track record is mixed — the hard part has never been the technology.",
+          "keyPoints": [
+            "Decentralisation is hard because centralised services are often more convenient",
+            "Protocols beat platforms when the protocol is genuinely open",
+            "The cycle repeats — because the underlying pull of centralisation is real"
+          ]
+        },
+        {
+          "id": "l15",
+          "title": "What the Story Leaves Us",
+          "description": "Reading the past to read the present.",
+          "format": "reading",
+          "durationMinutes": 15,
+          "order": 2,
+          "content": "The internet wasn't inevitable. Every layer was a choice someone made, often for reasons that looked narrow at the time. The current internet is also a choice — and the next one will be too.",
+          "keyPoints": [
+            "Design decisions made decades ago still constrain us today",
+            "Policy choices shape technology at least as much as the reverse",
+            "Knowing the history is a prerequisite for thinking about what comes next"
+          ],
+          "quiz": [
+            {
+              "id": "q1",
+              "type": "multiple-choice",
+              "question": "What problem was packet switching originally designed to solve?",
+              "options": [
+                "High-speed streaming video",
+                "Survivable communications after catastrophic damage to the network",
+                "Wireless data transmission",
+                "Efficient billing for long-distance calls"
+              ],
+              "correctAnswer": 1,
+              "explanation": "Paul Baran's 1964 RAND memo proposed packet switching specifically as a way to keep communications functioning even after large parts of the network were destroyed.",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 7,
+    "hoursPerWeek": 2,
+    "totalWeeks": 4
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}

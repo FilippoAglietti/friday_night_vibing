@@ -7,7 +7,7 @@
 @page {
   size: A4;
   margin: var(--page-margin-outer);
-  /* Running header left — creator name when set, blank otherwise (NO Syllabi) */
+  /* Running header left — creator name when set, blank otherwise */
   @top-left {
     content: string(creator-name);
     font-family: var(--ff-sans);
@@ -21,7 +21,7 @@
     font-size: var(--fs-micro);
     color: var(--c-ink-muted);
   }
-  /* Page numbers only — never "Page X of Y / Syllabi" */
+  /* Page numbers only — no platform-name suffix */
   @bottom-center {
     content: counter(page);
     font-family: var(--ff-sans);

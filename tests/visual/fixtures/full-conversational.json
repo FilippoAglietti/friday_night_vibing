@@ -1,0 +1,292 @@
+{
+  "id": "fx-full-conversational",
+  "title": "Nutrition Without the Noise",
+  "subtitle": "What we actually know, and what we just argue about",
+  "description": "A full-length conversational course that cuts through the contradictions of popular nutrition advice and explains what the evidence actually supports.",
+  "targetAudience": "Adults tired of contradictory headlines about food",
+  "difficulty": "beginner",
+  "objectives": [
+    "Tell the difference between evidence and opinion in nutrition",
+    "Understand macronutrients without the drama",
+    "Build a sustainable way of eating that isn't a fad",
+    "Spot the red flags of pseudoscience wellness content"
+  ],
+  "prerequisites": [],
+  "tags": ["nutrition", "health", "evidence-based"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Why Is This So Confusing?",
+      "description": "Before we talk about food, let's talk about why the advice keeps changing.",
+      "objectives": [
+        "Understand what nutrition science can and can't prove",
+        "See how headlines get made"
+      ],
+      "order": 0,
+      "durationMinutes": 80,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Nutrition Is a Hard Science",
+          "description": "And not in the way you think.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "You can't lock people in a lab for 30 years and control what they eat. So nutrition studies mostly rely on people remembering what they ate last week, which is about as accurate as you'd expect. That's why so much advice wobbles.",
+          "keyPoints": [
+            "Most nutrition studies are observational, not experimental",
+            "Asking 'what did you eat last year?' is a terrible data source",
+            "The loudest claims usually have the weakest evidence"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "How a Headline Is Born",
+          "description": "The six-step journey from a small study to your phone.",
+          "format": "reading",
+          "durationMinutes": 28,
+          "order": 1,
+          "content": "A modest finding gets amplified by a press release, rewritten by a journalist, simplified by an editor, clickified by a headline writer, and finally distorted by every social post about it. By the time it reaches you, 'some association in mice' has become 'red wine cures cancer.'",
+          "keyPoints": [
+            "University press offices reward dramatic framings",
+            "Journalists rarely read the actual paper",
+            "If a claim sounds like a miracle, something was lost in translation"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "The Real Rules",
+          "description": "What the evidence actually keeps pointing at.",
+          "format": "reading",
+          "durationMinutes": 27,
+          "order": 2,
+          "content": "Strip out the trendy claims and you're left with a pretty boring list: eat more plants, less ultra-processed food, less sugar-sweetened drinks, and about the right number of calories for you. That's about 80% of good nutrition advice, and it's been stable for decades.",
+          "keyPoints": [
+            "Boring advice is the advice with the strongest evidence",
+            "'Eat food, not too much, mostly plants' holds up well",
+            "Exciting-sounding exceptions usually don't replicate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Macronutrients, Calmly",
+      "description": "What they are and why the arguments about them are mostly oversold.",
+      "objectives": [
+        "Know what proteins, carbs, and fats actually do",
+        "Understand why diets can 'work' for opposite reasons"
+      ],
+      "order": 1,
+      "durationMinutes": 100,
+      "lessons": [
+        {
+          "id": "l4",
+          "title": "Protein Isn't Magic (But It's Important)",
+          "description": "How much you need and where to get it.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "Protein is what your body builds itself from. You probably need about 0.8 to 1.2 grams per kilogram of body weight daily — more if you're very active or older. Most people in wealthy countries easily hit that without trying.",
+          "keyPoints": [
+            "Animal protein is efficient but optional",
+            "Plant proteins combined across a day cover all amino acids",
+            "Protein shakes are convenient, not required"
+          ]
+        },
+        {
+          "id": "l5",
+          "title": "Carbs Aren't the Enemy",
+          "description": "The difference between an apple and a candy bar.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 1,
+          "content": "'Carbs' covers everything from lettuce to lollipops, and treating them as one category is where confusion starts. Whole foods with fibre act totally differently in your body than refined sugar.",
+          "keyPoints": [
+            "Fibre changes how quickly carbs hit your bloodstream",
+            "The glycemic index is a rough guide, not a rule",
+            "Cutting all carbs is neither required nor sustainable for most people"
+          ]
+        },
+        {
+          "id": "l6",
+          "title": "Fat Made a Comeback",
+          "description": "Why the low-fat craze aged badly.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 2,
+          "content": "From the 1980s to the 2000s, fat was the villain. Then the food industry replaced fat with sugar, people got fatter anyway, and the story fell apart. Fat isn't a villain — it's just calorie-dense.",
+          "keyPoints": [
+            "Saturated fat is still worth moderating",
+            "Unsaturated fats have decent cardiovascular evidence",
+            "Fat makes food taste good, which is a feature not a bug"
+          ]
+        },
+        {
+          "id": "l7",
+          "title": "Why Every Diet 'Works'",
+          "description": "The dirty secret behind diet bestsellers.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 3,
+          "content": "Low-carb, Mediterranean, intermittent fasting, vegan — they all work for some people. What they share is getting you to eat fewer calories, usually by cutting out ultra-processed food. The specific mechanism is mostly marketing.",
+          "keyPoints": [
+            "Calories matter; you can't cheat thermodynamics",
+            "Different diets make calorie reduction easier for different people",
+            "The best diet is one you can live with, honestly"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Eating Like a Human",
+      "description": "Practical patterns, not rules.",
+      "objectives": [
+        "Build a flexible default eating pattern",
+        "Handle social situations without stress"
+      ],
+      "order": 2,
+      "durationMinutes": 90,
+      "lessons": [
+        {
+          "id": "l8",
+          "title": "The Pantry Test",
+          "description": "What's in your kitchen determines what you eat.",
+          "format": "reading",
+          "durationMinutes": 22,
+          "order": 0,
+          "content": "If your pantry is stocked with fruit, nuts, beans, and grains, you'll eat those. If it's stocked with chips and cookies, you'll eat those. The battle is won at the grocery store, not at the dinner table.",
+          "keyPoints": [
+            "Don't rely on willpower at 10pm — shop well at 10am",
+            "Keep 'default snacks' that are actually good",
+            "Ban 'always' lists — just make better things more available"
+          ]
+        },
+        {
+          "id": "l9",
+          "title": "Plating Logic",
+          "description": "A quarter-plate method that beats calorie counting.",
+          "format": "reading",
+          "durationMinutes": 23,
+          "order": 1,
+          "content": "Half your plate: vegetables. A quarter: protein. A quarter: starch. Add a bit of fat for flavour. It's a heuristic, not a rule — but it works for most meals and you never need to weigh anything.",
+          "keyPoints": [
+            "Half a plate of veg gets most people more fibre than they'd otherwise eat",
+            "The protein quarter keeps you full",
+            "The starch is there for energy and because starch is nice"
+          ]
+        },
+        {
+          "id": "l10",
+          "title": "Eating Out",
+          "description": "Because you're going to, and that's fine.",
+          "format": "reading",
+          "durationMinutes": 22,
+          "order": 2,
+          "content": "Restaurant food is often calorie-dense because fat and salt sell. The defence isn't to refuse — it's to plan: look at the menu before you're hangry, share dishes, drink water between glasses of wine.",
+          "keyPoints": [
+            "You can be 80% sensible and 20% flexible and still be healthy",
+            "Social eating has benefits the kale doesn't",
+            "One restaurant meal won't derail anything"
+          ]
+        },
+        {
+          "id": "l11",
+          "title": "Hunger Is a Signal, Not an Emergency",
+          "description": "Relearning what 'a bit hungry' feels like.",
+          "format": "reading",
+          "durationMinutes": 23,
+          "order": 3,
+          "content": "If you eat every two hours, you never actually get hungry — which is fine, but it means you don't notice when you are. Most people can comfortably go 4-5 hours between meals, and the sky doesn't fall.",
+          "keyPoints": [
+            "Distinguish hunger from habit, thirst, and boredom",
+            "A bit of hunger isn't dangerous — it's information",
+            "Pre-planned meal timing beats grazing for most people"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "title": "Red Flags",
+      "description": "How to spot a nutrition scam in 30 seconds.",
+      "objectives": [
+        "Recognise the standard playbook",
+        "Know when to walk away"
+      ],
+      "order": 3,
+      "durationMinutes": 55,
+      "lessons": [
+        {
+          "id": "l12",
+          "title": "The Scam Vocabulary",
+          "description": "Words that should make you suspicious.",
+          "format": "reading",
+          "durationMinutes": 18,
+          "order": 0,
+          "content": "'Detox.' 'Cleanse.' 'Boost your metabolism.' 'Superfood.' These terms are unregulated and mostly meaningless. If someone uses three of them in a row, close the tab.",
+          "keyPoints": [
+            "Your liver already detoxes for you — free",
+            "No food is 'super' in any meaningful way",
+            "'Boost your metabolism' is not a thing you can really do"
+          ]
+        },
+        {
+          "id": "l13",
+          "title": "The Supplement Question",
+          "description": "When are supplements worth it?",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 1,
+          "content": "Most people on varied diets don't need supplements. Exceptions: vitamin D if you don't see sun, B12 if you're vegan, iron if your blood work shows deficiency. Beyond those, the evidence gets thin fast.",
+          "keyPoints": [
+            "Multivitamins don't help healthy people live longer",
+            "Food beats pills for most nutrients we've measured",
+            "Blood work first, supplements second — not the other way around"
+          ]
+        },
+        {
+          "id": "l14",
+          "title": "When to See a Real Professional",
+          "description": "Dietitian vs nutritionist vs influencer.",
+          "format": "reading",
+          "durationMinutes": 17,
+          "order": 2,
+          "content": "'Registered Dietitian' is a regulated title with years of training behind it. 'Nutritionist' is, in most places, unregulated — anyone can call themselves one. If you have a real medical condition, go to the regulated ones.",
+          "keyPoints": [
+            "Regulation matters — check titles and licensing in your country",
+            "A good dietitian asks questions; a bad one sells a product",
+            "An Instagram following is not a clinical qualification"
+          ],
+          "quiz": [
+            {
+              "id": "q1",
+              "type": "multiple-choice",
+              "question": "What's the most common reason different diets can all 'work' for weight loss?",
+              "options": [
+                "They each activate a special metabolic switch",
+                "They all lead participants to eat fewer calories in practice",
+                "They all require expensive supplements",
+                "They all eliminate specific 'toxins' from the body"
+              ],
+              "correctAnswer": 1,
+              "explanation": "The common thread is a reduction in total calorie intake, usually by cutting ultra-processed food — the specific macronutrient story is mostly branding.",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 6,
+    "hoursPerWeek": 2,
+    "totalWeeks": 3
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}

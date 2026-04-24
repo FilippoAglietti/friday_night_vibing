@@ -1,0 +1,504 @@
+{
+  "id": "fx-masterclass-academic",
+  "title": "Advanced Statistical Inference",
+  "subtitle": "Theory and practice of modern statistical reasoning",
+  "description": "A masterclass-length academic course covering the philosophical foundations, mathematical machinery, and computational methods of contemporary statistical inference.",
+  "targetAudience": "Graduate students in statistics, data science, or quantitative social science",
+  "difficulty": "advanced",
+  "objectives": [
+    "Articulate the distinctions and trade-offs between frequentist, Bayesian, and likelihoodist inference",
+    "Derive and interpret maximum likelihood estimators",
+    "Construct and diagnose Bayesian posterior distributions",
+    "Design and interpret hypothesis tests with appropriate multiple-comparison corrections",
+    "Apply bootstrap and permutation methods for non-parametric inference",
+    "Formulate and fit hierarchical models",
+    "Evaluate causal claims using potential outcomes and directed acyclic graphs"
+  ],
+  "prerequisites": ["Probability theory", "Mathematical statistics", "Linear algebra", "Programming in R or Python"],
+  "tags": ["statistics", "inference", "bayesian", "academic"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Foundations of Statistical Inference",
+      "description": "Competing paradigms and their philosophical commitments.",
+      "objectives": [
+        "Distinguish the major inferential paradigms",
+        "Identify the commitments of each"
+      ],
+      "order": 0,
+      "durationMinutes": 120,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "What Inference Is For",
+          "description": "The gap between data and knowledge.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "Statistical inference is the formal study of how to reason from observed data to claims about unobserved quantities — parameters, future observations, or counterfactuals. Different paradigms answer this with different logical commitments.",
+          "keyPoints": [
+            "Estimation, testing, and prediction are related but distinct tasks",
+            "Paradigm choice reflects philosophical not just technical commitments",
+            "Every inference requires assumptions that are themselves untestable"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "Frequentism",
+          "description": "Long-run properties of procedures.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Frequentist inference treats parameters as fixed and focuses on procedures whose long-run behaviour has desirable properties — unbiasedness, consistency, coverage. Probability attaches to procedures, not to parameters.",
+          "keyPoints": [
+            "Parameters are fixed; randomness is in the data",
+            "Coverage is a property of the interval procedure, not any specific interval",
+            "p-values measure compatibility under a null, not probability of the null"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "Bayesianism",
+          "description": "Probability as degree of belief.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "Bayesian inference treats parameters as random and combines a prior distribution with observed data via Bayes' theorem. The resulting posterior directly expresses uncertainty about the parameter.",
+          "keyPoints": [
+            "Prior, likelihood, and posterior form the core triplet",
+            "Conjugacy simplifies posteriors but is a mathematical convenience",
+            "Subjective priors encode pre-data information honestly"
+          ]
+        },
+        {
+          "id": "l4",
+          "title": "Likelihoodism",
+          "description": "The third path.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 3,
+          "content": "Likelihoodist inference uses the likelihood function directly, without priors or long-run frequencies. Evidence about competing hypotheses is compared via likelihood ratios.",
+          "keyPoints": [
+            "The Law of Likelihood formalises the intuition",
+            "Likelihood-based intervals differ from confidence and credible intervals",
+            "Likelihoodism sits between frequentism and Bayesianism"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "question": "In standard frequentist inference, to what does 'probability' most directly attach?",
+          "options": [
+            "The parameter value",
+            "The observed data set",
+            "The procedure generating the data",
+            "The prior belief of the analyst"
+          ],
+          "correctAnswer": 2,
+          "explanation": "Frequentist probability describes the long-run behaviour of procedures under hypothetical repetitions of the data-generating process.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Maximum Likelihood Estimation",
+      "description": "The workhorse of classical inference.",
+      "objectives": [
+        "Derive the MLE for common models",
+        "Characterise its asymptotic properties"
+      ],
+      "order": 1,
+      "durationMinutes": 110,
+      "lessons": [
+        {
+          "id": "l5",
+          "title": "The Likelihood Function",
+          "description": "Definition, interpretation, and common pitfalls.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "The likelihood is the joint density of the data regarded as a function of the parameter. It is not a probability distribution over the parameter, and its absolute values are not interpretable — only ratios matter.",
+          "keyPoints": [
+            "Likelihood is a function of the parameter, not the data",
+            "Only likelihood ratios are meaningful",
+            "Log-likelihoods simplify both computation and theory"
+          ]
+        },
+        {
+          "id": "l6",
+          "title": "Score and Information",
+          "description": "First and second derivatives of the log-likelihood.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "The score function is the gradient of the log-likelihood; Fisher information is the expected negative Hessian. These quantities drive both the MLE's definition and its asymptotic distribution.",
+          "keyPoints": [
+            "Score has expectation zero at the true parameter",
+            "Fisher information measures the curvature of the log-likelihood",
+            "Observed information is the sample analogue of Fisher information"
+          ]
+        },
+        {
+          "id": "l7",
+          "title": "Asymptotic Normality",
+          "description": "Why MLEs work for large samples.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "Under regularity conditions, the MLE is consistent and asymptotically normal with variance equal to the inverse Fisher information. The result underlies Wald, score, and likelihood-ratio tests.",
+          "keyPoints": [
+            "Regularity conditions rule out boundary parameters and non-identified models",
+            "The inverse information gives the Cramér–Rao lower bound",
+            "Asymptotic coverage can fail badly in small samples"
+          ]
+        },
+        {
+          "id": "l8",
+          "title": "Computation",
+          "description": "Newton, Fisher scoring, and EM.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 3,
+          "content": "Finding the MLE numerically typically requires iterative methods. Newton–Raphson, Fisher scoring, and expectation-maximisation each suit different problem structures.",
+          "keyPoints": [
+            "Newton–Raphson has quadratic local convergence but can diverge",
+            "Fisher scoring uses expected instead of observed information",
+            "EM handles missing data and latent-variable models elegantly"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Hypothesis Testing",
+      "description": "Decisions under uncertainty.",
+      "objectives": [
+        "Construct standard tests",
+        "Control error rates across many tests"
+      ],
+      "order": 2,
+      "durationMinutes": 100,
+      "lessons": [
+        {
+          "id": "l9",
+          "title": "Neyman–Pearson Framework",
+          "description": "Most powerful tests for simple hypotheses.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "The Neyman–Pearson lemma characterises uniformly most powerful tests for simple-versus-simple hypotheses via the likelihood ratio. Composite hypotheses complicate but generalise the framework.",
+          "keyPoints": [
+            "Type I error is fixed; Type II error is minimised",
+            "The lemma establishes likelihood-ratio optimality",
+            "UMP tests do not always exist for composite alternatives"
+          ]
+        },
+        {
+          "id": "l10",
+          "title": "p-values Revisited",
+          "description": "What they measure and what they don't.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "A p-value is the probability under the null of observing data at least as extreme as the observed data. It is not the probability the null is true, not a measure of effect size, and not evidence of practical significance.",
+          "keyPoints": [
+            "The ASA statement lists what p-values are not",
+            "Statistical significance and practical significance differ",
+            "Post-hoc comparisons invalidate nominal p-values without correction"
+          ]
+        },
+        {
+          "id": "l11",
+          "title": "Multiple Comparisons",
+          "description": "Bonferroni, Holm, and Benjamini–Hochberg.",
+          "format": "reading",
+          "durationMinutes": 40,
+          "order": 2,
+          "content": "When many hypotheses are tested, family-wise error rate or false discovery rate must be controlled. Procedures differ in stringency and in the error rate they bound.",
+          "keyPoints": [
+            "FWER controls the probability of any Type I error",
+            "FDR controls the expected fraction of false positives among rejected",
+            "FDR-controlling procedures are more powerful when many tests are done"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "title": "Bayesian Inference",
+      "description": "Priors, posteriors, and computation.",
+      "objectives": [
+        "Construct posterior distributions",
+        "Diagnose MCMC convergence"
+      ],
+      "order": 3,
+      "durationMinutes": 130,
+      "lessons": [
+        {
+          "id": "l12",
+          "title": "Priors",
+          "description": "Elicitation, conjugacy, and objectivity.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "A prior encodes information available before the data. Conjugate priors yield analytically tractable posteriors. Reference priors attempt to minimise prior influence when no substantive information is available.",
+          "keyPoints": [
+            "Conjugacy is mathematical convenience, not a substantive requirement",
+            "Improper priors can still yield proper posteriors",
+            "Sensitivity analysis is essential for all Bayesian analyses"
+          ]
+        },
+        {
+          "id": "l13",
+          "title": "Posterior Summaries",
+          "description": "What to report from a posterior.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 1,
+          "content": "Posteriors are distributions, not points. Useful summaries include posterior means, medians, modes, credible intervals, and highest-posterior-density regions.",
+          "keyPoints": [
+            "Credible intervals have direct probabilistic interpretation",
+            "HPD regions are the narrowest intervals at given probability",
+            "Reporting full posteriors is preferable to point estimates alone"
+          ]
+        },
+        {
+          "id": "l14",
+          "title": "MCMC Basics",
+          "description": "Metropolis–Hastings and Gibbs sampling.",
+          "format": "reading",
+          "durationMinutes": 35,
+          "order": 2,
+          "content": "Markov chain Monte Carlo generates samples from the posterior by constructing a Markov chain with the posterior as stationary distribution. Metropolis–Hastings uses a proposal distribution; Gibbs sampling cycles through full conditionals.",
+          "keyPoints": [
+            "The stationarity of the chain requires detailed balance",
+            "Burn-in samples should be discarded",
+            "Autocorrelation reduces effective sample size"
+          ]
+        },
+        {
+          "id": "l15",
+          "title": "HMC and NUTS",
+          "description": "Modern gradient-based samplers.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 3,
+          "content": "Hamiltonian Monte Carlo uses gradient information to propose distant states efficiently. The No-U-Turn Sampler adaptively chooses trajectory length, powering Stan and modern Bayesian software.",
+          "keyPoints": [
+            "HMC scales to high-dimensional parameter spaces",
+            "NUTS removes the manual tuning of trajectory length",
+            "Gradient-based samplers require continuous parameters"
+          ]
+        },
+        {
+          "id": "l16",
+          "title": "Convergence Diagnostics",
+          "description": "R-hat, effective sample size, and trace plots.",
+          "format": "reading",
+          "durationMinutes": 15,
+          "order": 4,
+          "content": "No diagnostic proves convergence — they only detect failure. Multiple chains, R-hat, effective sample size, and visual inspection of traces together give a practical convergence check.",
+          "keyPoints": [
+            "R-hat should be very close to 1",
+            "Effective sample size accounts for autocorrelation",
+            "Multiple chains from dispersed starting points expose mixing failures"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q2",
+          "type": "multiple-choice",
+          "question": "Which diagnostic most directly assesses whether multiple MCMC chains have mixed?",
+          "options": [
+            "Posterior mean",
+            "R-hat (potential scale reduction factor)",
+            "Bayes factor",
+            "Prior predictive check"
+          ],
+          "correctAnswer": 1,
+          "explanation": "R-hat compares within-chain to between-chain variance; values close to 1 indicate the chains have mixed.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "title": "Resampling Methods",
+      "description": "Inference without parametric assumptions.",
+      "objectives": [
+        "Apply bootstrap and permutation methods",
+        "Understand their assumptions"
+      ],
+      "order": 4,
+      "durationMinutes": 90,
+      "lessons": [
+        {
+          "id": "l17",
+          "title": "The Bootstrap",
+          "description": "Resampling with replacement.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "The bootstrap approximates the sampling distribution of a statistic by resampling the observed data. It requires almost no parametric assumptions but assumes the sample is representative.",
+          "keyPoints": [
+            "Non-parametric and parametric bootstrap differ in resampling distribution",
+            "Percentile intervals are simple but often biased",
+            "BCa intervals correct for bias and skew"
+          ]
+        },
+        {
+          "id": "l18",
+          "title": "Permutation Tests",
+          "description": "Exact inference under exchangeability.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Permutation tests compute the sampling distribution of a test statistic under the null by enumerating or sampling permutations of the data. They give exact p-values when exchangeability holds.",
+          "keyPoints": [
+            "Exchangeability under the null is the key assumption",
+            "The number of permutations sets the finest achievable p-value",
+            "Two-sample permutation tests generalise the t-test to arbitrary statistics"
+          ]
+        },
+        {
+          "id": "l19",
+          "title": "Cross-Validation",
+          "description": "Honest estimates of predictive performance.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "Cross-validation partitions the data into folds, holding each out in turn. Its estimate of generalisation error is approximately unbiased but introduces its own variance.",
+          "keyPoints": [
+            "Leave-one-out has low bias but high variance",
+            "k-fold CV balances bias and variance",
+            "Nested CV is required when model selection is also performed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m6",
+      "title": "Hierarchical Models",
+      "description": "When parameters share structure.",
+      "objectives": [
+        "Formulate multilevel models",
+        "Interpret partial pooling"
+      ],
+      "order": 5,
+      "durationMinutes": 80,
+      "lessons": [
+        {
+          "id": "l20",
+          "title": "Partial Pooling",
+          "description": "Between no pooling and complete pooling.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "Hierarchical models shrink group-level estimates toward a global mean. The amount of shrinkage is driven by the ratio of within-group to between-group variance.",
+          "keyPoints": [
+            "No pooling overfits to group-level noise",
+            "Complete pooling ignores genuine group differences",
+            "Partial pooling is a principled compromise"
+          ]
+        },
+        {
+          "id": "l21",
+          "title": "Model Fitting",
+          "description": "REML, Laplace, and HMC.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Restricted maximum likelihood is standard for frequentist multilevel models; Laplace approximations and HMC dominate the Bayesian side. All face challenges when variance components are near zero.",
+          "keyPoints": [
+            "REML adjusts for fixed-effect estimation",
+            "Singular fits signal underidentified variance components",
+            "Bayesian fits handle singular cases more gracefully"
+          ]
+        },
+        {
+          "id": "l22",
+          "title": "Prior Choice for Variances",
+          "description": "Why half-Normal beats inverse-Gamma.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "Default inverse-Gamma priors on variances are badly behaved near zero. Weakly informative half-Normal or half-Cauchy priors on standard deviations are now standard.",
+          "keyPoints": [
+            "Inverse-Gamma priors can dominate the posterior in sparse settings",
+            "Half-Normal priors are weakly informative and well-behaved",
+            "Prior predictive checks catch problematic choices before fitting"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m7",
+      "title": "Causal Inference",
+      "description": "From association to intervention.",
+      "objectives": [
+        "Formalise causal claims",
+        "Identify assumptions required for identification"
+      ],
+      "order": 6,
+      "durationMinutes": 100,
+      "lessons": [
+        {
+          "id": "l23",
+          "title": "Potential Outcomes",
+          "description": "The Neyman–Rubin framework.",
+          "format": "reading",
+          "durationMinutes": 35,
+          "order": 0,
+          "content": "Each unit has a potential outcome under each treatment. The causal effect is the difference between potential outcomes — but only one is ever observed, giving rise to the fundamental problem of causal inference.",
+          "keyPoints": [
+            "Causal estimands are defined before any identification strategy",
+            "SUTVA encodes non-interference and treatment consistency",
+            "Randomisation guarantees identification without further assumptions"
+          ]
+        },
+        {
+          "id": "l24",
+          "title": "DAGs and Adjustment",
+          "description": "Graphical models for causal structure.",
+          "format": "reading",
+          "durationMinutes": 35,
+          "order": 1,
+          "content": "Directed acyclic graphs encode causal assumptions. The back-door criterion identifies sets of variables that, when adjusted for, block confounding paths.",
+          "keyPoints": [
+            "DAGs make causal assumptions transparent and falsifiable",
+            "The back-door criterion formalises confounder adjustment",
+            "Adjusting for colliders opens rather than closes bias"
+          ]
+        },
+        {
+          "id": "l25",
+          "title": "Modern Methods",
+          "description": "Matching, weighting, and doubly robust estimation.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "Propensity score methods rebalance observational data. Doubly robust estimators remain consistent if either the outcome or the treatment model is correct, providing some protection against specification error.",
+          "keyPoints": [
+            "Propensity score overlap is necessary for identification",
+            "Doubly robust methods trade off bias in both models",
+            "Sensitivity analysis quantifies unmeasured-confounder risk"
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "instructor-led",
+    "totalHours": 30,
+    "hoursPerWeek": 4,
+    "totalWeeks": 8
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}

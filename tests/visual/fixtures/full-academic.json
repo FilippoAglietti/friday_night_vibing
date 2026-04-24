@@ -1,0 +1,338 @@
+{
+  "id": "fx-full-academic",
+  "title": "Microeconomics Fundamentals",
+  "subtitle": "Markets, behaviour, and equilibrium",
+  "description": "A full semester-equivalent academic course on microeconomic theory — supply, demand, elasticity, market structures, and welfare analysis.",
+  "targetAudience": "Undergraduate economics, business, and public policy students",
+  "difficulty": "intermediate",
+  "objectives": [
+    "Derive and interpret supply and demand curves",
+    "Compute price, income, and cross-price elasticities",
+    "Analyse market outcomes under perfect competition, monopoly, and oligopoly",
+    "Evaluate welfare effects of taxes, subsidies, and price controls",
+    "Apply marginal analysis to consumer and producer decisions"
+  ],
+  "prerequisites": ["Single-variable calculus", "Introductory economics"],
+  "tags": ["economics", "microeconomics", "academic"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Supply and Demand",
+      "description": "The foundational model of market interaction.",
+      "objectives": [
+        "Interpret demand and supply curves",
+        "Identify equilibrium",
+        "Trace effects of shifts in each curve"
+      ],
+      "order": 0,
+      "durationMinutes": 120,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "The Demand Curve",
+          "description": "Quantity demanded as a function of price.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "The demand curve plots quantity demanded against price, holding other variables constant. Its downward slope reflects both the substitution effect and the income effect of a price change.",
+          "keyPoints": [
+            "Movement along vs shift of the curve are distinct phenomena",
+            "Ceteris paribus assumptions are explicit, not decorative",
+            "Individual demand aggregates to market demand horizontally"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "The Supply Curve",
+          "description": "Quantity supplied as a function of price.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "The supply curve reflects producer decisions given costs of production. Its upward slope follows from increasing marginal costs at higher output levels.",
+          "keyPoints": [
+            "Short-run and long-run supply differ in which inputs are variable",
+            "Technology shifts the supply curve; price changes move along it",
+            "Market supply is the horizontal sum of firm supplies"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "Equilibrium",
+          "description": "The price at which plans are consistent.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "Market equilibrium is the price-quantity pair at which quantity demanded equals quantity supplied. Deviations generate either surplus or shortage, with self-correcting pressure back to equilibrium.",
+          "keyPoints": [
+            "Equilibrium is a tendency, not a steady observation",
+            "Disequilibrium implies either surplus or shortage",
+            "Price adjustment speed depends on market structure"
+          ]
+        },
+        {
+          "id": "l4",
+          "title": "Comparative Statics",
+          "description": "Tracing the effects of parameter changes.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 3,
+          "content": "Comparative statics compares equilibria before and after a parameter change — an input-price increase, a tax, a technology shock — without modelling the adjustment path.",
+          "keyPoints": [
+            "Shifts of curves cause new equilibria",
+            "Direction of change is often unambiguous; magnitude needs elasticities",
+            "The comparative-statics method ignores adjustment dynamics deliberately"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "question": "An increase in consumer income shifts the demand curve for a normal good in which direction?",
+          "options": [
+            "Rightward",
+            "Leftward",
+            "Downward along its slope",
+            "It becomes vertical"
+          ],
+          "correctAnswer": 0,
+          "explanation": "A normal good is defined by positive income elasticity — higher income increases demand at every price, shifting the curve rightward.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Elasticity",
+      "description": "Measuring responsiveness.",
+      "objectives": [
+        "Compute price elasticity of demand",
+        "Interpret income and cross-price elasticities",
+        "Apply elasticity to pricing decisions"
+      ],
+      "order": 1,
+      "durationMinutes": 90,
+      "lessons": [
+        {
+          "id": "l5",
+          "title": "Price Elasticity of Demand",
+          "description": "How quantity responds to price.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "Price elasticity of demand is the percentage change in quantity demanded divided by the percentage change in price. Values above one in absolute magnitude indicate elastic demand; below one, inelastic.",
+          "keyPoints": [
+            "Elasticity varies along a linear demand curve",
+            "Arc elasticity uses midpoints to avoid directional asymmetry",
+            "Total revenue increases with price cuts only on the elastic segment"
+          ]
+        },
+        {
+          "id": "l6",
+          "title": "Income and Cross-Price",
+          "description": "Responsiveness to income and to other goods' prices.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Income elasticity distinguishes normal from inferior goods; cross-price elasticity distinguishes substitutes from complements.",
+          "keyPoints": [
+            "Positive income elasticity → normal good; negative → inferior",
+            "Positive cross-price → substitutes; negative → complements",
+            "Magnitudes identify luxuries vs necessities and close vs distant substitutes"
+          ]
+        },
+        {
+          "id": "l7",
+          "title": "Applications",
+          "description": "Tax incidence and pricing.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "Elasticities determine who bears the economic burden of a tax — the side of the market with more inelastic behaviour absorbs more of it, regardless of which side writes the cheque.",
+          "keyPoints": [
+            "Statutory incidence differs from economic incidence",
+            "The more inelastic side bears more of the tax burden",
+            "Elasticity-based pricing is standard practice in monopoly settings"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Consumer Choice",
+      "description": "Preferences, constraints, and optimisation.",
+      "objectives": [
+        "Represent preferences with indifference curves",
+        "Derive demand from utility maximisation"
+      ],
+      "order": 2,
+      "durationMinutes": 100,
+      "lessons": [
+        {
+          "id": "l8",
+          "title": "Preferences and Utility",
+          "description": "Rational choice over bundles.",
+          "format": "reading",
+          "durationMinutes": 35,
+          "order": 0,
+          "content": "Standard consumer theory assumes preferences are complete, transitive, and monotonic. A utility function is a numerical representation that preserves the preference ordering.",
+          "keyPoints": [
+            "Ordinal utility is all the theory requires",
+            "Indifference curves are level sets of the utility function",
+            "Convex preferences imply diminishing marginal rates of substitution"
+          ]
+        },
+        {
+          "id": "l9",
+          "title": "The Budget Constraint",
+          "description": "What the consumer can afford.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "The budget line represents all bundles costing exactly the consumer's income, given market prices. Its slope equals the negative price ratio.",
+          "keyPoints": [
+            "Price changes rotate the line; income changes shift it",
+            "The feasible set is the triangle below the budget line",
+            "The budget line is the relevant frontier for optimisation"
+          ]
+        },
+        {
+          "id": "l10",
+          "title": "Utility Maximisation",
+          "description": "The tangency condition.",
+          "format": "reading",
+          "durationMinutes": 35,
+          "order": 2,
+          "content": "The optimal bundle lies where an indifference curve is tangent to the budget line — the consumer's marginal rate of substitution equals the market's price ratio.",
+          "keyPoints": [
+            "Interior optima satisfy MRS = price ratio",
+            "Corner solutions violate tangency but are still optimal",
+            "Lagrangian methods handle the constrained optimisation formally"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "title": "Market Structures",
+      "description": "Competition, monopoly, and in between.",
+      "objectives": [
+        "Characterise the four canonical market structures",
+        "Derive profit-maximising output under each"
+      ],
+      "order": 3,
+      "durationMinutes": 100,
+      "lessons": [
+        {
+          "id": "l11",
+          "title": "Perfect Competition",
+          "description": "Price-taking firms and zero long-run profit.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "Perfectly competitive firms take price as given and produce where marginal cost equals price. Free entry drives economic profit to zero in the long run.",
+          "keyPoints": [
+            "Firms are price-takers because each is small relative to market",
+            "Short-run shutdown decision uses average variable cost",
+            "Long-run equilibrium occurs at minimum long-run average cost"
+          ]
+        },
+        {
+          "id": "l12",
+          "title": "Monopoly",
+          "description": "Single seller with pricing power.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "A monopolist faces the entire market demand curve and sets quantity where marginal revenue equals marginal cost — producing less and charging more than a competitive equivalent.",
+          "keyPoints": [
+            "Marginal revenue is below price because of the demand-curve slope",
+            "Deadweight loss measures welfare reduction vs competitive outcome",
+            "Price discrimination can partly recover lost welfare — or worsen it"
+          ]
+        },
+        {
+          "id": "l13",
+          "title": "Oligopoly",
+          "description": "Few firms, strategic interdependence.",
+          "format": "reading",
+          "durationMinutes": 40,
+          "order": 2,
+          "content": "With only a handful of firms, each must anticipate rivals' responses. Cournot and Bertrand models differ in whether firms choose quantity or price as their strategic variable.",
+          "keyPoints": [
+            "Nash equilibrium is the standard solution concept",
+            "Cournot quantity competition yields outcomes between monopoly and competition",
+            "Bertrand price competition can produce perfectly competitive outcomes with just two firms"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "title": "Welfare and Market Failure",
+      "description": "When markets work and when they don't.",
+      "objectives": [
+        "Compute consumer and producer surplus",
+        "Identify externalities and public goods"
+      ],
+      "order": 4,
+      "durationMinutes": 90,
+      "lessons": [
+        {
+          "id": "l14",
+          "title": "Surplus and Efficiency",
+          "description": "Welfare arithmetic in competitive markets.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "Consumer surplus measures willingness to pay above market price; producer surplus measures revenue above marginal cost. Their sum is maximised in the competitive equilibrium under standard assumptions.",
+          "keyPoints": [
+            "Surplus areas are geometric on the supply-demand diagram",
+            "The first welfare theorem formalises the efficiency result",
+            "Distributional implications are separate from efficiency claims"
+          ]
+        },
+        {
+          "id": "l15",
+          "title": "Externalities and Public Goods",
+          "description": "Where the market fails.",
+          "format": "reading",
+          "durationMinutes": 60,
+          "order": 1,
+          "content": "Externalities arise when one agent's decisions affect others without compensation; public goods are non-rival and non-excludable. Both produce equilibria that diverge from the socially optimal outcome.",
+          "keyPoints": [
+            "Pigouvian taxes internalise external costs",
+            "Public goods suffer free-rider problems in private provision",
+            "Coasian bargaining can resolve small-scale externalities when property rights are clear"
+          ],
+          "quiz": [
+            {
+              "id": "q2",
+              "type": "multiple-choice",
+              "question": "A Pigouvian tax is designed to internalise which of the following?",
+              "options": [
+                "Fixed costs of production",
+                "Pecuniary externalities",
+                "External costs imposed on third parties",
+                "The deadweight loss of monopoly"
+              ],
+              "correctAnswer": 2,
+              "explanation": "Pigouvian taxes target negative externalities by making producers pay the social cost of the external harm they impose.",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 12,
+    "hoursPerWeek": 3,
+    "totalWeeks": 4
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}

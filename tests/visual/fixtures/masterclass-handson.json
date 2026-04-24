@@ -1,0 +1,604 @@
+{
+  "id": "fx-masterclass-handson",
+  "title": "Ship a SaaS MVP in 30 Days",
+  "subtitle": "A day-by-day build log, from idea to first paying customer",
+  "description": "A hands-on masterclass that walks through building, shipping, and monetising a real SaaS product in 30 days — with code, deployment, and customer acquisition all covered.",
+  "targetAudience": "Intermediate developers who want to ship a product, not just learn a framework",
+  "difficulty": "intermediate",
+  "objectives": [
+    "Validate an idea before writing any code",
+    "Ship a minimal working product in week 1",
+    "Add auth, payments, and a database by week 2",
+    "Instrument, deploy, and monitor in week 3",
+    "Launch publicly and close first customers in week 4",
+    "Know when to throw code away and rewrite"
+  ],
+  "prerequisites": ["Working knowledge of a web framework", "Comfortable with git and the command line", "Familiarity with JavaScript or Python"],
+  "tags": ["saas", "startup", "fullstack", "hands-on"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Week 0: Before You Write Any Code",
+      "description": "The discovery work most builders skip.",
+      "objectives": [
+        "Validate demand without shipping",
+        "Pick a problem worth solving"
+      ],
+      "order": 0,
+      "durationMinutes": 150,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Talk to Five People",
+          "description": "The cheapest validation you'll ever do.",
+          "format": "project",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "Before a single line of code, interview five people who have the problem you're solving. Ask what they currently do and what they've tried. If you can't find five, you haven't picked a real problem.",
+          "keyPoints": [
+            "Ask about past behaviour, not future intent",
+            "Silence is data — not hearing back is a signal",
+            "Listen for the duct-tape workarounds people build"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "Landing Page First",
+          "description": "Test demand with a page, not a product.",
+          "format": "project",
+          "durationMinutes": 45,
+          "order": 1,
+          "content": "Build a one-page site describing the product. Put up a waitlist form. Run a small ad campaign or post in a relevant community. If nobody signs up, nobody wanted it.",
+          "keyPoints": [
+            "Traffic without signups means the page doesn't explain the value",
+            "Signups without pain means you have a nice-to-have",
+            "Paid pre-orders beat free waitlists as a demand signal"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "Pick the Stack in 30 Minutes",
+          "description": "Boring technology for the win.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 2,
+          "content": "Use what you already know. A familiar stack you can ship with beats a trendy stack you're learning. Next.js + Postgres + Stripe is a perfectly good answer for most SaaS MVPs.",
+          "keyPoints": [
+            "Boring tech is a feature, not a limitation",
+            "Managed services (Supabase, Neon, Vercel) remove whole categories of work",
+            "You can always rewrite later if you have the traction problem"
+          ]
+        },
+        {
+          "id": "l4",
+          "title": "Scope the MVP Brutally",
+          "description": "What can come out without breaking the product.",
+          "format": "project",
+          "durationMinutes": 50,
+          "order": 3,
+          "content": "List everything you want to build. Sort by necessity. Ship the top third. The user needs one path through the product that works; everything else can wait until people pay for it.",
+          "keyPoints": [
+            "If a feature's absence doesn't block anyone from paying, cut it",
+            "Perfectionism is a form of procrastination",
+            "The ugly version that ships beats the polished version that doesn't"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Week 1: The Walking Skeleton",
+      "description": "A minimal end-to-end user flow.",
+      "objectives": [
+        "Ship a deployable empty shell",
+        "Add the core user action"
+      ],
+      "order": 1,
+      "durationMinutes": 180,
+      "lessons": [
+        {
+          "id": "l5",
+          "title": "Day 1: Scaffold and Deploy",
+          "description": "Get a blank page live on day one.",
+          "format": "project",
+          "durationMinutes": 40,
+          "order": 0,
+          "content": "Run create-next-app (or your framework equivalent), push to GitHub, connect to Vercel. By end of day one, a blank page on a real domain should exist. Nothing else.",
+          "keyPoints": [
+            "Deploy before you build — the deploy is the hard part",
+            "Never have undeployable code",
+            "A working CI/CD pipeline on day one pays dividends for 30 days"
+          ]
+        },
+        {
+          "id": "l6",
+          "title": "Day 2: Database",
+          "description": "Set up managed Postgres.",
+          "format": "project",
+          "durationMinutes": 35,
+          "order": 1,
+          "content": "Provision a managed Postgres instance (Supabase or Neon). Write a tiny migration that creates one table. Read from it in a route. Deploy.",
+          "keyPoints": [
+            "Managed Postgres saves you from database ops entirely",
+            "Start with one table; schemas can grow",
+            "Connection pooling matters from day one in serverless"
+          ]
+        },
+        {
+          "id": "l7",
+          "title": "Day 3: The Core Action",
+          "description": "Build the single thing the product does.",
+          "format": "project",
+          "durationMinutes": 50,
+          "order": 2,
+          "content": "Your product has one central action users take. Build it end-to-end with no auth, no fancy UI. Just: input → server → database → rendered output. Get this working for yourself.",
+          "keyPoints": [
+            "Prototype without auth first — auth can be added late",
+            "Server actions or route handlers are fine; API routes can wait",
+            "Test by using it yourself for a day"
+          ]
+        },
+        {
+          "id": "l8",
+          "title": "Day 4-5: The Second Action",
+          "description": "List, view, edit the thing you created.",
+          "format": "project",
+          "durationMinutes": 55,
+          "order": 3,
+          "content": "Once creation works, add the list view and detail view. Now the user has a minimal loop: create, view, modify. That's often enough for the first week's demo.",
+          "keyPoints": [
+            "Lists before editing — editing is a harder UX",
+            "Pagination can wait until you have more than 50 items",
+            "Sorting and filtering are v2 features"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Week 2: Auth and Payments",
+      "description": "Make the product account-based and chargeable.",
+      "objectives": [
+        "Add user accounts",
+        "Wire up Stripe Checkout"
+      ],
+      "order": 2,
+      "durationMinutes": 150,
+      "lessons": [
+        {
+          "id": "l9",
+          "title": "Day 8: Auth with a Managed Service",
+          "description": "Don't roll your own.",
+          "format": "project",
+          "durationMinutes": 40,
+          "order": 0,
+          "content": "Use Supabase Auth, Auth.js, or Clerk. Email magic links or OAuth cover 90% of users. Skip password-based auth if you can — it's a decade of footguns.",
+          "keyPoints": [
+            "Rolling your own auth is technical debt on day one",
+            "OAuth and magic links avoid the password question entirely",
+            "Email deliverability will bite you if you don't use a reputable provider"
+          ]
+        },
+        {
+          "id": "l10",
+          "title": "Day 9-10: Scope to User",
+          "description": "Make data per-user, not global.",
+          "format": "project",
+          "durationMinutes": 45,
+          "order": 1,
+          "content": "Add a user_id column to every table. Filter every query by the current user. Row-Level Security in Postgres can enforce this automatically if you're using Supabase.",
+          "keyPoints": [
+            "RLS in Postgres turns authorisation into a database concern",
+            "Test cross-user access explicitly — that's where leaks hide",
+            "Admin views should go through a separate policy"
+          ]
+        },
+        {
+          "id": "l11",
+          "title": "Day 11: Stripe Checkout",
+          "description": "The shortest path to a first dollar.",
+          "format": "project",
+          "durationMinutes": 35,
+          "order": 2,
+          "content": "Stripe Checkout is a hosted page that handles the whole purchase flow. Redirect to it; listen for the webhook; flip a database flag when the payment succeeds. An afternoon's work.",
+          "keyPoints": [
+            "Hosted Checkout avoids PCI scope entirely",
+            "Webhooks must be idempotent — retries will happen",
+            "Store the Stripe customer ID — you'll need it for subscriptions"
+          ]
+        },
+        {
+          "id": "l12",
+          "title": "Day 12-14: Subscription Logic",
+          "description": "Recurring payments and gating.",
+          "format": "project",
+          "durationMinutes": 30,
+          "order": 3,
+          "content": "Switch to a subscription price. Handle subscription.updated and customer.subscription.deleted webhooks. Gate premium features behind the subscription status stored in your database.",
+          "keyPoints": [
+            "Read the Stripe webhook documentation carefully — there are many events",
+            "Subscription cancellations can be immediate or at period end",
+            "Stripe's customer portal saves you from building billing UI yourself"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "question": "Why should Stripe webhook handlers be idempotent?",
+          "options": [
+            "Stripe throttles non-idempotent endpoints",
+            "Stripe may retry delivery, causing duplicate events",
+            "Idempotency is a legal requirement for PCI compliance",
+            "It reduces the webhook signing latency"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Stripe retries webhooks on non-2xx responses or timeouts, so a handler that processes the same event twice must not double-charge or double-grant access.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "title": "Week 2.5: The Polish Pass",
+      "description": "Make it look like a real product.",
+      "objectives": [
+        "Fix the obvious UX gaps",
+        "Handle error cases"
+      ],
+      "order": 3,
+      "durationMinutes": 100,
+      "lessons": [
+        {
+          "id": "l13",
+          "title": "Empty States",
+          "description": "What the app shows when there's nothing yet.",
+          "format": "project",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "Every list view needs an empty state that explains what to do next. A blank screen with no call to action is the most common SaaS first-impression disaster.",
+          "keyPoints": [
+            "Empty state text is onboarding — write it carefully",
+            "Include a single primary action",
+            "Avoid the word 'nothing' in empty states"
+          ]
+        },
+        {
+          "id": "l14",
+          "title": "Error Handling",
+          "description": "When things break gracefully.",
+          "format": "project",
+          "durationMinutes": 35,
+          "order": 1,
+          "content": "Network errors, auth expiry, validation failures — each needs a user-visible path. Never leave a user staring at a loading spinner that never resolves.",
+          "keyPoints": [
+            "Toast notifications for transient errors",
+            "Inline validation for form fields",
+            "Retry buttons for operations that can be retried safely"
+          ]
+        },
+        {
+          "id": "l15",
+          "title": "Loading States",
+          "description": "Perceived performance matters.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "Optimistic updates make the app feel instant. Skeleton screens beat spinners. Above all, don't block the whole page when only one piece is loading.",
+          "keyPoints": [
+            "Optimistic updates require rollback logic",
+            "Skeleton screens preserve layout while loading",
+            "Prefetching on hover makes navigation feel instant"
+          ]
+        },
+        {
+          "id": "l16",
+          "title": "Mobile Once-Over",
+          "description": "Your users are on phones.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 3,
+          "content": "Open the app on a phone. Fix the three worst things you see. Ship. Do it again next week. Don't try for perfect responsive design in the first 30 days.",
+          "keyPoints": [
+            "Test on real devices, not just Chrome dev tools",
+            "The hamburger menu is usually the worst-scoped component",
+            "Touch targets must be at least 44 × 44 pixels"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "title": "Week 3: Observability",
+      "description": "Know what's happening in production.",
+      "objectives": [
+        "Collect logs, metrics, and errors",
+        "Set up actionable alerts"
+      ],
+      "order": 4,
+      "durationMinutes": 100,
+      "lessons": [
+        {
+          "id": "l17",
+          "title": "Error Tracking",
+          "description": "Sentry in ten minutes.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 0,
+          "content": "Install the Sentry SDK. Every unhandled exception now goes to a dashboard with stack trace, user context, and release version. The ten minutes pays back within a week.",
+          "keyPoints": [
+            "Server and client both need instrumentation",
+            "Release tagging links errors to deploys",
+            "User context helps reproduce reports"
+          ]
+        },
+        {
+          "id": "l18",
+          "title": "Structured Logs",
+          "description": "Logs worth reading.",
+          "format": "project",
+          "durationMinutes": 25,
+          "order": 1,
+          "content": "Write JSON logs from day one. Include request id, user id, and route. A log aggregator like Axiom or Logtail indexes them so you can query later.",
+          "keyPoints": [
+            "Plain-text logs become useless fast at scale",
+            "Never log passwords, tokens, or PII",
+            "Request IDs let you trace a user through a multi-step flow"
+          ]
+        },
+        {
+          "id": "l19",
+          "title": "Metrics Dashboards",
+          "description": "What to watch, what to ignore.",
+          "format": "project",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "Four charts are enough for week 3: signups/day, active users, key-action count, and error rate. Every other dashboard is a distraction at this stage.",
+          "keyPoints": [
+            "A handful of meaningful metrics beats a wall of them",
+            "Daily not minutely — you don't run an ops team yet",
+            "Relative trends matter more than absolute numbers"
+          ]
+        },
+        {
+          "id": "l20",
+          "title": "Alerting That Doesn't Page You for Nothing",
+          "description": "Only wake up for things you'd fix right now.",
+          "format": "project",
+          "durationMinutes": 25,
+          "order": 3,
+          "content": "Set up alerts only for: payments failing, signups dropping to zero, error rate spiking, or the site being down. Everything else can wait for morning.",
+          "keyPoints": [
+            "Alert fatigue ruins whatever alert system you have",
+            "Every alert needs a documented response action",
+            "A pager that goes off for non-actionable noise will be ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m6",
+      "title": "Week 3.5: The Private Beta",
+      "description": "Ship to the first 20 users.",
+      "objectives": [
+        "Onboard users one by one",
+        "Fix their top issue before the next one"
+      ],
+      "order": 5,
+      "durationMinutes": 80,
+      "lessons": [
+        {
+          "id": "l21",
+          "title": "Onboard the First Ten Yourself",
+          "description": "Concierge onboarding finds bugs you won't.",
+          "format": "project",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "Schedule 20-minute calls with each of the first ten users. Walk them through signup. Watch what they get stuck on. Every pause they have is a UX gap you can fix that evening.",
+          "keyPoints": [
+            "Screen-sharing reveals problems you can't see in analytics",
+            "Don't explain — watch them try on their own",
+            "Record the call (with permission) so you can review"
+          ]
+        },
+        {
+          "id": "l22",
+          "title": "Fix Forward Fast",
+          "description": "Every call generates a bug list — burn it down.",
+          "format": "project",
+          "durationMinutes": 25,
+          "order": 1,
+          "content": "After each call, ship fixes within a day. If user 2 hits the same issue user 1 hit, that's a process failure. The goal is zero repeat issues across the first ten.",
+          "keyPoints": [
+            "Speed of iteration matters more than elegance of fix",
+            "Same-day fixes build user loyalty",
+            "Users who see their feedback turn into improvements become evangelists"
+          ]
+        },
+        {
+          "id": "l23",
+          "title": "Say No to Feature Requests",
+          "description": "The customer is not always right.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 2,
+          "content": "Users will request features you shouldn't build. Listen for the underlying problem, not the proposed solution. Often the same pain underlies five different requests — fix that, not all five.",
+          "keyPoints": [
+            "Ask 'what are you trying to do?' not 'would you use X?'",
+            "One customer's essential feature is another's bloat",
+            "Saying no is a core product skill"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m7",
+      "title": "Week 4: Launch",
+      "description": "Show up in public and close first customers.",
+      "objectives": [
+        "Pick a launch channel",
+        "Handle the traffic"
+      ],
+      "order": 6,
+      "durationMinutes": 120,
+      "lessons": [
+        {
+          "id": "l24",
+          "title": "Pick One Channel",
+          "description": "Product Hunt, Hacker News, or your existing audience.",
+          "format": "project",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "One channel, done well, beats four channels done half-assed. Pick where your actual users are and execute hard. For most devtools: HN. For productivity: Twitter + Product Hunt.",
+          "keyPoints": [
+            "Know where your users already hang out",
+            "Don't launch on a Friday or in December",
+            "A warm list of early supporters matters more than any algorithm"
+          ]
+        },
+        {
+          "id": "l25",
+          "title": "Write the Launch Post",
+          "description": "Why them, why now, why this.",
+          "format": "project",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "The launch post answers: who is this for, what specific problem does it solve, and why does it exist. Avoid adjectives. Include a single demo video under 60 seconds.",
+          "keyPoints": [
+            "The first sentence decides whether anyone reads the rest",
+            "Demo videos must start with the payoff, not the setup",
+            "Include pricing — hiding it signals you don't believe in it"
+          ]
+        },
+        {
+          "id": "l26",
+          "title": "Launch Day",
+          "description": "What you actually do when the post goes up.",
+          "format": "project",
+          "durationMinutes": 35,
+          "order": 2,
+          "content": "Be online. Respond to every comment within an hour. Share user stories as they come in. Do not check metrics every five minutes — set them to send you a summary every few hours.",
+          "keyPoints": [
+            "Present attention beats scheduled attention",
+            "Respond to critics with curiosity, not defensiveness",
+            "Monitor the error dashboard — launch traffic breaks things"
+          ]
+        },
+        {
+          "id": "l27",
+          "title": "Day 30 Retrospective",
+          "description": "What worked, what didn't, what's next.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 3,
+          "content": "On day 30, write it all down: what shipped, what metrics moved, what the first customers actually say. The document is the handoff from day-30-you to day-60-you. It will matter.",
+          "keyPoints": [
+            "Write the retro while details are fresh",
+            "Honest metrics, not vanity ones",
+            "Next 30 days: one theme, not ten"
+          ],
+          "quiz": [
+            {
+              "id": "q2",
+              "type": "multiple-choice",
+              "question": "Why is concierge onboarding for the first ten users high-leverage?",
+              "options": [
+                "It automates the onboarding for everyone after",
+                "It reveals UX gaps that analytics can't surface",
+                "It's required for PCI compliance",
+                "It increases viral coefficient"
+              ],
+              "correctAnswer": 1,
+              "explanation": "Direct observation surfaces friction points that quantitative analytics can't detect — users rarely report what they got confused by.",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m8",
+      "title": "After Day 30",
+      "description": "What to do next.",
+      "objectives": [
+        "Decide whether to keep going",
+        "Plan the first real quarter"
+      ],
+      "order": 7,
+      "durationMinutes": 60,
+      "lessons": [
+        {
+          "id": "l28",
+          "title": "Kill or Commit",
+          "description": "An honest 30-day checkpoint.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "After 30 days you have enough data to know: are people actually paying? Are they actually using it? If the answer is no, that's valuable information — it's okay to stop.",
+          "keyPoints": [
+            "Sunk cost isn't a reason to continue",
+            "A 30-day failed product teaches you more than most books",
+            "If you're going to continue, commit hard for the next 90 days"
+          ]
+        },
+        {
+          "id": "l29",
+          "title": "The First Quarter Plan",
+          "description": "Pick one theme.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 1,
+          "content": "If you continue, pick one theme for the next 90 days — retention, or growth, or a specific customer segment. Trying all three at once produces nothing.",
+          "keyPoints": [
+            "One theme — not three",
+            "Write it down; share it with any collaborator",
+            "Review weekly; revise monthly; don't change it mid-quarter"
+          ]
+        },
+        {
+          "id": "l30",
+          "title": "Hiring (Probably Not Yet)",
+          "description": "Why the first hire is rarely the right move.",
+          "format": "reading",
+          "durationMinutes": 15,
+          "order": 2,
+          "content": "Revenue under $20k monthly almost always means you shouldn't hire. Contracting out specific bottlenecks (design, content) is smarter. Hiring too early destroys runway and forces you to be a manager before you're ready.",
+          "keyPoints": [
+            "First hire should be for a clear, bounded, repeating task",
+            "A cofounder is a different decision — made months earlier",
+            "A contractor for 10 hours/week beats a fractional hire for most early needs"
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 40,
+    "hoursPerWeek": 10,
+    "totalWeeks": 4
+  },
+  "bonusResources": [
+    {
+      "id": "br1",
+      "title": "The Mom Test",
+      "type": "book",
+      "url": "https://www.momtestbook.com/",
+      "description": "Short, practical book on customer interview questions that don't bias toward false positives.",
+      "isFree": false
+    },
+    {
+      "id": "br2",
+      "title": "Stripe Atlas Guides",
+      "type": "article",
+      "url": "https://stripe.com/atlas/guides",
+      "description": "Free written guides covering the non-technical side of starting a SaaS.",
+      "isFree": true
+    }
+  ],
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}

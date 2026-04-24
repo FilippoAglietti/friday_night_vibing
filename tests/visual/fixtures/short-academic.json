@@ -1,0 +1,226 @@
+{
+  "id": "fx-short-academic",
+  "title": "Introduction to Cognitive Psychology",
+  "subtitle": "Core theories of memory, attention, and decision-making",
+  "description": "An eight-lesson academic overview of the foundational experiments and theoretical models that shape the modern study of cognition.",
+  "targetAudience": "Undergraduate students in psychology, philosophy, or neuroscience",
+  "difficulty": "intermediate",
+  "objectives": [
+    "Define the cognitive revolution and its break from behaviourism",
+    "Describe the multi-store and working memory models",
+    "Distinguish selective, divided, and sustained attention",
+    "Evaluate dual-process theories of reasoning"
+  ],
+  "prerequisites": ["Introductory Psychology or equivalent"],
+  "tags": ["psychology", "cognition", "academic"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Foundations",
+      "description": "The shift from stimulus–response to information processing.",
+      "objectives": [
+        "Trace the limits of behaviourism",
+        "Introduce the information-processing metaphor"
+      ],
+      "order": 0,
+      "durationMinutes": 90,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "The Cognitive Revolution",
+          "description": "Why behaviourism collapsed as an explanatory framework.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "The behaviourist program — study only observable stimulus and response — proved unable to account for language acquisition, planning, or mental imagery. Chomsky's 1959 review of Skinner's Verbal Behavior is widely cited as the inflection point.",
+          "keyPoints": [
+            "Behaviourism excluded internal states by methodological fiat",
+            "Chomsky's poverty-of-stimulus argument undermined the core claim",
+            "The computer metaphor offered a tractable alternative"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "Information Processing",
+          "description": "Inputs, encoding, storage, retrieval, and output.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Cognition can be decomposed into stages where information is transformed: encoded from perception, maintained in limited-capacity stores, operated on by rules, and used to produce behaviour.",
+          "keyPoints": [
+            "Stage models are descriptive, not neurological maps",
+            "Capacity limits at each stage constrain overall performance",
+            "Reaction-time paradigms infer stage duration"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "Methods",
+          "description": "How cognitive claims are tested.",
+          "format": "reading",
+          "durationMinutes": 35,
+          "order": 2,
+          "content": "Chronometric experiments, eye-tracking, dual-task paradigms, and neuroimaging each constrain different aspects of cognitive theory — no single method is decisive.",
+          "keyPoints": [
+            "Reaction time is a function of encoding + comparison + response",
+            "Dual-task interference localises capacity limits",
+            "fMRI offers spatial resolution but low temporal resolution"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "question": "Which methodological restriction did the cognitive revolution explicitly reject?",
+          "options": [
+            "Inferential statistics",
+            "The use of animal subjects",
+            "Exclusion of unobservable mental states from theory",
+            "Controlled laboratory settings"
+          ],
+          "correctAnswer": 2,
+          "explanation": "Behaviourism's core methodological claim was that only observable behaviour could be legitimate subject matter; cognitive psychology re-admitted internal states as theoretical constructs.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Memory",
+      "description": "Models of short-term and long-term storage.",
+      "objectives": [
+        "Distinguish sensory, short-term, and long-term stores",
+        "Describe the working memory model",
+        "Contrast encoding depth effects"
+      ],
+      "order": 1,
+      "durationMinutes": 110,
+      "lessons": [
+        {
+          "id": "l4",
+          "title": "The Atkinson–Shiffrin Model",
+          "description": "The classic multi-store architecture of memory.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "The 1968 multi-store model proposes sensory registers, a short-term store of limited capacity and duration, and a long-term store of effectively unlimited capacity. Transfer depends on rehearsal.",
+          "keyPoints": [
+            "Sensory registers are modality-specific and brief",
+            "Short-term store is capacity-limited (≈7±2 items)",
+            "Rehearsal is the proposed transfer mechanism"
+          ]
+        },
+        {
+          "id": "l5",
+          "title": "Working Memory",
+          "description": "Baddeley and Hitch's revision.",
+          "format": "reading",
+          "durationMinutes": 35,
+          "order": 1,
+          "content": "The working memory model replaces a single short-term store with a central executive managing two slave systems — the phonological loop and the visuospatial sketchpad — plus a later-added episodic buffer.",
+          "keyPoints": [
+            "Dual-task interference evidence motivates separate subsystems",
+            "The phonological loop handles verbal and acoustic information",
+            "The episodic buffer integrates modalities with long-term memory"
+          ]
+        },
+        {
+          "id": "l6",
+          "title": "Levels of Processing",
+          "description": "Why depth of encoding matters more than duration of rehearsal.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 2,
+          "content": "Craik and Lockhart argue that semantic encoding produces better retention than structural or phonological encoding, independent of rehearsal time — challenging the Atkinson–Shiffrin rehearsal account.",
+          "keyPoints": [
+            "Semantic processing produces more durable traces",
+            "Depth is inferred from retrieval performance, not measured directly",
+            "The framework predicts encoding-specificity effects"
+          ]
+        },
+        {
+          "id": "l7",
+          "title": "Forgetting",
+          "description": "Decay, interference, and retrieval failure.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 3,
+          "content": "Forgetting is rarely pure decay; it is better modelled as interference from competing traces or failure to reconstruct the retrieval context.",
+          "keyPoints": [
+            "Proactive and retroactive interference have distinct signatures",
+            "Context-dependent memory effects implicate retrieval over storage",
+            "Amnesic dissociations separate encoding from retrieval failures"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Attention and Decision",
+      "description": "Selection, control, and reasoning.",
+      "objectives": [
+        "Distinguish early and late selection theories",
+        "Contrast System 1 and System 2 reasoning"
+      ],
+      "order": 2,
+      "durationMinutes": 70,
+      "lessons": [
+        {
+          "id": "l8",
+          "title": "Attention",
+          "description": "Early versus late selection accounts.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "Broadbent's early-selection filter and Treisman's attenuation theory disagree about how far unattended input is processed. Dichotic listening and cocktail-party evidence favours attenuation over a strict filter.",
+          "keyPoints": [
+            "Early selection blocks unattended input before semantic analysis",
+            "Late selection processes all input but selects at response",
+            "Neither extreme matches all empirical findings"
+          ]
+        },
+        {
+          "id": "l9",
+          "title": "Dual-Process Reasoning",
+          "description": "Fast heuristics and slow deliberation.",
+          "format": "reading",
+          "durationMinutes": 40,
+          "order": 1,
+          "content": "Dual-process theories — most prominently Kahneman's — distinguish fast, associative System 1 responses from slow, rule-governed System 2 reasoning. The account explains systematic errors on tasks like the Wason selection and the Linda problem.",
+          "keyPoints": [
+            "System 1 is fast, parallel, and affect-laden",
+            "System 2 is slow, serial, and effortful",
+            "The distinction is a functional division, not a neural one"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q2",
+          "type": "multiple-choice",
+          "question": "In Baddeley's working memory model, which component is specifically responsible for integrating information across modalities?",
+          "options": [
+            "The phonological loop",
+            "The visuospatial sketchpad",
+            "The central executive",
+            "The episodic buffer"
+          ],
+          "correctAnswer": 3,
+          "explanation": "The episodic buffer was added to the original model specifically to account for cross-modal integration and linkage to long-term memory.",
+          "points": 1
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 5,
+    "hoursPerWeek": 2,
+    "totalWeeks": 3
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}

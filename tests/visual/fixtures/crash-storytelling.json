@@ -1,0 +1,139 @@
+{
+  "id": "fx-crash-storytelling",
+  "title": "The Story of the Stock Market",
+  "subtitle": "A short narrative tour through how markets came to be",
+  "description": "A story-driven crash course that follows the invention of the stock market from Amsterdam in 1602 to today's algorithmic trading floors.",
+  "targetAudience": "Curious readers who want historical context before touching an investment app",
+  "difficulty": "beginner",
+  "objectives": [
+    "Recognise the key historical turning points that shaped modern markets",
+    "Explain why stock exchanges emerged and what problem they originally solved",
+    "Spot the human patterns that repeat through every market era"
+  ],
+  "prerequisites": [],
+  "tags": ["history", "finance", "narrative"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Origins in Amsterdam",
+      "description": "How a single Dutch trading company accidentally invented the modern stock market.",
+      "objectives": [
+        "Understand the VOC's funding problem",
+        "Trace the birth of tradable shares"
+      ],
+      "order": 0,
+      "durationMinutes": 35,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "The Spice Problem",
+          "description": "Why no single merchant could afford a voyage to the Indies — and what they did about it.",
+          "format": "reading",
+          "durationMinutes": 10,
+          "order": 0,
+          "content": "In 1602 Amsterdam, a single round-trip to the Spice Islands cost more than most merchants would earn in a lifetime, and nearly half the ships never came back. The Dutch East India Company invented a solution still running today: pool the money across many people, and spread the risk across many voyages.",
+          "keyPoints": [
+            "Individual merchants couldn't absorb the risk of a single voyage",
+            "Pooling capital turned catastrophic loss into a statistical problem",
+            "The VOC's charter granted a 21-year monopoly — which made shares worth owning"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "The First Share Certificate",
+          "description": "What it looked like to own a tiny slice of an ocean-crossing company.",
+          "format": "reading",
+          "durationMinutes": 12,
+          "order": 1,
+          "content": "A VOC share was literally a piece of paper that said: bring this back, and you get a cut of what the ships bring home. Within months, people were trading the papers themselves on the street outside the company office — and the price of those papers started reflecting hopes, fears, and rumours.",
+          "keyPoints": [
+            "The secondary market for shares emerged before the primary issuance was fully sold",
+            "Price became a running opinion poll about expected returns",
+            "Paper ownership abstracted away the ships, crews, and storms"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "The Bridge Traders",
+          "description": "How a stone bridge in Amsterdam became the world's first stock exchange.",
+          "format": "reading",
+          "durationMinutes": 13,
+          "order": 2,
+          "content": "Traders gathered on the Nieuwe Brug at dawn because that's where the mail arrived from the docks, and news from the docks moved the price of shares. The word 'bourse' — still used for European exchanges — comes from this informal bridge market.",
+          "keyPoints": [
+            "Information asymmetry has always been the engine of trading profits",
+            "Physical proximity to news source dictated trading advantage for 400 years",
+            "The bridge crowd was already inventing futures, shorts, and options by 1610"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "The Tulip and the Lesson",
+      "description": "The first speculative bubble, and why it matters four centuries later.",
+      "objectives": [
+        "Recognise the anatomy of a financial bubble",
+        "Understand how narrative amplifies price"
+      ],
+      "order": 1,
+      "durationMinutes": 25,
+      "lessons": [
+        {
+          "id": "l4",
+          "title": "Tulipmania",
+          "description": "When a single rare tulip bulb cost more than a house on an Amsterdam canal.",
+          "format": "reading",
+          "durationMinutes": 12,
+          "order": 0,
+          "content": "At the peak of 1637, a single Semper Augustus bulb traded for ten times a skilled craftsman's annual wage. The bubble didn't pop because flowers stopped being beautiful; it popped because a single no-show at a routine auction broke the spell, and the price structure collapsed within days.",
+          "keyPoints": [
+            "Price detached from any underlying cash flow — a pure narrative asset",
+            "The crash was triggered by a local, almost trivial event",
+            "The pattern — social contagion, then sudden confidence collapse — repeats in every bubble since"
+          ]
+        },
+        {
+          "id": "l5",
+          "title": "The Mirror",
+          "description": "What Tulipmania tells us about 2026.",
+          "format": "reading",
+          "durationMinutes": 13,
+          "order": 1,
+          "content": "Every generation believes its bubble is different because the asset is different. The tulip traders thought tulips were special; later generations thought the same about railroads, radios, dot-coms, and tokens. The asset changes; the script doesn't.",
+          "keyPoints": [
+            "The narrative is always that 'this time is different'",
+            "Leverage and easy credit consistently precede the peak",
+            "Survivors are the ones who wrote down their rules before the mania started"
+          ],
+          "quiz": [
+            {
+              "id": "q1",
+              "type": "multiple-choice",
+              "question": "What most consistently separates a bubble from a boom?",
+              "options": [
+                "The asset class involved",
+                "The ratio of price to any underlying cash flow",
+                "The geographic location",
+                "The number of participants"
+              ],
+              "correctAnswer": 1,
+              "explanation": "Bubbles detach price from any defensible estimate of future cash flow. The asset and era vary — the disconnect is the constant.",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 1,
+    "hoursPerWeek": 1,
+    "totalWeeks": 1
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}
