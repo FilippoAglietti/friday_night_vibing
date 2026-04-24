@@ -4,7 +4,7 @@ import { ReactNode, useState } from "react";
 import { isPricingLive } from "@/lib/pricing/pricingLive";
 
 interface CheckoutButtonProps {
-  priceId: string | undefined;
+  priceId?: string;
   /**
    * @deprecated Legacy prop from the pre-POST CTA flow. Ignored at runtime —
    * any call site still passing `href` will render in the disabled
