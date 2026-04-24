@@ -1,0 +1,226 @@
+{
+  "id": "fx-short-handson",
+  "title": "Git Essentials for Daily Work",
+  "subtitle": "The commands you'll actually use on a working team",
+  "description": "A hands-on short course covering the 90% of Git that shows up in daily engineering work — no internals, no resets-from-memory.",
+  "targetAudience": "Developers who use Git but have never learned it systematically",
+  "difficulty": "beginner",
+  "objectives": [
+    "Stage, commit, and amend changes confidently",
+    "Work with branches and remotes without fear of losing work",
+    "Resolve merge conflicts methodically",
+    "Use git log and git blame to investigate code history"
+  ],
+  "prerequisites": ["Basic command-line usage"],
+  "tags": ["git", "version-control", "workflow"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Day-to-Day Commits",
+      "description": "The commands you'll run dozens of times a day.",
+      "objectives": [
+        "Stage changes selectively",
+        "Write useful commit messages",
+        "Amend the last commit safely"
+      ],
+      "order": 0,
+      "durationMinutes": 80,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Status, Add, Commit",
+          "description": "The inner loop of every Git session.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 0,
+          "content": "Run git status before every commit. Use git add -p to stage hunk-by-hunk instead of whole files. git commit -m for a one-liner, or no flag to open your editor for a longer message.",
+          "keyPoints": [
+            "git status is cheap — run it constantly",
+            "git add -p gives surgical control over what lands in each commit",
+            "A commit's first line is a subject (max 72 chars), then blank, then body"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "Diff and Stash",
+          "description": "See what you're about to commit — and set it aside if needed.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 1,
+          "content": "git diff shows unstaged changes; git diff --cached shows what's staged. git stash shelves your current changes so you can switch branches cleanly, and git stash pop brings them back.",
+          "keyPoints": [
+            "git diff has two main views: unstaged vs staged",
+            "git stash is safe — nothing is lost, just moved aside",
+            "Name stashes with git stash push -m 'message' so you don't lose track"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "Amend and Reword",
+          "description": "Fix the last commit without creating a new one.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "git commit --amend folds new staged changes into the last commit, or lets you edit the message. Only amend commits you haven't pushed yet — amending a pushed commit rewrites history on the remote.",
+          "keyPoints": [
+            "--amend rewrites the most recent commit's SHA",
+            "Never amend commits that other people may have pulled",
+            "--amend --no-edit keeps the existing message"
+          ]
+        },
+        {
+          "id": "l4",
+          "title": "Ignore and Clean",
+          "description": "Keep build artefacts out of the repo.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 3,
+          "content": "A .gitignore file tells Git which paths to skip. git clean -n previews which untracked files would be removed; git clean -f actually removes them. Keep secrets in .env files and ignore them.",
+          "keyPoints": [
+            ".gitignore rules are glob-based and directory-scoped",
+            "git clean -n is always safe — preview before destroying",
+            "Files already tracked must be removed with git rm --cached before .gitignore takes effect"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Branches and Remotes",
+      "description": "Work in parallel without stepping on anyone.",
+      "objectives": [
+        "Create and switch branches",
+        "Push and pull from a shared remote",
+        "Understand fast-forward and merge commits"
+      ],
+      "order": 1,
+      "durationMinutes": 75,
+      "lessons": [
+        {
+          "id": "l5",
+          "title": "Branching Basics",
+          "description": "Cheap, fast, local branches.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 0,
+          "content": "git switch -c feat/my-feature creates and checks out a branch in one step. Branches in Git are essentially pointers — creating one is almost free.",
+          "keyPoints": [
+            "git switch replaces the older git checkout for branch switching",
+            "Branch names should match your team's convention (feat/, fix/, chore/)",
+            "git branch -d deletes a merged branch; -D forces deletion of unmerged"
+          ]
+        },
+        {
+          "id": "l6",
+          "title": "Push and Pull",
+          "description": "Share your branch with the team.",
+          "format": "project",
+          "durationMinutes": 20,
+          "order": 1,
+          "content": "git push -u origin feat/my-feature pushes and sets up tracking. After that, git push and git pull operate on the tracked remote branch without extra arguments.",
+          "keyPoints": [
+            "The -u flag is only needed on first push of a new branch",
+            "git pull is git fetch + git merge (or rebase, if configured)",
+            "Prefer git pull --ff-only to avoid accidental merge commits"
+          ]
+        },
+        {
+          "id": "l7",
+          "title": "Merge vs Rebase",
+          "description": "Two ways to bring changes together.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "Merge preserves the full history with a merge commit. Rebase rewrites your commits onto the target branch, producing a linear history. Teams usually pick one convention.",
+          "keyPoints": [
+            "Never rebase commits that have been shared with others",
+            "git rebase -i lets you squash, reorder, or edit commits before sharing",
+            "A merge commit has two parents; a rebased commit has one — the history shape differs"
+          ]
+        },
+        {
+          "id": "l8",
+          "title": "Fetching Without Merging",
+          "description": "Update your view of the remote without touching local work.",
+          "format": "project",
+          "durationMinutes": 15,
+          "order": 3,
+          "content": "git fetch updates your remote-tracking branches (like origin/main) but leaves your local branches alone. You can inspect what changed before deciding to merge.",
+          "keyPoints": [
+            "git fetch is always safe — it never modifies working-tree files",
+            "git log ..origin/main shows what you'd pull before pulling",
+            "Fetching daily helps you avoid stale branch surprises"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "question": "Which command previews what git clean would remove without actually removing anything?",
+          "options": [
+            "git clean",
+            "git clean -n",
+            "git clean --dry-run --force",
+            "git status"
+          ],
+          "correctAnswer": 1,
+          "explanation": "git clean -n (short for --dry-run) lists the untracked files that would be deleted without touching them.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Conflicts and Investigation",
+      "description": "Resolve conflicts and dig into history when something breaks.",
+      "objectives": [
+        "Resolve merge conflicts methodically",
+        "Use git log to trace changes",
+        "Use git blame to find the commit that introduced a line"
+      ],
+      "order": 2,
+      "durationMinutes": 60,
+      "lessons": [
+        {
+          "id": "l9",
+          "title": "Resolving Conflicts",
+          "description": "What those <<<<<<< markers mean and how to clear them.",
+          "format": "project",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "When Git can't merge two changes automatically, it writes both versions into the file with markers. Edit the file to keep what you want, delete the markers, then git add and git commit to finish the merge.",
+          "keyPoints": [
+            "The markers are HEAD (your branch) vs the incoming branch name",
+            "Don't panic — conflict markers are just text, editable like any code",
+            "git merge --abort backs you out cleanly if you've dug yourself in deep"
+          ]
+        },
+        {
+          "id": "l10",
+          "title": "git log and git blame",
+          "description": "Ask Git who wrote what, when, and why.",
+          "format": "project",
+          "durationMinutes": 35,
+          "order": 1,
+          "content": "git log --oneline --graph shows commit history as a compact ASCII tree. git blame file.ts annotates each line with the commit that last touched it — use git show <sha> on that commit to read the message and full diff.",
+          "keyPoints": [
+            "git log -S 'string' finds commits that added or removed a specific string",
+            "git blame tells you who, when, and which commit — not why",
+            "The commit message is where 'why' lives; invest time in writing good ones"
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 4,
+    "hoursPerWeek": 2,
+    "totalWeeks": 2
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}

@@ -1,0 +1,195 @@
+{
+  "id": "fx-short-conversational",
+  "title": "Understanding Your Money",
+  "subtitle": "A friendly tour through personal finance, no jargon",
+  "description": "A relaxed, conversational short course that covers budgeting, emergency funds, and the basics of investing — enough to stop feeling lost when your friends talk about money.",
+  "targetAudience": "Adults in their 20s and 30s who never got a real personal finance lesson",
+  "difficulty": "beginner",
+  "objectives": [
+    "Set up a simple budget you'll actually keep",
+    "Build an emergency fund and know why it matters",
+    "Tell the difference between investing and speculating",
+    "Avoid the most common money traps"
+  ],
+  "prerequisites": [],
+  "tags": ["finance", "budgeting", "beginner"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "Seeing Your Money",
+      "description": "Before you can manage money, you have to know where it's going.",
+      "objectives": [
+        "Track spending without driving yourself crazy",
+        "Build a budget that leaves room to breathe"
+      ],
+      "order": 0,
+      "durationMinutes": 70,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "Where Does It Go?",
+          "description": "Honestly, probably not where you think.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 0,
+          "content": "Most people wildly underestimate how much they spend on the small stuff — coffee, apps, delivery fees. The first thing you need isn't discipline; it's visibility. Export the last three months of your main debit card and just look at it.",
+          "keyPoints": [
+            "Three months is enough to see patterns without cherry-picking",
+            "Don't judge yet — just look",
+            "The weird little recurring subscriptions add up fast"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "The 50/30/20 Starting Point",
+          "description": "A budget template you can use today.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 1,
+          "content": "Aim for roughly 50% of take-home pay on needs (rent, food, bills), 30% on wants (fun stuff), 20% on savings or debt paydown. These aren't rules — they're a useful starting point when you have no idea where to start.",
+          "keyPoints": [
+            "If your 'needs' are above 70%, the math is fighting you — address rent or income first",
+            "The 20% for future-you is what makes everything else work long-term",
+            "Review the split every few months; life changes"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "Automating the Boring Parts",
+          "description": "Make good decisions once, then stop having to make them.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 2,
+          "content": "Set up an automatic transfer to your savings account on payday. You won't miss what you never see, and you won't have to summon willpower every month. Willpower is finite; automation isn't.",
+          "keyPoints": [
+            "Pay yourself first — literally, before bills",
+            "One transfer rule beats a hundred small decisions",
+            "Review automations twice a year in case life changed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Safety First",
+      "description": "Before investing, before anything fancy — build a cushion.",
+      "objectives": [
+        "Understand why an emergency fund is non-negotiable",
+        "Pick a good home for short-term savings"
+      ],
+      "order": 1,
+      "durationMinutes": 55,
+      "lessons": [
+        {
+          "id": "l4",
+          "title": "The Emergency Fund",
+          "description": "Why three to six months is the sweet spot.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "An emergency fund is not for emergencies like 'there's a sale' — it's for actual emergencies, like losing a job or a major car repair. Three months of expenses is the minimum; six is comfier.",
+          "keyPoints": [
+            "Calculate based on expenses, not income",
+            "Keep it boring — in a high-yield savings account, not invested",
+            "Once you hit the target, stop contributing and redirect elsewhere"
+          ]
+        },
+        {
+          "id": "l5",
+          "title": "Paying Off Debt",
+          "description": "Which debt to kill first.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "High-interest credit card debt is an emergency. A low-interest mortgage probably isn't. The math is simple: if the interest rate is higher than what you'd reasonably earn investing, pay it off first.",
+          "keyPoints": [
+            "Credit card APRs (20%+) beat any reliable investment return",
+            "Student loan interest rates vary — treat them case by case",
+            "The snowball method (smallest balance first) is less optimal mathematically but keeps you motivated"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "question": "Where should an emergency fund live?",
+          "options": [
+            "In index funds for growth",
+            "In a high-yield savings account, easy to access",
+            "In crypto for flexibility",
+            "Under your mattress, obviously"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Emergency funds trade returns for liquidity and safety — you need it available without a market crash eating 30% of it the week you lose your job.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "The Investing Part",
+      "description": "The basics that will save you from yourself.",
+      "objectives": [
+        "Understand what an index fund actually is",
+        "Recognise speculation dressed up as investing"
+      ],
+      "order": 2,
+      "durationMinutes": 65,
+      "lessons": [
+        {
+          "id": "l6",
+          "title": "Index Funds, Explained Simply",
+          "description": "Why boring beats clever, most of the time.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "An index fund is a bucket that owns tiny slices of hundreds or thousands of companies at once. Instead of betting on individual winners, you own a piece of everything. Fees are low, and over long periods, this quietly beats most 'clever' strategies.",
+          "keyPoints": [
+            "Low fees compound into big differences over decades",
+            "You're not trying to beat the market — you're trying to be the market",
+            "Diversification is the one free lunch in investing"
+          ]
+        },
+        {
+          "id": "l7",
+          "title": "Time in the Market",
+          "description": "Compounding is the quiet superpower.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 1,
+          "content": "Starting at 25 with $200/month beats starting at 35 with $400/month by a huge margin — even though you put in less total money. That's compounding doing the heavy lifting while you sleep.",
+          "keyPoints": [
+            "Starting early matters more than starting big",
+            "Consistency beats timing — reliably, across studies",
+            "The best day to start was 10 years ago; the second-best is today"
+          ]
+        },
+        {
+          "id": "l8",
+          "title": "Red Flags",
+          "description": "If it sounds too good to be true, it is.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "Guaranteed returns, urgent deadlines, and 'my friend made 10x' — these are the classics. Real investing is slow and boring. If it feels like a rush, it's probably speculation or a scam.",
+          "keyPoints": [
+            "No legitimate investment is both high-return and guaranteed",
+            "Urgency is a manipulation tactic, not a market feature",
+            "'You have to get in now' is almost never true in real investing"
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 3,
+    "hoursPerWeek": 1,
+    "totalWeeks": 3
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}

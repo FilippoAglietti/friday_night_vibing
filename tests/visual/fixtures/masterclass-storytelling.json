@@ -1,0 +1,488 @@
+{
+  "id": "fx-masterclass-storytelling",
+  "title": "The Great Scientific Revolutions",
+  "subtitle": "Seven moments when the world changed its mind",
+  "description": "A masterclass-length narrative course tracing seven scientific revolutions — from Copernicus to information theory — and the people who drove them.",
+  "targetAudience": "Curious readers who want the story of science, not a textbook",
+  "difficulty": "intermediate",
+  "objectives": [
+    "Understand what Kuhn meant by a paradigm shift",
+    "Recognise the social and political context of each revolution",
+    "Appreciate how scientific progress is actually messy",
+    "See why some ideas take centuries to win",
+    "Spot the recurring pattern across very different fields"
+  ],
+  "prerequisites": [],
+  "tags": ["history-of-science", "narrative", "philosophy"],
+  "modules": [
+    {
+      "id": "m1",
+      "title": "The Copernican Upheaval",
+      "description": "When the Earth stopped being at the centre.",
+      "objectives": [
+        "Understand the Ptolemaic system's staying power",
+        "See why Copernicus delayed publication"
+      ],
+      "order": 0,
+      "durationMinutes": 100,
+      "lessons": [
+        {
+          "id": "l1",
+          "title": "A Universe of Spheres",
+          "description": "Fourteen hundred years of Ptolemy.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "For fourteen centuries, Europe's model of the cosmos was Ptolemy's: a stationary Earth at the centre, surrounded by nested crystal spheres carrying the planets, the Sun, and the stars. It worked — it predicted eclipses well enough for everyday use.",
+          "keyPoints": [
+            "Predictive success is not proof of a model's truth",
+            "Ptolemy's epicycles were a mathematical compromise that worked",
+            "The system had theological and philosophical inertia beyond science"
+          ]
+        },
+        {
+          "id": "l2",
+          "title": "The Man Who Waited",
+          "description": "Why Copernicus sat on his manuscript for three decades.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Copernicus worked out the heliocentric model by 1514 but only published in 1543 — the year he died. He knew the backlash was coming, from theologians and from common sense. The Earth feels stationary.",
+          "keyPoints": [
+            "Fear of consequences often delays publication, not certainty",
+            "Copernicus's preface, written by someone else, softened the claims",
+            "Intuition and observation can disagree for centuries"
+          ]
+        },
+        {
+          "id": "l3",
+          "title": "Tycho and Kepler",
+          "description": "The observation that broke the old model.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 2,
+          "content": "Tycho Brahe made astronomical observations so precise that his data couldn't fit either Ptolemy or pure Copernicus. His assistant Kepler spent years forcing the data to speak — and eventually concluded the orbits were ellipses, not circles.",
+          "keyPoints": [
+            "Better data often breaks older models before a new theory arrives",
+            "Kepler held Tycho's data for years and wrestled with it",
+            "Ellipses were more beautiful than epicycles, but only in retrospect"
+          ]
+        },
+        {
+          "id": "l4",
+          "title": "Galileo's Telescope",
+          "description": "Seeing is finally believing.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 3,
+          "content": "When Galileo turned his telescope to Jupiter in 1610 and found moons orbiting it, he had the first visual proof that not everything orbited Earth. The Church's reaction is well-known. Science had crossed a line.",
+          "keyPoints": [
+            "New instruments open new evidence categories",
+            "The Jupiter moons were the first definitive falsification",
+            "Institutional responses to new evidence are slower than evidence itself"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m2",
+      "title": "Newton Makes the Rules",
+      "description": "A single mathematics for heaven and earth.",
+      "objectives": [
+        "Understand what was novel in Newton's synthesis",
+        "See how laws and mathematics became the template for science"
+      ],
+      "order": 1,
+      "durationMinutes": 85,
+      "lessons": [
+        {
+          "id": "l5",
+          "title": "The Plague Year",
+          "description": "What a 23-year-old did at home in 1666.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "When Cambridge closed because of plague, Newton went home for eighteen months. In that year he invented calculus, sketched the laws of motion, and began work on universal gravitation. He was twenty-three.",
+          "keyPoints": [
+            "Concentrated isolation can produce extraordinary output",
+            "Newton sat on most of these ideas for twenty years before publishing",
+            "The apple story is largely apocryphal — but he did reason about gravity from the Moon"
+          ]
+        },
+        {
+          "id": "l6",
+          "title": "The Principia",
+          "description": "One framework for everything that moves.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "In 1687, Newton published the Principia Mathematica. It showed that the same gravitational force that made an apple fall also held the Moon in orbit. Terrestrial and celestial physics were unified for the first time.",
+          "keyPoints": [
+            "Unification is a recurring driver of scientific revolutions",
+            "Newton wrote the Principia in Latin to signal seriousness",
+            "The mathematical style set a template followed for three centuries"
+          ]
+        },
+        {
+          "id": "l7",
+          "title": "What Got Left Unexplained",
+          "description": "The cracks in the Newtonian edifice.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 2,
+          "content": "Newton's theory worked spectacularly — but the precession of Mercury's orbit wouldn't fit quite right. For two hundred years astronomers assumed there must be another planet tugging it. There wasn't. The crack would have to wait for Einstein.",
+          "keyPoints": [
+            "Anomalies that don't go away are clues to the next revolution",
+            "Successful theories accumulate small failures patiently",
+            "The Mercury anomaly was measured, ignored, and then explained — eventually"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "title": "Darwin's Slow Bomb",
+      "description": "How a single idea reshaped biology.",
+      "objectives": [
+        "Understand why Darwin delayed for twenty years",
+        "See what was revolutionary about natural selection"
+      ],
+      "order": 2,
+      "durationMinutes": 95,
+      "lessons": [
+        {
+          "id": "l8",
+          "title": "The Beagle Years",
+          "description": "A young naturalist's five-year voyage.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "Darwin boarded HMS Beagle in 1831 aged twenty-two. Over five years he filled notebooks with observations from South America and the Galápagos. He came home with boxes of specimens and questions he couldn't yet answer.",
+          "keyPoints": [
+            "Fieldwork produces raw material that takes decades to interpret",
+            "The Galápagos finches came into focus only after Darwin had returned",
+            "Revolutionary ideas often start with careful cataloguing"
+          ]
+        },
+        {
+          "id": "l9",
+          "title": "Twenty Years of Delay",
+          "description": "Why the Origin didn't appear until 1859.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Darwin worked out natural selection by 1844 but spent fifteen more years refining his case. The delay wasn't cowardice alone — he knew the evidence had to be overwhelming to survive the backlash he correctly anticipated.",
+          "keyPoints": [
+            "Wallace's independent discovery finally forced Darwin's hand",
+            "Darwin and Wallace announced the theory jointly in 1858",
+            "A well-prepared case can survive hostile reception; a half-prepared one can't"
+          ]
+        },
+        {
+          "id": "l10",
+          "title": "The Mechanism",
+          "description": "Variation, inheritance, selection — and that's it.",
+          "format": "reading",
+          "durationMinutes": 35,
+          "order": 2,
+          "content": "Natural selection requires only three ingredients: traits vary, traits are heritable, and some traits confer reproductive advantage. Given those three, evolution follows deductively. The power of the theory is in its minimalism.",
+          "keyPoints": [
+            "Darwin didn't know the mechanism of inheritance — Mendel's work was still obscure",
+            "The three-ingredient structure is elegant but easy to misunderstand",
+            "Social Darwinism was a misappropriation, not an implication"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "question": "Which was the primary reason Darwin delayed publishing On the Origin of Species?",
+          "options": [
+            "Lack of supporting evidence in his lifetime",
+            "His understanding that the theory would be resisted and needed an airtight case",
+            "Legal disputes over the voyage of the Beagle",
+            "Fear of losing academic funding"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Darwin knew the theological and scientific establishment would resist the theory, so he spent fifteen years assembling as watertight a case as he could manage.",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "title": "The Germ Idea",
+      "description": "From miasma to microbes.",
+      "objectives": [
+        "Trace the overthrow of miasma theory",
+        "See how experimental proof looks in practice"
+      ],
+      "order": 3,
+      "durationMinutes": 85,
+      "lessons": [
+        {
+          "id": "l11",
+          "title": "Before Germs",
+          "description": "The theory that bad air made you sick.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "Into the 19th century, educated opinion held that disease came from bad air — miasma — rising from swamps and corpses. It wasn't silly: there was a correlation between foul places and sickness, so the model half-worked.",
+          "keyPoints": [
+            "Wrong theories usually contain a kernel of useful correlation",
+            "Miasma theory motivated useful sanitation reforms even though the mechanism was wrong",
+            "Half-correct ideas can hold ground for decades"
+          ]
+        },
+        {
+          "id": "l12",
+          "title": "Semmelweis's Hands",
+          "description": "The doctor who told obstetricians to wash their hands — and got fired.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "In 1840s Vienna, Ignaz Semmelweis noticed that obstetricians who went straight from the morgue to the delivery room were killing mothers with childbed fever. Hand-washing dropped mortality dramatically. Colleagues rejected the finding and drove him from the hospital.",
+          "keyPoints": [
+            "Correct findings can be rejected because of how they're delivered",
+            "Semmelweis's communication style hurt his cause badly",
+            "The tragedy is that he was right, and patients died during the delay"
+          ]
+        },
+        {
+          "id": "l13",
+          "title": "Pasteur and Koch",
+          "description": "The definitive experiments.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "Pasteur's swan-necked-flask experiment in 1859 killed the theory of spontaneous generation. Koch's postulates, two decades later, provided a rigorous procedure for identifying the specific microbe causing a specific disease. The game was over.",
+          "keyPoints": [
+            "Well-designed experiments can decisively kill a competing theory",
+            "Koch's postulates formalised what scientific proof should look like",
+            "Microbiology became a real discipline almost overnight once the framework stuck"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "title": "Einstein's Year",
+      "description": "1905, and four papers that broke physics.",
+      "objectives": [
+        "Understand what Einstein changed in our view of space and time",
+        "See what a genuine paradigm shift looks like"
+      ],
+      "order": 4,
+      "durationMinutes": 100,
+      "lessons": [
+        {
+          "id": "l14",
+          "title": "The Patent Clerk",
+          "description": "How a job reviewing patents gave Einstein time to think.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 0,
+          "content": "Einstein finished his day job at the Bern patent office by early afternoon, leaving the rest of the day to physics. In 1905 he published four papers, any one of which would have been a career. Together they redefined what space, time, mass, and light were.",
+          "keyPoints": [
+            "Being outside mainstream academia can be an advantage",
+            "Mental space matters — creativity needs unrushed time",
+            "Revolutionary work can come from someone with no institutional power"
+          ]
+        },
+        {
+          "id": "l15",
+          "title": "Special Relativity",
+          "description": "Space and time are not what we thought.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Einstein started from two postulates: the laws of physics are the same for all inertial observers, and the speed of light is constant. From those, he derived that time and length are relative to the observer — a conclusion that violates daily intuition.",
+          "keyPoints": [
+            "Simultaneity is not absolute — it depends on the observer",
+            "Mass and energy are interchangeable (E = mc²)",
+            "The derivation is mathematically short but philosophically seismic"
+          ]
+        },
+        {
+          "id": "l16",
+          "title": "General Relativity",
+          "description": "Gravity as curved spacetime.",
+          "format": "reading",
+          "durationMinutes": 25,
+          "order": 2,
+          "content": "By 1915, Einstein had generalised the theory to include gravity. Matter curves spacetime; objects move along geodesics in that curved geometry. It took experiments during a 1919 eclipse to confirm it — and then the world knew his name.",
+          "keyPoints": [
+            "The 1919 Eddington eclipse expedition made Einstein world-famous overnight",
+            "General relativity subsumes Newtonian gravity as a low-velocity limit",
+            "The geometric view of gravity was a genuine paradigm shift"
+          ]
+        },
+        {
+          "id": "l17",
+          "title": "Mercury Again",
+          "description": "The anomaly Newton couldn't explain.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 3,
+          "content": "Remember Mercury's odd orbital precession? General relativity predicts it exactly. Einstein said that moment of discovery gave him heart palpitations. A 250-year anomaly had finally found its explanation.",
+          "keyPoints": [
+            "Anomalies can wait centuries for resolution",
+            "A new theory's first triumph is often resolving an old anomaly",
+            "Einstein confirmed Mercury before publishing — he didn't want to be wrong"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m6",
+      "title": "The Quantum Strangeness",
+      "description": "The theory nobody really understands.",
+      "objectives": [
+        "Understand what makes quantum mechanics philosophically difficult",
+        "See why the founders never fully agreed about it"
+      ],
+      "order": 5,
+      "durationMinutes": 110,
+      "lessons": [
+        {
+          "id": "l18",
+          "title": "The Problem with Light",
+          "description": "Waves or particles? Yes.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "At the turn of the 20th century, light seemed to be a wave. But experiments with the photoelectric effect showed it behaving like particles. Einstein's 1905 paper on this (one of the four) was the one that won him the Nobel.",
+          "keyPoints": [
+            "The Nobel wasn't for relativity, which was still too controversial",
+            "Wave-particle duality was the first sign that classical concepts wouldn't cut it",
+            "Quantum theory was built from experimental anomalies, not theory first"
+          ]
+        },
+        {
+          "id": "l19",
+          "title": "The Copenhagen Interpretation",
+          "description": "Observation creates reality — maybe.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Bohr, Heisenberg, and Born developed an interpretation in which particles don't have definite properties until measured. The math works perfectly; the philosophy has never stopped being debated.",
+          "keyPoints": [
+            "The Copenhagen view was pragmatic — shut up and calculate",
+            "Einstein famously hated it: 'God does not play dice.'",
+            "Ninety years on, the debate continues"
+          ]
+        },
+        {
+          "id": "l20",
+          "title": "EPR and Bell",
+          "description": "Einstein's protest and its experimental resolution.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 2,
+          "content": "Einstein, Podolsky, and Rosen argued in 1935 that quantum mechanics must be incomplete because it implied 'spooky action at a distance.' In the 1960s, John Bell showed how to test it experimentally. By 2020s experiments, Einstein had lost — entanglement is real.",
+          "keyPoints": [
+            "Philosophy can become physics once someone designs the right experiment",
+            "Bell's theorem rules out local hidden-variable theories",
+            "The 2022 Nobel Prize rewarded the experimentalists who confirmed entanglement"
+          ]
+        },
+        {
+          "id": "l21",
+          "title": "A Theory That Works Too Well",
+          "description": "Why quantum is the most accurate theory we have.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 3,
+          "content": "Quantum electrodynamics predicts the electron's magnetic moment to twelve decimal places — matching experiment exactly. No theory in human history has been tested more precisely. And yet we still can't agree what it means.",
+          "keyPoints": [
+            "Predictive success doesn't guarantee interpretive clarity",
+            "Quantum's accuracy is the most extreme in the history of science",
+            "The field split — pragmatists calculate, philosophers argue"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "m7",
+      "title": "Information as Substance",
+      "description": "The revolution hiding in plain sight.",
+      "objectives": [
+        "Understand Shannon's definition of information",
+        "See why it connects fields that shouldn't connect"
+      ],
+      "order": 6,
+      "durationMinutes": 80,
+      "lessons": [
+        {
+          "id": "l22",
+          "title": "Shannon at Bell Labs",
+          "description": "A 1948 paper that started a discipline.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 0,
+          "content": "In 1948, Claude Shannon published 'A Mathematical Theory of Communication.' It defined information as the reduction of uncertainty, measured in bits. Telecom engineers got a tool; everyone else eventually realised it applied to their problems too.",
+          "keyPoints": [
+            "Shannon wasn't trying to start a revolution — he was solving an engineering problem",
+            "The formal definition of a bit dates from this paper",
+            "Information theory later unified problems in genetics, neuroscience, and finance"
+          ]
+        },
+        {
+          "id": "l23",
+          "title": "Information Meets Physics",
+          "description": "Entropy, from thermodynamics to bits.",
+          "format": "reading",
+          "durationMinutes": 30,
+          "order": 1,
+          "content": "Shannon's entropy looked suspiciously like the entropy physicists had been using for a century. The connection turned out to be real — at a deep level, information and thermodynamic entropy are the same quantity.",
+          "keyPoints": [
+            "Two fields independently discovered the same mathematics",
+            "Landauer's principle connects information to actual energy dissipation",
+            "Black-hole entropy is a frontier where information becomes physics"
+          ]
+        },
+        {
+          "id": "l24",
+          "title": "The Modern World",
+          "description": "Why every layer of the information age traces back to 1948.",
+          "format": "reading",
+          "durationMinutes": 20,
+          "order": 2,
+          "content": "Error-correcting codes, compression, cryptography, and digital storage all trace their mathematical roots to Shannon. The smartphone in your pocket is a stack of applied information theory a metre deep.",
+          "keyPoints": [
+            "Theoretical work often pays off on a multi-decade timescale",
+            "Information theory is the infrastructure of the digital age",
+            "Shannon's quiet revolution may be the biggest of the seven"
+          ],
+          "quiz": [
+            {
+              "id": "q2",
+              "type": "multiple-choice",
+              "question": "In Shannon's information theory, what does a 'bit' represent?",
+              "options": [
+                "A physical storage location in memory",
+                "A unit for measuring the reduction of uncertainty",
+                "A binary string of any length",
+                "An abbreviation for 'binary digit' and nothing more"
+              ],
+              "correctAnswer": 1,
+              "explanation": "Shannon defined the bit as a measure of information content — specifically, the amount of uncertainty resolved by a single yes/no answer.",
+              "points": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing": {
+    "style": "self-paced",
+    "totalHours": 20,
+    "hoursPerWeek": 3,
+    "totalWeeks": 7
+  },
+  "createdBy": "fixture-author",
+  "createdAt": "2026-04-24T00:00:00Z",
+  "updatedAt": "2026-04-24T00:00:00Z",
+  "version": "1"
+}
