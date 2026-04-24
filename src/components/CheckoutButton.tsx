@@ -1,34 +1,38 @@
 "use client";
 
-import Link from "next/link";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { isPricingLive } from "@/lib/pricing/pricingLive";
 
 interface CheckoutButtonProps {
-  href: string;
+  priceId: string | undefined;
   className?: string;
   disabledClassName?: string;
   children: ReactNode;
   /**
-   * Label shown when pricing is not yet live. Defaults to "Launching tomorrow".
+   * Label shown when pricing is not yet live OR no priceId is configured.
+   * Defaults to "Launching tomorrow".
    */
   launchingLabel?: string;
 }
 
 /**
- * Checkout CTA gated by `NEXT_PUBLIC_PRICING_LIVE`. When the flag is off, the
- * button renders as a non-interactive disabled element with a "Launching
- * tomorrow" label so customers cannot hit a checkout that would charge stale
- * Stripe prices.
+ * Checkout CTA that POSTs to /api/checkout with the resolved priceId and
+ * navigates to the returned Stripe-hosted checkout URL.
+ *
+ * Gated by `NEXT_PUBLIC_PRICING_LIVE`. When the flag is off OR `priceId` is
+ * missing, the button renders disabled with the `launchingLabel` so customers
+ * cannot start a checkout that would fail or hit a stale / unconfigured price.
  */
 export function CheckoutButton({
-  href,
+  priceId,
   className,
   disabledClassName,
   children,
   launchingLabel = "Launching tomorrow",
 }: CheckoutButtonProps) {
-  if (!isPricingLive()) {
+  const [loading, setLoading] = useState(false);
+
+  if (!isPricingLive() || !priceId) {
     return (
       <button
         type="button"
@@ -44,9 +48,38 @@ export function CheckoutButton({
     );
   }
 
+  async function handleClick() {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const resp = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priceId }),
+      });
+      const data = (await resp.json().catch(() => ({}))) as {
+        url?: string;
+        error?: string;
+      };
+      if (resp.ok && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      console.error("[checkout] failed", resp.status, data);
+    } catch (err) {
+      console.error("[checkout] network error", err);
+    }
+    setLoading(false);
+  }
+
   return (
-    <Link href={href} className={className}>
-      {children}
-    </Link>
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={loading}
+      className={className}
+    >
+      {loading ? "Opening checkout…" : children}
+    </button>
   );
 }

@@ -29,12 +29,38 @@ type Plan = {
   description: string;
   features: { included: boolean; label: string }[];
   cta: string;
-  ctaHref: string;
+  /** Href used for Free (internal link) and Enterprise (mailto). Paid tiers resolve priceId instead. */
+  ctaHref?: string;
   highlight?: "popular" | "best" | "onetime";
   accent: "muted" | "violet" | "amber";
   icon?: "crown" | null;
   notebookLMHighlight?: boolean;
 };
+
+/**
+ * Resolve the Stripe Price ID for a paid CTA from the plan id and the
+ * monthly/annual selection. Returns undefined when no price is configured,
+ * which causes <CheckoutButton> to render in its disabled "launching" state.
+ */
+function resolvePlanPriceId(
+  planId: string,
+  isAnnual: boolean
+): string | undefined {
+  switch (planId) {
+    case "planner":
+      return isAnnual
+        ? process.env.NEXT_PUBLIC_STRIPE_PLANNER_ANNUAL_PRICE_ID
+        : process.env.NEXT_PUBLIC_STRIPE_PLANNER_MONTHLY_PRICE_ID;
+    case "masterclass":
+      return isAnnual
+        ? process.env.NEXT_PUBLIC_STRIPE_MASTERCLASS_ANNUAL_PRICE_ID
+        : process.env.NEXT_PUBLIC_STRIPE_MASTERCLASS_MONTHLY_PRICE_ID;
+    case "5pack":
+      return process.env.NEXT_PUBLIC_STRIPE_MASTERCLASS_5PACK_PRICE_ID;
+    default:
+      return undefined;
+  }
+}
 
 const PLANS: Plan[] = [
   {
@@ -76,7 +102,6 @@ const PLANS: Plan[] = [
       { included: false, label: "NotebookLM podcast export" },
     ],
     cta: "Start Planner",
-    ctaHref: "/api/checkout?tier=planner",
     accent: "violet",
     highlight: "popular",
   },
@@ -99,7 +124,6 @@ const PLANS: Plan[] = [
       { included: true, label: "Priority queue" },
     ],
     cta: "Start Masterclass",
-    ctaHref: "/api/checkout?tier=masterclass",
     accent: "amber",
     highlight: "best",
     icon: "crown",
@@ -128,6 +152,7 @@ const PLANS: Plan[] = [
 
 export default function PricingCards() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
+  const isAnnual = billingCycle === "annual";
 
   return (
     <>
@@ -167,7 +192,6 @@ export default function PricingCards() {
       {/* 4-card grid */}
       <div className="grid gap-6 xl:gap-8 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
         {PLANS.map((plan) => {
-          const isAnnual = billingCycle === "annual";
           const displayPrice =
             isAnnual && plan.priceAnnual ? plan.priceAnnual : plan.price;
           const displayUnit =
@@ -287,14 +311,14 @@ export default function PricingCards() {
                   <EnterpriseMailtoCta label={plan.cta} />
                 ) : plan.id === "free" ? (
                   <Link
-                    href={plan.ctaHref}
+                    href={plan.ctaHref ?? "/"}
                     className={`w-full inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium transition-all hover:scale-[1.02] ${ctaClass}`}
                   >
                     {plan.cta}
                   </Link>
                 ) : (
                   <CheckoutButton
-                    href={plan.ctaHref}
+                    priceId={resolvePlanPriceId(plan.id, isAnnual)}
                     className={`w-full inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium transition-all hover:scale-[1.02] ${ctaClass}`}
                     disabledClassName={`w-full inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium ${disabledCtaClass}`}
                     launchingLabel={`${plan.name} — launching tomorrow`}
@@ -312,13 +336,14 @@ export default function PricingCards() {
       </div>
 
       {/* Single Masterclass sub-card — Planner upsell (violet/indigo to associate with Planner tier) */}
+      {/* Kept disabled until a Stripe Price ID is wired for Single Masterclass. */}
       <div className="mt-12 rounded-2xl border border-violet-200/30 bg-violet-50/5 dark:bg-violet-500/5 dark:border-violet-500/20 p-6 text-center">
         <h3 className="text-lg font-semibold">One Masterclass, no subscription</h3>
         <p className="mt-2 text-sm text-muted-foreground">
           Keep your Planner plan — generate a single Masterclass-quality course on demand. One-time €{SINGLE_MASTERCLASS_PRICE_EUR}.
         </p>
         <CheckoutButton
-          href="/api/checkout?tier=single_masterclass"
+          priceId={undefined}
           className="mt-4 inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium bg-gradient-to-r from-violet-600 to-indigo-600 text-white border-0 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/40 transition-all hover:scale-[1.02]"
           disabledClassName="mt-4 inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium bg-muted text-muted-foreground cursor-not-allowed opacity-60"
           launchingLabel="Single Masterclass — launching tomorrow"
@@ -334,7 +359,7 @@ export default function PricingCards() {
           5 full Masterclass generations · 90 days to use · €20 off if you upgrade within 30 days.
         </p>
         <CheckoutButton
-          href="/api/checkout?tier=5pack"
+          priceId={resolvePlanPriceId("5pack", false)}
           className="mt-4 inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium bg-gradient-to-r from-amber-600 to-orange-600 text-white border-0 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:scale-[1.02]"
           disabledClassName="mt-4 inline-flex items-center justify-center rounded-full h-11 px-6 text-sm font-medium bg-muted text-muted-foreground cursor-not-allowed opacity-60"
           launchingLabel="5-Pack — launching tomorrow"
