@@ -5,6 +5,13 @@ import { isPricingLive } from "@/lib/pricing/pricingLive";
 
 interface CheckoutButtonProps {
   priceId: string | undefined;
+  /**
+   * @deprecated Legacy prop from the pre-POST CTA flow. Ignored at runtime —
+   * any call site still passing `href` will render in the disabled
+   * "launching" state because no `priceId` is provided. Migrate by resolving
+   * the Stripe Price ID and passing it as `priceId`.
+   */
+  href?: string;
   className?: string;
   disabledClassName?: string;
   children: ReactNode;
