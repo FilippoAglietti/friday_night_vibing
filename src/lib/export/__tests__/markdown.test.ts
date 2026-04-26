@@ -89,6 +89,76 @@ describe("markdownToHtml", () => {
     expect(out).toContain('<a href="https://mdn.com"');
   });
 
+  it("renders inline math via KaTeX", () => {
+    const out = markdownToHtml("Solve $x = 1$ for the root.");
+    // KaTeX wraps inline math in <span class="katex">…</span> with html output
+    expect(out).toContain('class="katex"');
+    expect(out).not.toContain("$x = 1$");
+    // The literal LaTeX should be replaced by rendered spans
+    expect(out).toMatch(/<span class="katex">/);
+  });
+
+  it("renders display math centered (block) via KaTeX", () => {
+    const out = markdownToHtml("Below the fold:\n\n$$E = mc^2$$");
+    expect(out).toContain("katex-display");
+    expect(out).not.toContain("$$E = mc^2$$");
+  });
+
+  it("does not treat escaped \\$ as math", () => {
+    const out = markdownToHtml("That costs \\$5 today");
+    expect(out).toContain("$5");
+    expect(out).not.toContain('class="katex"');
+  });
+
+  it("does not parse math inside inline code spans", () => {
+    const out = markdownToHtml("Run `$x = 1$` literally");
+    expect(out).toContain("<code>$x = 1$</code>");
+    expect(out).not.toContain('class="katex"');
+  });
+
+  it("does not parse math inside fenced code blocks", () => {
+    const out = markdownToHtml("```\n$x = 1$\n```");
+    expect(out).not.toContain('class="katex"');
+  });
+
+  it("preserves underscores inside math (no italic substitution)", () => {
+    const out = markdownToHtml("See $u_\\theta(x_i, t_j)$ here.");
+    // No <em> from underscore italic regex eating math underscores
+    expect(out).toContain('class="katex"');
+    expect(out).not.toMatch(/<em>[^<]*\\theta/);
+  });
+
+  it("falls back to literal text for invalid LaTeX (no throw)", () => {
+    expect(() =>
+      markdownToHtml("Bad math: $\\notARealCommand{x}$"),
+    ).not.toThrow();
+  });
+
+  it("renders a GFM table with header + body rows", () => {
+    const md = [
+      "| Symbol | Meaning |",
+      "| ------ | ------- |",
+      "| `m`    | mass    |",
+      "| `c`    | speed   |",
+    ].join("\n");
+    const out = markdownToHtml(md);
+    expect(out).toContain("<table>");
+    expect(out).toContain("<thead>");
+    expect(out).toContain("<th>Symbol</th>");
+    expect(out).toContain("<th>Meaning</th>");
+    expect(out).toContain("<tbody>");
+    expect(out).toContain("<td><code>m</code></td>");
+    expect(out).toContain("<td>mass</td>");
+    expect(out).toContain("</table>");
+  });
+
+  it("does not treat a stray pipe-line as a table without separator", () => {
+    const out = markdownToHtml("| just a sentence with | inside |");
+    expect(out).not.toContain("<table>");
+    // Falls through to a regular paragraph
+    expect(out).toContain("<p>");
+  });
+
   it("survives a real-world lesson body", () => {
     const md = [
       "## Goals",

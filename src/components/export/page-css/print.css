@@ -74,3 +74,10 @@ h1, h2, h3 {
 table, tr, td, th {
   break-inside: avoid;
 }
+
+/* Math (KaTeX) — display equations should never split across pages.
+   KaTeX's own stylesheet already centers .katex-display, so we only
+   add print-specific protection here. */
+.katex-display {
+  break-inside: avoid;
+}

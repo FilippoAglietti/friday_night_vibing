@@ -5,7 +5,9 @@
  * Lifted out of generateScorm.ts (Phase 2 audit recommendation,
  * 2026-04-26) and extended to cover what the online course view
  * renders: ## headings, **bold**, *italic*, `inline code`,
- * > blockquote, * / 1. lists, [links](url), and paragraphs.
+ * > blockquote, * / 1. lists, [links](url), paragraphs,
+ * GFM tables (| col | col |), and KaTeX math
+ * ($...$ inline, $$...$$ display).
  *
  * Used by:
  *   - PDF v2 LessonPage.tsx (renders via dangerouslySetInnerHTML
@@ -18,10 +20,15 @@
  *   - SCORM (refactored to call this instead of its inline copy)
  *
  * Safety: input is always escaped before any markdown substitution,
- * so a malicious lesson.content cannot inject <script> tags.
+ * so a malicious lesson.content cannot inject <script> tags. Math is
+ * extracted to placeholders BEFORE escape and rendered by KaTeX
+ * (whose output is its own controlled markup), so user-supplied
+ * LaTeX cannot smuggle HTML through the math channel either.
  * Generated output is safe to inject via dangerouslySetInnerHTML.
  * ──────────────────────────────────────────────────────────────
  */
+
+import katex from "katex";
 
 const HTML_ESCAPE_MAP: Record<string, string> = {
   "&": "&amp;",
@@ -121,6 +128,105 @@ function joinPhrasesAsSentence(phrases: string[]): string {
 }
 
 /**
+ * Math placeholder format: MATH(BLOCK|INLINE)<idx>
+ *
+ *  (start of heading) is a control char that:
+ *   - never appears in real lesson content
+ *   - is not in HTML_ESCAPE_MAP, so it survives escapeHtml() unchanged
+ *   - is not consumed by any markdown regex in this file
+ *
+ * The pre-pass extractor walks the input character-by-character, leaving
+ * code spans (`...`) and fenced blocks (```...```) intact so that
+ * something like `` `$x$` `` keeps the dollar signs literal.
+ */
+const MATH_PLACEHOLDER_PREFIX = "MATH";
+const MATH_PLACEHOLDER_SUFFIX = "";
+const MATH_PLACEHOLDER_RE = /MATH(BLOCK|INLINE)(\d+)/g;
+
+function extractMath(input: string): {
+  stripped: string;
+  rendered: string[];
+} {
+  const rendered: string[] = [];
+  let out = "";
+  let i = 0;
+
+  const renderAndPlace = (expr: string, displayMode: boolean): string => {
+    const html = katex.renderToString(expr, {
+      displayMode,
+      throwOnError: false,
+      output: "html",
+    });
+    rendered.push(html);
+    const kind = displayMode ? "BLOCK" : "INLINE";
+    return `${MATH_PLACEHOLDER_PREFIX}${kind}${rendered.length - 1}${MATH_PLACEHOLDER_SUFFIX}`;
+  };
+
+  while (i < input.length) {
+    // Fenced code block: ``` ... ``` — passthrough untouched
+    if (input.startsWith("```", i)) {
+      const end = input.indexOf("```", i + 3);
+      if (end === -1) {
+        out += input.slice(i);
+        break;
+      }
+      out += input.slice(i, end + 3);
+      i = end + 3;
+      continue;
+    }
+    // Inline code: ` ... ` — passthrough untouched
+    if (input[i] === "`") {
+      const end = input.indexOf("`", i + 1);
+      if (end === -1) {
+        out += input[i];
+        i++;
+        continue;
+      }
+      out += input.slice(i, end + 1);
+      i = end + 1;
+      continue;
+    }
+    // Escaped dollar — keep literal, drop the backslash so it renders as $
+    if (input[i] === "\\" && input[i + 1] === "$") {
+      out += "$";
+      i += 2;
+      continue;
+    }
+    // Block math: $$ ... $$ (may span lines)
+    if (input.startsWith("$$", i)) {
+      const end = input.indexOf("$$", i + 2);
+      if (end !== -1) {
+        const expr = input.slice(i + 2, end).trim();
+        out += renderAndPlace(expr, true);
+        i = end + 2;
+        continue;
+      }
+    }
+    // Inline math: $ ... $ on a single line, no internal blank
+    if (input[i] === "$") {
+      let end = -1;
+      for (let j = i + 1; j < input.length; j++) {
+        if (input[j] === "\n") break;
+        if (input[j] === "$" && input[j - 1] !== "\\") {
+          end = j;
+          break;
+        }
+      }
+      if (end !== -1 && end > i + 1) {
+        const expr = input.slice(i + 1, end);
+        out += renderAndPlace(expr, false);
+        i = end + 1;
+        continue;
+      }
+    }
+    out += input[i];
+    i++;
+  }
+
+  return { stripped: out, rendered };
+}
+
+/**
  * Convert lightweight markdown to HTML.
  *
  * Supports the subset used in lesson.content across the app:
@@ -132,6 +238,8 @@ function joinPhrasesAsSentence(phrases: string[]): string {
  *   - `* item` / `- item` unordered list
  *   - `1. item` ordered list
  *   - `[label](https://url)` links (open in new tab)
+ *   - GFM tables: `| col1 | col2 |\n| --- | --- |\n| a | b |`
+ *   - Math (KaTeX): `$inline$` and `$$display$$`
  *   - blank-line paragraph separation
  *
  * Returns sanitized HTML safe for dangerouslySetInnerHTML.
@@ -139,9 +247,14 @@ function joinPhrasesAsSentence(phrases: string[]): string {
 export function markdownToHtml(markdown: string): string {
   if (!markdown) return "";
 
+  // Pre-pass: extract math expressions (raw LaTeX has $, <, >, & that
+  // would otherwise be escaped or eaten by markdown regexes) and replace
+  // them with placeholders that survive escape + markdown processing.
+  const { stripped, rendered } = extractMath(markdown);
+
   // Escape every untrusted character first. All subsequent regex
   // substitutions only re-introduce *intended* HTML.
-  const escaped = escapeHtml(markdown);
+  const escaped = escapeHtml(stripped);
 
   const lines = escaped.split("\n");
   const out: string[] = [];
@@ -181,7 +294,8 @@ export function markdownToHtml(markdown: string): string {
     closeBlockquote();
   };
 
-  for (const rawLine of lines) {
+  for (let li = 0; li < lines.length; li++) {
+    const rawLine = lines[li];
     const line = rawLine.trimEnd();
 
     // Blank line — paragraph / list / quote terminator
@@ -207,6 +321,27 @@ export function markdownToHtml(markdown: string): string {
     if (h1) {
       closeAllBlocks();
       out.push(`<h1>${renderInline(h1[1])}</h1>`);
+      continue;
+    }
+
+    // GFM table — header row + separator row + zero or more body rows.
+    // We only enter this branch when the *next* line is a valid separator,
+    // which keeps lonely "| ... |" lines from being mistaken for tables.
+    if (
+      isTableRow(line) &&
+      li + 1 < lines.length &&
+      isTableSeparator(lines[li + 1].trimEnd())
+    ) {
+      closeAllBlocks();
+      const header = splitTableRow(line);
+      const bodyRows: string[][] = [];
+      let scan = li + 2;
+      while (scan < lines.length && isTableRow(lines[scan].trimEnd())) {
+        bodyRows.push(splitTableRow(lines[scan].trimEnd()));
+        scan++;
+      }
+      out.push(buildTableHtml(header, bodyRows));
+      li = scan - 1; // for-loop increment lands on `scan`
       continue;
     }
 
@@ -261,11 +396,20 @@ export function markdownToHtml(markdown: string): string {
   }
 
   closeAllBlocks();
-  return out.join("\n");
+
+  // Post-pass: substitute math placeholders with the rendered KaTeX HTML.
+  // The placeholders survived escape unchanged and may now sit inside
+  // <p>, <li>, <td>, <blockquote>, etc. — KaTeX HTML is always valid in
+  // those contexts (inline math is a <span>, display math is a <span>
+  // that renders as a centered block via the consumer's CSS).
+  const html = out.join("\n");
+  return html.replace(MATH_PLACEHOLDER_RE, (_, _kind, idx) => {
+    return rendered[Number(idx)] ?? "";
+  });
 }
 
 /**
- * Inline pass: applied per line / paragraph / list-item / heading.
+ * Inline pass: applied per line / paragraph / list-item / heading / table cell.
  * Order matters — code spans are processed first so their contents
  * are protected from bold/italic/link substitution.
  */
@@ -275,7 +419,7 @@ function renderInline(text: string): string {
   const codeStash: string[] = [];
   let stage = text.replace(/`([^`]+)`/g, (_, c) => {
     codeStash.push(c);
-    return ` CODE${codeStash.length - 1} `;
+    return ` CODE${codeStash.length - 1} `;
   });
 
   // Bold (must run before italic so ** isn't consumed as nested *)
@@ -295,9 +439,55 @@ function renderInline(text: string): string {
   );
 
   // Restore code spans
-  stage = stage.replace(/ CODE(\d+) /g, (_, i) => {
+  stage = stage.replace(/ CODE(\d+) /g, (_, i) => {
     return `<code>${codeStash[Number(i)]}</code>`;
   });
 
   return stage;
+}
+
+// ─── GFM table helpers ───────────────────────────────────────
+
+function isTableRow(line: string): boolean {
+  // Must start and end with a pipe and have at least one cell separator inside.
+  // We check the post-escape representation, where `|` is unchanged.
+  return /^\|.+\|$/.test(line) && line.indexOf("|", 1) < line.length - 1;
+}
+
+function isTableSeparator(line: string): boolean {
+  if (!isTableRow(line)) return false;
+  const cells = splitTableRow(line);
+  // Each cell must be a run of dashes, optionally bracketed by colons for
+  // alignment. We accept the alignment markers but currently ignore them
+  // (default left-align in CSS).
+  return cells.length > 0 && cells.every((c) => /^:?-{3,}:?$/.test(c.trim()));
+}
+
+function splitTableRow(line: string): string[] {
+  // GFM allows `\|` for a literal pipe inside a cell. Stash escaped pipes
+  // before splitting, restore after.
+  const PIPE = "";
+  return line
+    .slice(1, -1)
+    .replace(/\\\|/g, PIPE)
+    .split("|")
+    .map((c) => c.trim().replace(new RegExp(PIPE, "g"), "|"));
+}
+
+function buildTableHtml(header: string[], rows: string[][]): string {
+  const headerHtml = header
+    .map((c) => `<th>${renderInline(c)}</th>`)
+    .join("");
+  if (rows.length === 0) {
+    return `<table><thead><tr>${headerHtml}</tr></thead></table>`;
+  }
+  const bodyHtml = rows
+    .map((row) => {
+      const cells = row
+        .map((c) => `<td>${renderInline(c)}</td>`)
+        .join("");
+      return `<tr>${cells}</tr>`;
+    })
+    .join("");
+  return `<table><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table>`;
 }
