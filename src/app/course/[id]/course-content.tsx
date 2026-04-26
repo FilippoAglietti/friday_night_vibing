@@ -36,6 +36,7 @@ import {
   Users,
   Calendar,
 } from "lucide-react";
+import { useToast } from "@/components/ToastProvider";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
@@ -528,6 +529,7 @@ export default function CourseContent({
 
   const router = useRouter();
   const plan = normalizePlan(rawPlan);
+  const { toast } = useToast();
 
   const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
   const [historyVersion, setHistoryVersion] = useState(0);
@@ -556,6 +558,8 @@ export default function CourseContent({
     if (isExportV2ClientEnabled()) {
       try {
         await downloadPdfV2(courseId);
+        recordExport("pdf");
+        toast("PDF ready — check your downloads", "success");
         return;
       } catch (err) {
         console.error("[export v2] failed, using legacy:", err);
@@ -565,8 +569,10 @@ export default function CourseContent({
       const pdf = generateCurriculumPDF(c, { teachingStyle });
       pdf.save(`${sanitizeFilename(c.title)}_syllabus.pdf`);
       recordExport("pdf");
+      toast("PDF ready — check your downloads", "success");
     } catch (err) {
       console.error("PDF generation failed:", err);
+      toast("Couldn't generate PDF. Please try again.", "error");
     }
   };
 
@@ -576,8 +582,10 @@ export default function CourseContent({
       const blob = await generateCurriculumDocx(c, { teachingStyle });
       downloadBlob(blob, `${sanitizeFilename(c.title)}.docx`);
       recordExport("word");
+      toast("Word document downloaded", "success");
     } catch (err) {
       console.error("Word export failed:", err);
+      toast("Couldn't generate Word document.", "error");
     } finally {
       setLoadingExports((p) => ({ ...p, docx: false }));
     }
@@ -589,8 +597,10 @@ export default function CourseContent({
       const blob = await generateScormPackage(c, { teachingStyle });
       downloadBlob(blob, `${sanitizeFilename(c.title)}_scorm.zip`);
       recordExport("scorm");
+      toast("SCORM package downloaded", "success");
     } catch (err) {
       console.error("SCORM export failed:", err);
+      toast("Couldn't generate SCORM package.", "error");
     } finally {
       setLoadingExports((p) => ({ ...p, scorm: false }));
     }
@@ -602,8 +612,10 @@ export default function CourseContent({
       const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
       downloadBlob(blob, notebookLMFilename(c));
       recordExport("nlmAudio");
+      toast("NotebookLM markdown downloaded", "success");
     } catch (err) {
       console.error("NotebookLM audio export failed:", err);
+      toast("Couldn't generate markdown.", "error");
     }
   };
 
@@ -622,8 +634,10 @@ export default function CourseContent({
       const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
       downloadBlob(blob, notebookLMSlidesFilename(c, style));
       recordExport("nlmSlides");
+      toast("Slides markdown downloaded", "success");
     } catch (err) {
       console.error("NotebookLM slides export failed:", err);
+      toast("Couldn't generate slides markdown.", "error");
     }
   };
 
@@ -633,15 +647,22 @@ export default function CourseContent({
 
   const handleExportNotion = async () => {
     const ok = await copyNotionHtmlToClipboard(c, { teachingStyle });
-    if (ok) recordExport("notion");
+    if (ok) {
+      recordExport("notion");
+      toast("Course copied as Notion blocks — paste into Notion", "success");
+    } else {
+      toast("Couldn't copy to clipboard.", "error");
+    }
   };
 
   const handleCopyMarkdown = async () => {
     try {
       await navigator.clipboard.writeText(curriculumToMarkdown(c));
       recordExport("markdown");
+      toast("Markdown copied to clipboard", "success");
     } catch (err) {
       console.error("Copy markdown failed:", err);
+      toast("Couldn't copy markdown.", "error");
     }
   };
 
@@ -651,12 +672,18 @@ export default function CourseContent({
         .from("courses")
         .update({ is_public: true })
         .eq("id", courseId);
-      if (error) console.error("Failed to make course public:", error);
+      if (error) {
+        console.error("Failed to make course public:", error);
+        toast("Couldn't generate share link.", "error");
+        return;
+      }
       const url = generateStudentShareUrl(courseId);
       await navigator.clipboard.writeText(url);
       recordExport("share");
+      toast("Share link copied to clipboard", "success");
     } catch (err) {
       console.error("Share failed:", err);
+      toast("Couldn't generate share link.", "error");
     }
   };
 
