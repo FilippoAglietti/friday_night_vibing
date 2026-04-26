@@ -115,9 +115,12 @@ function stripModulePrefix(title: string): string {
  */
 export async function generateScormPackage(
   curriculum: Curriculum,
-  opts?: { teachingStyle?: TeachingStyle | null }
+  opts?: { teachingStyle?: TeachingStyle | null; creatorName?: string | null }
 ): Promise<Blob> {
   const style: TeachingStyle = opts?.teachingStyle ?? DEFAULT_STYLE;
+  // Reserved for future SCORM-level metadata; SCORM HTML pages don't currently
+  // surface a Syllabi/creator string, so the value is not yet rendered.
+  void opts?.creatorName;
   const zip = new JSZip();
 
   // Generate manifest
@@ -524,7 +527,6 @@ function generateLessonPage(
       <section class="lesson-info">
         <p class="lesson-description">${escapeHtml(lesson.description)}</p>
         <div class="lesson-meta">
-          <span class="meta-badge">${escapeHtml(lesson.format)}</span>
           <span class="meta-item">${lesson.durationMinutes} min</span>
         </div>
       </section>
@@ -933,7 +935,6 @@ function generateLessonCard(lesson: Lesson): string {
         <h3>${escapeHtml(lesson.title)}</h3>
         <p>${escapeHtml(lesson.description)}</p>
         <div class="card-footer">
-          <span class="format-badge">${escapeHtml(lesson.format)}</span>
           <span class="duration">${lesson.durationMinutes} min</span>
         </div>
       </a>`;

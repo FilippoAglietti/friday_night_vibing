@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     .eq("id", user.id)
     .single();
 
-  const branding = resolveBranding(profile);
+  const branding = resolveBranding(profile, user.email);
   const html = await renderHtml(
     <CourseDocument curriculum={curriculum} branding={branding} />,
   );

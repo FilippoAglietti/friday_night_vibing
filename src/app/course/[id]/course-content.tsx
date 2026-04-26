@@ -13,7 +13,7 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -96,19 +96,6 @@ function getDifficultyStyle(d?: string) {
       return "bg-rose-500/15 text-rose-400 border-rose-500/30";
     default:
       return "bg-violet-500/15 text-violet-400 border-violet-500/30";
-  }
-}
-
-/** Lesson format icon */
-function getLessonIcon(format?: string) {
-  switch (format?.toLowerCase()) {
-    case "video":       return "▶";
-    case "reading":     return "📄";
-    case "interactive": return "🎮";
-    case "project":     return "🛠️";
-    case "live-session": return "🔴";
-    case "discussion":  return "💬";
-    default:            return "📚";
   }
 }
 
@@ -202,10 +189,10 @@ function LessonItem({ lesson, index }: { lesson: Lesson; index: number }) {
           hasDetails ? "cursor-pointer hover:bg-white/5" : "cursor-default"
         } ${expanded ? "bg-white/5" : ""}`}
       >
-        {/* Lesson number + icon */}
+        {/* Lesson number */}
         <div className="flex-shrink-0 mt-0.5">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-500/10 text-sm">
-            {getLessonIcon(lesson.format)}
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-violet-500/10 text-sm font-semibold text-violet-400">
+            {index + 1}
           </div>
         </div>
 
@@ -213,13 +200,8 @@ function LessonItem({ lesson, index }: { lesson: Lesson; index: number }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-sm font-semibold text-white">
-              {index + 1}. {lesson.title}
+              {lesson.title}
             </h4>
-            {lesson.format && (
-              <span className="text-[10px] px-1.5 py-0.5 bg-violet-500/10 text-violet-400 rounded capitalize">
-                {lesson.format}
-              </span>
-            )}
           </div>
           {lesson.description && (
             <p className="text-xs text-slate-400 mt-1 line-clamp-2">
@@ -533,10 +515,27 @@ export default function CourseContent({
 
   const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
   const [historyVersion, setHistoryVersion] = useState(0);
+  const [creatorName, setCreatorName] = useState<string>("Author");
 
   const currentLoadingFormat = (Object.entries(loadingExports).find(
     ([, v]) => v,
   )?.[0] ?? null) as ExportFormat | null;
+
+  // Resolve the authenticated user's display name once (full_name → email-prefix → "Author")
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: { user } } = await supabaseBrowser.auth.getUser();
+      if (cancelled || !user) return;
+      const meta = user.user_metadata as { full_name?: string } | undefined;
+      const fromName = meta?.full_name?.trim();
+      const fromEmail = user.email?.split("@")[0];
+      setCreatorName(fromName || fromEmail || "Author");
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const recordExport = (format: ExportFormatId) => {
     appendExportEvent(courseId, format);
@@ -575,7 +574,7 @@ export default function CourseContent({
       }
     }
     try {
-      const pdf = generateCurriculumPDF(c, { teachingStyle });
+      const pdf = generateCurriculumPDF(c, { teachingStyle, creatorName });
       pdf.save(`${sanitizeFilename(c.title)}_syllabus.pdf`);
       recordExport("pdf");
       toast("PDF ready — check your downloads", "success");
@@ -590,7 +589,7 @@ export default function CourseContent({
   const handleExportDocx = async () => {
     try {
       setLoadingExports((p) => ({ ...p, word: true }));
-      const blob = await generateCurriculumDocx(c, { teachingStyle });
+      const blob = await generateCurriculumDocx(c, { teachingStyle, creatorName });
       downloadBlob(blob, `${sanitizeFilename(c.title)}.docx`);
       recordExport("word");
       toast("Word document downloaded", "success");
@@ -619,7 +618,7 @@ export default function CourseContent({
 
   const handleExportNotebookLMAudio = () => {
     try {
-      const md = generateNotebookLMMarkdown(c);
+      const md = generateNotebookLMMarkdown(c, { creatorName });
       const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
       downloadBlob(blob, notebookLMFilename(c));
       recordExport("nlmAudio");
@@ -641,7 +640,7 @@ export default function CourseContent({
 
   const runSlideExport = (style: SlideStyle) => {
     try {
-      const md = generateNotebookLMSlidesMarkdown(c, { style });
+      const md = generateNotebookLMSlidesMarkdown(c, { style, creatorName });
       const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
       downloadBlob(blob, notebookLMSlidesFilename(c, style));
       recordExport("nlmSlides");
@@ -657,7 +656,7 @@ export default function CourseContent({
   };
 
   const handleExportNotion = async () => {
-    const ok = await copyNotionHtmlToClipboard(c, { teachingStyle });
+    const ok = await copyNotionHtmlToClipboard(c, { teachingStyle, creatorName });
     if (ok) {
       recordExport("notion");
       toast("Course copied as Notion blocks — paste into Notion", "success");
@@ -1007,15 +1006,6 @@ export default function CourseContent({
 
         {/* ── Footer / CTA ────────────────────────────── */}
         <section className="text-center pt-8 border-t border-white/5">
-          <p className="text-xs text-slate-600 mb-4">
-            Generated by{" "}
-            <a
-              href="https://syllabi.online"
-              className="text-violet-500 hover:text-violet-400 transition-colors"
-            >
-              Syllabi
-            </a>
-          </p>
           <Link
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl font-semibold text-sm transition-colors shadow-lg shadow-violet-500/10"

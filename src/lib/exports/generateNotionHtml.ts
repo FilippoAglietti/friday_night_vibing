@@ -35,9 +35,10 @@ const MOD_PREFIX_RE = /^(?:module|chapter|session|unit|lesson|scene)\s*\d+\s*[:.
 
 export function generateNotionHtml(
   c: Curriculum,
-  opts?: { teachingStyle?: TeachingStyle | null }
+  opts?: { teachingStyle?: TeachingStyle | null; creatorName?: string | null }
 ): string {
   const cfg = NOTION_HTML_STYLE[opts?.teachingStyle ?? "conversational"] ?? NOTION_HTML_STYLE.conversational;
+  const creatorName = opts?.creatorName?.trim() || "Author";
   const totalLessons = c.modules.reduce((a, m) => a + (m.lessons?.length || 0), 0);
   const totalQuizzes = c.modules.reduce(
     (a, m) => a + (m.quiz?.length || 0) + m.lessons.reduce((b, l) => b + (l.quiz?.length || 0), 0),
@@ -233,7 +234,7 @@ export function generateNotionHtml(
   }
 
   // ── Footer ──
-  parts.push(`<p><em>Generated with <a href="https://www.syllabi.online">Syllabi</a> — AI-powered course generator</em></p>`);
+  parts.push(`<p><em>By ${esc(creatorName)}</em></p>`);
 
   return parts.join("\n");
 }
@@ -244,7 +245,7 @@ export function generateNotionHtml(
  */
 export async function copyNotionHtmlToClipboard(
   curriculum: Curriculum,
-  opts?: { teachingStyle?: TeachingStyle | null }
+  opts?: { teachingStyle?: TeachingStyle | null; creatorName?: string | null }
 ): Promise<boolean> {
   const html = generateNotionHtml(curriculum, opts);
 
