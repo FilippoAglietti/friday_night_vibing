@@ -43,7 +43,7 @@ Reported by Gianmarco 2026-04-25 as one of six platform issues: *"we said to giv
 | 2 | **Separate `branding_display_name` column** from OAuth `full_name`. | Conceptually different: identity vs. brand. Editing `full_name` directly would overwrite the auth record. |
 | 3 | **Free-for-all in v1**, no tier-gating. | Easier to ship; collect usage signal before adding gates. The existing `profiles.white_label` boolean is left alone (out of scope for this work). |
 | 4 | **Cover only**, not every-page header/footer. | Smallest design surface, fewest regressions. Full-page branding is Phase 5. |
-| 5 | **PNG / JPG / SVG, 2 MB max**, recommended ≤512×512. | Covers all common logo formats. 2 MB is generous for logos; allows future raster needs. |
+| 5 | **PNG / JPG, 2 MB max**, recommended ≤512×512. | Covers all common logo formats. 2 MB is generous for logos; allows future raster needs. |
 | 6 | **Logo bucket public-read.** | Logos aren't sensitive. Courses are publicly shareable. Public URLs simplify rendering. |
 | 7 | **Optional everything.** Fallback chain for displayName: `branding_display_name → full_name → null`. Logo: present-or-absent. | Lets users adopt incrementally. `null` displayName is already handled (no Syllabi fallback). |
 | 8 | **Apply all four planned Phase 5 columns** in migration 020, even though only logo is wired. | Future-friendly. Avoids a second migration when accent/hero/footer ship. |
@@ -232,7 +232,7 @@ Component lives at `src/components/profile/BrandingSection.tsx`. Uses the existi
 - Display name placement: unchanged from Phase 1 (already rendered when present)
 - If no logo: cover renders as today
 - If no logo and no display name: cover renders as today (title-only)
-- For SVG logos: render via `<img>` with the public URL (no inline SVG; keeps the renderer simple and works in Playwright PDF)
+- Logo rendered via plain `<img>` (no `next/image` — keeps Playwright PDF rendering simple and avoids domain whitelisting)
 
 Keep the implementation minimal — one `<img>` element, conditional on `logoUrl`, fixed max-height with `object-fit: contain`.
 
