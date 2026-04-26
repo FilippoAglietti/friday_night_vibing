@@ -354,6 +354,8 @@ export default function ProfilePage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [editingGenId, setEditingGenId] = useState<string | null>(null);
   const [slideExport, setSlideExport] = useState<{ curriculum: Curriculum; defaultStyle: SlideStyle } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [genProgress, setGenProgress] = useState<GenerationProgress | null>(null);
 
@@ -668,6 +670,27 @@ export default function ProfilePage() {
       console.error("Failed to dismiss failed course:", error);
     }
   }, []);
+
+  const handleRequestDelete = useCallback((gen: Generation) => {
+    const title = gen.curriculum?.title || gen.topic || "this course";
+    setDeleteTarget({ id: gen.id, title });
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      const { error } = await supabaseBrowser.from("courses").delete().eq("id", deleteTarget.id);
+      if (error) {
+        console.error("Failed to delete course:", error);
+        return;
+      }
+      setGenerations((prev) => prev.filter((g) => g.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [deleteTarget]);
 
   const handleFormGenerated = useCallback(async () => {
     // Refresh the generations list from Supabase
@@ -1170,6 +1193,14 @@ export default function ProfilePage() {
                   title="Remix"
                 >
                   <Sparkles className="size-3.5" />
+                </Button>
+                <Button
+                  variant="ghost" size="sm"
+                  className="h-7 w-7 p-0 hover:bg-rose-500/10 hover:text-rose-400"
+                  onClick={(e) => { e.stopPropagation(); handleRequestDelete(gen); }}
+                  title="Delete"
+                >
+                  <Trash2 className="size-3.5" />
                 </Button>
               </div>
               <button
@@ -2372,6 +2403,52 @@ export default function ProfilePage() {
           setSlideExport(null);
         }}
       />
+
+      {/* Confirm-delete modal — destructive action requires explicit confirmation. */}
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4"
+          onClick={() => !isDeleting && setDeleteTarget(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-rose-500/20 bg-gradient-to-br from-slate-900 to-slate-950 p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3 mb-4">
+              <div className="shrink-0 rounded-full bg-rose-500/15 p-2">
+                <AlertTriangle className="size-5 text-rose-400" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-base font-semibold text-white">Delete this course?</h2>
+                <p className="mt-1 text-xs text-slate-400">
+                  &ldquo;{deleteTarget.title}&rdquo; will be permanently removed, including its
+                  curriculum, share link, and any quiz attempts. This cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="rounded-md px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/5 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="rounded-md bg-rose-500/90 px-3 py-1.5 text-xs font-medium text-white hover:bg-rose-500 disabled:opacity-50"
+              >
+                {isDeleting ? "Deleting…" : "Delete permanently"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
