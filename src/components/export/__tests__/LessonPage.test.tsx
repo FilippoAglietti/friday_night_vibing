@@ -62,11 +62,6 @@ describe("<LessonPage />", () => {
     expect(html).toContain("A short lead paragraph");
   });
 
-  it("renders the lesson format badge", () => {
-    const html = renderToString(<LessonPage lesson={lesson} moduleIndex={0} lessonIndex={0} />);
-    expect(html).toContain("reading");
-  });
-
   it("renders suggestedResources and skips unreachable ones", () => {
     const withResources: Lesson = {
       ...lesson,

@@ -13,22 +13,40 @@ export interface BrandingTokens {
 /**
  * Resolve the branding tokens used by export components.
  *
- * Hard constraint (spec §7): never include any Syllabi branding. When a creator
- * has no display name, every field is null and the renderer falls back to
- * title-only covers / blank metadata.
+ * Hard constraint (spec §7): never include any Syllabi branding. The fallback
+ * chain is full_name → email-prefix → null, so if a user has at least an email
+ * (always true for authenticated users) the cover/footer carries an identifier
+ * rather than going blank.
  *
  * Phase 1 reads only `full_name`. Phase 5 extends this helper to read
  * `branding_logo_url`, `branding_accent`, `branding_hero_url`, `branding_footer`
  * once migration 020 adds those columns.
  */
-export function resolveBranding(profile: Profile | null): BrandingTokens {
+export function resolveBranding(
+  profile: Profile | null,
+  email?: string | null,
+): BrandingTokens {
   const raw = profile?.full_name?.trim();
-  const displayName = raw && raw.length > 0 ? raw : null;
+  const fromName = raw && raw.length > 0 ? raw : null;
+  const fromEmail =
+    email && email.includes("@") ? email.split("@")[0] || null : null;
   return {
-    displayName,
+    displayName: fromName ?? fromEmail,
     logoUrl: null,
     accent: null,
     heroUrl: null,
     footer: null,
   };
+}
+
+/**
+ * String version of the displayName for export pipelines that don't accept null
+ * (file metadata, footer attribution). Falls back to "Author" when nothing
+ * resolvable is available — preserves the no-Syllabi guarantee.
+ */
+export function resolveCreatorLabel(
+  profile: Profile | null,
+  email?: string | null,
+): string {
+  return resolveBranding(profile, email).displayName ?? "Author";
 }

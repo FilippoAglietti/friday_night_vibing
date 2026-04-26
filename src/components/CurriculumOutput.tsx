@@ -33,7 +33,8 @@ import {
   Trophy,
   Wand2,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { supabaseBrowser } from "@/lib/supabase";
 import { generateCurriculumPDF } from "@/lib/pdf/generatePDF";
 import { generateCurriculumDocx } from "@/lib/exports/generateDocx";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
@@ -306,6 +307,22 @@ export default function CurriculumOutput({
   const [copied, setCopied] = useState(false);
   const [notionCopied, setNotionCopied] = useState(false);
   const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
+  const [creatorName, setCreatorName] = useState<string>("Author");
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data: { user } } = await supabaseBrowser.auth.getUser();
+      if (cancelled || !user) return;
+      const meta = user.user_metadata as { full_name?: string } | undefined;
+      const fromName = meta?.full_name?.trim();
+      const fromEmail = user.email?.split("@")[0];
+      setCreatorName(fromName || fromEmail || "Author");
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const [leadMagnet, setLeadMagnet] = useState<LeadMagnetSettings>({
     enabled: false,
     headline: "Get free access to this course",
@@ -333,7 +350,7 @@ export default function CurriculumOutput({
 
   const handleDownloadPDF = () => {
     try {
-      const pdf = generateCurriculumPDF(curriculum, { teachingStyle });
+      const pdf = generateCurriculumPDF(curriculum, { teachingStyle, creatorName });
       pdf.save(`${sanitizeFilename(curriculum.title)}_syllabus.pdf`);
     } catch (e) {
       console.error("Failed to generate PDF:", e);
@@ -341,7 +358,7 @@ export default function CurriculumOutput({
   };
 
   const handleExportNotion = async () => {
-    const ok = await copyNotionHtmlToClipboard(curriculum, { teachingStyle });
+    const ok = await copyNotionHtmlToClipboard(curriculum, { teachingStyle, creatorName });
     if (ok) {
       setNotionCopied(true);
       setTimeout(() => setNotionCopied(false), 3000);
@@ -351,7 +368,7 @@ export default function CurriculumOutput({
   const handleExportDocx = async () => {
     try {
       setLoadingExports((prev) => ({ ...prev, docx: true }));
-      const blob = await generateCurriculumDocx(curriculum, { teachingStyle });
+      const blob = await generateCurriculumDocx(curriculum, { teachingStyle, creatorName });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -370,7 +387,7 @@ export default function CurriculumOutput({
   const handleExportScorm = async () => {
     try {
       setLoadingExports((prev) => ({ ...prev, scorm: true }));
-      const blob = await generateScormPackage(curriculum, { teachingStyle });
+      const blob = await generateScormPackage(curriculum, { teachingStyle, creatorName });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -387,7 +404,7 @@ export default function CurriculumOutput({
   };
 
   const handleExportNotebookLM = () => {
-    const md = generateNotebookLMMarkdown(curriculum);
+    const md = generateNotebookLMMarkdown(curriculum, { creatorName });
     const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

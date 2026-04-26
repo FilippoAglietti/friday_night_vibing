@@ -117,25 +117,6 @@ export default function SharePageContent() {
     }
   };
 
-  const getLessonIcon = (format?: string) => {
-    switch (format?.toLowerCase()) {
-      case "video":
-        return "\u25B6";
-      case "reading":
-        return "\uD83D\uDCC4";
-      case "interactive":
-        return "\uD83C\uDFAE";
-      case "project":
-        return "\u270F\uFE0F";
-      case "live-session":
-        return "\uD83D\uDD34";
-      case "discussion":
-        return "\uD83D\uDCAC";
-      default:
-        return "\uD83D\uDCDA";
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       {/* Hero Section — always visible */}
@@ -439,17 +420,11 @@ export default function SharePageContent() {
                                 key={lessonIndex}
                                 className="flex items-start gap-4 p-4 bg-white/3 rounded-lg border border-white/5"
                               >
-                                <div className="text-2xl mt-1">
-                                  {getLessonIcon(lesson.format)}
-                                </div>
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
                                     <h4 className="font-semibold text-white">
                                       {lesson.title}
                                     </h4>
-                                    <span className="text-xs px-2 py-1 bg-violet-900/50 text-violet-300 rounded capitalize">
-                                      {lesson.format || "lesson"}
-                                    </span>
                                   </div>
                                   {lesson.description && (
                                     <p className="text-sm text-slate-400 mb-2">
@@ -520,45 +495,6 @@ export default function SharePageContent() {
         </>
       )}
 
-      {/* CTA Footer */}
-      <section className="relative px-4 py-24 sm:px-6 lg:px-8 border-t border-white/10">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-4 text-white">
-            Want to create courses like this?
-          </h2>
-          <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Syllabi generates complete courses with NotebookLM podcast export, stunning design, and shareable links.
-          </p>
-          <a
-            href="https://syllabi.online"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-violet-600 to-violet-700 hover:from-violet-500 hover:to-violet-600 text-white font-bold rounded-xl transition shadow-lg hover:shadow-violet-500/50 text-lg"
-          >
-            Create your first course free
-          </a>
-        </div>
-      </section>
-
-      {/* Made with Syllabi */}
-      <div className="border-t border-white/5 py-6 text-center">
-        <a
-          href="https://syllabi.online"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-violet-400 transition-colors"
-        >
-          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-            <path d="M6 12v5c3 3 9 3 12 0v-5" />
-          </svg>
-          Made with Syllabi
-        </a>
-      </div>
     </div>
   );
 }

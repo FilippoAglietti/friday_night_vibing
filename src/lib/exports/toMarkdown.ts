@@ -81,10 +81,7 @@ export function curriculumToMarkdown(c: Curriculum): string {
     mod.lessons.forEach((l) => {
       lines.push(`### Lesson ${l.order + 1}: ${l.title}`);
 
-      const lessonMeta: string[] = [];
-      lessonMeta.push(`${l.durationMinutes} min`);
-      if (l.format) lessonMeta.push(l.format);
-      lines.push(`*${lessonMeta.join(" · ")}*`);
+      lines.push(`*${l.durationMinutes} min*`);
       lines.push("");
 
       if (l.description) {

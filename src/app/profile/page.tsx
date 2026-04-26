@@ -715,13 +715,18 @@ export default function ProfilePage() {
 
   // ── Handlers ───────────────────────────────────────────────
 
+  const creatorName =
+    user?.user_metadata?.full_name?.trim() ||
+    user?.email?.split("@")[0] ||
+    "Author";
+
   const handleDownloadPDF = useCallback(
     (curriculum: Curriculum, teachingStyle?: TeachingStyle | null, courseId?: string) => {
       if (courseId && isExportV2ClientEnabled()) {
         downloadPdfV2(courseId).catch((err) => {
           console.error("[export v2] failed, using legacy:", err);
           try {
-            const pdf = generateCurriculumPDF(curriculum, { teachingStyle });
+            const pdf = generateCurriculumPDF(curriculum, { teachingStyle, creatorName });
             pdf.save(`${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_syllabus.pdf`);
           } catch (e) {
             console.error("Failed to generate PDF:", e);
@@ -730,23 +735,23 @@ export default function ProfilePage() {
         return;
       }
       try {
-        const pdf = generateCurriculumPDF(curriculum, { teachingStyle });
+        const pdf = generateCurriculumPDF(curriculum, { teachingStyle, creatorName });
         pdf.save(`${curriculum.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_syllabus.pdf`);
       } catch (e) {
         console.error("Failed to generate PDF:", e);
       }
     },
-    [],
+    [creatorName],
   );
 
   const handleExportNotion = useCallback(async (curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
-    await copyNotionHtmlToClipboard(curriculum, { teachingStyle });
+    await copyNotionHtmlToClipboard(curriculum, { teachingStyle, creatorName });
     // Brief visual feedback — the button text could be updated via state if needed
-  }, []);
+  }, [creatorName]);
 
   const handleExportDocx = useCallback(async (curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
     try {
-      const blob = await generateCurriculumDocx(curriculum, { teachingStyle });
+      const blob = await generateCurriculumDocx(curriculum, { teachingStyle, creatorName });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -758,7 +763,7 @@ export default function ProfilePage() {
     } catch (e) {
       console.error("Failed to export DOCX:", e);
     }
-  }, []);
+  }, [creatorName]);
 
   const handleShareCourse = useCallback(async (gen: Generation) => {
     if (!gen.curriculum) return;
@@ -791,7 +796,7 @@ export default function ProfilePage() {
 
   const handleExportScorm = useCallback(async (curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
     try {
-      const blob = await generateScormPackage(curriculum, { teachingStyle });
+      const blob = await generateScormPackage(curriculum, { teachingStyle, creatorName });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -803,11 +808,11 @@ export default function ProfilePage() {
     } catch (e) {
       console.error("SCORM export failed:", e);
     }
-  }, [sanitizeForFilename]);
+  }, [sanitizeForFilename, creatorName]);
 
   const handleExportNotebookLMAudio = useCallback((curriculum: Curriculum) => {
     try {
-      const md = generateNotebookLMMarkdown(curriculum);
+      const md = generateNotebookLMMarkdown(curriculum, { creatorName });
       const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -820,11 +825,11 @@ export default function ProfilePage() {
     } catch (e) {
       console.error("NotebookLM audio export failed:", e);
     }
-  }, []);
+  }, [creatorName]);
 
   const runSlideExport = useCallback((curriculum: Curriculum, style: SlideStyle) => {
     try {
-      const md = generateNotebookLMSlidesMarkdown(curriculum, { style });
+      const md = generateNotebookLMSlidesMarkdown(curriculum, { style, creatorName });
       const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -837,7 +842,7 @@ export default function ProfilePage() {
     } catch (e) {
       console.error("NotebookLM slides export failed:", e);
     }
-  }, []);
+  }, [creatorName]);
 
   const handleExportNotebookLMSlides = useCallback((curriculum: Curriculum, teachingStyle?: TeachingStyle | null) => {
     const defaultStyle: SlideStyle =

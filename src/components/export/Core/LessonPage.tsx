@@ -47,17 +47,6 @@ export function LessonPage({ lesson, moduleIndex, lessonIndex }: LessonPageProps
           <span>
             {`Lesson ${moduleIndex + 1}.${lessonIndex + 1} · ${lesson.durationMinutes} min`}
           </span>
-          {lesson.format && (
-            <span
-              style={{
-                color: "var(--c-ink-muted)",
-                letterSpacing: "0.12em",
-                fontWeight: 600,
-              }}
-            >
-              · {lesson.format}
-            </span>
-          )}
         </div>
         <h3 style={{ fontSize: "var(--fs-h2)", marginTop: 0 }}>{lesson.title}</h3>
         {lesson.description && (

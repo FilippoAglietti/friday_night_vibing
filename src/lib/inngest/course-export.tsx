@@ -27,21 +27,22 @@ export const courseExport = inngest.createFunction(
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     );
 
-    const { course, profile } = await step.run("fetch-inputs", async () => {
-      const [{ data: course }, { data: profile }] = await Promise.all([
+    const { course, profile, userEmail } = await step.run("fetch-inputs", async () => {
+      const [{ data: course }, { data: profile }, { data: userResult }] = await Promise.all([
         supabase.from("courses").select("id, user_id, curriculum").eq("id", courseId).single(),
         supabase.from("profiles").select("*").eq("id", userId).single(),
+        supabase.auth.admin.getUserById(userId),
       ]);
       if (!course) throw new Error(`course ${courseId} not found`);
       if (course.user_id !== userId) throw new Error(`course ${courseId} not owned by ${userId}`);
       if (!course.curriculum) throw new Error(`course ${courseId} has no curriculum yet`);
-      return { course, profile };
+      return { course, profile, userEmail: userResult?.user?.email ?? null };
     });
 
     // Render + upload deliberately run outside step.run — Inngest memoizes step
     // results, so on retry a previous failed upload would reuse the stale render.
     const curriculum = course.curriculum as unknown as Curriculum;
-    const branding = resolveBranding(profile);
+    const branding = resolveBranding(profile, userEmail);
     const html = await renderHtml(
       <CourseDocument curriculum={curriculum} branding={branding} />,
     );

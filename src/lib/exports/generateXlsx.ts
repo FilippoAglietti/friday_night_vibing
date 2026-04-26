@@ -73,9 +73,12 @@ function addTitle(ws: ExcelJS.Worksheet, title: string, colSpan: number) {
 
 // ── Main Export ─────────────────────────────────────────────
 
-export async function generateCurriculumXlsx(curriculum: Curriculum): Promise<Blob> {
+export async function generateCurriculumXlsx(
+  curriculum: Curriculum,
+  opts?: { creatorName?: string | null },
+): Promise<Blob> {
   const wb = new ExcelJS.Workbook();
-  wb.creator = "Syllabi";
+  wb.creator = opts?.creatorName?.trim() || "Author";
   wb.created = new Date();
 
   const totalLessons = curriculum.modules.reduce((a, m) => a + (m.lessons?.length || 0), 0);
@@ -186,7 +189,7 @@ export async function generateCurriculumXlsx(curriculum: Curriculum): Promise<Bl
 
   addTitle(wsLessons, "Lesson Details", 7);
 
-  const lessonHeaders = ["Module", "Lesson #", "Title", "Format", "Duration (min)", "Objectives", "Key Points"];
+  const lessonHeaders = ["Module", "Lesson #", "Title", "Duration (min)", "Objectives", "Key Points"];
   const lessonHeaderRow = wsLessons.addRow(lessonHeaders);
   styleHeaderRow(lessonHeaderRow, lessonHeaders.length);
 
@@ -197,7 +200,6 @@ export async function generateCurriculumXlsx(curriculum: Curriculum): Promise<Bl
         mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, ""),
         li + 1,
         lesson.title,
-        lesson.format,
         lesson.durationMinutes,
         (lesson.objectives || []).join("\n"),
         (lesson.keyPoints || []).join("\n"),
@@ -205,7 +207,6 @@ export async function generateCurriculumXlsx(curriculum: Curriculum): Promise<Bl
       styleDataRow(row, lessonHeaders.length, lessonIdx);
       row.getCell(2).alignment = { horizontal: "center", vertical: "top" };
       row.getCell(4).alignment = { horizontal: "center", vertical: "top" };
-      row.getCell(5).alignment = { horizontal: "center", vertical: "top" };
       lessonIdx++;
     });
   });
@@ -337,7 +338,7 @@ export async function generateCurriculumXlsx(curriculum: Curriculum): Promise<Bl
 
   addTitle(wsTracker, "Progress Tracker", 5);
 
-  const trackerHeaders = ["Module", "Lesson", "Format", "Duration", "Completed"];
+  const trackerHeaders = ["Module", "Lesson", "Duration", "Completed"];
   const trackerHeaderRow = wsTracker.addRow(trackerHeaders);
   styleHeaderRow(trackerHeaderRow, trackerHeaders.length);
 
@@ -347,13 +348,12 @@ export async function generateCurriculumXlsx(curriculum: Curriculum): Promise<Bl
       const row = wsTracker.addRow([
         mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, ""),
         lesson.title,
-        lesson.format,
         `${lesson.durationMinutes} min`,
         "",
       ]);
       styleDataRow(row, trackerHeaders.length, tIdx);
       // Make the "Completed" column a dropdown-ready empty cell
-      row.getCell(5).alignment = { horizontal: "center" };
+      row.getCell(4).alignment = { horizontal: "center" };
       tIdx++;
     });
   });
