@@ -1,10 +1,12 @@
 import type { Curriculum } from "@/types/curriculum";
 import type { BrandingTokens } from "@/lib/export/branding";
 import { Cover } from "./Core/Cover";
+import { CourseIntroduction } from "./Core/CourseIntroduction";
 import { TableOfContents } from "./Core/TableOfContents";
 import { ModuleOpener } from "./Core/ModuleOpener";
 import { LessonPage } from "./Core/LessonPage";
 import { QuizBlock } from "./Core/QuizBlock";
+import { PacingSchedule } from "./Core/PacingSchedule";
 import { Certificate } from "./Core/Certificate";
 
 interface CourseDocumentProps {
@@ -33,6 +35,8 @@ export function CourseDocument({ curriculum, branding, volume = 1 }: CourseDocum
         volume={volume}
       />
 
+      <CourseIntroduction curriculum={curriculum} />
+
       <TableOfContents modules={curriculum.modules} />
 
       {curriculum.modules.map((module, moduleIndex) => (
@@ -53,6 +57,10 @@ export function CourseDocument({ curriculum, branding, volume = 1 }: CourseDocum
           ))}
         </div>
       ))}
+
+      {curriculum.pacing && (
+        <PacingSchedule pacing={curriculum.pacing} modules={curriculum.modules} />
+      )}
 
       <Certificate
         courseTitle={curriculum.title}

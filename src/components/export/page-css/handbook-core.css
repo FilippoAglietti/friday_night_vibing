@@ -109,3 +109,45 @@ pre {
   overflow-x: auto;
   break-inside: avoid;
 }
+
+/* ── Lesson body — markdown-rendered HTML ──────────── */
+
+.lesson-body p { margin: 0 0 var(--sp-3); }
+
+.lesson-body ul,
+.lesson-body ol {
+  padding-left: var(--sp-5);
+  margin: 0 0 var(--sp-3);
+}
+
+.lesson-body li { padding: 2px 0; }
+
+.lesson-body strong { font-weight: 700; color: var(--c-ink); }
+.lesson-body em { font-style: italic; }
+
+.lesson-body code {
+  background: var(--c-paper-alt);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.92em;
+}
+
+.lesson-body blockquote {
+  background: var(--c-paper-alt);
+  border-left: 3px solid var(--c-accent);
+  padding: var(--sp-3) var(--sp-4);
+  margin: var(--sp-4) 0;
+  border-radius: 0 4px 4px 0;
+  font-style: italic;
+  color: var(--c-ink-sec);
+  break-inside: avoid;
+}
+
+.lesson-body blockquote p { margin: 0 0 var(--sp-2); }
+.lesson-body blockquote p:last-child { margin-bottom: 0; }
+
+.lesson-body h1,
+.lesson-body h2,
+.lesson-body h3 {
+  margin-top: var(--sp-6);
+}
