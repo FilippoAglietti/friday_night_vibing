@@ -412,6 +412,11 @@ export default function ProfilePage() {
       url.searchParams.delete("courseId");
       url.searchParams.delete("topic");
       window.history.replaceState({}, "", url.pathname + (url.search ? url.search : ""));
+    } else if (tab === "overview" || tab === "courses" || tab === "generate" || tab === "settings") {
+      setActiveTab(tab);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("tab");
+      window.history.replaceState({}, "", url.pathname + (url.search ? url.search : ""));
     }
   }, []);
 
