@@ -60,6 +60,8 @@ import { ExportGrid, type ExportFormat } from "@/components/dashboard/ExportGrid
 import { appendExportEvent, summarizeExportHistory, type ExportFormatId } from "@/lib/exports/exportHistory";
 import { useRouter } from "next/navigation";
 import QuizResultsPanel from "@/components/course/QuizResultsPanel";
+import LessonProse from "@/components/course/LessonProse";
+import InlineMarkdown from "@/components/course/InlineMarkdown";
 import { downloadPdfV2, isExportV2ClientEnabled } from "@/lib/export/client";
 
 // ─── Props ───────────────────────────────────────────────────
@@ -99,77 +101,6 @@ function getDifficultyStyle(d?: string) {
   }
 }
 
-/** Render markdown-like content to JSX (basic: bold, inline code, headers, line breaks) */
-function renderContent(text: string) {
-  // Split by double newlines for paragraphs
-  const paragraphs = text.split(/\n\n+/);
-  return paragraphs.map((p, i) => {
-    const trimmed = p.trim();
-    if (!trimmed) return null;
-
-    // Heading: ## or ###
-    if (trimmed.startsWith("### ")) {
-      return (
-        <h4 key={i} className="text-base font-semibold text-white mt-4 mb-2">
-          {trimmed.slice(4)}
-        </h4>
-      );
-    }
-    if (trimmed.startsWith("## ")) {
-      return (
-        <h3 key={i} className="text-lg font-semibold text-white mt-5 mb-2">
-          {trimmed.slice(3)}
-        </h3>
-      );
-    }
-
-    // Blockquote: > text
-    if (trimmed.startsWith("> ")) {
-      return (
-        <blockquote
-          key={i}
-          className="border-l-2 border-violet-500/50 pl-4 py-1 my-3 text-sm text-slate-300 italic"
-        >
-          {renderInline(trimmed.slice(2))}
-        </blockquote>
-      );
-    }
-
-    // Regular paragraph
-    return (
-      <p key={i} className="text-sm text-slate-300 leading-relaxed mb-3">
-        {renderInline(trimmed)}
-      </p>
-    );
-  });
-}
-
-/** Render inline markdown: **bold**, `code` */
-function renderInline(text: string) {
-  // Split by bold and code patterns, preserving delimiters
-  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return (
-        <strong key={i} className="font-semibold text-white">
-          {part.slice(2, -2)}
-        </strong>
-      );
-    }
-    if (part.startsWith("`") && part.endsWith("`")) {
-      return (
-        <code
-          key={i}
-          className="px-1.5 py-0.5 bg-violet-500/10 text-violet-300 rounded text-xs font-mono"
-        >
-          {part.slice(1, -1)}
-        </code>
-      );
-    }
-    return part;
-  });
-}
-
 // ─── Sub-components ──────────────────────────────────────────
 
 /** Single lesson with expandable details */
@@ -205,7 +136,7 @@ function LessonItem({ lesson, index }: { lesson: Lesson; index: number }) {
           </div>
           {lesson.description && (
             <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-              {lesson.description}
+              <InlineMarkdown markdown={lesson.description} />
             </p>
           )}
           {lesson.durationMinutes && (
@@ -230,9 +161,7 @@ function LessonItem({ lesson, index }: { lesson: Lesson; index: number }) {
       {expanded && hasDetails && (
         <div className="px-4 pb-4 ml-11 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Lesson content (markdown body) */}
-          {lesson.content && (
-            <div className="prose-sm">{renderContent(lesson.content)}</div>
-          )}
+          {lesson.content && <LessonProse markdown={lesson.content} />}
 
           {/* Key points */}
           {lesson.keyPoints && lesson.keyPoints.length > 0 && (
@@ -250,7 +179,7 @@ function LessonItem({ lesson, index }: { lesson: Lesson; index: number }) {
                     className="flex items-start gap-2 text-sm text-slate-300"
                   >
                     <span className="text-violet-400 mt-1 flex-shrink-0">•</span>
-                    <span>{renderInline(kp)}</span>
+                    <InlineMarkdown markdown={kp} />
                   </li>
                 ))}
               </ul>
@@ -329,7 +258,7 @@ function QuizSection({ questions }: { questions: QuizQuestion[] }) {
           >
             <p className="text-sm font-medium text-white mb-3">
               <span className="text-violet-400 mr-1">Q{i + 1}.</span>{" "}
-              {q.question}
+              <InlineMarkdown markdown={q.question} />
             </p>
 
             {/* Options */}
@@ -349,7 +278,7 @@ function QuizSection({ questions }: { questions: QuizQuestion[] }) {
                       <span className="flex-shrink-0 w-5 text-slate-500">
                         {String.fromCharCode(65 + oi)}.
                       </span>
-                      <span>{opt}</span>
+                      <InlineMarkdown markdown={opt} />
                       {isCorrect && (
                         <CheckCircle2 className="size-4 ml-auto flex-shrink-0 text-emerald-400" />
                       )}
@@ -374,7 +303,7 @@ function QuizSection({ questions }: { questions: QuizQuestion[] }) {
                     <span className="text-violet-400 font-semibold">
                       Explanation:{" "}
                     </span>
-                    {q.explanation}
+                    <InlineMarkdown markdown={q.explanation} />
                   </p>
                 </div>
               )
@@ -445,7 +374,7 @@ function ModuleSection({
           {/* Module description */}
           {mod.description && (
             <p className="text-sm text-slate-400 leading-relaxed italic">
-              {mod.description}
+              <InlineMarkdown markdown={mod.description} />
             </p>
           )}
 
@@ -465,7 +394,7 @@ function ModuleSection({
                     className="flex items-start gap-2 text-sm text-slate-400"
                   >
                     <CheckCircle2 className="size-3.5 text-violet-500/50 mt-0.5 flex-shrink-0" />
-                    <span>{obj}</span>
+                    <InlineMarkdown markdown={obj} />
                   </li>
                 ))}
               </ul>
@@ -863,7 +792,7 @@ export default function CourseContent({
                   <GraduationCap className="size-3.5" /> About This Course
                 </h2>
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  {c.description}
+                  <InlineMarkdown markdown={c.description} />
                 </p>
               </div>
             )}
@@ -873,7 +802,7 @@ export default function CourseContent({
                   <Users className="size-3.5" /> Who Is This For
                 </h2>
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  {c.targetAudience}
+                  <InlineMarkdown markdown={c.targetAudience} />
                 </p>
               </div>
             )}
@@ -898,7 +827,9 @@ export default function CourseContent({
                       {i + 1}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-300">{obj}</p>
+                  <p className="text-sm text-slate-300">
+                    <InlineMarkdown markdown={obj} />
+                  </p>
                 </div>
               ))}
             </div>
