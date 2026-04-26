@@ -287,12 +287,17 @@
 }
 
 /* ─── KaTeX (math rendering) ──────────────────────────── */
-/* Display math: add vertical breathing room and let very wide
+/* Display math: centered, with vertical breathing room. Very wide
    equations scroll horizontally instead of breaking the layout. */
 .lesson-prose .katex-display {
-  margin: 1rem 0;
+  margin: 1.25rem 0;
+  text-align: center;
   overflow-x: auto;
   overflow-y: hidden;
+}
+.lesson-prose .katex-display > .katex {
+  display: inline-block;
+  text-align: initial;
 }
 /* Inline math inside the dark course view should follow the
    surrounding text color, not KaTeX's own defaults. */
