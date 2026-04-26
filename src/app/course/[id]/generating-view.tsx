@@ -85,6 +85,15 @@ export default function GeneratingView({
     pollingRef.current = true;
     let aborted = false;
 
+    // Safety net: if generation never reaches a terminal state, bounce to My Courses
+    // after 30 min so the loader can't spin forever. Course will appear there in
+    // whatever state it ended up in.
+    const timeoutId = setTimeout(() => {
+      if (aborted) return;
+      pollingRef.current = false;
+      router.push("/profile?tab=courses");
+    }, 30 * 60 * 1000);
+
     async function tick() {
       if (aborted || !pollingRef.current) return;
       try {
@@ -104,7 +113,7 @@ export default function GeneratingView({
         setStatus(data.status);
         if (data.status === "ready") {
           pollingRef.current = false;
-          router.refresh();
+          router.push("/profile?tab=courses");
           return;
         }
         if (data.status === "failed") {
@@ -123,6 +132,7 @@ export default function GeneratingView({
       aborted = true;
       pollingRef.current = false;
       clearInterval(id);
+      clearTimeout(timeoutId);
     };
   }, [courseId, router]);
 
