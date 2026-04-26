@@ -43,4 +43,40 @@ describe("<LessonPage />", () => {
       renderToString(<LessonPage lesson={bare} moduleIndex={0} lessonIndex={0} />)
     ).not.toThrow();
   });
+
+  it("renders markdown bold as <strong>", () => {
+    const md: Lesson = { ...lesson, content: "This is **important** stuff." };
+    const html = renderToString(<LessonPage lesson={md} moduleIndex={0} lessonIndex={0} />);
+    expect(html).toContain("<strong>important</strong>");
+  });
+
+  it("renders markdown headings as <h2>", () => {
+    const md: Lesson = { ...lesson, content: "## Section title\n\nbody" };
+    const html = renderToString(<LessonPage lesson={md} moduleIndex={0} lessonIndex={0} />);
+    expect(html).toContain("<h2>Section title</h2>");
+  });
+
+  it("renders the lesson description when present", () => {
+    const withDesc: Lesson = { ...lesson, description: "A short lead paragraph" };
+    const html = renderToString(<LessonPage lesson={withDesc} moduleIndex={0} lessonIndex={0} />);
+    expect(html).toContain("A short lead paragraph");
+  });
+
+  it("renders the lesson format badge", () => {
+    const html = renderToString(<LessonPage lesson={lesson} moduleIndex={0} lessonIndex={0} />);
+    expect(html).toContain("reading");
+  });
+
+  it("renders suggestedResources and skips unreachable ones", () => {
+    const withResources: Lesson = {
+      ...lesson,
+      suggestedResources: [
+        { title: "MDN docs", url: "https://mdn.com", type: "article" },
+        { title: "Dead link", url: "https://gone.com", type: "article", status: "unreachable" },
+      ],
+    };
+    const html = renderToString(<LessonPage lesson={withResources} moduleIndex={0} lessonIndex={0} />);
+    expect(html).toContain("MDN docs");
+    expect(html).not.toContain("Dead link");
+  });
 });
