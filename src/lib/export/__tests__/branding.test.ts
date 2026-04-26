@@ -40,4 +40,48 @@ describe("resolveBranding", () => {
     const json = JSON.stringify(result);
     expect(json.toLowerCase()).not.toContain("syllabi");
   });
+
+  it("prefers branding_display_name over full_name", () => {
+    const result = resolveBranding({
+      full_name: "Maria Rossi",
+      branding_display_name: "Acme Academy",
+    } as never);
+    expect(result.displayName).toBe("Acme Academy");
+  });
+
+  it("falls back to full_name when branding_display_name is empty", () => {
+    expect(
+      resolveBranding({
+        full_name: "Maria Rossi",
+        branding_display_name: "",
+      } as never).displayName
+    ).toBe("Maria Rossi");
+    expect(
+      resolveBranding({
+        full_name: "Maria Rossi",
+        branding_display_name: "   ",
+      } as never).displayName
+    ).toBe("Maria Rossi");
+  });
+
+  it("trims branding_display_name whitespace", () => {
+    expect(
+      resolveBranding({
+        branding_display_name: "  Acme Academy  ",
+      } as never).displayName
+    ).toBe("Acme Academy");
+  });
+
+  it("returns logoUrl when branding_logo_url is set", () => {
+    const result = resolveBranding({
+      full_name: "Maria",
+      branding_logo_url: "https://example.com/logo.png",
+    } as never);
+    expect(result.logoUrl).toBe("https://example.com/logo.png");
+  });
+
+  it("returns null logoUrl when branding_logo_url is empty or whitespace", () => {
+    expect(resolveBranding({ branding_logo_url: "" } as never).logoUrl).toBeNull();
+    expect(resolveBranding({ branding_logo_url: "   " } as never).logoUrl).toBeNull();
+  });
 });

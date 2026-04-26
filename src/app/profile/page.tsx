@@ -67,6 +67,7 @@ import { normalizePlan } from "@/lib/pricing/tiers";
 import { PlanBadge } from "@/components/dashboard/PlanBadge";
 import { BenefitsStrip } from "@/components/dashboard/BenefitsStrip";
 import { ExportGrid, type ExportFormat } from "@/components/dashboard/ExportGrid";
+import BrandingSection from "@/components/profile/BrandingSection";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
 import { generateNotebookLMMarkdown, notebookLMFilename } from "@/lib/exports/generateNotebookLMMarkdown";
 import { generateNotebookLMSlidesMarkdown, notebookLMSlidesFilename, type SlideStyle } from "@/lib/exports/generateNotebookLMSlidesMarkdown";
@@ -104,6 +105,9 @@ interface UserProfile {
   plan: string;
   generations_used: number;
   generations_limit: number;
+  full_name?: string | null;
+  branding_display_name?: string | null;
+  branding_logo_url?: string | null;
 }
 
 type TabId = "overview" | "courses" | "settings" | "generate";
@@ -498,7 +502,7 @@ export default function ProfilePage() {
       if (user) {
         const [{ data: courses }, { data: profileData }] = await Promise.all([
           supabaseBrowser.from("courses").select("id, topic, audience, length, niche, curriculum, status, created_at, teaching_style, generation_progress, generation_total_modules, generation_completed_modules").order("created_at", { ascending: false }),
-          supabaseBrowser.from("profiles").select("plan, generations_used, generations_limit").eq("id", user.id).single(),
+          supabaseBrowser.from("profiles").select("plan, generations_used, generations_limit, full_name, branding_display_name, branding_logo_url").eq("id", user.id).single(),
         ]);
         if (courses) setGenerations(courses as unknown as Generation[]);
         setUserProfile(
@@ -529,7 +533,7 @@ export default function ProfilePage() {
 
       const { data: profileData } = await supabaseBrowser
         .from("profiles")
-        .select("plan, generations_used, generations_limit")
+        .select("plan, generations_used, generations_limit, full_name, branding_display_name, branding_logo_url")
         .eq("id", user.id)
         .single();
       if (profileData) setUserProfile(profileData as UserProfile);
@@ -2180,6 +2184,13 @@ export default function ProfilePage() {
                 </p>
               </CardContent>
             </Card>
+
+            {/* Branding */}
+            <BrandingSection
+              initialDisplayName={userProfile?.branding_display_name ?? null}
+              initialLogoUrl={userProfile?.branding_logo_url ?? null}
+              fallbackName={userProfile?.full_name ?? null}
+            />
 
             {/* Plan & usage */}
             <Card className="border-border/40 bg-card/50">

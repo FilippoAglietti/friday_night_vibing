@@ -44,6 +44,20 @@ export function Cover({ curriculum, branding, volume }: CoverProps) {
       <span className="running-course-title">{curriculum.title}</span>
 
       <header>
+        {branding.logoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={branding.logoUrl}
+            alt=""
+            style={{
+              maxHeight: "var(--sp-12)",
+              maxWidth: "var(--sp-32)",
+              objectFit: "contain",
+              marginBottom: "var(--sp-6)",
+              display: "block",
+            }}
+          />
+        )}
         <div style={{
           fontSize: "var(--fs-micro)",
           letterSpacing: "0.2em",

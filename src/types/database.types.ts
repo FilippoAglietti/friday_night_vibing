@@ -484,6 +484,11 @@ export type Database = {
         Row: {
           avatar_url: string | null
           billing_period: string | null
+          branding_accent: string | null
+          branding_display_name: string | null
+          branding_footer: string | null
+          branding_hero_url: string | null
+          branding_logo_url: string | null
           created_at: string
           email: string | null
           enterprise_gen_cap: number | null
@@ -503,6 +508,11 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           billing_period?: string | null
+          branding_accent?: string | null
+          branding_display_name?: string | null
+          branding_footer?: string | null
+          branding_hero_url?: string | null
+          branding_logo_url?: string | null
           created_at?: string
           email?: string | null
           enterprise_gen_cap?: number | null
@@ -522,6 +532,11 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           billing_period?: string | null
+          branding_accent?: string | null
+          branding_display_name?: string | null
+          branding_footer?: string | null
+          branding_hero_url?: string | null
+          branding_logo_url?: string | null
           created_at?: string
           email?: string | null
           enterprise_gen_cap?: number | null

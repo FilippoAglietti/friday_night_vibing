@@ -17,16 +17,27 @@ export interface BrandingTokens {
  * has no display name, every field is null and the renderer falls back to
  * title-only covers / blank metadata.
  *
- * Phase 1 reads only `full_name`. Phase 5 extends this helper to read
- * `branding_logo_url`, `branding_accent`, `branding_hero_url`, `branding_footer`
- * once migration 020 adds those columns.
+ * v1 wires displayName + logoUrl. accent / heroUrl / footer columns exist in
+ * the schema but are unused (Phase 5 will wire them).
+ *
+ * Display name fallback chain: branding_display_name → full_name → null.
  */
 export function resolveBranding(profile: Profile | null): BrandingTokens {
-  const raw = profile?.full_name?.trim();
-  const displayName = raw && raw.length > 0 ? raw : null;
+  const brandName = profile?.branding_display_name?.trim();
+  const fallbackName = profile?.full_name?.trim();
+  const displayName =
+    brandName && brandName.length > 0
+      ? brandName
+      : fallbackName && fallbackName.length > 0
+        ? fallbackName
+        : null;
+
+  const rawLogo = profile?.branding_logo_url?.trim();
+  const logoUrl = rawLogo && rawLogo.length > 0 ? rawLogo : null;
+
   return {
     displayName,
-    logoUrl: null,
+    logoUrl,
     accent: null,
     heroUrl: null,
     footer: null,
