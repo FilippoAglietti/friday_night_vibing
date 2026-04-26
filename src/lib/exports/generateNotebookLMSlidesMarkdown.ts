@@ -45,16 +45,94 @@ interface StyleConfig {
   bulletsFromLesson: (lesson: Lesson) => string[];
 }
 
+/**
+ * Maximum length for a slide bullet. Long lines wrap badly in Marp/Slidev
+ * and overwhelm the audience — keep each bullet to roughly one sentence
+ * worth of phone-screen reading.
+ */
+const SLIDE_BULLET_MAX_CHARS = 80;
+
+/**
+ * Pull bullet candidates straight from lesson.content when the curriculum
+ * doesn't provide rich keyPoints. Looks for (in order):
+ *   1. H2/H3 headings — these are explicit topical pivots
+ *   2. First sentence of each paragraph — usually the topic sentence
+ * Returns up to `max` items, each already stripped of markdown markers.
+ */
+function extractContentBullets(content: string | undefined, max: number): string[] {
+  if (!content) return [];
+
+  const headings: string[] = [];
+  const headingRe = /^#{2,3}\s+(.+)$/gm;
+  let m: RegExpExecArray | null;
+  while ((m = headingRe.exec(content)) && headings.length < max) {
+    headings.push(stripMarkdown(m[1]));
+  }
+  if (headings.length >= max) return headings;
+
+  const paragraphs = content
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter((p) => p && !p.startsWith("#") && !p.startsWith(">") && !/^([*\-]|\d+\.)\s+/.test(p));
+
+  const sentenceLeads = paragraphs
+    .map((p) => p.split(/(?<=[.!?])\s+/)[0]?.trim() ?? "")
+    .map(stripMarkdown)
+    .filter((s) => {
+      const wordCount = s.split(/\s+/).length;
+      return wordCount >= 4 && wordCount <= 18;
+    });
+
+  return [...headings, ...sentenceLeads].slice(0, max);
+}
+
+/**
+ * Extract blockquote lines from lesson.content; they're often the
+ * memorable example or quote — exactly the material slide presenters
+ * (and NotebookLM hosts reading speaker notes) want to surface.
+ */
+function extractBlockquotes(content: string | undefined): string[] {
+  if (!content) return [];
+  const out: string[] = [];
+  const re = /^>\s*(.+)$/gm;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(content))) {
+    const line = stripMarkdown(m[1]).trim();
+    if (line) out.push(line);
+  }
+  return out;
+}
+
+/**
+ * Take the first ~2 paragraphs of lesson.content as speaker-note material,
+ * rather than dumping the entire body and truncating mid-sentence. Hosts /
+ * presenters get the lead-in and the first elaboration; the rest of the
+ * lesson is for self-study, not for read-aloud.
+ */
+function leadParagraphs(content: string | undefined, max: number): string {
+  if (!content) return "";
+  return content
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .slice(0, max)
+    .join("\n\n");
+}
+
 function defaultBullets(lesson: Lesson): string[] {
-  return (
-    lesson.keyPoints?.length
-      ? lesson.keyPoints
-      : lesson.objectives?.length
-      ? lesson.objectives
-      : lesson.description
-      ? [lesson.description]
-      : []
-  );
+  if (lesson.keyPoints?.length) return lesson.keyPoints;
+  if (lesson.objectives?.length) return lesson.objectives;
+  // No structured bullets? Pull from the prose body before falling back to
+  // a one-line description.
+  const fromContent = extractContentBullets(lesson.content, 5);
+  if (fromContent.length > 0) return fromContent;
+  if (lesson.description) return [lesson.description];
+  return [];
+}
+
+function tightenBullet(text: string): string {
+  const stripped = stripMarkdown(text).replace(/\s+/g, " ").trim();
+  return shorten(stripped, SLIDE_BULLET_MAX_CHARS);
 }
 
 function shorten(text: string, max: number): string {
@@ -192,7 +270,8 @@ function objectivesSlide(c: Curriculum, style: SlideStyle): string | null {
       cfg.objectivesBulletPrefix === "1."
         ? `${idx + 1}.`
         : cfg.objectivesBulletPrefix;
-    lines.push(`${prefix} ${style === "executive" ? executiveBullet(o) : o}`);
+    const text = style === "executive" ? executiveBullet(o) : o;
+    lines.push(`${prefix} ${tightenBullet(text)}`);
   });
   const overflow = c.objectives.length - cfg.maxBulletsPerSlide;
   if (overflow > 0) {
@@ -220,7 +299,8 @@ function moduleIntroSlide(mod: Module, index: number, style: SlideStyle): string
   if (mod.objectives && mod.objectives.length > 0) {
     lines.push("");
     mod.objectives.slice(0, cfg.maxBulletsPerSlide).forEach((o) => {
-      lines.push(`- ${style === "executive" ? executiveBullet(o) : o}`);
+      const text = style === "executive" ? executiveBullet(o) : o;
+      lines.push(`- ${tightenBullet(text)}`);
     });
   }
   const hostCue =
@@ -248,7 +328,7 @@ function lessonSlide(lesson: Lesson, modIndex: number, lessonIndex: number, styl
   const lines: string[] = [];
   lines.push(cfg.lessonHeading(num, title));
 
-  const allBullets = cfg.bulletsFromLesson(lesson);
+  const allBullets = cfg.bulletsFromLesson(lesson).map(tightenBullet).filter(Boolean);
   const bullets = allBullets.slice(0, cfg.maxBulletsPerSlide);
   if (bullets.length > 0) {
     lines.push("");
@@ -269,11 +349,19 @@ function lessonSlide(lesson: Lesson, modIndex: number, lessonIndex: number, styl
       : style === "executive"
       ? "Name the change this slide unlocks for the audience. Skip the background unless asked."
       : "Ground the idea in a concrete example; ask one question before moving on.";
+
+  // Speaker notes: first ~2 paragraphs of body as the read-aloud lead, then
+  // any blockquote (often a memorable example/quote), then the overflow
+  // bullets, then the host cue. Earlier we shoved the whole body in and
+  // truncated at 900 chars mid-word.
+  const lead = leadParagraphs(lesson.content, 2) || lesson.description || null;
+  const quotes = extractBlockquotes(lesson.content);
+  const quoteLine = quotes[0] ? `Quote to land: "${quotes[0]}"` : null;
   const overflow =
     allBullets.length > cfg.maxBulletsPerSlide
       ? `Additional points: ${allBullets.slice(cfg.maxBulletsPerSlide).join("; ")}`
       : null;
-  const notes = speakerNotes([lesson.content || lesson.description, overflow, hostCue]);
+  const notes = speakerNotes([lead, quoteLine, overflow, hostCue]);
   if (notes) {
     lines.push("");
     lines.push(notes);

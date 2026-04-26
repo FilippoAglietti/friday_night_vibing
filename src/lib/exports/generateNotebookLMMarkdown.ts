@@ -1,4 +1,5 @@
 import type { Curriculum, Lesson, Module } from "@/types/curriculum";
+import { markdownToProse } from "@/lib/export/markdown";
 
 /**
  * Generates a "Deep Dive" briefing document optimised for Google NotebookLM's
@@ -12,8 +13,10 @@ import type { Curriculum, Lesson, Module } from "@/types/curriculum";
  *   • Opens with an episode brief (title, angle, runtime, host notes)
  *   • Reframes every module as an episode arc: hook → core ideas → tensions →
  *     takeaways — written in prose, not bullets.
- *   • Injects conversational prompts the hosts can latch on to ("why this
- *     matters", "what most people get wrong", "a simple example").
+ *   • Cycles host prompts by module index so an 8-module course doesn't get
+ *     "what most people get wrong about X" eight times in a row.
+ *   • Flattens lesson.content markdown to prose before inlining it; raw
+ *     headings/bullets in the briefing pull hosts back into list-reading.
  *   • Keeps resources at the end as a reading list, not inline noise.
  */
 
@@ -31,19 +34,51 @@ function joinSentences(parts: (string | undefined | null)[]): string {
     .join(" ");
 }
 
+/**
+ * Cycle through 4 host-cue archetypes by module position so the briefing
+ * doesn't repeat the same "what most people get wrong" prompt every module.
+ */
+const MODULE_PROMPT_CYCLE = [
+  (topic: string) =>
+    `the foundational misconception people hold about ${topic} before they study it; a one-line metaphor that lands on first hearing; the simplest concrete example a beginner could try today.`,
+  (topic: string) =>
+    `the most common pitfall practitioners hit halfway through ${topic}; a tension worth debating between two reasonable approaches; one moment where a listener should pause and re-read.`,
+  (topic: string) =>
+    `a surprising connection between ${topic} and something outside the topic; a story or named example that made the idea click; what changes for the listener if they internalize this.`,
+  (topic: string) =>
+    `an edge case that breaks the simple version of ${topic}; the question the hosts should leave hanging at the end; a recommendation for what to read or build next.`,
+];
+
 function lessonNarrative(lesson: Lesson, lessonNum: string): string {
   const parts: string[] = [];
   parts.push(`**${lessonNum} — ${stripPrefix(lesson.title)}.**`);
   if (lesson.description) parts.push(lesson.description);
   if (lesson.objectives && lesson.objectives.length > 0) {
-    parts.push(`By the end of this lesson a learner should be able to ${lesson.objectives.join("; ").toLowerCase()}.`);
+    // Drop the "By the end…" boilerplate; treat each objective as a plain
+    // declarative the hosts can paraphrase without sounding like a syllabus.
+    const objectiveLine = lesson.objectives
+      .map((o) => o.trim())
+      .filter(Boolean)
+      .map((o) => (o.endsWith(".") || o.endsWith("?") || o.endsWith("!") ? o : `${o}.`))
+      .join(" ");
+    if (objectiveLine) parts.push(objectiveLine);
   }
   if (lesson.keyPoints && lesson.keyPoints.length > 0) {
-    parts.push(`The ideas worth lingering on are: ${lesson.keyPoints.join(" ")}`);
+    // Each key point must end with sentence punctuation; raw `.join(" ")`
+    // produced run-on sentences that hosts read as one breathless line.
+    const keyPointsLine = lesson.keyPoints
+      .map((k) => k.trim())
+      .filter(Boolean)
+      .map((k) => (k.endsWith(".") || k.endsWith("?") || k.endsWith("!") ? k : `${k}.`))
+      .join(" ");
+    if (keyPointsLine) parts.push(keyPointsLine);
   }
   if (lesson.content) {
-    // Content is often long-form markdown; keep but trim excessive blank lines.
-    parts.push(lesson.content.replace(/\n{3,}/g, "\n\n").trim());
+    // Flatten markdown markers (headings/bullets/emphasis) — keep the prose,
+    // drop the structure. Raw markdown in the briefing is the #1 cause of
+    // stilted "first… second… third…" narration.
+    const prose = markdownToProse(lesson.content);
+    if (prose) parts.push(prose);
   }
   return joinSentences(parts);
 }
@@ -64,8 +99,18 @@ function moduleEpisode(module: Module, modNum: number): string[] {
     lines.push("");
   }
 
-  // Host cues — surfaces the conversation the two narrators should have.
-  lines.push(`**Why this matters.** ${title} is worth an episode because it connects ideas most learners meet in isolation. Link back to earlier modules where it makes sense, and flag the common traps early.`);
+  // Why this matters — pull a real signal from the module rather than a
+  // generic "this connects ideas in isolation" filler. Use the module's
+  // first lesson title as the concrete touchpoint.
+  const firstLessonTitle = module.lessons?.[0]?.title
+    ? stripPrefix(module.lessons[0].title)
+    : null;
+  const moduleDescriptionFirstSentence = module.description?.split(/(?<=[.!?])\s+/)[0]?.trim() ?? null;
+  const whyThisMatters = firstLessonTitle
+    ? `${title} earns its own episode because it opens on "${firstLessonTitle}" and builds from there. ${moduleDescriptionFirstSentence ?? ""}`.trim()
+    : moduleDescriptionFirstSentence
+      ?? `${title} is worth an episode because it threads several lessons into one coherent arc.`;
+  lines.push(`**Why this matters.** ${whyThisMatters}`);
   lines.push("");
 
   // Core ideas — the meat, expressed as a narrative walk-through.
@@ -86,8 +131,10 @@ function moduleEpisode(module: Module, modNum: number): string[] {
     lines.push("");
   }
 
-  // Conversation prompts — hosts love these.
-  lines.push(`**Prompts for the hosts.** What most people get wrong about ${title.toLowerCase()}; a simple example a beginner could try today; a tension worth debating; and one surprising connection to something outside the topic.`);
+  // Conversation prompts — cycled by module index so an 8-module season
+  // gets four distinct prompt shapes rather than the same one repeated.
+  const promptBuilder = MODULE_PROMPT_CYCLE[(modNum - 1) % MODULE_PROMPT_CYCLE.length];
+  lines.push(`**Prompts for the hosts.** Discuss: ${promptBuilder(title.toLowerCase())}`);
   lines.push("");
 
   return lines;
