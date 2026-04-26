@@ -155,6 +155,11 @@ function extractMath(input: string): {
     const html = katex.renderToString(expr, {
       displayMode,
       throwOnError: false,
+      // AI-generated lessons frequently include em-dashes and other
+      // non-LaTeX Unicode inside math. Ignore these instead of warning
+      // (the default 'warn' mode floods Cloud Run logs and provides no
+      // user-facing benefit — KaTeX still renders the expression).
+      strict: "ignore",
       output: "html",
     });
     rendered.push(html);
