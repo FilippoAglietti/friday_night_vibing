@@ -12,6 +12,7 @@
  */
 
 import type { Curriculum, TeachingStyle } from "@/types/curriculum";
+import { markdownToHtml } from "@/lib/export/markdown";
 
 type NotionHtmlCfg = {
   subtitleIcon: string;
@@ -120,7 +121,10 @@ export function generateNotionHtml(
       }
 
       if (lesson.content) {
-        parts.push(`<p>${esc(lesson.content)}</p>`);
+        // markdownToHtml escapes input internally, so the rendered HTML
+        // is safe to splice into the document. Notion's paste handler
+        // converts <h2>/<strong>/<ul>/<blockquote>/<a> into native blocks.
+        parts.push(markdownToHtml(lesson.content));
       }
 
       if (lesson.keyPoints && lesson.keyPoints.length > 0) {

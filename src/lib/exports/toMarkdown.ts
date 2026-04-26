@@ -1,11 +1,18 @@
 /**
  * lib/exports/toMarkdown.ts
  * ---------------------------------------------------------
- * Converts a Curriculum object into a clean Markdown string.
+ * Converts a Curriculum object into a complete Markdown document.
  *
- * Used by the "Copy as Markdown" button in CurriculumOutput.
- * The resulting Markdown is suitable for pasting into Notion,
- * Google Docs, or any editor that supports Markdown formatting.
+ * Used by the "Copy as Markdown" button. Because the curriculum's
+ * lesson.content is already markdown, the export passes it through
+ * verbatim — no escaping, no stripping. Suitable for paste into
+ * Notion, Obsidian, GitHub, or any markdown editor.
+ *
+ * Phase 2 audit fix (2026-04-26): the previous implementation
+ * skipped lesson.content entirely (the audit's "real bug" finding)
+ * along with description, keyPoints, suggestedResources, format,
+ * and the curriculum-level metadata (targetAudience, prerequisites,
+ * difficulty, tags). All of those are now included.
  *
  * @example
  *   import { curriculumToMarkdown } from '@/lib/exports/toMarkdown'
@@ -16,101 +23,161 @@
 
 import type { Curriculum } from "@/types/curriculum";
 
-/**
- * Converts a Curriculum object to a complete Markdown document.
- *
- * Sections included:
- *   - Title, subtitle, description
- *   - Learning outcomes (objectives)
- *   - Modules with lessons (title, objectives, duration)
- *   - Quiz questions with answers and explanations
- *   - Pacing schedule with weekly breakdown
- *   - Bonus resources with type badges
- *
- * @param c - The Curriculum object to convert
- * @returns A formatted Markdown string
- */
 export function curriculumToMarkdown(c: Curriculum): string {
   const lines: string[] = [];
 
   // ── Header ──────────────────────────────────────────────
   lines.push(`# ${c.title}`);
-  lines.push(`**${c.subtitle}**\n`);
-  lines.push(`${c.description}\n`);
+  if (c.subtitle) lines.push(`**${c.subtitle}**`);
+  lines.push("");
+
+  // Difficulty + tags as a single metadata line
+  const meta: string[] = [];
+  if (c.difficulty) meta.push(`*${c.difficulty}*`);
+  if (c.tags && c.tags.length > 0) meta.push(c.tags.map((t) => `\`${t}\``).join(" "));
+  if (meta.length > 0) {
+    lines.push(meta.join(" · "));
+    lines.push("");
+  }
+
+  if (c.description) {
+    lines.push(c.description);
+    lines.push("");
+  }
+
+  if (c.targetAudience) {
+    lines.push(`## Who this is for`);
+    lines.push(c.targetAudience);
+    lines.push("");
+  }
 
   // ── Learning Outcomes ───────────────────────────────────
-  lines.push(`## Learning Outcomes`);
-  c.objectives.forEach((o) => lines.push(`- ${o}`));
-  lines.push("");
+  if (c.objectives && c.objectives.length > 0) {
+    lines.push(`## Learning Outcomes`);
+    c.objectives.forEach((o) => lines.push(`- ${o}`));
+    lines.push("");
+  }
+
+  if (c.prerequisites && c.prerequisites.length > 0) {
+    lines.push(`## Prerequisites`);
+    c.prerequisites.forEach((p) => lines.push(`- ${p}`));
+    lines.push("");
+  }
 
   // ── Modules ─────────────────────────────────────────────
   c.modules.forEach((mod) => {
-    // Module heading with order number
     lines.push(`## Module ${mod.order + 1}: ${mod.title}`);
-    lines.push(`${mod.description}\n`);
+    if (mod.description) {
+      lines.push(mod.description);
+    }
+    lines.push("");
 
-    // Lessons within the module
+    if (mod.objectives && mod.objectives.length > 0) {
+      lines.push(`**Module objectives:**`);
+      mod.objectives.forEach((o) => lines.push(`- ${o}`));
+      lines.push("");
+    }
+
     mod.lessons.forEach((l) => {
       lines.push(`### Lesson ${l.order + 1}: ${l.title}`);
-      if (l.objectives && l.objectives.length > 0) {
-        lines.push(`**Objectives:** ${l.objectives.join(", ")}`);
-      }
-      lines.push(`**Duration:** ${l.durationMinutes} mins`);
+
+      const lessonMeta: string[] = [];
+      lessonMeta.push(`${l.durationMinutes} min`);
+      if (l.format) lessonMeta.push(l.format);
+      lines.push(`*${lessonMeta.join(" · ")}*`);
       lines.push("");
+
+      if (l.description) {
+        lines.push(l.description);
+        lines.push("");
+      }
+
+      if (l.objectives && l.objectives.length > 0) {
+        lines.push(`**Objectives:**`);
+        l.objectives.forEach((o) => lines.push(`- ${o}`));
+        lines.push("");
+      }
+
+      // The actual lesson body — already markdown, pass through
+      if (l.content) {
+        lines.push(l.content);
+        lines.push("");
+      }
+
+      if (l.keyPoints && l.keyPoints.length > 0) {
+        lines.push(`**Key points:**`);
+        l.keyPoints.forEach((k) => lines.push(`- ${k}`));
+        lines.push("");
+      }
+
+      const visibleResources = (l.suggestedResources ?? []).filter(
+        (r) => r.status !== "unreachable",
+      );
+      if (visibleResources.length > 0) {
+        lines.push(`**Resources:**`);
+        visibleResources.forEach((r) => {
+          const tail = r.type ? ` *(${r.type})*` : "";
+          lines.push(`- [${r.title}](${r.url})${tail}`);
+        });
+        lines.push("");
+      }
     });
 
     // Quiz section (if any questions exist)
     if (mod.quiz && mod.quiz.length > 0) {
       lines.push(`### Quiz`);
+      lines.push("");
       mod.quiz.forEach((q, i) => {
         lines.push(`**Q${i + 1}: ${q.question}**`);
-        // List all answer options
         if (q.options) {
           q.options.forEach((opt) => lines.push(`- ${opt}`));
         }
-        // Resolve correct answer — could be an index (number) or string
         const answerText =
           typeof q.correctAnswer === "number" && q.options
             ? q.options[q.correctAnswer]
             : q.correctAnswer;
         lines.push(`✅ **Answer:** ${answerText}`);
         if (q.explanation) {
-          lines.push(`💡 ${q.explanation}\n`);
+          lines.push(`💡 ${q.explanation}`);
         }
+        lines.push("");
       });
     }
   });
 
   // ── Pacing Schedule ─────────────────────────────────────
-  lines.push(`## Pacing Schedule`);
   if (c.pacing) {
-    lines.push(`**Total Duration:** ${c.pacing.totalHours} hours\n`);
-    if (c.pacing.weeklyPlan) {
+    lines.push(`## Pacing Schedule`);
+    lines.push(
+      `**${c.pacing.totalHours}h** total · **${c.pacing.hoursPerWeek}h/week** · **${c.pacing.totalWeeks} weeks** · *${c.pacing.style}*`,
+    );
+    lines.push("");
+
+    if (c.pacing.weeklyPlan && c.pacing.weeklyPlan.length > 0) {
       c.pacing.weeklyPlan.forEach((w) => {
-        const moduleLabel =
+        const fromLabel = w.label;
+        const fromModules =
           w.moduleIds?.length
-            ? w.moduleIds.map(id => { const mod = c.modules.find(m => m.id === id); return mod ? mod.title.replace(/^Module\s*\d+\s*[:\.]\s*/i, "") : id; }).join(", ")
-            : w.label || "TBD";
-        lines.push(
-          `- **Week ${w.week}:** ${moduleLabel} — ${c.pacing.hoursPerWeek}h/week`
-        );
+            ? w.moduleIds
+                .map((id) => c.modules.find((m) => m.id === id)?.title ?? id)
+                .join(" · ")
+            : null;
+        const display = fromLabel ?? fromModules ?? "TBD";
+        lines.push(`- **Week ${w.week}:** ${display}`);
       });
+      lines.push("");
     }
   }
-  lines.push("");
 
   // ── Bonus Resources ─────────────────────────────────────
   if (c.bonusResources && c.bonusResources.length > 0) {
     lines.push(`## Bonus Resources`);
-    c.bonusResources.forEach((r) =>
-      lines.push(`- **${r.title}** *(${r.type})*: ${r.description}`)
-    );
+    c.bonusResources.forEach((r) => {
+      const desc = r.description ? `: ${r.description}` : "";
+      lines.push(`- **[${r.title}](${r.url})** *(${r.type})*${desc}`);
+    });
+    lines.push("");
   }
 
-  // ── Footer ──────────────────────────────────────────────
-  lines.push("");
-  lines.push("---");
-  lines.push("*Generated by [Syllabi](https://syllabi.online)*");
-
-  return lines.join("\n");
+  return lines.join("\n").trimEnd() + "\n";
 }
