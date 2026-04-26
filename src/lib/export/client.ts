@@ -25,7 +25,12 @@ export async function downloadPdfV2(courseId: string): Promise<void> {
 }
 
 async function pollUntilReady(courseId: string): Promise<void> {
-  const deadline = Date.now() + 120_000; // 2 min cap
+  // Cloud Run cold start (chromium boot ~10-20s) + render of a 30+ page
+  // document + Supabase upload can comfortably exceed 2 minutes on the
+  // first call after the worker has scaled to zero. 5 minutes matches the
+  // route's maxDuration cap and the user's tolerance for "I clicked
+  // export, where is my file" — beyond that, give up and fall back.
+  const deadline = Date.now() + 300_000;
   while (Date.now() < deadline) {
     await new Promise((r) => setTimeout(r, 3000));
     const res = await fetch(`/api/export/pdf/status/${courseId}`);
@@ -35,7 +40,7 @@ async function pollUntilReady(courseId: string): Promise<void> {
       return;
     }
   }
-  throw new Error("export did not complete within 2 minutes");
+  throw new Error("export did not complete within 5 minutes");
 }
 
 let warnedFlagOff = false;
