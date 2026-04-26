@@ -22,6 +22,8 @@ export interface ExportGridProps {
   onLockedClick: (format: ExportFormat) => void;
   onDeepLink?: () => void;
   compact?: boolean;
+  /** Format currently being generated — its tile shows a spinner and is non-clickable. */
+  loadingFormat?: ExportFormat | null;
 }
 
 interface TileConfig {
@@ -52,7 +54,7 @@ function isUnlocked(minTier: "free" | "planner" | "masterclass", tier: Tier): bo
   return tier === "masterclass" || tier === "enterprise";
 }
 
-export function ExportGrid({ tier, onExport, onLockedClick, onDeepLink }: ExportGridProps) {
+export function ExportGrid({ tier, onExport, onLockedClick, onDeepLink, loadingFormat }: ExportGridProps) {
   const [recentFormat, setRecentFormat] = useState<ExportFormat | null>(null);
   const isMasterclass = tier === "masterclass" || tier === "enterprise";
   const isPlanner = tier === "planner";
@@ -80,6 +82,7 @@ export function ExportGrid({ tier, onExport, onLockedClick, onDeepLink }: Export
               locked={!unlocked}
               masterclassOnly={t.masterclassOnly}
               justClicked={recentFormat === t.format}
+              loading={loadingFormat === t.format}
               onClick={() => {
                 if (unlocked) {
                   onExport(t.format);

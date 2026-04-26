@@ -533,7 +533,10 @@ export default function CourseContent({
 
   const [loadingExports, setLoadingExports] = useState<Record<string, boolean>>({});
   const [historyVersion, setHistoryVersion] = useState(0);
-  void loadingExports;
+
+  const currentLoadingFormat = (Object.entries(loadingExports).find(
+    ([, v]) => v,
+  )?.[0] ?? null) as ExportFormat | null;
 
   const recordExport = (format: ExportFormatId) => {
     appendExportEvent(courseId, format);
@@ -555,11 +558,17 @@ export default function CourseContent({
   };
 
   const handleDownloadPDF = async () => {
+    setLoadingExports((p) => ({ ...p, pdf: true }));
+    // v2 renders server-side via Playwright; cold starts on Vercel can take
+    // 30-90s, so the user gets an immediate heads-up instead of clicking
+    // into apparent silence.
     if (isExportV2ClientEnabled()) {
+      toast("Generating PDF — this can take up to 90 seconds", "info");
       try {
         await downloadPdfV2(courseId);
         recordExport("pdf");
         toast("PDF ready — check your downloads", "success");
+        setLoadingExports((p) => ({ ...p, pdf: false }));
         return;
       } catch (err) {
         console.error("[export v2] failed, using legacy:", err);
@@ -573,12 +582,14 @@ export default function CourseContent({
     } catch (err) {
       console.error("PDF generation failed:", err);
       toast("Couldn't generate PDF. Please try again.", "error");
+    } finally {
+      setLoadingExports((p) => ({ ...p, pdf: false }));
     }
   };
 
   const handleExportDocx = async () => {
     try {
-      setLoadingExports((p) => ({ ...p, docx: true }));
+      setLoadingExports((p) => ({ ...p, word: true }));
       const blob = await generateCurriculumDocx(c, { teachingStyle });
       downloadBlob(blob, `${sanitizeFilename(c.title)}.docx`);
       recordExport("word");
@@ -587,7 +598,7 @@ export default function CourseContent({
       console.error("Word export failed:", err);
       toast("Couldn't generate Word document.", "error");
     } finally {
-      setLoadingExports((p) => ({ ...p, docx: false }));
+      setLoadingExports((p) => ({ ...p, word: false }));
     }
   };
 
@@ -820,6 +831,7 @@ export default function CourseContent({
 
             <ExportGrid
               tier={plan.tier}
+              loadingFormat={currentLoadingFormat}
               onExport={(format: ExportFormat) => {
                 switch (format) {
                   case "pdf":       return handleDownloadPDF();
