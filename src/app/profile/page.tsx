@@ -68,6 +68,7 @@ import { PlanBadge } from "@/components/dashboard/PlanBadge";
 import { BenefitsStrip } from "@/components/dashboard/BenefitsStrip";
 import { ExportGrid, type ExportFormat } from "@/components/dashboard/ExportGrid";
 import { generateScormPackage } from "@/lib/exports/generateScorm";
+import type { Json } from "@/types/database.types";
 import { generateNotebookLMMarkdown, notebookLMFilename } from "@/lib/exports/generateNotebookLMMarkdown";
 import { generateNotebookLMSlidesMarkdown, notebookLMSlidesFilename, type SlideStyle } from "@/lib/exports/generateNotebookLMSlidesMarkdown";
 import SlideStyleModal from "@/components/exports/SlideStyleModal";
@@ -576,7 +577,7 @@ export default function ProfilePage() {
     setActiveTab("generate");
   }, []);
 
-  const handleDuplicateCourse = useCallback((gen: Generation) => {
+  const handleRemixCourse = useCallback((gen: Generation) => {
     const c = gen.curriculum;
     const config: Partial<CurriculumFormData> = {
       topic: c?.title || gen.topic || "",
@@ -589,6 +590,62 @@ export default function ProfilePage() {
     setDuplicateConfig(config);
     setTemplateConfig(null);
     setActiveTab("generate");
+  }, []);
+
+  const handleDuplicateCourse = useCallback(async (gen: Generation) => {
+    if (!gen.curriculum) return;
+    try {
+      const { data: { user } } = await supabaseBrowser.auth.getUser();
+      if (!user) return;
+      const { data: o, error: fetchErr } = await supabaseBrowser
+        .from("courses")
+        .select("*")
+        .eq("id", gen.id)
+        .single();
+      if (fetchErr || !o) {
+        console.error("Failed to load course for duplication:", fetchErr);
+        return;
+      }
+      const originalTitle = o.title || o.topic || "Course";
+      const copyTitle = `${originalTitle} (copy)`;
+      const curriculumCopy =
+        gen.curriculum && typeof gen.curriculum === "object"
+          ? { ...gen.curriculum, title: `${gen.curriculum.title || originalTitle} (copy)` }
+          : gen.curriculum;
+      const { data: inserted, error: insertErr } = await supabaseBrowser
+        .from("courses")
+        .insert({
+          user_id: user.id,
+          title: copyTitle,
+          topic: o.topic,
+          audience: o.audience,
+          length: o.length,
+          niche: o.niche,
+          language: o.language,
+          level: o.level,
+          content_type: o.content_type,
+          curriculum: curriculumCopy as unknown as Json,
+          description: o.description,
+          status: "ready",
+          error_message: null,
+          teaching_style: o.teaching_style,
+          output_structure: o.output_structure,
+          include_quizzes: o.include_quizzes,
+          learner_profile: o.learner_profile,
+          course_abstract: o.course_abstract,
+          has_attachments: o.has_attachments,
+          is_public: false,
+        })
+        .select("id, topic, audience, length, niche, curriculum, status, created_at, teaching_style, generation_progress, generation_total_modules, generation_completed_modules")
+        .single();
+      if (insertErr || !inserted) {
+        console.error("Failed to duplicate course:", insertErr);
+        return;
+      }
+      setGenerations((prev) => [inserted as unknown as Generation, ...prev]);
+    } catch (err) {
+      console.error("Duplicate failed:", err);
+    }
   }, []);
 
   const handleRetryFailed = useCallback((gen: Generation) => {
@@ -1101,10 +1158,18 @@ export default function ProfilePage() {
                 <Button
                   variant="ghost" size="sm"
                   className="h-7 w-7 p-0 hover:bg-pink-500/10 hover:text-pink-400"
-                  onClick={(e) => { e.stopPropagation(); handleDuplicateCourse(gen); setActiveTab("generate"); }}
-                  title="Duplicate & Remix"
+                  onClick={(e) => { e.stopPropagation(); handleDuplicateCourse(gen); }}
+                  title="Duplicate"
                 >
                   <Copy className="size-3.5" />
+                </Button>
+                <Button
+                  variant="ghost" size="sm"
+                  className="h-7 w-7 p-0 hover:bg-fuchsia-500/10 hover:text-fuchsia-400"
+                  onClick={(e) => { e.stopPropagation(); handleRemixCourse(gen); setActiveTab("generate"); }}
+                  title="Remix"
+                >
+                  <Sparkles className="size-3.5" />
                 </Button>
               </div>
               <button
