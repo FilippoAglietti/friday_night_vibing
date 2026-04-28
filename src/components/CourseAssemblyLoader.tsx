@@ -848,16 +848,25 @@ export default function CourseAssemblyLoader({
                 aria-atomic="true"
                 className="mt-2 min-h-[60px] sm:min-h-[72px]"
               >
-                <p className="text-base sm:text-lg leading-snug text-foreground/90">
-                  {typedLine}
-                  <span
-                    className={`ml-0.5 inline-block w-[2px] align-baseline -translate-y-[1px] ${
-                      cursorOn ? "bg-violet-500" : "bg-transparent"
-                    }`}
-                    style={{ height: "1em" }}
-                    aria-hidden
-                  />
-                </p>
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.p
+                    key={copyIdx}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="text-base sm:text-lg leading-snug text-foreground/90"
+                  >
+                    {typedLine}
+                    <span
+                      className={`ml-0.5 inline-block w-[2px] align-baseline -translate-y-[1px] ${
+                        cursorOn ? "bg-violet-500" : "bg-transparent"
+                      }`}
+                      style={{ height: "1em" }}
+                      aria-hidden
+                    />
+                  </motion.p>
+                </AnimatePresence>
               </div>
             </div>
           </div>
